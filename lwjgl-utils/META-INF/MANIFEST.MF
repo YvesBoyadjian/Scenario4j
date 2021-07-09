@@ -1,0 +1,13 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Lwjgl-utils
+Bundle-SymbolicName: lwjgl-utils
+Bundle-Version: 1.0.0.qualifier
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Automatic-Module-Name: lwjgl-utils
+Export-Package: org.lwjgl,
+ org.lwjgl.util,
+ org.lwjgl.util.generator,
+ org.lwjgl.util.generator.openal,
+ org.lwjgl.util.generator.opengl,
+ org.lwjgl.util.vector

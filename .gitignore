@@ -1,0 +1,10 @@
+# Project exclude paths
+/application/bin/
+/jscenegraph/bin/
+/jsceneviewer-glfw/bin/
+/lwjgl-utils/bin/
+/out/
+/vk-bootstrap/target/
+# Project exclude paths
+/loader/bin/
+/org.lwjglx/bin/
