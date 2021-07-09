@@ -17,7 +17,7 @@
       <module fileurl="file://$PROJECT_DIR$/jsceneviewer-glfw/jsceneviewer-glfw.iml" filepath="$PROJECT_DIR$/jsceneviewer-glfw/jsceneviewer-glfw.iml" />
       <module fileurl="file://$PROJECT_DIR$/loader/loader.iml" filepath="$PROJECT_DIR$/loader/loader.iml" />
       <module fileurl="file://$PROJECT_DIR$/lwjgl-jawt/lwjgl-jawt.iml" filepath="$PROJECT_DIR$/lwjgl-jawt/lwjgl-jawt.iml" />
-      <module fileurl="file://$PROJECT_DIR$/../lwjgl-opengl/lwjgl-opengl.iml" filepath="$PROJECT_DIR$/../lwjgl-opengl/lwjgl-opengl.iml" />
+      <module fileurl="file://$PROJECT_DIR$/lwjgl-opengl/lwjgl-opengl.iml" filepath="$PROJECT_DIR$/lwjgl-opengl/lwjgl-opengl.iml" />
       <module fileurl="file://$PROJECT_DIR$/lwjgl-utils/lwjgl-utils.iml" filepath="$PROJECT_DIR$/lwjgl-utils/lwjgl-utils.iml" />
       <module fileurl="file://$PROJECT_DIR$/lwjgl3-awt/lwjgl3-awt.iml" filepath="$PROJECT_DIR$/lwjgl3-awt/lwjgl3-awt.iml" />
       <module fileurl="file://$PROJECT_DIR$/lwjgl3-swt/lwjgl3-swt.iml" filepath="$PROJECT_DIR$/lwjgl3-swt/lwjgl3-swt.iml" />
