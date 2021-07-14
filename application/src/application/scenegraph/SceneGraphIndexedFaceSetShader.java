@@ -1456,45 +1456,58 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 		
 		current_z = newZ;
 
-		if( null != forest && null != space) {
-			SbVec3f trans = transl.translation.getValue();
-			dummy.setValue(current_x - trans.getX(), current_y - trans.getY(), current_z - trans.getZ());
-
-			SbSphere sphere = new SbSphere(dummy,99);
-			SbListInt points = new SbListInt();
-			treesBSPTree.findPoints(sphere,points);
-			float trunk_width_coef = DouglasFir.trunk_diameter_angle_degree*(float)Math.PI/180.0f;
-			nearGeoms.clear();
-			for(int i=0; i< points.getLength();i++) {
-				int bsp_index = points.operator_square_bracket(i);
-				if (bsp_index != -1) {
-					int tree_index = (int) treesBSPTree.getUserData(bsp_index);
-					if (!geoms.containsKey(tree_index)) {
-						float xd = forest.xArray[tree_index];
-						float yd = forest.yArray[tree_index];
-						float zd = forest.zArray[tree_index];
-						float height = forest.heightArray[tree_index];
-						float width = height * trunk_width_coef;
-
-						DGeom box = OdeHelper.createCapsule(space, width, height);
-						box.setPosition(xd + trans.getX(), yd + trans.getY(), zd + trans.getZ()+height/2);
-						geoms.put(tree_index,box);
-					}
-					nearGeoms.add(tree_index);
-				}
-			}
-			Set<Map.Entry<Integer,DGeom>> entrySet = new HashSet<>();
-			entrySet.addAll(geoms.entrySet()); // To avoid ConcurrentModificationException
-			for( Map.Entry entry : entrySet) {
-				if(!nearGeoms.contains(entry.getKey())) {
-					space.remove((DGeom)entry.getValue());
-					geoms.remove(entry.getKey());
-				}
-			}
-		}
+		updateNearGeoms();
 
 		//setBBoxCenter();
 		return current_z;
+	}
+
+	public void updateNearGeoms() {
+
+		if( null == forest) {
+			return;
+		}
+		if( null == space) {
+			return;
+		}
+
+		SbVec3f trans = transl.translation.getValue();
+		dummy.setValue(current_x - trans.getX(), current_y - trans.getY(), current_z - trans.getZ());
+
+		SbSphere sphere = new SbSphere(dummy,99);
+		SbListInt points = new SbListInt();
+		treesBSPTree.findPoints(sphere,points);
+		float trunk_width_coef = DouglasFir.trunk_diameter_angle_degree*(float)Math.PI/180.0f;
+		nearGeoms.clear();
+		for(int i=0; i< points.getLength();i++) {
+			int bsp_index = points.operator_square_bracket(i);
+			if (bsp_index == -1) {
+				continue;
+			}
+			int tree_index = (int) treesBSPTree.getUserData(bsp_index);
+			if (!geoms.containsKey(tree_index)) {
+				float xd = forest.xArray[tree_index];
+				float yd = forest.yArray[tree_index];
+				float zd = forest.zArray[tree_index];
+				float height = forest.heightArray[tree_index];
+				float width = height * trunk_width_coef;
+
+				DGeom box = OdeHelper.createCapsule(space, width, height);
+				box.setPosition(xd + trans.getX(), yd + trans.getY(), zd + trans.getZ()+height/2);
+				geoms.put(tree_index,box);
+			}
+			nearGeoms.add(tree_index);
+		}
+		Set<Map.Entry<Integer,DGeom>> entrySet = new HashSet<>();
+		entrySet.addAll(geoms.entrySet()); // To avoid ConcurrentModificationException
+		for( Map.Entry entry : entrySet) {
+			if(!nearGeoms.contains(entry.getKey())) {
+				DGeom g = (DGeom)entry.getValue();
+				g.destroy();
+				//space.remove(g);
+				geoms.remove(entry.getKey());
+			}
+		}
 	}
 
 	public float getGroundZ() {
