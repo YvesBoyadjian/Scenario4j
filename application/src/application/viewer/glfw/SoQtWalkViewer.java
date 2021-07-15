@@ -233,15 +233,16 @@ public class SoQtWalkViewer extends SoQtConstrainedViewer {
 	  
 	}
 
+	final DoubleBuffer bufx = BufferUtils.createDoubleBuffer(1);
+	final DoubleBuffer bufy = BufferUtils.createDoubleBuffer(1);
+
 	 private SbVec2f getCursorPosition()
 	 {
 	   /* Ziskani absolutni pozice kurzoru. */
 	   //QPoint position = QCursor.pos();
-		 DoubleBuffer bufx = BufferUtils.createDoubleBuffer(1);
-		 DoubleBuffer bufy = BufferUtils.createDoubleBuffer(1);
 		 glfwGetCursorPos(getGLWidget().getWindow(),bufx,bufy);
 	   //Point position = Display.getCurrent().getCursorLocation();		  
-	   return new SbVec2f((float)bufx.get(), (float)bufy.get());
+	   return new SbVec2f((float)bufx.get(0), (float)bufy.get(0));
 	 }
 	 	
 	protected boolean processSoKeyboardEvent( SoKeyboardEvent event)
