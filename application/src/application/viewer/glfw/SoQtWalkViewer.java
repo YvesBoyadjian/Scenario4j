@@ -9,10 +9,7 @@ import java.awt.Robot;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Consumer;
 
 import javax.imageio.ImageIO;
@@ -96,6 +93,10 @@ public class SoQtWalkViewer extends SoQtConstrainedViewer {
 	double now;
 	
 	private Set<SoKeyboardEvent.Key> keysDown = new HashSet<>();
+
+	private Map<SoKeyboardEvent.Key,Runnable> keyDownListeners = new HashMap<>();
+
+	private Map<SoKeyboardEvent.Key,Runnable> keyUpListeners = new HashMap<>();
 	
 	private List<Consumer<SoQtWalkViewer>> idleListeners = new ArrayList<>();
 	
@@ -288,7 +289,7 @@ public class SoQtWalkViewer extends SoQtConstrainedViewer {
 			      ImageIO.write(image, format, file);
 			  } catch (IOException e) { e.printStackTrace(); }
 		    return true;
-		  }
+		  } // end PRINT
 		  if (SoKeyboardEvent.SO_KEY_RELEASE_EVENT(event, SoKeyboardEvent.Key.ESCAPE))
 		  {
 		  	if( escapeCallback != null ) {
@@ -299,7 +300,7 @@ public class SoQtWalkViewer extends SoQtConstrainedViewer {
 				glfwSetWindowShouldClose(getGLWidget().getWindow(), true);
 			}
 		    return true;
-		  }
+		  } // End ESCAPE
 		  else if (SoKeyboardEvent.SO_KEY_PRESS_EVENT(event, SoKeyboardEvent.Key.W) ||
 				  SoKeyboardEvent.SO_KEY_PRESS_EVENT(event, SoKeyboardEvent.Key.UP_ARROW))
 		  {
@@ -369,12 +370,22 @@ public class SoQtWalkViewer extends SoQtConstrainedViewer {
 				toggleFly();
 			}
 			  return true;
-		  }
+		  } // end F
 		  else if(
 				  SoKeyboardEvent.SO_KEY_RELEASE_EVENT(event, SoKeyboardEvent.Key.T) ) {
 			  toggleTimeStop();
 			  return true;
-		  }
+		  } // end T
+		for( var dl : keyDownListeners.keySet()) {
+			if(SoKeyboardEvent.SO_KEY_PRESS_EVENT(event,dl)) {
+				keyDownListeners.get(dl).run();
+			}
+		}
+		for( var ul : keyUpListeners.keySet()) {
+			if(SoKeyboardEvent.SO_KEY_RELEASE_EVENT(event,ul)) {
+				keyUpListeners.get(ul).run();
+			}
+		}
 		return false;
 	}
 	
@@ -721,5 +732,13 @@ protected void onAim(SoMouseButtonEvent event, boolean aim) {
 	
 	public double dt() {
 		return dt;
+	}
+
+	public void addKeyDownListener(SoKeyboardEvent.Key key,Runnable runnable) {
+		keyDownListeners.put(key,runnable);
+	}
+
+	public void addKeyUpListener(SoKeyboardEvent.Key key,Runnable runnable) {
+		keyUpListeners.put(key,runnable);
 	}
 }

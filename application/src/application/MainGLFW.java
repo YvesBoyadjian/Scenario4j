@@ -73,6 +73,7 @@ import application.scenegraph.Soleil;
 import application.viewer.glfw.SoQtWalkViewer;
 import jscenegraph.database.inventor.*;
 import jscenegraph.database.inventor.actions.SoGLRenderAction.TransparencyType;
+import jscenegraph.database.inventor.events.SoKeyboardEvent;
 import jscenegraph.database.inventor.events.SoMouseButtonEvent;
 import jscenegraph.database.inventor.actions.SoAction;
 import jscenegraph.database.inventor.actions.SoRayPickAction;
@@ -1113,6 +1114,18 @@ public class MainGLFW {
 					sg.setFPS(viewer1.getFPS());
 				}
 		);
+
+		viewer.addKeyDownListener(SoKeyboardEvent.Key.P,()->{
+			SbVec3f translation = new SbVec3f();
+			translation.setValue(sg.getPosition());
+			SbVec3f axis = new SbVec3f();
+			axis.setValue(0,0,1);
+			SbRotation rotation = viewer.getCameraController().getCamera().orientation.getValue();
+			SbRotation rot2 = new SbRotation();
+			rot2.setValue(new SbVec3f(1,0,0), (float)-Math.PI/2);
+			sg.addPlank(translation,rot2.operator_mul(rotation));
+			System.out.println("plank");
+		});
 
 		window.setVisible(false);
 

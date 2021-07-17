@@ -236,6 +236,8 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 
 	private final Set<String> shotTargets = new HashSet<>();
 
+	final SoSeparator planksSeparator = new SoSeparator();
+
 	public SceneGraphIndexedFaceSetShader(Raster rw, Raster re, int overlap, float zTranslation, int max_i) {
 		super();
 		this.rw = rw;
@@ -865,6 +867,8 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 		};
 		addTarget(barredOwlBack_);
 
+		final SoGroup targetsGroup = new SoGroup();
+
 		for( Target target : targets) {
 
 			SoTargets targetsSeparator = new SoTargets(target) {
@@ -898,22 +902,22 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 
 			targetsSeparator.addChild(targetTexture);
 		
-		final float[] vector = new float[3];
+			final float[] vector = new float[3];
 		
-		final SbVec3f targetPosition = new SbVec3f();
+			final SbVec3f targetPosition = new SbVec3f();
 
 			for (int instance = 0; instance < target.getNbTargets(); instance++) {
 				SoTarget targetSeparator = new SoTarget();
 				//sealSeparator.renderCaching.setValue(SoSeparator.CacheEnabled.OFF);
 
-				SoTranslation sealTranslation = new SoTranslation();
+				SoTranslation targetTranslation = new SoTranslation();
 
 				targetPosition.setValue(target.getTarget(instance, vector));
 				targetPosition.setZ(targetPosition.getZ() + 0.3f);
 
-				sealTranslation.translation.setValue(targetPosition);
+				targetTranslation.translation.setValue(targetPosition);
 
-				targetSeparator.addChild(sealTranslation);
+				targetSeparator.addChild(targetTranslation);
 
 				SoVRMLBillboard billboard = new SoVRMLBillboard();
 				//billboard.axisOfRotation.setValue(0, 1, 0);
@@ -931,9 +935,10 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 				targetsSeparator.addChild(targetSeparator);
 			}
 
-			shadowGroup.addChild(targetsSeparator);
+			targetsGroup.addChild(targetsSeparator);
 
 		}
+		shadowGroup.addChild(targetsGroup);
 
 		addWater(shadowGroup,185 + zTranslation, 0.0f, true,false);
 		addWater(shadowGroup,175 + zTranslation, 0.2f, true,false);
@@ -947,7 +952,11 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 		oracleSwitch.addChild(oracleSeparator);
 		shadowGroup.addChild(oracleSwitch);
 
+		shadowGroup.addChild(planksSeparator);
+
 		sep.addChild(shadowGroup);
+
+		// _______________________________________________ shadows
 		
 		SoSeparator castingShadowScene = new SoSeparator();
 		castingShadowScene.renderCaching.setValue(SoSeparator.CacheEnabled.OFF);
@@ -1012,6 +1021,11 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 		oracleSwitchShadow.addChild(buildOracle(true));
 
 		castingShadowScene.addChild(oracleSwitchShadow);
+
+		castingShadowScene.addChild(planksSeparator);
+
+		// slowdown too much the rendering
+		//castingShadowScene.addChild(targetsGroup);
 		
 		sun[0].shadowMapScene.setValue(castingShadowScene);
 		sun[1].shadowMapScene.setValue(castingShadowScene);
@@ -1976,5 +1990,32 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 		if( AIM ) {
 			aimSwitch.whichChild.setValue(aim ? SoSwitch.SO_SWITCH_ALL : SoSwitch.SO_SWITCH_NONE);
 		}
+	}
+
+	public void addPlank(SbVec3f translation, SbRotation rotation) {
+		final SoSeparator plankSeparator = new SoSeparator();
+		final SoCube plank = new SoCube();
+		plank.width.setValue(2.0f); // X
+		plank.height.setValue(10.0f); // Y
+		plank.depth.setValue(0.05f); // Z
+		final SoTranslation plankLayerTranslation = new SoTranslation();
+		plankLayerTranslation.translation.setValue(translation);
+		plankSeparator.addChild(plankLayerTranslation);
+		final SoRotation plankRotation = new SoRotation();
+		plankRotation.rotation.setValue(rotation);
+		plankSeparator.addChild(plankRotation);
+		final SoTranslation plankFrontTranslation = new SoTranslation();
+		plankFrontTranslation.translation.setValue(0.0f,plank.height.getValue()/2.0f + 2.0f,-0.05f);
+		plankSeparator.addChild(plankFrontTranslation);
+		plankSeparator.addChild(plank);
+		planksSeparator.addChild(plankSeparator);
+	}
+
+	public SbVec3f getPosition() {
+		return new SbVec3f(current_x,current_y,current_z);
+	}
+
+	public SbVec3f getTranslation() {
+		return transl.translation.getValue();
 	}
 }
