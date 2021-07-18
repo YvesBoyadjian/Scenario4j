@@ -952,6 +952,17 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 		oracleSwitch.addChild(oracleSeparator);
 		shadowGroup.addChild(oracleSwitch);
 
+
+		SoMaterial plankMat = new SoMaterial();
+		plankMat.diffuseColor.setValue(0.7f,0.5f,0.1f);
+		plankMat.ambientColor.setValue(0, 0, 0); // no ambient
+		plankMat.specularColor.setValue(0.3f,0.3f,0.3f);
+		plankMat.shininess.setValue(0.25f);
+
+		planksSeparator.addChild(plankMat);
+
+		//planksSeparator.addChild(ot.getTexture());
+
 		shadowGroup.addChild(planksSeparator);
 
 		sep.addChild(shadowGroup);
