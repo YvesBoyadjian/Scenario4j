@@ -1115,6 +1115,8 @@ public class MainGLFW {
 				}
 		);
 
+		final int[] id = new int[1];
+
 		viewer.addKeyDownListener(SoKeyboardEvent.Key.P,()->{
 			SbVec3f translation = new SbVec3f();
 			translation.setValue(sg.getPosition());
@@ -1124,7 +1126,26 @@ public class MainGLFW {
 			SbRotation rot2 = new SbRotation();
 			rot2.setValue(new SbVec3f(1,0,0), (float)-Math.PI/2);
 			sg.addPlank(translation,rot2.operator_mul(rotation));
+			id[0] = 1;
 			System.out.println("plank");
+		});
+
+		viewer.addIdleListener((viewer1)-> {
+			if( id[0] == 0) {
+				return;
+			}
+			SbVec3f translation = new SbVec3f();
+			translation.setValue(sg.getPosition());
+			SbVec3f axis = new SbVec3f();
+			axis.setValue(0,0,1);
+			SbRotation rotation = viewer.getCameraController().getCamera().orientation.getValue();
+			SbRotation rot2 = new SbRotation();
+			rot2.setValue(new SbVec3f(1,0,0), (float)-Math.PI/2);
+			sg.movePlank(translation,rot2.operator_mul(rotation));
+		});
+
+		viewer.addKeyUpListener(SoKeyboardEvent.Key.P,()->{
+			id[0] = 0;
 		});
 
 		window.setVisible(false);

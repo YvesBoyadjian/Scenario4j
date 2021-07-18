@@ -2022,6 +2022,15 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 		planksSeparator.addChild(plankSeparator);
 	}
 
+	public void movePlank(SbVec3f translation, SbRotation rotation) {
+		final SoSeparator plankSeparator = (SoSeparator) planksSeparator.getChild(planksSeparator.getNumChildren()-1);
+		final SoTranslation plankLayerTranslation = (SoTranslation) plankSeparator.getChild(0);
+		final SoRotation plankRotation = (SoRotation) plankSeparator.getChild(1);
+
+		plankLayerTranslation.translation.setValue(translation);
+		plankRotation.rotation.setValue(rotation);
+	}
+
 	public SbVec3f getPosition() {
 		return new SbVec3f(current_x,current_y,current_z);
 	}
