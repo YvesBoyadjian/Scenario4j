@@ -30,12 +30,19 @@ import jscenegraph.coin3d.inventor.lists.SbListInt;
 import jscenegraph.coin3d.inventor.nodes.*;
 import jscenegraph.coin3d.shaders.inventor.nodes.SoShaderProgram;
 import jscenegraph.database.inventor.*;
+import jscenegraph.database.inventor.actions.SoAction;
 import jscenegraph.database.inventor.actions.SoGLRenderAction;
+import jscenegraph.database.inventor.actions.SoGetMatrixAction;
+import jscenegraph.database.inventor.actions.SoSearchAction;
 import jscenegraph.database.inventor.misc.SoNotList;
 import jscenegraph.database.inventor.nodes.*;
 import jscenegraph.port.Ctx;
 import jscenegraph.port.memorybuffer.MemoryBuffer;
+import jsceneviewerglfw.inventor.qt.viewers.SoQtConstrainedViewer;
 import org.lwjgl.system.CallbackI;
+import org.ode4j.math.DMatrix3;
+import org.ode4j.math.DMatrix3C;
+import org.ode4j.ode.DBox;
 import org.ode4j.ode.DGeom;
 import org.ode4j.ode.DSpace;
 import org.ode4j.ode.OdeHelper;
@@ -237,6 +244,8 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 	private final Set<String> shotTargets = new HashSet<>();
 
 	final SoSeparator planksSeparator = new SoSeparator();
+
+	final List<DBox> planks = new ArrayList<>();
 
 	public SceneGraphIndexedFaceSetShader(Raster rw, Raster re, int overlap, float zTranslation, int max_i) {
 		super();
@@ -2003,12 +2012,12 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 		}
 	}
 
-	public void addPlank(SbVec3f translation, SbRotation rotation) {
+	public void addPlank(SoQtConstrainedViewer viewer, SbVec3f translation, SbRotation rotation) {
 		final SoSeparator plankSeparator = new SoSeparator();
 		final SoCube plank = new SoCube();
-		plank.width.setValue(2.0f); // X
-		plank.height.setValue(10.0f); // Y
-		plank.depth.setValue(0.05f); // Z
+		plank.width.setValue(3.0f); // X
+		plank.height.setValue(20.0f); // Y
+		plank.depth.setValue(0.1f); // Z
 		final SoTranslation plankLayerTranslation = new SoTranslation();
 		plankLayerTranslation.translation.setValue(translation);
 		plankSeparator.addChild(plankLayerTranslation);
@@ -2020,15 +2029,61 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 		plankSeparator.addChild(plankFrontTranslation);
 		plankSeparator.addChild(plank);
 		planksSeparator.addChild(plankSeparator);
+
+		DBox box = OdeHelper.createBox(space,20.0,3.0,0.1);
+		planks.add(box);
 	}
 
-	public void movePlank(SbVec3f translation, SbRotation rotation) {
+	public void movePlank(SoQtConstrainedViewer viewer, SbVec3f translation, SbRotation rotation) {
 		final SoSeparator plankSeparator = (SoSeparator) planksSeparator.getChild(planksSeparator.getNumChildren()-1);
 		final SoTranslation plankLayerTranslation = (SoTranslation) plankSeparator.getChild(0);
 		final SoRotation plankRotation = (SoRotation) plankSeparator.getChild(1);
 
 		plankLayerTranslation.translation.setValue(translation);
 		plankRotation.rotation.setValue(rotation);
+
+		SoSearchAction sa = new SoSearchAction();
+
+		final SoCube plank = (SoCube) plankSeparator.getChild(3);
+		sa.setNode(plank);
+		sa.apply(getSceneGraph());
+
+		SoPath path = sa.getPath();
+
+		SoGetMatrixAction getMatrixAction = new SoGetMatrixAction(viewer.getSceneHandler().getViewportRegion());
+		getMatrixAction.apply(path);
+		SbMatrix matrix = getMatrixAction.getMatrix();
+
+		DBox box = planks.get(planks.size()-1);
+
+		final SbVec3f mat_translation = new SbVec3f();
+		final SbRotation mat_rotation = new SbRotation();
+		final SbVec3f mat_scaleFactor = new SbVec3f();
+		final SbRotation mat_scaleOrientation = new SbRotation();
+		final SbVec3f mat_center = new SbVec3f();
+		matrix.getTransform(mat_translation, mat_rotation,mat_scaleFactor,mat_scaleOrientation,mat_center);
+
+		double x=mat_translation.x(),y=mat_translation.y(),z=mat_translation.z();
+
+		box.setPosition(x,y,z);
+
+		SbMatrix rot_matrix = mat_rotation.getMatrix();
+
+		double d = rot_matrix.getValueAt(0),
+				e = rot_matrix.getValueAt(1),
+				f = rot_matrix.getValueAt(2),
+				g = rot_matrix.getValueAt(3),
+				h = rot_matrix.getValueAt(4),
+				i = rot_matrix.getValueAt(5),
+				j = rot_matrix.getValueAt(6),
+				k = rot_matrix.getValueAt(7),
+				l = rot_matrix.getValueAt(8),
+				m = rot_matrix.getValueAt(9),
+				n = rot_matrix.getValueAt(10),
+				o = rot_matrix.getValueAt(11);
+		DMatrix3C rot = new DMatrix3(d,e,f,g,h,i,j,k,l,m,n,o);
+
+		box.setRotation(rot);
 	}
 
 	public SbVec3f getPosition() {

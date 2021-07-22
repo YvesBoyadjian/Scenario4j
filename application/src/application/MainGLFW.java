@@ -1125,7 +1125,7 @@ public class MainGLFW {
 			SbRotation rotation = viewer.getCameraController().getCamera().orientation.getValue();
 			SbRotation rot2 = new SbRotation();
 			rot2.setValue(new SbVec3f(1,0,0), (float)-Math.PI/2);
-			sg.addPlank(translation,rot2.operator_mul(rotation));
+			sg.addPlank(viewer,translation,rot2.operator_mul(rotation));
 			id[0] = 1;
 			System.out.println("plank");
 		});
@@ -1141,7 +1141,7 @@ public class MainGLFW {
 			SbRotation rotation = viewer.getCameraController().getCamera().orientation.getValue();
 			SbRotation rot2 = new SbRotation();
 			rot2.setValue(new SbVec3f(1,0,0), (float)-Math.PI/2);
-			sg.movePlank(translation,rot2.operator_mul(rotation));
+			sg.movePlank(viewer1,translation,rot2.operator_mul(rotation));
 		});
 
 		viewer.addKeyUpListener(SoKeyboardEvent.Key.P,()->{
