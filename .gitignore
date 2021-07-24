@@ -5,6 +5,7 @@
 /lwjgl-utils/bin/
 /out/
 /vk-bootstrap/target/
+/lwjgl-opengl/target/
 # Project exclude paths
 /loader/bin/
 /org.lwjglx/bin/
