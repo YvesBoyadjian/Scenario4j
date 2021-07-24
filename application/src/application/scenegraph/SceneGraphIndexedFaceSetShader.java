@@ -2025,12 +2025,12 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 		plankRotation.rotation.setValue(rotation);
 		plankSeparator.addChild(plankRotation);
 		final SoTranslation plankFrontTranslation = new SoTranslation();
-		plankFrontTranslation.translation.setValue(0.0f,plank.height.getValue()/2.0f + 2.0f,-0.05f);
+		plankFrontTranslation.translation.setValue(0.0f,plank.height.getValue()/2.0f + 2.0f,0.13f - 1.75f -0.05f);
 		plankSeparator.addChild(plankFrontTranslation);
 		plankSeparator.addChild(plank);
 		planksSeparator.addChild(plankSeparator);
 
-		DBox box = OdeHelper.createBox(space,20.0,3.0,0.1);
+		DBox box = OdeHelper.createBox(space,3.0,20.0,0.1);
 		planks.add(box);
 	}
 
@@ -2067,7 +2067,7 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 
 		box.setPosition(x,y,z);
 
-		SbMatrix rot_matrix = mat_rotation.getMatrix();
+		SbMatrix rot_matrix = rotation.getMatrix();
 
 		double d = rot_matrix.getValueAt(0),
 				e = rot_matrix.getValueAt(1),
@@ -2083,7 +2083,7 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 				o = rot_matrix.getValueAt(11);
 		DMatrix3C rot = new DMatrix3(d,e,f,g,h,i,j,k,l,m,n,o);
 
-		box.setRotation(rot);
+		box.setRotation(rot.reTranspose());
 	}
 
 	public SbVec3f getPosition() {

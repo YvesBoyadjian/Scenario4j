@@ -1119,10 +1119,13 @@ public class MainGLFW {
 
 		viewer.addKeyDownListener(SoKeyboardEvent.Key.P,()->{
 			SbVec3f translation = new SbVec3f();
-			translation.setValue(sg.getPosition());
+
+			SoCamera vcamera = viewer.getCameraController().getCamera();
+
+			translation.setValue(vcamera.position.getValue());
 			SbVec3f axis = new SbVec3f();
 			axis.setValue(0,0,1);
-			SbRotation rotation = viewer.getCameraController().getCamera().orientation.getValue();
+			SbRotation rotation = vcamera.orientation.getValue();
 			SbRotation rot2 = new SbRotation();
 			rot2.setValue(new SbVec3f(1,0,0), (float)-Math.PI/2);
 			sg.addPlank(viewer,translation,rot2.operator_mul(rotation));
@@ -1135,10 +1138,13 @@ public class MainGLFW {
 				return;
 			}
 			SbVec3f translation = new SbVec3f();
-			translation.setValue(sg.getPosition());
+
+			SoCamera vcamera = viewer.getCameraController().getCamera();
+
+			translation.setValue(vcamera.position.getValue());
 			SbVec3f axis = new SbVec3f();
 			axis.setValue(0,0,1);
-			SbRotation rotation = viewer.getCameraController().getCamera().orientation.getValue();
+			SbRotation rotation = vcamera.orientation.getValue();
 			SbRotation rot2 = new SbRotation();
 			rot2.setValue(new SbVec3f(1,0,0), (float)-Math.PI/2);
 			sg.movePlank(viewer1,translation,rot2.operator_mul(rotation));
