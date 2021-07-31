@@ -19,6 +19,7 @@ import java.net.URL;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.file.Files;
+import java.util.Objects;
 import java.util.Properties;
 import java.util.function.Consumer;
 
@@ -154,10 +155,16 @@ public class MainGLFW {
 
 	public static final SbColor VERY_DEEP_SKY_BLUE = new SbColor(0.0f, 0.749f / 3.0f, 1.0f);
 
+	public static boolean god = false;
+
 	/**
 	 * @param args
 	 */
 	public static void main(String[] args) {
+
+		if(args.length == 1 && Objects.equals(args[0],"god")) {
+			god = true;
+		}
 		SwingUtilities.invokeLater(() -> {
 			showSplash();
 		});
@@ -1117,42 +1124,74 @@ public class MainGLFW {
 
 		final int[] id = new int[1];
 
-		viewer.addKeyDownListener(SoKeyboardEvent.Key.P,()->{
-			SbVec3f translation = new SbVec3f();
+		if(god) {
+			viewer.addKeyDownListener(SoKeyboardEvent.Key.P, () -> {
 
-			SoCamera vcamera = viewer.getCameraController().getCamera();
 
-			translation.setValue(vcamera.position.getValue());
-			SbVec3f axis = new SbVec3f();
-			axis.setValue(0,0,1);
-			SbRotation rotation = vcamera.orientation.getValue();
-			SbRotation rot2 = new SbRotation();
-			rot2.setValue(new SbVec3f(1,0,0), (float)-Math.PI/2);
-			sg.addPlank(viewer,translation,rot2.operator_mul(rotation));
-			id[0] = 1;
-			System.out.println("plank");
-		});
+				SbViewportRegion vr = viewer.getSceneHandler().getViewportRegion();
+				SoNode sg_ = viewer.getSceneHandler().getSceneGraph();
 
-		viewer.addIdleListener((viewer1)-> {
-			if( id[0] == 0) {
-				return;
-			}
-			SbVec3f translation = new SbVec3f();
+				SoRayPickAction fireAction = new SoRayPickAction(vr);
 
-			SoCamera vcamera = viewer.getCameraController().getCamera();
+				fireAction.setPoint(vr.getViewportSizePixels().operator_div(2));
+				fireAction.setRadius(2.0f);
+				fireAction.apply(sg_);
+				SoPickedPoint pp = fireAction.getPickedPoint();
 
-			translation.setValue(vcamera.position.getValue());
-			SbVec3f axis = new SbVec3f();
-			axis.setValue(0,0,1);
-			SbRotation rotation = vcamera.orientation.getValue();
-			SbRotation rot2 = new SbRotation();
-			rot2.setValue(new SbVec3f(1,0,0), (float)-Math.PI/2);
-			sg.movePlank(viewer1,translation,rot2.operator_mul(rotation));
-		});
+				if(pp != null) {
+					SoPath p = pp.getPath();
+					if( p != null) {
+						SoNode n = p.getTail();
+						if(n instanceof SoCube && Objects.equals(n.getName().getString(),"plank")) {
+							int len = p.getLength();
+							if(len >= 2) {
+								SoNode sep = p.getNode(len-2);
+								sg.removePlank(sep);
+								fireAction.destructor();
+								return;
+							}
+						}
+					}
+				}
 
-		viewer.addKeyUpListener(SoKeyboardEvent.Key.P,()->{
-			id[0] = 0;
-		});
+				fireAction.destructor();
+
+				SbVec3f translation = new SbVec3f();
+
+				SoCamera vcamera = viewer.getCameraController().getCamera();
+
+				translation.setValue(vcamera.position.getValue());
+				SbVec3f axis = new SbVec3f();
+				axis.setValue(0, 0, 1);
+				SbRotation rotation = vcamera.orientation.getValue();
+				SbRotation rot2 = new SbRotation();
+				rot2.setValue(new SbVec3f(1, 0, 0), (float) -Math.PI / 2);
+				sg.addPlank(viewer, translation, rot2.operator_mul(rotation));
+				id[0] = 1;
+				System.out.println("plank");
+			});
+
+			viewer.addIdleListener((viewer1) -> {
+				if (id[0] == 0) {
+					return;
+				}
+				SbVec3f translation = new SbVec3f();
+
+				SoCamera vcamera = viewer.getCameraController().getCamera();
+
+				translation.setValue(vcamera.position.getValue());
+				SbVec3f axis = new SbVec3f();
+				axis.setValue(0, 0, 1);
+				SbRotation rotation = vcamera.orientation.getValue();
+				SbRotation rot2 = new SbRotation();
+				rot2.setValue(new SbVec3f(1, 0, 0), (float) -Math.PI / 2);
+				sg.movePlank(viewer1, translation, rot2.operator_mul(rotation));
+			});
+
+			viewer.addKeyUpListener(SoKeyboardEvent.Key.P, () -> {
+				id[0] = 0;
+			});
+		}
 
 		window.setVisible(false);
 

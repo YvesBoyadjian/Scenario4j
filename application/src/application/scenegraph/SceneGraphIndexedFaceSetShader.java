@@ -2015,7 +2015,8 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 	public void addPlank(SoQtConstrainedViewer viewer, SbVec3f translation, SbRotation rotation) {
 		final SoSeparator plankSeparator = new SoSeparator();
 		final SoCube plank = new SoCube();
-		plank.width.setValue(3.0f); // X
+		plank.setName("plank");
+		plank.width.setValue(3.5f); // X
 		plank.height.setValue(20.0f); // Y
 		plank.depth.setValue(0.1f); // Z
 		final SoTranslation plankLayerTranslation = new SoTranslation();
@@ -2030,7 +2031,7 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 		plankSeparator.addChild(plank);
 		planksSeparator.addChild(plankSeparator);
 
-		DBox box = OdeHelper.createBox(space,3.0,20.0,0.1);
+		DBox box = OdeHelper.createBox(space,3.5,20.0,0.1);
 		planks.add(box);
 	}
 
@@ -2084,6 +2085,15 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 		DMatrix3C rot = new DMatrix3(d,e,f,g,h,i,j,k,l,m,n,o);
 
 		box.setRotation(rot.reTranspose());
+	}
+
+	public void removePlank(SoNode sep) {
+		int index = planksSeparator.findChild(sep);
+		if(index != -1) {
+			planksSeparator.removeChild(index);
+			DBox box = planks.remove(index-1);
+			box.destroy();
+		}
 	}
 
 	public SbVec3f getPosition() {
