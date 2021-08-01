@@ -403,6 +403,25 @@ public class MainGLFW {
 					e.printStackTrace();
 				}
 
+				if(god) {
+					File planksFile = new File("planks.mri");
+
+					Properties planksProperties = new Properties();
+
+					sg.storePlanks(planksProperties);
+
+					try {
+						OutputStream out = new FileOutputStream(planksFile);
+
+						planksProperties.store(out, "Mount Rainier Island planks");
+
+						out.close();
+					} catch (FileNotFoundException e) {
+						e.printStackTrace();
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+				}
 			}
 
 			byte[] gunSound = loadSound("GUN_FIRE-GoodSoundForYou-820112263_10db.wav");
@@ -735,9 +754,31 @@ public class MainGLFW {
 		heightField.setQuaternion(q);
 		heightField.setPosition(-SCENE_POSITION.getX() + heightFieldWidth / 2, -SCENE_POSITION.getY() + sg.getExtraDY() + heightFieldDepth / 2, 0);
 
+		File planksFile = new File("planks.mri");
+		if (planksFile.exists()) {
+			try {
+				InputStream in = new FileInputStream(planksFile);
+
+				Properties planksProperties = new Properties();
+
+				planksProperties.load(in);
+
+				in.close();
+
+				sg.loadPlanks(viewer,planksProperties);
+
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+
+		}
+
 		world.setGravity(0, 0, -9.81);
 
-		final float above_ground = 0.2f; // Necessary when respawning on water
+		final float above_ground = //4.5f; // Necessary for planks
+		0.2f; // Necessary when respawning on water
 
 		final DBody body = OdeHelper.createBody(world);
 		body.setPosition(cameraPositionValue.getX(), cameraPositionValue.getY(), cameraPositionValue.getZ() - /*1.75f / 2*/0.4f + 0.13f + above_ground);
@@ -750,11 +791,11 @@ public class MainGLFW {
 		DGeom box = OdeHelper.createSphere(space,0.4);
 		box.setBody(body);
 
-		DRay ray = OdeHelper.createRay(space, 10000);
-		DVector3C direction = ray.getDirection();
-		//DBody rayBody = OdeHelper.createBody(world);
-		ray.setBody(body);
-		//ray.set(cameraPositionValue.getX(), cameraPositionValue.getY(), cameraPositionValue.getZ() - 1.75f/2 + 0.13f,0,0,-1);
+//		DRay ray = OdeHelper.createRay(space, 10000);
+//		DVector3C direction = ray.getDirection();
+//		//DBody rayBody = OdeHelper.createBody(world);
+//		ray.setBody(body);
+//		//ray.set(cameraPositionValue.getX(), cameraPositionValue.getY(), cameraPositionValue.getZ() - 1.75f/2 + 0.13f,0,0,-1);
 
 		DGeom ball = OdeHelper.createSphere(space, 0.4);
 		final DBody ballBody = OdeHelper.createBody(world);
@@ -971,6 +1012,9 @@ public class MainGLFW {
 
 		int nb_step = 50;
 
+		final boolean firstDT[] = new boolean[1];
+		firstDT[0] = true;
+
 		DVector3 saved_pos = new DVector3();
 		viewer.addIdleListener((viewer1) -> {
 
@@ -992,12 +1036,16 @@ public class MainGLFW {
 						body.getPosition().get2() /*cameraPositionValue.getZ() - 0.4f + 0.13f + above_ground*/ - 1.75f+ 2*0.4f);
 				return;
 			}
+
+			double nbSteps = firstDT[0] ? 999 : nb_step;
+			firstDT[0] = false;
+
 			double dt = Math.min(0.5, viewer1.dt());
-			for (int i = 0; i < nb_step; i++) {
+			for (int i = 0; i < nbSteps; i++) {
 				physics_error = false;
 				saved_pos.set(body.getPosition());
 				space.collide(data, /*callback*/callback2);
-				world.step(dt / nb_step);
+				world.step(dt / nbSteps);
 				contactGroup.empty();
 				if(physics_error) {
 					saved_pos.add2(0.1);

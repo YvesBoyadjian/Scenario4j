@@ -429,7 +429,9 @@ protected void onAim(SoMouseButtonEvent event, boolean aim) {
 		  
 		  boolean wasNotif = camera.enableNotify(false);
 
-		  if( null == positionProvider  || fly ) {
+		  if( null == positionProvider ) {
+		  	// do nothing
+		  } else if( fly ) {
 			  camera.position.setValue(new_position);
 		  }
 		  else {

@@ -245,6 +245,10 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 
 	final SoSeparator planksSeparator = new SoSeparator();
 
+	final List<SbVec3f> planksTranslations = new ArrayList<>();
+
+	final List<SbRotation> planksRotations = new ArrayList<>();
+
 	final List<DBox> planks = new ArrayList<>();
 
 	public SceneGraphIndexedFaceSetShader(Raster rw, Raster re, int overlap, float zTranslation, int max_i) {
@@ -2031,6 +2035,9 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 		plankSeparator.addChild(plank);
 		planksSeparator.addChild(plankSeparator);
 
+		planksTranslations.add(translation);
+		planksRotations.add(rotation);
+
 		DBox box = OdeHelper.createBox(space,3.5,20.0,0.1);
 		planks.add(box);
 	}
@@ -2039,6 +2046,12 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 		final SoSeparator plankSeparator = (SoSeparator) planksSeparator.getChild(planksSeparator.getNumChildren()-1);
 		final SoTranslation plankLayerTranslation = (SoTranslation) plankSeparator.getChild(0);
 		final SoRotation plankRotation = (SoRotation) plankSeparator.getChild(1);
+
+		planksTranslations.get(planks.size()-1).setValue(translation);
+
+		float[] q0q1q2q3 = rotation.getValue();
+
+		planksRotations.get(planks.size()-1).setValue(q0q1q2q3);
 
 		plankLayerTranslation.translation.setValue(translation);
 		plankRotation.rotation.setValue(rotation);
@@ -2102,5 +2115,71 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 
 	public SbVec3f getTranslation() {
 		return transl.translation.getValue();
+	}
+
+	public void storePlanks(Properties planksProperties) {
+		int nbPlanks = planks.size();
+
+		float[] q0q1q2q3 = new float[4];
+
+		for( int plankIndex=0; plankIndex < nbPlanks; plankIndex++) {
+			String key = "plankTranslX"+plankIndex;
+			String value = Float.toString(planksTranslations.get(plankIndex).getX());
+			planksProperties.put(key,value);
+
+			key = "plankTranslY"+plankIndex;
+			value = Float.toString(planksTranslations.get(plankIndex).getY());
+			planksProperties.put(key,value);
+
+			key = "plankTranslZ"+plankIndex;
+			value = Float.toString(planksTranslations.get(plankIndex).getZ());
+			planksProperties.put(key,value);
+
+			planksRotations.get(plankIndex).getValue(q0q1q2q3);
+
+			key = "plankRotQ0"+plankIndex;
+			value = Float.toString(q0q1q2q3[0]);
+			planksProperties.put(key,value);
+
+			key = "plankRotQ1"+plankIndex;
+			value = Float.toString(q0q1q2q3[1]);
+			planksProperties.put(key,value);
+
+			key = "plankRotQ2"+plankIndex;
+			value = Float.toString(q0q1q2q3[2]);
+			planksProperties.put(key,value);
+
+			key = "plankRotQ3"+plankIndex;
+			value = Float.toString(q0q1q2q3[3]);
+			planksProperties.put(key,value);
+		}
+	}
+
+	public void loadPlanks(SoQtConstrainedViewer viewer, Properties plankProperties) {
+		int plankIndex = 0;
+		String key;
+		while(plankProperties.containsKey((key="plankTranslX"+plankIndex))) {
+			float x = Float.valueOf(plankProperties.getProperty(key,"0"));
+			key = "plankTranslY"+plankIndex;
+			float y = Float.valueOf(plankProperties.getProperty(key,"0"));
+			key = "plankTranslZ"+plankIndex;
+			float z = Float.valueOf(plankProperties.getProperty(key,"0"));
+			key = "plankRotQ0"+plankIndex;
+			float q0 = Float.valueOf(plankProperties.getProperty(key,"0"));
+			key = "plankRotQ1"+plankIndex;
+			float q1 = Float.valueOf(plankProperties.getProperty(key,"0"));
+			key = "plankRotQ2"+plankIndex;
+			float q2 = Float.valueOf(plankProperties.getProperty(key,"0"));
+			key = "plankRotQ3"+plankIndex;
+			float q3 = Float.valueOf(plankProperties.getProperty(key,"1"));
+
+			SbVec3f translation = new SbVec3f(x,y,z);
+			SbRotation rotation = new SbRotation(q0,q1,q2,q3);
+
+			addPlank(viewer,translation,rotation);
+			movePlank(viewer,translation,rotation);
+			
+			plankIndex++;
+		}
 	}
 }

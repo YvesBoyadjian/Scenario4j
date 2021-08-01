@@ -102,8 +102,13 @@ public class SbRotation implements Mutable {
 	
 	private final float[] quat = new float[4];
 
+	/*!
+      The default constructor just initializes a valid rotation. The
+      actual value is unspecified, and you should not depend on it.
+    */
 	public SbRotation() {
-		
+		// This translates to zero rotation around the positive Z-axis.
+		quat[3] = 1;
 	}
 	
 	public SbRotation(SbRotation other) {
@@ -335,6 +340,34 @@ getValue(final SbVec3f axis, final float[] radians)
 		   
 		  }
 	
+/*!
+  Reset the rotation by the four quaternions in the array.
+  \sa getValue().
+ */
+	public SbRotation
+	setValue(float[] q)
+	{
+		this.quat[0] = q[0];
+		this.quat[1] = q[1];
+		this.quat[2] = q[2];
+		this.quat[3] = q[3];
+
+		SbVec4f quatVec = new SbVec4f(q);
+
+		if (quatVec.normalize() == 0.0f) {
+//#if COIN_DEBUG
+		SoDebugError.postWarning("SbRotation::setValue",
+				"Quarternion has zero length => "+
+		"undefined rotation.");
+//#endif // COIN_DEBUG
+	}
+		q = quatVec.getValueRead();
+		this.quat[0] = q[0];
+		this.quat[1] = q[1];
+		this.quat[2] = q[2];
+		this.quat[3] = q[3];
+		return this;
+	}
 
 ////////////////////////////////////////////////////////////////////////
 //
