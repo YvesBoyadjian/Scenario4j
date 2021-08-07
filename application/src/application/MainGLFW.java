@@ -1172,6 +1172,8 @@ public class MainGLFW {
 
 		final int[] id = new int[1];
 
+		final int[] idTrail = new int[1];
+
 		if(god) {
 			viewer.addKeyDownListener(SoKeyboardEvent.Key.P, () -> {
 
@@ -1239,7 +1241,28 @@ public class MainGLFW {
 			viewer.addKeyUpListener(SoKeyboardEvent.Key.P, () -> {
 				id[0] = 0;
 			});
-		}
+
+			viewer.addKeyDownListener(SoKeyboardEvent.Key.O, ()->{
+				idTrail[0] = 1;
+				System.out.println("trail");
+			});
+
+			viewer.addIdleListener((viewer1) -> {
+						if (idTrail[0] == 0) {
+							return;
+						}
+						float ifloat = sg.getIFloat(sg.getPosition().x());
+						float jfloat = sg.getJFloat(sg.getPosition().y());
+						sg.addTrail((int)Math.floor(ifloat),(int)Math.floor(jfloat));
+						sg.addTrail((int)Math.ceil(ifloat),(int)Math.floor(jfloat));
+						sg.addTrail((int)Math.floor(ifloat),(int)Math.ceil(jfloat));
+						sg.addTrail((int)Math.ceil(ifloat),(int)Math.ceil(jfloat));
+					});
+
+			viewer.addKeyUpListener(SoKeyboardEvent.Key.O, () -> {
+				idTrail[0] = 0;
+			});
+		} // end GOD
 
 		window.setVisible(false);
 

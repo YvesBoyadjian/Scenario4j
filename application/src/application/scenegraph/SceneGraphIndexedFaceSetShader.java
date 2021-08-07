@@ -89,6 +89,8 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 	private static final float SKY_INTENSITY = 0.2f; 
 	
 	private static final Color STONE = new Color(139,141,122); //http://www.colourlovers.com/color/8B8D7A/stone_gray
+
+	private static final Color TRAIL = new Color(200,150,50); // Color of trail
 	
 	private static final float GRASS_LUMINOSITY = 0.6f;
 	
@@ -175,6 +177,8 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 	SoNode shadowTree;
 	SoNode chunkTree;
 	SoCamera camera;
+
+	SoTexture2 gigaTexture;
 	
 	float current_x;
 	
@@ -250,6 +254,10 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 	final List<SbRotation> planksRotations = new ArrayList<>();
 
 	final List<DBox> planks = new ArrayList<>();
+
+	final Set<Long> trails = new HashSet<>();
+
+	boolean trailsDirty = false;
 
 	public SceneGraphIndexedFaceSetShader(Raster rw, Raster re, int overlap, float zTranslation, int max_i) {
 		super();
@@ -685,8 +693,10 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 	    landSep.addChild(transl);
 	    
 	    OverallTexture ot = chunks.getOverallTexture();
-	    
-	    landSep.addChild(ot.getTexture());
+
+	    gigaTexture = ot.getTexture();
+
+	    landSep.addChild(gigaTexture);
 	    
 	    RecursiveChunk rc = chunks.getRecursiveChunk();
 	    
@@ -1689,11 +1699,21 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 				
 		return indices;
 	}
+
+	public float getIFloat(float x) {
+		float ifloat = (x - transl.translation.getValue().getX())/delta_x;
+		return ifloat;
+	}
+
+	public float getJFloat(float y) {
+		float jfloat = (delta_y*(h-1) -(y - transl.translation.getValue().getY() - jstart * delta_y))/delta_y;
+		return jfloat;
+	}
 	
 	public float getInternalZ(float x, float y, int[] indices) {
 		
-		float ifloat = (x - transl.translation.getValue().getX())/delta_x;
-		float jfloat = (delta_y*(h-1) -(y - transl.translation.getValue().getY() - jstart * delta_y))/delta_y;
+		float ifloat = getIFloat(x);// (x - transl.translation.getValue().getX())/delta_x;
+		float jfloat = getJFloat(y);// (delta_y*(h-1) -(y - transl.translation.getValue().getY() - jstart * delta_y))/delta_y;
 		
 		int i = Math.round(ifloat);
 		//int j = Math.round((y - transl.translation.getValue().getY() - 3298)/delta_y);
@@ -1876,6 +1896,20 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 	public void idle() {
 		setBBoxCenter();
 		hideOracleIfTooFar();
+
+		if(trailsDirty) {
+			trailsDirty = false;
+
+			OverallTexture ot = chunks.getOverallTexture();
+
+			final SoTexture2 newGigaTexture = ot.getTexture();
+			newGigaTexture.ref();
+			final SbVec2s s = new SbVec2s();
+			final int[] nc = new int[1];
+			MemoryBuffer mb = newGigaTexture.image.getValue(s,nc);
+			gigaTexture.image.setValue(s,nc[0],mb, true);
+			newGigaTexture.unref();
+		}
 	}
 
 	public float getzTranslation() {
@@ -2180,6 +2214,21 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 			movePlank(viewer,translation,rotation);
 			
 			plankIndex++;
+		}
+	}
+
+	public void addTrail(int i, int j) {
+		long code = (((long)j) << 32) | i;
+		if(trails.add(code)) {
+			int index = i * h + j;
+			if (!chunks.isStone(index)) {
+				int red = TRAIL.getRed();
+				int green = TRAIL.getGreen();
+				int blue = TRAIL.getBlue();
+				int alpha = 255;
+				chunks.colorsPut(index, red, green, blue, alpha);
+				trailsDirty = true;
+			}
 		}
 	}
 }

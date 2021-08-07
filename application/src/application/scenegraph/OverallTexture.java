@@ -133,7 +133,7 @@ public class OverallTexture {
 		return image;
 	}
 
-	public SoNode getTexture() {
+	public SoTexture2 getTexture() {
 		return texture;
 	}
 
