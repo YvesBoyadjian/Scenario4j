@@ -258,6 +258,9 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 	final Set<Long> trails = new HashSet<>();
 
 	boolean trailsDirty = false;
+	boolean CBRunning = false;
+
+	final Collection<Runnable> idleCallbacks = new ArrayList<>();
 
 	public SceneGraphIndexedFaceSetShader(Raster rw, Raster re, int overlap, float zTranslation, int max_i) {
 		super();
@@ -1897,19 +1900,44 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 		setBBoxCenter();
 		hideOracleIfTooFar();
 
-		if(trailsDirty) {
+		runIdleCB();
+
+		if(trailsDirty && !CBRunning) {
+
+			CBRunning = true;
 			trailsDirty = false;
 
-			OverallTexture ot = chunks.getOverallTexture();
+			Thread t = new Thread() {
+				@Override
+				public void run() {
 
-			final SoTexture2 newGigaTexture = ot.getTexture();
-			newGigaTexture.ref();
-			final SbVec2s s = new SbVec2s();
-			final int[] nc = new int[1];
-			MemoryBuffer mb = newGigaTexture.image.getValue(s,nc);
-			gigaTexture.image.setValue(s,nc[0],mb, true);
-			newGigaTexture.unref();
+					final OverallTexture ot = chunks.getOverallTexture();
+
+					addIdleCB(()-> {
+						final SoTexture2 newGigaTexture = ot.getTexture();
+						newGigaTexture.ref();
+						final SbVec2s s = new SbVec2s();
+						final int[] nc = new int[1];
+						MemoryBuffer mb = newGigaTexture.image.getValue(s,nc);
+						gigaTexture.image.setValue(s,nc[0],mb, true);
+						newGigaTexture.unref();
+					});
+				}
+			};
+			t.start();
 		}
+	}
+
+	synchronized void addIdleCB(Runnable r) {
+		idleCallbacks.add(r);
+	}
+
+	synchronized void runIdleCB() {
+		for( var r : idleCallbacks) {
+			CBRunning = false;
+			r.run();
+		}
+		idleCallbacks.clear();
 	}
 
 	public float getzTranslation() {
