@@ -1253,10 +1253,15 @@ public class MainGLFW {
 						}
 						float ifloat = sg.getIFloat(sg.getPosition().x());
 						float jfloat = sg.getJFloat(sg.getPosition().y());
-						sg.addTrail((int)Math.floor(ifloat),(int)Math.floor(jfloat));
-						sg.addTrail((int)Math.ceil(ifloat),(int)Math.floor(jfloat));
-						sg.addTrail((int)Math.floor(ifloat),(int)Math.ceil(jfloat));
-						sg.addTrail((int)Math.ceil(ifloat),(int)Math.ceil(jfloat));
+
+						int i0 = (int)Math.floor(ifloat);
+						int j0 = (int)Math.floor(jfloat);
+
+						for( int di = -1; di<3; di++) {
+							for(int dj=-1;dj<3;dj++) {
+								sg.addTrail(i0+di,j0+dj);
+							}
+						}
 					});
 
 			viewer.addKeyUpListener(SoKeyboardEvent.Key.O, () -> {

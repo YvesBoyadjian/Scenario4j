@@ -2246,9 +2246,13 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 	}
 
 	public void addTrail(int i, int j) {
+		int index = i * h + j;
+		float normal = chunks.normalsGet(index*3+2);
+		if(Math.abs(normal)<0.96) {
+			return;
+		}
 		long code = (((long)j) << 32) | i;
 		if(trails.add(code)) {
-			int index = i * h + j;
 			if (!chunks.isStone(index)) {
 				int red = TRAIL.getRed();
 				int green = TRAIL.getGreen();
