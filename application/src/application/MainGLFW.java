@@ -5,20 +5,13 @@ package application;
 
 import java.awt.*;
 import java.awt.image.Raster;
-import java.io.BufferedInputStream;
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.file.Files;
+import java.util.Collection;
 import java.util.Objects;
 import java.util.Properties;
 import java.util.function.Consumer;
@@ -156,6 +149,8 @@ public class MainGLFW {
 	public static final SbColor VERY_DEEP_SKY_BLUE = new SbColor(0.0f, 0.749f / 3.0f, 1.0f);
 
 	public static boolean god = false;
+
+	public static final long TRAILS_VERSION = 0;
 
 	/**
 	 * @param args
@@ -320,6 +315,27 @@ public class MainGLFW {
 		rw = null; // for garbage collection
 		re = null; // for garbage collection
 
+		// ______________________________________________________________________________________________________ trails
+		File trailsFile = new File("trails.mri");
+
+		DataInputStream reader = null;
+		try {
+			reader = new DataInputStream(new BufferedInputStream(new FileInputStream(trailsFile)));
+			long version = reader.readLong();
+			long size = reader.readLong();
+			for(long i =0; i<size;i++) {
+				long code = reader.readLong();
+
+				int iv = (int) code;
+				int jv = (int)(code >>> 32);
+				sg.addTrail(iv,jv);
+			}
+			reader.close();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 
 		sg.getShadowGroup().precision.setValue(shadow_precision);
 
@@ -339,10 +355,11 @@ public class MainGLFW {
 		viewer = new SoQtWalkViewer(SoQtFullViewer.BuildFlag.BUILD_NONE, SoQtCameraController.Type.BROWSER,/*shell*/null, style) {
 
 			public void onClose(boolean resetToDefault) {
+
+				// ____________________________________________________________________________________________ savegame
 				File saveGameFile = new File("savegame.mri");
 
 				Properties saveGameProperties = new Properties();
-
 
 				try {
 					OutputStream out = new FileOutputStream(saveGameFile);
@@ -371,6 +388,7 @@ public class MainGLFW {
 					e.printStackTrace();
 				}
 
+				// ____________________________________________________________________________________________ graphics
 				File graphicsFile = new File("graphics.mri");
 
 				Properties graphicsProperties = new Properties();
@@ -404,6 +422,8 @@ public class MainGLFW {
 				}
 
 				if(god) {
+
+					// __________________________________________________________________________________________ planks
 					File planksFile = new File("planks.mri");
 
 					Properties planksProperties = new Properties();
@@ -416,6 +436,26 @@ public class MainGLFW {
 						planksProperties.store(out, "Mount Rainier Island planks");
 
 						out.close();
+					} catch (FileNotFoundException e) {
+						e.printStackTrace();
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+
+					// __________________________________________________________________________________________ trails
+					File trailsFile = new File("trails.mri");
+
+					try {
+						DataOutputStream ecrivain = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(trailsFile)));
+						ecrivain.writeLong(TRAILS_VERSION);
+						ecrivain.writeLong(sg.getTrailsSize());
+						sg.getTrails().forEach((l)-> {
+							try {
+								ecrivain.writeLong(l);
+							} catch (IOException e) {
+							}
+						});
+						ecrivain.close();
 					} catch (FileNotFoundException e) {
 						e.printStackTrace();
 					} catch (IOException e) {
@@ -730,7 +770,7 @@ public class MainGLFW {
 		DHeightfieldData heightFieldData = OdeHelper.createHeightfieldData();
 
 		int nbi = sg.getNbI();
-		int nbj = sg.getNbJ();
+		int nbj = (int)sg.getNbJ();
 		float[] pHeightData = new float[nbi * nbj];
 		int index = 0;
 		for (int i = 0; i < nbi; i++) {
@@ -754,6 +794,7 @@ public class MainGLFW {
 		heightField.setQuaternion(q);
 		heightField.setPosition(-SCENE_POSITION.getX() + heightFieldWidth / 2, -SCENE_POSITION.getY() + sg.getExtraDY() + heightFieldDepth / 2, 0);
 
+		// ______________________________________________________________________________________________________ planks
 		File planksFile = new File("planks.mri");
 		if (planksFile.exists()) {
 			try {

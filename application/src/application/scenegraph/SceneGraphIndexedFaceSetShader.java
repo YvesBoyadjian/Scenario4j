@@ -11,6 +11,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
+import java.util.stream.Stream;
 
 import javax.imageio.ImageIO;
 
@@ -1319,7 +1320,7 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 		return w;
 	}
 
-	public int getNbJ() {
+	public long getNbJ() {
 		return h;
 	}
 
@@ -2262,5 +2263,13 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 				trailsDirty = true;
 			}
 		}
+	}
+
+	public Stream<Long> getTrails() {
+		return trails.stream();
+	}
+
+	public long getTrailsSize() {
+		return trails.size();
 	}
 }
