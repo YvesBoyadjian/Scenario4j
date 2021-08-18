@@ -258,6 +258,8 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 
 	final Set<Long> trails = new HashSet<>();
 
+	List<Long> sorted_trails;
+
 	boolean trailsDirty = false;
 	boolean CBRunning = false;
 
@@ -2266,7 +2268,9 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 	}
 
 	public Stream<Long> getTrails() {
-		return trails.stream();
+		sorted_trails = new ArrayList<>(trails);
+		java.util.Collections.sort(sorted_trails);
+		return sorted_trails.stream();
 	}
 
 	public long getTrailsSize() {

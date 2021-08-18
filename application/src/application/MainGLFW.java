@@ -537,11 +537,11 @@ public class MainGLFW {
 
 				saveGameProperties.load(in);
 
-				float x = Float.valueOf(saveGameProperties.getProperty(HERO_X, "250"));
+				float x = Float.valueOf(saveGameProperties.getProperty(HERO_X, "250.5"));
 
-				float y = Float.valueOf(saveGameProperties.getProperty(HERO_Y, "305"));
+				float y = Float.valueOf(saveGameProperties.getProperty(HERO_Y, "303.5"));
 
-				float z = Float.valueOf(saveGameProperties.getProperty(HERO_Z, String.valueOf(1279/* - SCENE_POSITION.getZ()*/)));
+				float z = Float.valueOf(saveGameProperties.getProperty(HERO_Z, String.valueOf(1256/* - SCENE_POSITION.getZ()*/)));
 
 				previousTimeSec = Double.valueOf(saveGameProperties.getProperty(TIME, "0"));
 
@@ -560,7 +560,7 @@ public class MainGLFW {
 
 
 		} else {
-			camera.position.setValue(250, 305, 1279 - SCENE_POSITION.getZ());
+			camera.position.setValue(250.5f, 303.5f, 1256 - SCENE_POSITION.getZ());
 		}
 		viewer.getCameraController().changeCameraValues(camera);
 
