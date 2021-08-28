@@ -31,7 +31,6 @@ public class TerrainLoader {
 
     public Raster load(String fileName)
     {
-        System.out.println( "Hello World!" );
         //initJAI();
         //System.setProperty(GeoTiffReader.OVERRIDE_CRS_SWITCH, "False");
         //File tiffFile = new File("..\\loader\\ressource\\ned19_n47x00_w122x00_wa_mounttrainier_2008\\ned19_n47x00_w122x00_wa_mounttrainier_2008.tif");
@@ -54,7 +53,8 @@ public class TerrainLoader {
 			
 			grid.dispose(true);
 			reader.dispose();
-			
+
+			System.out.println(tiffFile.getName()+" loaded");
 			return r;
 		} catch (DataSourceException e) {
 			// TODO Auto-generated catch block
