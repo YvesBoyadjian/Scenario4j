@@ -26,6 +26,7 @@ public class GLData {
         NONE, FLUSH;
     }
 
+    public String name;
 	public boolean doubleBuffer;
 	public int redSize;
 	public int greenSize;
@@ -47,6 +48,7 @@ public class GLData {
 	public boolean waitForRefresh;
 	
 	public GLData() {
+		name = "";
 		doubleBuffer = true;
 	    redSize = 8;
 	    greenSize = 8;

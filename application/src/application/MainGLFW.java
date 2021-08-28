@@ -486,6 +486,7 @@ public class MainGLFW {
 			}
 		};
 		GLData glf = new GLData(/*GLProfile.getDefault()*/);
+		glf.name = "Mount Rainier Island";
 		glf.redSize = 8;//10;
 		glf.greenSize = 8;//10;
 		glf.blueSize = 8;//10;
