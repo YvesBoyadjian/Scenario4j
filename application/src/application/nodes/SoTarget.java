@@ -36,10 +36,13 @@ public class SoTarget extends SoSeparator {
 	private final SbVec3fSingle dummyRender = new SbVec3fSingle();
 	//private final SbVec3fSingle dummyPick = new SbVec3fSingle();
 
-	public SoTarget() {
+	private int instance;
+
+	public SoTarget(int instance) {
 		super();
 		renderCaching.setValue(SoSeparator.CacheEnabled.OFF);
 		pickCulling.setValue(CacheEnabled.OFF); // Speed up picking
+		this.instance = instance;
 	}
 	
 //	public void setSealIndex( int sealIndex) {
@@ -75,4 +78,7 @@ public class SoTarget extends SoSeparator {
 	  super.pick( action);
 	}
 
+	public int getInstance() {
+		return instance;
+	}
 }

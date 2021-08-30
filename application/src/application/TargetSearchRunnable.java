@@ -3,6 +3,7 @@
  */
 package application;
 
+import application.nodes.SoTarget;
 import application.nodes.SoTargets;
 import application.objects.Target;
 import application.scenegraph.SceneGraphIndexedFaceSetShader;
@@ -63,14 +64,22 @@ public class TargetSearchRunnable implements Runnable {
 								maybe_targets instanceof SoTargets) {
 									v.addOneShotIdleListener((viewer1)->{
 										SoGroup g = (SoGroup)parent;
-										SoMaterial c = new SoMaterial();
-										c.diffuseColor.setValue(1, 0, 0);
-										g.enableNotify(false);
-										g.insertChild(c, 0);
-										g.enableNotify(true);
+
 										SoTargets targets = (SoTargets) maybe_targets;
 										Target t = targets.getTarget();
-										main.shootTarget(t);
+										SoTarget targetNode = (SoTarget) p.getNode(len-3);
+
+										if(!main.isShot(t,targetNode.getInstance())) {
+
+											SoMaterial c = new SoMaterial();
+											c.diffuseColor.setValue(1, 0, 0);
+											g.enableNotify(false);
+											g.insertChild(c, 0);
+											g.enableNotify(true);
+
+											main.shootTarget(t, targetNode.getInstance());
+
+										}
 									});
 								}
 							}

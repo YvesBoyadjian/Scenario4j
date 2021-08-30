@@ -244,9 +244,13 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 
 	private DSpace space;
 
-	final Collection<Target> targets = new ArrayList<>();
+	final SoGroup targetsGroup = new SoGroup();
+
+	final List<Target> targets = new ArrayList<>();
 
 	private final Set<String> shotTargets = new HashSet<>();
+	private final List<Integer> shotTargetsIndices = new ArrayList<>();
+	private final List<Integer> shotTargetsInstances = new ArrayList<>();
 
 	final SoSeparator planksSeparator = new SoSeparator();
 
@@ -896,8 +900,6 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 		};
 		addTarget(barredOwlBack_);
 
-		final SoGroup targetsGroup = new SoGroup();
-
 		for( Target target : targets) {
 
 			SoTargets targetsSeparator = new SoTargets(target) {
@@ -936,7 +938,7 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 			final SbVec3f targetPosition = new SbVec3f();
 
 			for (int instance = 0; instance < target.getNbTargets(); instance++) {
-				SoTarget targetSeparator = new SoTarget();
+				SoTarget targetSeparator = new SoTarget(instance);
 				//sealSeparator.renderCaching.setValue(SoSeparator.CacheEnabled.OFF);
 
 				SoTranslation targetTranslation = new SoTranslation();
@@ -2042,7 +2044,31 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 		targets.add(target);
 	}
 
-	public void shootTarget(Target t) {
+	public void shootTarget(Target t, int instance) {
+		registerShot(targets.indexOf(t),instance);
+		doShootTarget(t,instance);
+	}
+
+	public void registerShot(int index, int instance) {
+		shotTargetsIndices.add(index);
+		shotTargetsInstances.add(instance);
+	}
+
+	public boolean isShot(Target t, int instance) {
+		int index = targets.indexOf(t);
+		int nbShots = shotTargetsIndices.size();
+		for(int i=0; i<nbShots; i++) {
+			if(shotTargetsIndices.get(i) == index) {
+				if(shotTargetsInstances.get(i) == instance) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
+	public void doShootTarget(Target t, int instance) {
+
 		shotTargets.add(t.targetName());
 
 		String[] targets = new String[shotTargets.size()];
@@ -2052,6 +2078,31 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 			i++;
 		}
 		targetDisplay.string.setValues(0,targets);
+	}
+
+	public void loadShots(Properties saveGameProperties) {
+		int i=0;
+		String keyIndex = "targetShotIndex";
+		String keyInstance = "targetShotInstance";
+		while(saveGameProperties.containsKey(keyIndex+i)) {
+			int index = Integer.valueOf(saveGameProperties.getProperty(keyIndex+i));
+			int instance = Integer.valueOf(saveGameProperties.getProperty(keyInstance+i));
+
+			SoTargets targetsNode = (SoTargets) targetsGroup.getChild(index);
+
+			SoTarget target = targetsNode.getTargetChild(instance);
+
+			SoVRMLBillboard billboard = (SoVRMLBillboard) target.getChild(1);
+
+			SoMaterial c = new SoMaterial();
+			c.diffuseColor.setValue(1, 0, 0);
+			//billboard.enableNotify(false);
+			billboard.insertChild(c, 0);
+			//billboard.enableNotify(true);
+
+			shootTarget(targets.get(index),instance);
+			i++;
+		}
 	}
 
 	public void talk(String[] whatToSay) {
@@ -2275,5 +2326,13 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 
 	public long getTrailsSize() {
 		return trails.size();
+	}
+
+	public void saveShots(Properties properties) {
+		int nbShots = shotTargetsIndices.size();
+		for(int i=0; i<nbShots; i++) {
+			properties.put("targetShotIndex"+i, String.valueOf(shotTargetsIndices.get(i)));
+			properties.put("targetShotInstance"+i, String.valueOf(shotTargetsInstances.get(i)));
+		}
 	}
 }

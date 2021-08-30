@@ -378,6 +378,8 @@ public class MainGLFW {
 						saveGameProperties.setProperty(TIME_STOP, isTimeStop() ? "true" : "false");
 
 						saveGameProperties.setProperty(FLY, isFlying() ? "true" : "false");
+
+						sg.saveShots(saveGameProperties);
 					}
 					saveGameProperties.store(out, "Mount Rainier Island save game");
 
@@ -551,6 +553,8 @@ public class MainGLFW {
 				timeStop = "true".equals(saveGameProperties.getProperty(TIME_STOP, "false")) ? true : false;
 
 				fly = "true".equals(saveGameProperties.getProperty(FLY, "false")) ? true : false;
+
+				sg.loadShots(saveGameProperties);
 
 				in.close();
 			} catch (FileNotFoundException e) {

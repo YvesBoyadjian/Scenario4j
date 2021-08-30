@@ -45,6 +45,8 @@ public class SoTargets extends SoSeparator {
 
 	private final Set<Integer> nearChildren = new HashSet<>();
 
+	private final List<SoTarget> targets = new ArrayList<>();
+
 	public SoTargets(Target target) {
 		super();
 		renderCaching.setValue(SoSeparator.CacheEnabled.OFF);
@@ -80,6 +82,7 @@ public class SoTargets extends SoSeparator {
 		if ( child instanceof SoTarget) {
 			child.ref();
 			bspTree.addPoint(((SoTarget)child).getCoordinates(),child);
+			targets.add((SoTarget)child);
 		}
 		else {
 			super.addChild(child);
@@ -130,5 +133,9 @@ public class SoTargets extends SoSeparator {
 
 	public Target getTarget() {
 		return target;
+	}
+
+	public SoTarget getTargetChild(int index) {
+		return targets.get(index);
 	}
 }
