@@ -42,7 +42,7 @@ public class TargetsKillingQuest implements Quest {
             }
             else {
                 if(allKilled) {
-                    sceneGraph.setMessage("Go back to the oracle, he has a present for you");
+                    sceneGraph.setMessage("Go back to the oracle by taking the trail, he has a present for you");
                 }
                 else {
                     sceneGraph.setMessage("");
