@@ -115,6 +115,12 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 
 	static public final float ORACLE_Z = 1250.24f;//1248.5f;
 
+	static public final float STARTING_X = 250.5f;
+
+	static public final float STARTING_Y = 303.5f;
+
+	static public final float STARTING_Z = 1256f;
+
 	private final float[] douglas_distance_trunk = new float[1];
 
 	private final float[] douglas_distance_foliage = new float[1];
@@ -268,6 +274,8 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 	boolean CBRunning = false;
 
 	final Collection<Runnable> idleCallbacks = new ArrayList<>();
+
+	int currentQuestIndex = -1;
 
 	public SceneGraphIndexedFaceSetShader(Raster rw, Raster re, int overlap, float zTranslation, int max_i) {
 		super();
@@ -2123,7 +2131,9 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 	}
 
 	public void setMessage(String message) {
-		messageDisplay.string.setValue(message);
+		if(messageDisplay.string.getNum() != 1 || !Objects.equals(messageDisplay.string.getValueAt(0),message)) {
+			messageDisplay.string.setValue(message);
+		}
 	}
 
 	public void aim(boolean aim) {
@@ -2222,6 +2232,8 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 			planksSeparator.removeChild(index);
 			DBox box = planks.remove(index-1);
 			box.destroy();
+			planksRotations.remove(index-1);
+			planksTranslations.remove(index-1);
 		}
 	}
 

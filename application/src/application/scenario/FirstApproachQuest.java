@@ -1,7 +1,7 @@
 package application.scenario;
 
 import application.MainGLFW;
-import application.scenegraph.SceneGraphIndexedFaceSetShader;
+import application.scenegraph.*;
 import application.viewer.glfw.SoQtWalkViewer;
 import jscenegraph.database.inventor.nodes.SoCamera;
 
@@ -12,16 +12,15 @@ public class FirstApproachQuest implements Quest {
     @Override
     public void setSceneGraph(SceneGraphIndexedFaceSetShader sceneGraph) {
         this.sceneGraph = sceneGraph;
-        sceneGraph.setMessage("You are at Klapatche Point. Your fate is on the trail");
     }
 
     @Override
     public boolean isAchieved(SoQtWalkViewer viewer) {
         boolean achieved = getDistanceFromOracle(viewer) <= 4.5;
         if(achieved) {
-            sceneGraph.setMessage("");
             System.out.println("Oracle found");
         }
+        sceneGraph.setMessage("");
         return achieved;
     }
 

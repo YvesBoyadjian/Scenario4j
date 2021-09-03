@@ -731,6 +731,10 @@ protected void onAim(SoMouseButtonEvent event, boolean aim) {
 	public boolean isFlying() {
     	return fly;
 	}
+
+	public boolean isAllowingFly() {
+    	return allowToggleFly;
+	}
 	
 	public double dt() {
 		return dt;

@@ -17,13 +17,38 @@ public class TargetsKillingQuest implements Quest {
     @Override
     public boolean isAchieved(SoQtWalkViewer viewer) {
         boolean achieved = getDistanceFromOracle(viewer) <= 4.5;
-        achieved &= sceneGraph.haveShot(GroundSquirrels.GROUND_SQUIRREL_NAME);
-        achieved &= sceneGraph.haveShot(HoaryMarmots.HOARY_MARMOT_NAME);
-        achieved &= sceneGraph.haveShot(Seals.SEAL_NAME);
-        achieved &= sceneGraph.haveShot(MountainGoats.MOUNTAIN_GOAT_NAME);
-        achieved &= sceneGraph.haveShot(Owls.SPOTTED_OWL_NAME);
-        achieved &= sceneGraph.haveShot(Owls.BARRED_OWL_NAME);
-        achieved &= sceneGraph.haveShot(BigFoots.BIGFOOT_NAME);
+        boolean allKilled = true;
+        allKilled &= sceneGraph.haveShot(GroundSquirrels.GROUND_SQUIRREL_NAME);
+        allKilled &= sceneGraph.haveShot(HoaryMarmots.HOARY_MARMOT_NAME);
+        allKilled &= sceneGraph.haveShot(Seals.SEAL_NAME);
+        allKilled &= sceneGraph.haveShot(MountainGoats.MOUNTAIN_GOAT_NAME);
+        allKilled &= sceneGraph.haveShot(Owls.SPOTTED_OWL_NAME);
+        allKilled &= sceneGraph.haveShot(Owls.BARRED_OWL_NAME);
+        allKilled &= sceneGraph.haveShot(BigFoots.BIGFOOT_NAME);
+
+        achieved &= allKilled;
+
+        if(!achieved) {
+            boolean onlyMissingSeal = !sceneGraph.haveShot(Seals.SEAL_NAME);
+            onlyMissingSeal &= sceneGraph.haveShot(GroundSquirrels.GROUND_SQUIRREL_NAME);
+            onlyMissingSeal &= sceneGraph.haveShot(HoaryMarmots.HOARY_MARMOT_NAME);
+            onlyMissingSeal &= sceneGraph.haveShot(MountainGoats.MOUNTAIN_GOAT_NAME);
+            onlyMissingSeal &= sceneGraph.haveShot(Owls.SPOTTED_OWL_NAME);
+            onlyMissingSeal &= sceneGraph.haveShot(Owls.BARRED_OWL_NAME);
+            onlyMissingSeal &= sceneGraph.haveShot(BigFoots.BIGFOOT_NAME);
+
+            if(onlyMissingSeal) {
+                sceneGraph.setMessage("You will find seals by the sea");
+            }
+            else {
+                if(allKilled) {
+                    sceneGraph.setMessage("Go back to the oracle, he has a present for you");
+                }
+                else {
+                    sceneGraph.setMessage("");
+                }
+            }
+        }
         return achieved;
     }
 
@@ -32,6 +57,7 @@ public class TargetsKillingQuest implements Quest {
         viewer.setAllowToggleFly(true);
         String[] speech = {"Hooray, I now have enough to eat.","To show my gratitude, I'm allowing you to fly", "by pressing the 'F' key."};
         sceneGraph.talk(speech);
+        sceneGraph.setMessage("");
     }
 
     double getDistanceFromOracle(SoQtWalkViewer viewer) {

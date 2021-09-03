@@ -27,6 +27,7 @@ import javax.swing.*;
 
 import application.gui.OptionDialog;
 import application.scenario.FirstApproachQuest;
+import application.scenario.LeaveKlapatchePointQuest;
 import application.scenario.Scenario;
 import application.scenario.TargetsKillingQuest;
 import application.viewer.glfw.ForceProvider;
@@ -124,6 +125,10 @@ public class MainGLFW {
 
 	public static final String FLY = "fly";
 
+	public static final String ALLOW_FLY = "allow_fly";
+
+	public static final String QUEST_INDEX = "quest_index";
+
 	public static final String SHADOW_PRECISION = "shadow_precision";
 
 	public static final String LOD_FACTOR = "lod_factor";
@@ -183,6 +188,8 @@ public class MainGLFW {
 	static JWindow window;
 
 	static boolean hasMainGameBeenCalled;
+
+	static Scenario scenario;
 
 	public static void showSplash() {
 		window = new JWindow()/* {
@@ -245,6 +252,8 @@ public class MainGLFW {
 
 
 	static boolean physics_error = false;
+
+	static int loadingQuestIndex = 0;
 
 	public static void mainGame() {
 		display = new Display();
@@ -352,6 +361,16 @@ public class MainGLFW {
 
 		sg.enableFPS(display_fps);
 
+		// _____________________________________________________ Story
+		scenario = new Scenario(sg);
+
+		// __________________________________________ Leave Klapatche point
+		scenario.addQuest(new LeaveKlapatchePointQuest());
+		// __________________________________________ Oracle encounter
+		scenario.addQuest(new FirstApproachQuest());
+		// __________________________________________ Killing targets
+		scenario.addQuest(new TargetsKillingQuest());
+
 		viewer = new SoQtWalkViewer(SoQtFullViewer.BuildFlag.BUILD_NONE, SoQtCameraController.Type.BROWSER,/*shell*/null, style) {
 
 			public void onClose(boolean resetToDefault) {
@@ -378,6 +397,10 @@ public class MainGLFW {
 						saveGameProperties.setProperty(TIME_STOP, isTimeStop() ? "true" : "false");
 
 						saveGameProperties.setProperty(FLY, isFlying() ? "true" : "false");
+
+						saveGameProperties.setProperty(ALLOW_FLY, isAllowingFly() ? "true" : "false" );
+
+						saveGameProperties.setProperty(QUEST_INDEX, String.valueOf(scenario.getCurrentQuestIndex()));
 
 						sg.saveShots(saveGameProperties);
 					}
@@ -530,6 +553,7 @@ public class MainGLFW {
 		double previousTimeSec = 0;
 		boolean timeStop = false;
 		boolean fly = false;
+		boolean allowFly = false;
 
 		File saveGameFile = new File("savegame.mri");
 		if (saveGameFile.exists()) {
@@ -540,21 +564,25 @@ public class MainGLFW {
 
 				saveGameProperties.load(in);
 
-				float x = Float.valueOf(saveGameProperties.getProperty(HERO_X, "250.5"));
+				float x = Float.valueOf(saveGameProperties.getProperty(HERO_X, String.valueOf(sg.STARTING_X)));
 
-				float y = Float.valueOf(saveGameProperties.getProperty(HERO_Y, "303.5"));
+				float y = Float.valueOf(saveGameProperties.getProperty(HERO_Y, String.valueOf(sg.STARTING_Y)));
 
-				float z = Float.valueOf(saveGameProperties.getProperty(HERO_Z, String.valueOf(1256/* - SCENE_POSITION.getZ()*/)));
+				float z = Float.valueOf(saveGameProperties.getProperty(HERO_Z, String.valueOf(sg.STARTING_Z/* - SCENE_POSITION.getZ()*/)));
 
 				previousTimeSec = Double.valueOf(saveGameProperties.getProperty(TIME, "0"));
 
 				camera.position.setValue(x, y, z - SCENE_POSITION.getZ());
 
-				timeStop = "true".equals(saveGameProperties.getProperty(TIME_STOP, "false")) ? true : false;
+				timeStop = "true".equals(saveGameProperties.getProperty(TIME_STOP, "false"));
 
 				fly = "true".equals(saveGameProperties.getProperty(FLY, "false")) ? true : false;
 
+				allowFly = "true".equals(saveGameProperties.getProperty(ALLOW_FLY,"false"));
+
 				sg.loadShots(saveGameProperties);
+
+				loadingQuestIndex = Integer.valueOf(saveGameProperties.getProperty(QUEST_INDEX,"0"));
 
 				in.close();
 			} catch (FileNotFoundException e) {
@@ -565,7 +593,7 @@ public class MainGLFW {
 
 
 		} else {
-			camera.position.setValue(250.5f, 303.5f, 1256 - SCENE_POSITION.getZ());
+			camera.position.setValue(sg.STARTING_X, sg.STARTING_Y, sg.STARTING_Z - SCENE_POSITION.getZ());
 		}
 		viewer.getCameraController().changeCameraValues(camera);
 
@@ -587,6 +615,8 @@ public class MainGLFW {
 		if (timeStop) {
 			viewer.toggleTimeStop();
 		}
+
+		viewer.setAllowToggleFly(allowFly);
 
 		if (fly) {
 			viewer.toggleFly();
@@ -1319,15 +1349,7 @@ public class MainGLFW {
 
 		boolean success = viewer.setFocus();
 
-		// _____________________________________________________ Story
-		Scenario scenario = new Scenario(sg);
-
-		// __________________________________________ Oracle encounter
-		scenario.addQuest(new FirstApproachQuest());
-		// __________________________________________ Killing targets
-		scenario.addQuest(new TargetsKillingQuest());
-
-		scenario.start();
+		scenario.start(loadingQuestIndex);
 
 		viewer.addIdleListener((viewer1)->{
 			scenario.idle(viewer1);

@@ -8,13 +8,11 @@ import java.util.List;
 
 public class Scenario {
 
+    int currentQuestIndex = 0;
+
     SceneGraphIndexedFaceSetShader sceneGraph;
 
     final List<Quest> quests = new ArrayList<>();
-
-    Quest currentQuest;
-
-    boolean over;
 
     public Scenario(SceneGraphIndexedFaceSetShader sceneGraph){
         this.sceneGraph = sceneGraph;
@@ -25,26 +23,21 @@ public class Scenario {
         quests.add(quest);
     }
 
-    public void start() {
-        if(!quests.isEmpty()) {
-            currentQuest = quests.get(0);
-        }
-        else {
-            over = true;
-        }
+    public void start(int questIndex) {
+        currentQuestIndex = questIndex;
     }
 
     public boolean idle(SoQtWalkViewer viewer) {
 
-        Quest thisQuest = currentQuest;
+        if(isOver()) {
+            return false;
+        }
 
-        if( !over && currentQuest.isAchieved(viewer) ) {
-            int currentQuestIndex = quests.indexOf(currentQuest);
-            if(currentQuestIndex >= 0 && currentQuestIndex < quests.size()-1) {
-                currentQuest = quests.get(currentQuestIndex+1);
-            }
-            else {
-                over = true;
+        Quest thisQuest = quests.get(currentQuestIndex);
+
+        if(quests.get(currentQuestIndex).isAchieved(viewer) ) {
+            if(currentQuestIndex >= 0) {
+                currentQuestIndex++;
             }
             if(!idle(viewer)) {
                 thisQuest.actionIfNextNotAchieved(viewer);
@@ -52,5 +45,17 @@ public class Scenario {
             return true;
         }
         return false;
+    }
+
+    public int getCurrentQuestIndex() {
+        return currentQuestIndex;
+    }
+
+    public void setCurrentQuestIndex(int questIndex) {
+        currentQuestIndex = questIndex;
+    }
+
+    public boolean isOver() {
+        return currentQuestIndex >= quests.size();
     }
 }
