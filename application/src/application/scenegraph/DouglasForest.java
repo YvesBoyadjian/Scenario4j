@@ -91,15 +91,22 @@ public class DouglasForest {
 			float averageBlue = DouglasChunk.TREE_FOLIAGE_AVERAGE_MULTIPLIER.getZ();
 			
 			final float nan = Float.NaN;
+
+			final SbVec3f xyz = new SbVec3f();
 			
 			for( int i = 0; i < NB_DOUGLAS_SEEDS; i++) {
 				float x = getRandomX(randomPlacementTrees);
 				float y = getRandomY(randomPlacementTrees);
 				float z = sg.getInternalZ(x,y,indices) + sg.getzTranslation();
+
+				xyz.setX(x);
+				xyz.setY(y);
+				xyz.setZ(z);
 				
 				boolean isAboveWater = z > - 150 + sg.getzTranslation() - sg.CUBE_DEPTH /2;
 				boolean isUnderSnowLevel = z < sg.ALPINE_HEIGHT;
 				boolean isStone = sg.isStone(x,y);
+				boolean isNearTrails = sg.isNearTrails(xyz);
 
 				final float randomHeight = DouglasFir.getHeight(randomHeightTrees);
 				final float randomAngle = randomAngleTrees.nextFloat();
@@ -111,7 +118,7 @@ public class DouglasForest {
 				final float randomColorMultiplier2 = randomColorMultiplier.nextFloat();
 				final float randomColorMultiplier3 = randomColorMultiplier.nextFloat();
 
-				if( isAboveWater && isUnderSnowLevel && !isStone) {
+				if( isAboveWater && isUnderSnowLevel && !isStone && !isNearTrails ) {
 					
 					float height = randomHeight;//DouglasFir.getHeight(randomHeightTrees);
 					

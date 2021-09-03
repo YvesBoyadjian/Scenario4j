@@ -268,6 +268,8 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 
 	final Set<Long> trails = new HashSet<>();
 
+	final SbBSPTree trailsBSPTree = new SbBSPTree();
+
 	List<Long> sorted_trails;
 
 	boolean trailsDirty = false;
@@ -277,7 +279,13 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 
 	int currentQuestIndex = -1;
 
-	public SceneGraphIndexedFaceSetShader(Raster rw, Raster re, int overlap, float zTranslation, int max_i) {
+	public SceneGraphIndexedFaceSetShader(
+			Raster rw,
+			Raster re,
+			int overlap,
+			float zTranslation,
+			int max_i,
+			long[] trails) {
 		super();
 		this.rw = rw;
 		this.re = re;
@@ -728,7 +736,17 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 	    landSep.addChild(chunkTree);
 	    
 		shadowGroup.addChild(landSep);
-		
+
+		// ___________________________________________________________ Douglas trees
+
+		for(long i =0; i<trails.length;i++) {
+			long code = trails[(int)i];
+
+			int iv = (int) code;
+			int jv = (int)(code >>> 32);
+			addTrail(iv,jv);
+		}
+
 	    SoSeparator douglasSep = new SoSeparator();
 	    douglasSep.renderCaching.setValue(SoSeparator.CacheEnabled.OFF);
 	    
@@ -2327,6 +2345,10 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 				chunks.colorsPut(index, red, green, blue, alpha);
 				trailsDirty = true;
 			}
+			float[] xyz = chunks.verticesGet(index,null);
+			SbVec3f pt = new SbVec3f(xyz);
+			Object data = null;
+			trailsBSPTree.addPoint(pt,data);
 		}
 	}
 
@@ -2338,6 +2360,13 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 
 	public long getTrailsSize() {
 		return trails.size();
+	}
+
+	public boolean isNearTrails(SbVec3f point) {
+		final SbSphere nearSphere = new SbSphere(point, 2.1f);
+		final SbListInt points = new SbListInt();
+		trailsBSPTree.findPoints(nearSphere, points);
+		return points.size() > 0;
 	}
 
 	public void saveShots(Properties properties) {

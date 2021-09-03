@@ -11,9 +11,7 @@ import java.net.URL;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.file.Files;
-import java.util.Collection;
-import java.util.Objects;
-import java.util.Properties;
+import java.util.*;
 import java.util.function.Consumer;
 
 import javax.sound.sampled.AudioInputStream;
@@ -316,28 +314,22 @@ public class MainGLFW {
 
 		}
 
-
-		int overlap = 13;
-		//SceneGraph sg = new SceneGraphIndexedFaceSet(rw,re,overlap,Z_TRANSLATION);
-		sg = new SceneGraphIndexedFaceSetShader(rw, re, overlap, Z_TRANSLATION, max_i);
-		//SceneGraph sg = new ShadowTestSceneGraph();
-		rw = null; // for garbage collection
-		re = null; // for garbage collection
-
 		// ______________________________________________________________________________________________________ trails
 		File trailsFile = new File("trails.mri");
+
+		long[] trails = null;
 
 		DataInputStream reader = null;
 		try {
 			reader = new DataInputStream(new BufferedInputStream(new FileInputStream(trailsFile)));
 			long version = reader.readLong();
 			long size = reader.readLong();
+
+			trails = new long[(int)size];
+
 			for(long i =0; i<size;i++) {
 				long code = reader.readLong();
-
-				int iv = (int) code;
-				int jv = (int)(code >>> 32);
-				sg.addTrail(iv,jv);
+				trails[(int)i] = code;
 			}
 			reader.close();
 		} catch (FileNotFoundException e) {
@@ -345,6 +337,13 @@ public class MainGLFW {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+
+		int overlap = 13;
+		//SceneGraph sg = new SceneGraphIndexedFaceSet(rw,re,overlap,Z_TRANSLATION);
+		sg = new SceneGraphIndexedFaceSetShader(rw, re, overlap, Z_TRANSLATION, max_i, trails);
+		//SceneGraph sg = new ShadowTestSceneGraph();
+		rw = null; // for garbage collection
+		re = null; // for garbage collection
 
 		sg.getShadowGroup().precision.setValue(shadow_precision);
 
