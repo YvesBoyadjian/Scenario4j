@@ -1515,6 +1515,7 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 		for(int is=0;is<4;is++) {	    		    
 		    sun[is].maxShadowDistance.setValue(1e4f + (1 - sinus)*1e5f);
 		    sun[is].bboxSize.setValue(5000+is*3000 + (1 - sinus)*10000, 5000+is*3000 + (1 - sinus)*10000, 2000);
+		    sun[is].nearBboxSize.setValue(80+is*10 + (1-sinus)*100,80+is*10+(1-sinus)*100,300);
 		}
 	}
 
@@ -1612,6 +1613,11 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 		    sun[is].bboxCenter.setValue(
 		    		current_x+2000*world_camera_direction.getX(),
 		    		current_y+2000*world_camera_direction.getY(), /*current_z*/getGroundZ());
+		    sun[is].nearBboxCenter.setValue(
+		    		current_x+40*world_camera_direction.getX(),
+					current_y+40*world_camera_direction.getY(),
+					getGroundZ()
+			);
 		}		
 		
 		float xTransl = - transl.translation.getValue().getX();

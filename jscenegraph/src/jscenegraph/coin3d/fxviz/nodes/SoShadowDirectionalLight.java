@@ -170,6 +170,9 @@ public class SoShadowDirectionalLight extends SoDirectionalLight {
 	  public final SoSFVec3f bboxCenter = new SoSFVec3f();
 	  public final SoSFVec3f bboxSize = new SoSFVec3f();
 
+	  public final SoSFVec3f nearBboxCenter = new SoSFVec3f();
+	  public final SoSFVec3f nearBboxSize = new SoSFVec3f();
+
 	  /*!
 	  Constructor.
 	*/
@@ -180,6 +183,8 @@ public class SoShadowDirectionalLight extends SoDirectionalLight {
 		nodeHeader.SO_NODE_ADD_FIELD(maxShadowDistance,"maxShadowDistance", (-1.0f));
 		nodeHeader.SO_NODE_ADD_FIELD(bboxCenter,"bboxCenter", new SbVec3f(0.0f, 0.0f, 0.0f));
 		nodeHeader.SO_NODE_ADD_FIELD(bboxSize,"bboxSize", new SbVec3f(-1.0f, -1.0f, -1.0f));
+		nodeHeader.SO_NODE_ADD_FIELD(nearBboxCenter,"nearBboxCenter", new SbVec3f(0.0f, 0.0f, 0.0f));
+		nodeHeader.SO_NODE_ADD_FIELD(nearBboxSize,"nearBboxSize", new SbVec3f(-1.0f, -1.0f, -1.0f));
 	}
 
 	  public static void

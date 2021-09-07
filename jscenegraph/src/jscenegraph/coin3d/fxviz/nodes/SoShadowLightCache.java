@@ -64,26 +64,58 @@ import jscenegraph.port.SbVec2fArray;
 public class SoShadowLightCache implements Destroyable {
 
 	  final SbMatrix matrix = new SbMatrix();
+  final SbMatrix nearmatrix = new SbMatrix();
+
 	  SoPath path; //ptr
 	  SoLight light; //ptr
 	  SoSceneTexture2 depthmap; //ptr
+
+      SoSceneTexture2 neardepthmap; //ptr
+
 	  SoNode depthmapscene; //ptr
+      SoNode neardepthmapscene; //ptr
+
 	  SoSceneTexture2 gaussmap; //ptr
+
 	  SoCamera camera; //ptr
+      SoCamera nearCamera;
+
 	  float farval;
 	  float nearval;
-	  int texunit;
+
+  float farvalnear;
+  float nearvalnear;
+
+  int texunit;
+
+	  int neartexunit; // for near shadow
+
 	  int lightid;
 	  float precision; // YB : Precision used to compute ShadowLightCache
 
 	  SoSeparator bboxnode; //ptr
 	  SoShaderProgram vsm_program; //ptr
 	  SoShaderParameter1i shadowmapid; //ptr
+  SoShaderParameter1i nearshadowmapid; //ptr
+
 	  SoShaderParameter1f vsm_farval; //ptr
 	  SoShaderParameter1f vsm_nearval; //ptr
-	  SoShaderParameter1f fragment_farval; //ptr
+
+  SoShaderParameter1f vsm_farvalnear; //ptr
+  SoShaderParameter1f vsm_nearvalnear; //ptr
+
+  SoShaderParameter1f vsm_nearflag;
+
+  SoShaderParameter1f fragment_farval; //ptr
 	  SoShaderParameter1f fragment_nearval; //ptr
-	  SoShaderParameter4f fragment_lightplane; //ptr
+
+  SoShaderParameter1f fragment_farvalnear; //ptr
+  SoShaderParameter1f fragment_nearvalnear; //ptr
+
+
+  SoShaderParameter4f fragment_lightplane; //ptr
+  SoShaderParameter4f fragment_lightnearplane;
+
 	  final SoShaderGenerator vsm_vertex_generator = new SoShaderGenerator();
 	  final SoShaderGenerator vsm_fragment_generator = new SoShaderGenerator();
 	  SoShaderParameter1f maxshadowdistance; //ptr
@@ -144,6 +176,11 @@ public class SoShadowLightCache implements Destroyable {
     this.vsm_program = null;
     this.vsm_farval = null;
     this.vsm_nearval = null;
+
+    this.vsm_farvalnear = null;
+    this.vsm_nearvalnear = null;
+    this.vsm_nearflag = null;
+
     this.gaussmap = null;
     this.texunit = -1;
     this.bboxnode = new SoSeparator();
@@ -152,14 +189,26 @@ public class SoShadowLightCache implements Destroyable {
     this.shadowmapid = new SoShaderParameter1i();
     this.shadowmapid.ref();
 
+    this.nearshadowmapid = new SoShaderParameter1i();
+    this.nearshadowmapid.ref();
+
     this.fragment_farval = new SoShaderParameter1f();
     this.fragment_farval.ref();
+
+    this.fragment_farvalnear = new SoShaderParameter1f();
+    this.fragment_farvalnear.ref();
 
     this.fragment_nearval = new SoShaderParameter1f();
     this.fragment_nearval.ref();
 
+    this.fragment_nearvalnear = new SoShaderParameter1f();
+    this.fragment_nearvalnear.ref();
+
     this.fragment_lightplane = new SoShaderParameter4f();
     this.fragment_lightplane.ref();
+
+    this.fragment_lightnearplane = new SoShaderParameter4f();
+    this.fragment_lightnearplane.ref();
 
     this.maxshadowdistance = new SoShaderParameter1f();
     this.maxshadowdistance.ref();
@@ -172,6 +221,7 @@ public class SoShadowLightCache implements Destroyable {
     this.light.ref();
 
     this.createVSMProgram();
+
     this.depthmap = new SoSceneTexture2();
     this.depthmap.ref();
     this.depthmap.transparencyFunction.setValue(SoSceneTexture2.TransparencyFunction.NONE);
@@ -179,43 +229,77 @@ public class SoShadowLightCache implements Destroyable {
     this.depthmap.wrapS.setValue( SoSceneTexture2.Wrap.CLAMP_TO_BORDER);
     this.depthmap.wrapT.setValue( SoSceneTexture2.Wrap.CLAMP_TO_BORDER);
 
+    this.neardepthmap = new SoSceneTexture2();
+    this.neardepthmap.ref();
+    this.neardepthmap.transparencyFunction.setValue(SoSceneTexture2.TransparencyFunction.NONE);
+    this.neardepthmap.size.setValue( new SbVec2s((short)TEXSIZE, (short)TEXSIZE));
+    this.neardepthmap.wrapS.setValue( SoSceneTexture2.Wrap.CLAMP_TO_BORDER);
+    this.neardepthmap.wrapT.setValue( SoSceneTexture2.Wrap.CLAMP_TO_BORDER);
+
     if (this.vsm_program != null) {
       this.depthmap.type.setValue( SoSceneTexture2.Type.RGBA32F);
       this.depthmap.backgroundColor.setValue( new SbVec4f(1.0f, 1.0f, 1.0f, 1.0f));
+
+      this.neardepthmap.type.setValue( SoSceneTexture2.Type.RGBA32F);
+      this.neardepthmap.backgroundColor.setValue( new SbVec4f(1.0f, 1.0f, 1.0f, 1.0f));
     }
     else {
       this.depthmap.type.setValue( SoSceneTexture2.Type.DEPTH);
+
+      this.neardepthmap.type.setValue( SoSceneTexture2.Type.DEPTH);
     }
     SoTransparencyType tt = new SoTransparencyType();
     tt.value.setValue( SoTransparencyType.Type.NONE);
 
     this.depthmap.sceneTransparencyType.setValue(tt);
 
+    tt = new SoTransparencyType();
+    tt.value.setValue( SoTransparencyType.Type.NONE);
+
+    this.neardepthmap.sceneTransparencyType.setValue(tt);
+
     if (this.light.isOfType(SoDirectionalLight.getClassTypeId())) {
       this.camera = new SoOrthographicCamera();
+      this.nearCamera = new SoOrthographicCamera();
     }
     else {
       this.camera = new SoPerspectiveCamera();
+      this.nearCamera = new SoPerspectiveCamera();
     }
     this.camera.ref();
     this.camera.viewportMapping.setValue( SoCamera.ViewportMapping.LEAVE_ALONE);
 
+    this.nearCamera.ref();
+    this.nearCamera.viewportMapping.setValue( SoCamera.ViewportMapping.LEAVE_ALONE);
+
     SoSeparator sep = new SoSeparator();
     sep.addChild(this.camera);
+
+    SoSeparator nearSep = new SoSeparator();
+    nearSep.addChild(this.nearCamera);
 
     SoCallback cb = new SoCallback();
     cb.setCallback(SoShadowLightCache::shadowmap_glcallback, this);
 
     sep.addChild(cb);
-    if (this.vsm_program != null) sep.addChild(this.vsm_program);
+    nearSep.addChild(cb);
+
+    if (this.vsm_program != null) {
+      sep.addChild(this.vsm_program);
+      nearSep.addChild(this.vsm_program);
+    }
 
     if (scene.isOfType(SoShadowGroup.getClassTypeId())) {
       SoShadowGroup g = (SoShadowGroup) scene;
       for (int i = 0; i < g.getNumChildren(); i++) {
         sep.addChild(g.getChild(i));
+        nearSep.addChild(g.getChild(i));
       }
     }
-    else sep.addChild(scene);
+    else {
+      sep.addChild(scene);
+      nearSep.addChild(scene);
+    }
 
     if (bboxscene.isOfType(SoShadowGroup.getClassTypeId())) {
       SoShadowGroup g = (SoShadowGroup) bboxscene;
@@ -230,11 +314,19 @@ public class SoShadowLightCache implements Destroyable {
     cb = new SoCallback();
     cb.setCallback(SoShadowLightCache::shadowmap_post_glcallback, this);
     sep.addChild(cb);
+    nearSep.addChild(cb);
 
     this.depthmap.scene.setValue( sep);
+    this.neardepthmap.scene.setValue( nearSep);
+
     this.depthmapscene = sep;
     this.depthmapscene.ref();
+
+    this.neardepthmapscene = nearSep;
+    this.neardepthmapscene.ref();
+
     this.matrix.copyFrom( SbMatrix.identity());
+    this.nearmatrix.copyFrom( SbMatrix.identity());
 
     if (gausskernelsize > 0) {
       this.gaussmap = new SoSceneTexture2();
@@ -255,19 +347,30 @@ public class SoShadowLightCache implements Destroyable {
 
 	  public void destructor() {
 		    if (this.depthmapscene != null) this.depthmapscene.unref();
+        if (this.neardepthmapscene != null) this.neardepthmapscene.unref();
 		    if (this.bboxnode != null) this.bboxnode.unref();
 		    if (this.maxshadowdistance != null) this.maxshadowdistance.unref();
 		    if (this.vsm_program != null) this.vsm_program.unref();
 		    if (this.vsm_farval != null) this.vsm_farval.unref();
 		    if (this.vsm_nearval != null) this.vsm_nearval.unref();
+        if (this.vsm_farvalnear != null) this.vsm_farvalnear.unref();
+        if (this.vsm_nearvalnear != null) this.vsm_nearvalnear.unref();
+        if (this.vsm_nearflag != null) this.vsm_nearflag.unref();
 		    if (this.fragment_farval != null) this.fragment_farval.unref();
+        if (this.fragment_farvalnear != null) this.fragment_farvalnear.unref();
 		    if (this.shadowmapid != null) this.shadowmapid.unref();
+        if (this.nearshadowmapid != null) this.nearshadowmapid.unref();
 		    if (this.fragment_nearval != null) this.fragment_nearval.unref();
+        if (this.fragment_nearvalnear != null) this.fragment_nearvalnear.unref();
 		    if (this.fragment_lightplane != null) this.fragment_lightplane.unref();
+        if (this.fragment_lightnearplane != null) this.fragment_lightnearplane.unref();
 		    if (this.light != null) this.light.unref();
 		    if (this.path != null) this.path.unref();
 		    if (this.gaussmap != null) this.gaussmap.unref();
 		    if (this.depthmap != null) this.depthmap.unref();
+
+		    if (this.neardepthmap != null) this.neardepthmap.unref();
+
 		    if (this.camera != null) this.camera.unref();
 		  }
 
@@ -313,12 +416,18 @@ createVSMProgram()
   fgen.addDeclaration("varying vec3 light_vec;", false);
   fgen.addDeclaration("uniform float farval;", false);
   fgen.addDeclaration("uniform float nearval;", false);
+  fgen.addDeclaration("uniform float farvalnear;", false);
+  fgen.addDeclaration("uniform float nearvalnear;", false);
+  fgen.addDeclaration("uniform float nearflag;",false);
   if (!dirlight)  {
-    fgen.addMainStatement("float l = (length(light_vec) - nearval) / (farval-nearval);\n");
+    fgen.addMainStatement("float lfar = (length(light_vec) - nearval) / (farval-nearval);\n");
+    fgen.addMainStatement("float lnear = (length(light_vec) - nearvalnear) / (farvalnear-nearvalnear);\n");
   }
   else {
-    fgen.addMainStatement("float l = (-light_vec.z - nearval) / (farval-nearval);\n");
+    fgen.addMainStatement("float lfar = (-light_vec.z - nearval) / (farval-nearval);\n");
+    fgen.addMainStatement("float lnear = (-light_vec.z - nearvalnear) / (farvalnear-nearvalnear);\n");
   }
+  fgen.addMainStatement( "float l = lfar*(1-nearflag)+ nearflag*lnear;");
   fgen.addMainStatement(
 //#ifdef DISTRIBUTE_FACTOR
                         "vec2 m = vec2(l, l*l);\n"+
@@ -349,15 +458,33 @@ createVSMProgram()
   this.vsm_farval.ref();
   this.vsm_farval.name.setValue("farval");
 
+  this.vsm_farvalnear = new SoShaderParameter1f();
+  this.vsm_farvalnear.ref();
+  this.vsm_farvalnear.name.setValue("farvalnear");
+
   this.vsm_nearval = new SoShaderParameter1f();
   this.vsm_nearval.ref();
   this.vsm_nearval.name.setValue( "nearval");
 
+  this.vsm_nearvalnear = new SoShaderParameter1f();
+  this.vsm_nearvalnear.ref();
+  this.vsm_nearvalnear.name.setValue( "nearvalnear");
+
+  this.vsm_nearflag = new SoShaderParameter1f();
+  this.vsm_nearflag.ref();
+  this.vsm_nearflag.name.setValue( "nearflag");
+
   fshader.parameter.set1Value(0, this.vsm_farval);
   fshader.parameter.set1Value(1, this.vsm_nearval);
+
+  fshader.parameter.set1Value(2, this.vsm_farvalnear);
+  fshader.parameter.set1Value(3, this.vsm_nearvalnear);
+
+  fshader.parameter.set1Value(4, this.vsm_nearflag);
 }
 
 private final SbXfBox3f xbox = new SbXfBox3f(); // SINGLE_THREAD
+  private final SbXfBox3f nearXbox = new SbXfBox3f(); // SINGLE_THREAD
 
 public SbBox3f toCameraSpace(final SbXfBox3f  worldbox)
 {
@@ -370,6 +497,18 @@ public SbBox3f toCameraSpace(final SbXfBox3f  worldbox)
   xbox.transform(mat);
   return xbox.project();
 }
+
+  public SbBox3f toNearCameraSpace(final SbXfBox3f  worldbox)
+  {
+    SoCamera cam = this.nearCamera;
+    final SbMatrix mat = new SbMatrix();
+    nearXbox.copyFrom(worldbox);
+    mat.setTranslate( cam.position.getValue().operator_minus());
+    nearXbox.transform(mat);
+    mat.copyFrom( cam.orientation.getValue().getMatrix().inverse()); // java port
+    nearXbox.transform(mat);
+    return nearXbox.project();
+  }
 
 public static void
 shadowmap_glcallback(Object closure, SoAction action)
