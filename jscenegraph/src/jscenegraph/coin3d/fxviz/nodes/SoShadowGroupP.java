@@ -107,6 +107,10 @@ public class SoShadowGroupP implements Destroyable {
 
 	  SoShaderProgramCache vertexshadercache; //ptr
 	  SoShaderProgramCache fragmentshadercache; //ptr
+
+	SoShaderParameterMatrix[] texturematrix; // ptr
+	SoShaderParameterMatrix[] neartexturematrix; // ptr
+
 	  SoShaderParameter1i texunit0; //ptr
 	  SoShaderParameter1i texunit1; //ptr
 	  SoShaderParameter1i lightmodel; //ptr
@@ -152,6 +156,11 @@ public class SoShadowGroupP implements Destroyable {
 		    if (twosided != null) twosided.unref();
 		    if (texunit0 != null) texunit0.unref();
 		    if (texunit1 != null) texunit1.unref();
+
+		    for( int i=0; i< texturematrix.length;i++) {
+				if (texturematrix[i] != null) texturematrix[i].unref();
+				if (neartexturematrix[i] != null) neartexturematrix[i].unref();
+			}
 		    
 		    //if (frame != null) frame.unref(); //YB
 		    
@@ -303,7 +312,13 @@ public class SoShadowGroupP implements Destroyable {
 	    if (this.fragmentshadercache == null || !this.fragmentshadercache.isValid(state)) {
 	      this.setFragmentShader(state);
 	    }
-	    
+
+		  for (int i = 0; i < this.shadowlights.getLength(); i++) {
+			  SoShadowLightCache cache = this.shadowlights.operator_square_bracket(i);
+			  texturematrix[i].value.setValue(cache.matrix);
+			  neartexturematrix[i].value.setValue(cache.nearmatrix);
+		  }
+
 	    this.shaderprogram.GLRender(action);
 
 //	    String vs = vertexshader.getSourceProgram();
@@ -488,7 +503,7 @@ public class SoShadowGroupP implements Destroyable {
 
 	      assert(cache.texunit >= 0);
 
-	      SoMultiTextureMatrixElement.set(state, master, cache.texunit, cache.matrix);
+	      //SoMultiTextureMatrixElement.set(state, master, cache.texunit, cache.matrix); brings problems on nvidia
 	      this.renderDepthMap(cache, action);
 	      SoGLMultiTextureEnabledElement.set(state, master, cache.texunit,
 	                                          SoMultiTextureEnabledElement.Mode.DISABLED.getValue() != 0);
@@ -500,7 +515,7 @@ public class SoShadowGroupP implements Destroyable {
 
 			assert(cache.neartexunit >= 0);
 
-			SoMultiTextureMatrixElement.set(state, master, cache.neartexunit, cache.nearmatrix);
+			//SoMultiTextureMatrixElement.set(state, master, cache.neartexunit, cache.nearmatrix); //brings problems on nvidia
 			this.renderNearDepthMap(cache, action);
 			SoGLMultiTextureEnabledElement.set(state, master, cache.neartexunit,
 					SoMultiTextureEnabledElement.Mode.DISABLED.getValue() != 0);
@@ -552,11 +567,15 @@ setVertexShader(SoState state)
       str = "varying vec3 spotVertexColor"+i+";";
       gen.addDeclaration(str, false);
     }
+
+	  gen.addDeclaration("uniform mat4 textureMatrix"+i+";", false);
+	  gen.addDeclaration("uniform mat4 nearTextureMatrix"+i+";", false);
   }
 
   if (numshadowlights != 0) {
     gen.addDeclaration("uniform mat4 cameraTransform;", false);
   }
+
   gen.addDeclaration("varying vec3 ecPosition3;", false);
   gen.addDeclaration("varying vec3 fragmentNormal;", false);
   gen.addDeclaration("varying vec3 perVertexColor;", false);
@@ -621,13 +640,34 @@ setVertexShader(SoState state)
   if (numshadowlights != 0) {
     gen.addMainStatement("vec4 pos = cameraTransform * ecPosition;\n"); // in world space
   }
+
+  if(this.texturematrix == null) {
+  	texturematrix = new SoShaderParameterMatrix[numshadowlights];
+  	neartexturematrix = new SoShaderParameterMatrix[numshadowlights];
+  }
+
   for (i = 0; i < numshadowlights; i++) {
     SoShadowLightCache cache = this.shadowlights.operator_square_bracket(i);
+
+
+	  if (this.texturematrix[i] == null) {
+		  this.texturematrix[i] = new SoShaderParameterMatrix();
+		  this.texturematrix[i].ref();
+		  this.texturematrix[i].name.setValue( "textureMatrix"+i);
+		  //this.texturematrix.value.setValue( 0);
+	  }
+	  if (this.neartexturematrix[i] == null) {
+		  this.neartexturematrix[i] = new SoShaderParameterMatrix();
+		  this.neartexturematrix[i].ref();
+		  this.neartexturematrix[i].name.setValue( "nearTextureMatrix"+i);
+		  //this.texunit0.value.setValue( 0);
+	  }
+
     //String str;
-    str = "shadowCoord"+i+" = gl_TextureMatrix["+cache.texunit+"] * pos;\n"; // in light space
+    str = "shadowCoord"+i+" = textureMatrix"+i+" * pos;\n"; // in light space
     gen.addMainStatement(str);
 
-	  str = "nearShadowCoord"+i+" = gl_TextureMatrix["+cache.neartexunit+"] * pos;\n"; // in light space
+	  str = "nearShadowCoord"+i+" = nearTextureMatrix"+i+" * pos;\n"; // in light space
 	  gen.addMainStatement(str);
 
 	  if (!perpixelspot[0]) {
@@ -682,6 +722,11 @@ setVertexShader(SoState state)
     else {
       this.vertexshader.parameter.setNum(0);
     }
+
+	  for (i = 0; i < numshadowlights; i++) {
+		  this.vertexshader.parameter.set1Value(this.vertexshader.parameter.getNum(), this.texturematrix[i]);
+		  this.vertexshader.parameter.set1Value(this.vertexshader.parameter.getNum(), this.neartexturematrix[i]);
+	  }
 //#if 0 // for debugging
 //    fprintf(stderr,"new vertex program: %s\n",
 //            gen.getShaderProgram().getString());
