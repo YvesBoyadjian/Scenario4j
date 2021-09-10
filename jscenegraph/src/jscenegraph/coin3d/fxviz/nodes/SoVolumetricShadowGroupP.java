@@ -107,6 +107,11 @@ public class SoVolumetricShadowGroupP extends SoShadowGroupP {
     }
 
     protected void postFragmentShaderShadowLight(int i) {
+
+        if(!getMaster().isVolumetricActive.getValue()) {
+            return;
+        }
+
         this.fragmentshader.parameter.set1Value(this.vertexshader.parameter.getNum(), this.texturematrix[i]);
     }
 }
