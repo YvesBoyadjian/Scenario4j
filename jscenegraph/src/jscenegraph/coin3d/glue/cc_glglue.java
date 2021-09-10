@@ -162,7 +162,7 @@ public class cc_glglue {
 	    maxtextureunits = 1; /* when multitexturing is not available */
 	    //if (w->glActiveTexture) {
 	      final int[] tmp = new int[1];
-	      gl2.glGetIntegerv(GL2.GL_MAX_TEXTURE_COORDS_ARB, tmp,0);
+	      gl2.glGetIntegerv(/*GL2.GL_MAX_TEXTURE_COORDS_ARB*/GL2.GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS, tmp,0);
 	      maxtextureunits = (int) tmp[0];
 	    //}
 	      

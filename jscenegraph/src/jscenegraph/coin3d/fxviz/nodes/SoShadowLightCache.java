@@ -183,6 +183,7 @@ public class SoShadowLightCache implements Destroyable {
 
     this.gaussmap = null;
     this.texunit = -1;
+    this.neartexunit = -1;
     this.bboxnode = new SoSeparator();
     this.bboxnode.ref();
 
