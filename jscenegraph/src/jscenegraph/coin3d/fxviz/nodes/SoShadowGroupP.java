@@ -1227,6 +1227,7 @@ setFragmentShader(SoState state)
 		}
 		this.fragmentshader.parameter.set1Value(this.fragmentshader.parameter.getNum(), lightnearplane);
     }
+    postFragmentShaderShadowLight(i);
   }
 
   this.shadowlightsvalid = true;
@@ -1289,6 +1290,10 @@ protected void endFragmentShader(SoShaderGenerator gen,SoEnvironmentElement.FogT
 		gen.addMainStatement("color = mix(gl_Fog.color.rgb, color, clamp(fog, 0.0, 1.0));\n");
 	}
 }
+
+	protected void postFragmentShaderShadowLight(int i) {
+
+	}
 
 	public void
 updateSpotCamera(SoState state, SoShadowLightCache cache, final SbMatrix transform)

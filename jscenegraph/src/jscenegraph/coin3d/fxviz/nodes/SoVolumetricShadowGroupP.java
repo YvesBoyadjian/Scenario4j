@@ -21,6 +21,10 @@ public class SoVolumetricShadowGroupP extends SoShadowGroupP {
 
         int numshadowlights = this.shadowlights.getLength();
 
+        for(int i=0;i<numshadowlights;i++) {
+            gen.addDeclaration("uniform mat4 textureMatrix" + i + ";", false);
+        }
+
         if (numshadowlights != 0) {
             gen.addMainStatement("vec3 g_CameraPosition = vec3(0.0f,0.0f,0.0f);");
             gen.addMainStatement("vec3 endRayPosition = ecPosition3;");
@@ -50,7 +54,8 @@ public class SoVolumetricShadowGroupP extends SoShadowGroupP {
         }
         gen.addMainStatement("sunDirection = normalize(vec3(gl_LightSource["+index+"].position));");
         gen.addMainStatement("g_SunColor = gl_LightSource["+index+"].diffuse.rgb;");
-        gen.addMainStatement("g_ShadowViewProjectionMatrix = gl_TextureMatrix["+texunit+"];");
+        //gen.addMainStatement("g_ShadowViewProjectionMatrix = gl_TextureMatrix["+texunit+"];");
+        gen.addMainStatement("g_ShadowViewProjectionMatrix = textureMatrix"+shadowlightnumber+";");
 
         gen.addMainStatement("currentPosition = startPosition;");
         gen.addMainStatement("accumFog = vec3(0.0f,0.0f,0.0f);");
@@ -99,5 +104,9 @@ public class SoVolumetricShadowGroupP extends SoShadowGroupP {
             case SMOKE:
                 break;
         }
+    }
+
+    protected void postFragmentShaderShadowLight(int i) {
+        this.fragmentshader.parameter.set1Value(this.vertexshader.parameter.getNum(), this.texturematrix[i]);
     }
 }
