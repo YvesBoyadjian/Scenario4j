@@ -112,6 +112,6 @@ public class SoVolumetricShadowGroupP extends SoShadowGroupP {
             return;
         }
 
-        this.fragmentshader.parameter.set1Value(this.vertexshader.parameter.getNum(), this.texturematrix[i]);
+        this.fragmentshader.parameter.set1Value(this.fragmentshader.parameter.getNum(), this.texturematrix[i]);
     }
 }
