@@ -43,10 +43,7 @@ import jsceneviewerglfw.inventor.qt.viewers.SoQtConstrainedViewer;
 import org.lwjgl.system.CallbackI;
 import org.ode4j.math.DMatrix3;
 import org.ode4j.math.DMatrix3C;
-import org.ode4j.ode.DBox;
-import org.ode4j.ode.DGeom;
-import org.ode4j.ode.DSpace;
-import org.ode4j.ode.OdeHelper;
+import org.ode4j.ode.*;
 
 /**
  * @author Yves Boyadjian
@@ -276,6 +273,10 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 	boolean CBRunning = false;
 
 	final Collection<Runnable> idleCallbacks = new ArrayList<>();
+
+	DBody heroBody;
+
+	DBody heroFeetBody;
 
 	int currentQuestIndex = -1;
 
@@ -2380,6 +2381,24 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 		for(int i=0; i<nbShots; i++) {
 			properties.put("targetShotIndex"+i, String.valueOf(shotTargetsIndices.get(i)));
 			properties.put("targetShotInstance"+i, String.valueOf(shotTargetsInstances.get(i)));
+		}
+	}
+
+	public void setBody(DBody body) {
+		heroBody = body;
+	}
+
+	public void setBallBody(DBody ballBody) {
+		heroFeetBody = ballBody;
+	}
+
+	public void stopBody() {
+		if(null != heroBody) {
+			heroBody.setLinearVel(0,0,0);
+		}
+		if(null != heroFeetBody) {
+			heroFeetBody.setLinearVel(0,0,0);
+			heroFeetBody.setAngularVel(0,0,0);
 		}
 	}
 }

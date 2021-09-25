@@ -862,6 +862,8 @@ public class MainGLFW {
 		body.setMass(m);
 		body.setMaxAngularSpeed(0);
 
+		sg.setBody(body);
+
 		//DGeom box = OdeHelper.createCapsule(space, 0.4, 1.75 - 2 * 0.4);
 		DGeom box = OdeHelper.createSphere(space,0.4);
 		box.setBody(body);
@@ -881,6 +883,9 @@ public class MainGLFW {
 		DMass ballm = OdeHelper.createMass();
 		ballm.setSphere(1000.0f, 0.25);
 		ballBody.setMass(ballm);
+
+		sg.setBallBody(ballBody);
+
 		ball.setBody(ballBody);
 
 //		final DAMotorJoint joint = OdeHelper.createAMotorJoint(world,null);
@@ -1348,7 +1353,7 @@ public class MainGLFW {
 
 		boolean success = viewer.setFocus();
 
-		scenario.start(loadingQuestIndex);
+		scenario.start(loadingQuestIndex,viewer);
 
 		viewer.addIdleListener((viewer1)->{
 			scenario.idle(viewer1);

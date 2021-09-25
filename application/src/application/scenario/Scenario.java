@@ -23,8 +23,12 @@ public class Scenario {
         quests.add(quest);
     }
 
-    public void start(int questIndex) {
+    public void start(int questIndex, SoQtWalkViewer viewer) {
         currentQuestIndex = questIndex;
+
+        if(currentQuestIndex > 0) {
+            quests.get(currentQuestIndex-1).actionIfNextNotAchieved(viewer);
+        }
     }
 
     public boolean idle(SoQtWalkViewer viewer) {
@@ -49,10 +53,6 @@ public class Scenario {
 
     public int getCurrentQuestIndex() {
         return currentQuestIndex;
-    }
-
-    public void setCurrentQuestIndex(int questIndex) {
-        currentQuestIndex = questIndex;
     }
 
     public boolean isOver() {
