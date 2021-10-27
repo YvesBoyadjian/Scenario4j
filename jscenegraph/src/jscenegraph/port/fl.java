@@ -971,7 +971,15 @@ public static void flSetHint(
 		  	fontDefault = fontPath + "/liberation/LiberationSerif-Regular.ttf";
 		  	fontFile = new File(fontDefault);
 		  	if(!fontFile.exists()) {
-				fontDefault = fontPath + "/truetype/liberation/LiberationSerif-Regular.ttf";
+				fontDefault = fontPath + "/liberation-serif/LiberationSerif-Regular.ttf";
+				fontFile = new File(fontDefault);
+				if (!fontFile.exists()) {
+					fontDefault = fontPath + "/truetype/liberation/LiberationSerif-Regular.ttf";
+					fontFile = new File(fontDefault);
+					if (!fontFile.exists()) {
+						fontDefault = fontPath + "/dejavu/DejaVuSerif.ttf";
+					}
+				}
 			}
 		  }
 
