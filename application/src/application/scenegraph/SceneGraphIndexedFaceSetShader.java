@@ -14,7 +14,9 @@ import java.util.*;
 import java.util.stream.Stream;
 
 import javax.imageio.ImageIO;
+import javax.swing.*;
 
+import application.MainGLFW;
 import application.nodes.SoTarget;
 import application.nodes.SoTargets;
 import application.objects.Target;
@@ -44,6 +46,8 @@ import org.lwjgl.system.CallbackI;
 import org.ode4j.math.DMatrix3;
 import org.ode4j.math.DMatrix3C;
 import org.ode4j.ode.*;
+
+import static application.MainGLFW.MAX_PROGRESS;
 
 /**
  * @author Yves Boyadjian
@@ -117,6 +121,10 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 	static public final float STARTING_Y = 303.5f;
 
 	static public final float STARTING_Z = 1256f;
+
+	static public final float LOADING_HEIGHMAP_TIME_PERCENTAGE = 40;
+
+	static public final float LOADING_NORMALS_TIME_PERCENTAGE = 20;
 
 	private final float[] douglas_distance_trunk = new float[1];
 
@@ -286,7 +294,8 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 			int overlap,
 			float zTranslation,
 			int max_i,
-			long[] trails) {
+			long[] trails,
+			final JProgressBar progressBar) {
 		super();
 		this.rw = rw;
 		this.re = re;
@@ -450,6 +459,7 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 					
 					chunks.colorsPut(index, red, green, blue, alpha);
 				}
+				progressBar.setValue((int)((long)MAX_PROGRESS*i*LOADING_HEIGHMAP_TIME_PERCENTAGE/100/w));
 			}
 
 			if(SAVE_CHUNK_MRI) {
@@ -500,6 +510,7 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 						chunks.stonePut(index);				
 					}
 				}
+				progressBar.setValue((int)((long)MAX_PROGRESS*LOADING_HEIGHMAP_TIME_PERCENTAGE/100 + (long)MAX_PROGRESS*i*LOADING_NORMALS_TIME_PERCENTAGE/100/w));
 			}
 			if ( need_to_save_colors ) {
 				if(SAVE_CHUNK_MRI) {
@@ -725,7 +736,7 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 
 	    landSep.addChild(gigaTexture);
 	    
-	    RecursiveChunk rc = chunks.getRecursiveChunk();
+	    RecursiveChunk rc = chunks.getRecursiveChunk(progressBar);
 	    
 	    master = new SoTouchLODMaster("viewer");
 
@@ -814,7 +825,7 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 
 	    douglas_distance_trunk[0] = DOUGLAS_DISTANCE/2;
 	    
-		douglasTreesT = getDouglasTreesT(douglasTreesRefPoint,douglas_distance_trunk);
+		douglasTreesT = getDouglasTreesT(douglasTreesRefPoint,douglas_distance_trunk,progressBar);
 		
 	    SoSeparator douglasSepF = new SoSeparator();
 	    douglasSepF.renderCaching.setValue(SoSeparator.CacheEnabled.OFF);
@@ -823,7 +834,7 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 
 		douglas_distance_foliage[0] = DOUGLAS_DISTANCE;
 		
-		douglasTreesF = getDouglasTreesF(douglasTreesRefPoint,douglas_distance_foliage,true);
+		douglasTreesF = getDouglasTreesF(douglasTreesRefPoint,douglas_distance_foliage,true,progressBar);
 		
 	    douglasSepF.addChild(douglasTexture);
 	    
@@ -1074,13 +1085,13 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 
 		douglas_distance_shadow_trunk[0] = DOUGLAS_DISTANCE_SHADOW/2;
 	    
-		douglasTreesST = getDouglasTreesT(douglasTreesSRefPoint,douglas_distance_shadow_trunk);
+		douglasTreesST = getDouglasTreesT(douglasTreesSRefPoint,douglas_distance_shadow_trunk,progressBar);
 		
 		douglasSepS.addChild(douglasTreesST);
 
 		douglas_distance_shadow_foliage[0] = DOUGLAS_DISTANCE_SHADOW;
 		
-		douglasTreesSF = getDouglasTreesF(douglasTreesSRefPoint,douglas_distance_shadow_foliage, false);
+		douglasTreesSF = getDouglasTreesF(douglasTreesSRefPoint,douglas_distance_shadow_foliage, false,progressBar);
 		
 		douglasSepS.addChild(douglasTreesSF);
 		
@@ -1860,11 +1871,11 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 	
 	DouglasForest forest;
 	
-	private void computeDouglas() { 
+	private void computeDouglas(final JProgressBar progressBar) {
 		
 		forest = new DouglasForest(this);
 		
-		int nbDouglas = forest.compute();
+		int nbDouglas = forest.compute(progressBar);
 		
 		forest.buildDouglasChunks();
 		
@@ -1874,7 +1885,13 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 
 		final SbVec3fSingle treePoint = new SbVec3fSingle();
 
+		int progressBarInitialValue = progressBar.getValue();
+
 		for( int i=0; i< forest.NB_DOUGLAS_SEEDS; i++) {
+			if( 0 == i%999 ) {
+				progressBar.setValue((int)(progressBarInitialValue + (MAX_PROGRESS - progressBarInitialValue)*(long)i/forest.NB_DOUGLAS_SEEDS));
+			}
+
 			float x = forest.xArray[i];
 			float y = forest.yArray[i];
 			float z = forest.zArray[i];
@@ -1887,19 +1904,19 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 		}
 	}
 		
-	SoGroup getDouglasTreesT(SbVec3f refPoint, final float[] distance) {
+	SoGroup getDouglasTreesT(SbVec3f refPoint, final float[] distance,final JProgressBar progressBar) {
 		
 		if( forest == null) {
-			computeDouglas();
+			computeDouglas(progressBar);
 		}
 		
 		return forest.getDouglasTreesT(refPoint, distance);			
 	}	
 	
-	SoGroup getDouglasTreesF(SbVec3f refPoint, final float[] distance, boolean withColors) {
+	SoGroup getDouglasTreesF(SbVec3f refPoint, final float[] distance, boolean withColors,final JProgressBar progressBar) {
 		
 		if( forest == null) {
-			computeDouglas();
+			computeDouglas(progressBar);
 		}
 		
 		return forest.getDouglasTreesF(refPoint, distance, withColors);			

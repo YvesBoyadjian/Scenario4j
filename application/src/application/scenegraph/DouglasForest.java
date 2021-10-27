@@ -16,6 +16,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Random;
 
+import application.MainGLFW;
 import application.objects.DouglasFir;
 import jscenegraph.coin3d.inventor.nodes.SoVertexProperty;
 import jscenegraph.database.inventor.SbBox3f;
@@ -26,6 +27,8 @@ import jscenegraph.database.inventor.actions.SoGLRenderAction;
 import jscenegraph.database.inventor.nodes.SoGroup;
 import jscenegraph.database.inventor.nodes.SoIndexedFaceSet;
 import jscenegraph.database.inventor.nodes.SoSeparator;
+
+import javax.swing.*;
 
 /**
  * @author Yves Boyadjian
@@ -68,7 +71,7 @@ public class DouglasForest {
 		this.sg = sg;
 	}
 
-	public int compute() {
+	public int compute(final JProgressBar progressBar) {
 		
 		if( ! loadDouglas()) {
 		
@@ -93,8 +96,15 @@ public class DouglasForest {
 			final float nan = Float.NaN;
 
 			final SbVec3f xyz = new SbVec3f();
+
+			final int progressBarInitialValue = progressBar.getValue();
 			
 			for( int i = 0; i < NB_DOUGLAS_SEEDS; i++) {
+
+				if(0 == i%999) {
+					progressBar.setValue((int)((long)progressBarInitialValue+((long)MainGLFW.MAX_PROGRESS*.9-progressBarInitialValue)*i/NB_DOUGLAS_SEEDS));
+				}
+
 				float x = getRandomX(randomPlacementTrees);
 				float y = getRandomY(randomPlacementTrees);
 				float z = sg.getInternalZ(x,y,indices) + sg.getzTranslation();

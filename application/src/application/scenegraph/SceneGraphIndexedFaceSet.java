@@ -398,7 +398,7 @@ for(int is=0;is<4;is++) {
 	    
 	    landSep.addChild(ot.getTexture());
 	    
-	    RecursiveChunk rc = chunks.getRecursiveChunk();
+	    RecursiveChunk rc = chunks.getRecursiveChunk(null);
 	    
 	    master = new SoTouchLODMaster("truc");
 

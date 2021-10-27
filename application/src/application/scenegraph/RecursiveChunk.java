@@ -13,6 +13,7 @@ import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.locks.Lock;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -32,6 +33,8 @@ import jscenegraph.database.inventor.nodes.SoNode;
 import jscenegraph.database.inventor.nodes.SoPerspectiveCamera;
 import jscenegraph.database.inventor.nodes.SoSeparator;
 import jscenegraph.port.memorybuffer.FloatMemoryBuffer;
+
+import javax.swing.*;
 
 /**
  * @author Yves Boyadjian
@@ -632,7 +635,7 @@ public class RecursiveChunk {
 //		return vertexProperty;
 //	}
 
-	public void prepare() {
+	public void prepare(Lock lock,final JProgressBar progressBar) {
 		getDecimatedVertices();
 		
 		if(KEEP_IN_MEMORY) {		
@@ -645,9 +648,18 @@ public class RecursiveChunk {
 			decimatedVertices = null;//getDecimatedVerticesBuffer();
 		}
 		getCenter();
+
+		updateProgressBar(lock,progressBar);
 		
-		childs.parallelStream().forEach((c)-> c.prepare());
+		childs.parallelStream().forEach((c)-> c.prepare(lock,progressBar));
 		decimatedVerticesCount = 0;
+	}
+
+	synchronized void updateProgressBar(Lock lock,final JProgressBar progressBar) {
+		lock.lock();
+		int progress = progressBar.getValue();
+		progressBar.setValue(progress+1);
+		lock.unlock();
 	}
 	
 	public boolean isInside(float x, float y) {

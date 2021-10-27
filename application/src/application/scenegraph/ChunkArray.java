@@ -11,6 +11,8 @@ import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Consumer;
 
 import jscenegraph.coin3d.inventor.nodes.SoLOD;
@@ -27,6 +29,8 @@ import jscenegraph.database.inventor.nodes.SoIndexedFaceSet;
 import jscenegraph.database.inventor.nodes.SoNode;
 import jscenegraph.database.inventor.nodes.SoSeparator;
 import jscenegraph.database.inventor.nodes.SoTextureCoordinate2;
+
+import javax.swing.*;
 
 /**
  * @author Yves Boyadjian
@@ -590,10 +594,12 @@ public class ChunkArray {
 		
 	}
 	
-	public RecursiveChunk getRecursiveChunk() {
+	public RecursiveChunk getRecursiveChunk(final JProgressBar progressBar) {
 		RecursiveChunk rc = new RecursiveChunk(this,null,1,0,0,w,h);
+
+		Lock lock = new ReentrantLock();
 		
-		rc.prepare();
+		rc.prepare(lock,progressBar);
 		
 		return rc;
 	}

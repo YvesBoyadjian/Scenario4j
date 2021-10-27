@@ -155,6 +155,8 @@ public class MainGLFW {
 
 	public static final long TRAILS_VERSION = 0;
 
+	public static final int MAX_PROGRESS = 99999;
+
 	/**
 	 * @param args
 	 */
@@ -190,34 +192,7 @@ public class MainGLFW {
 	static Scenario scenario;
 
 	public static void showSplash() {
-		window = new JWindow()/* {
-			public void paint(Graphics g) {
-			      super.paint(g);
-			      g.drawImage(splashScreen, 0, 0, this);
-			   }			
-		};*/
-		{
-			public void paint(Graphics g) {
-				super.paint(g);
-
-				if(!hasMainGameBeenCalled) {
-					hasMainGameBeenCalled = true;
-					SwingUtilities.invokeLater(() -> {
-						try {
-							mainGame();
-						} catch (Exception e) {
-							JOptionPane.showMessageDialog(window, e.toString(), "Exception in Mount Rainier Island", JOptionPane.ERROR_MESSAGE);
-							e.printStackTrace();
-							System.exit(-1); // Necessary, because of Linux
-						} catch (Error e) {
-							JOptionPane.showMessageDialog(window, e.toString(), "Error in Mount Rainier Island", JOptionPane.ERROR_MESSAGE);
-							e.printStackTrace();
-							System.exit(-1); // Necessary, because of Linux
-						}
-					});
-				}
-			}
-		};
+		window = new JWindow();
 		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 		double width = screenSize.getWidth();
 		double height = screenSize.getHeight();
@@ -228,10 +203,30 @@ public class MainGLFW {
 		window.getContentPane().add(
 				intro);
 
+		final JProgressBar progressBar = new JProgressBar(0, MAX_PROGRESS);
+		progressBar.setBackground(Color.black);
+		progressBar.setForeground(Color.red.darker());
+		progressBar.setBorderPainted(false);
+
+		JPanel southPanel = new JPanel();
+		southPanel.setBackground(Color.BLACK);
+		southPanel.setLayout(new BoxLayout(southPanel, BoxLayout.PAGE_AXIS));
+
+		southPanel.add(progressBar);
+
 		JLabel keys = new JLabel("[WASD] or [ZQSD] to walk, [left mouse button] to shoot"+ (SceneGraphIndexedFaceSetShader.AIM ? ", [right mouse button] to aim":""),null,SwingConstants.CENTER);
 		keys.setForeground(Color.yellow);
 		//keys.setFont(intro.getFont().deriveFont((float) height / 100f));
-		window.getContentPane().add(keys,BorderLayout.SOUTH);
+		keys.setBackground(Color.black);
+
+		JPanel keysPanel = new JPanel();
+		keysPanel.setBackground(Color.black);
+		keysPanel.add(keys);
+
+		southPanel.add(keysPanel);
+
+		window.getContentPane().add(southPanel,BorderLayout.SOUTH);
+
 
 		window.getContentPane().setBackground(Color.BLACK);
 		window.setCursor(new java.awt.Cursor(java.awt.Cursor.WAIT_CURSOR));
@@ -240,6 +235,28 @@ public class MainGLFW {
 		window.setBounds(0, 0, (int) width, (int) height - 40);
 
 		window.setVisible(true);
+
+		SwingWorker sw = new SwingWorker() {
+			@Override
+			protected Object doInBackground() throws Exception {
+				try {
+					mainGame(progressBar);
+				} catch (Exception e) {
+					JOptionPane.showMessageDialog(window, e.toString(), "Exception in Mount Rainier Island", JOptionPane.ERROR_MESSAGE);
+					e.printStackTrace();
+					System.exit(-1); // Necessary, because of Linux
+				} catch (Error e) {
+					JOptionPane.showMessageDialog(window, e.toString(), "Error in Mount Rainier Island", JOptionPane.ERROR_MESSAGE);
+					e.printStackTrace();
+					System.exit(-1); // Necessary, because of Linux
+				}
+				return null;
+			}
+		};
+
+		SwingUtilities.invokeLater(() -> {
+			sw.execute();
+		});
 	}
 
 	static Display display;
@@ -253,7 +270,17 @@ public class MainGLFW {
 
 	static int loadingQuestIndex = 0;
 
-	public static void mainGame() {
+	static double previousTimeSec = 0;
+
+	static boolean timeStop = false;
+	static boolean fly = false;
+	static boolean allowFly = false;
+
+	static DWorld world;
+	static DSpace space;
+	static DJointGroup contactGroup;
+
+	public static void mainGame(final JProgressBar progressBar) {
 		display = new Display();
 		//Shell shell = new Shell(display);
 		//shell.setLayout(new FillLayout());
@@ -265,8 +292,6 @@ public class MainGLFW {
 		SoQt.init("demo");
 
 		SoDB.setDelaySensorTimeout(SbTime.zero()); // Necessary to avoid bug in Display
-
-		int style = 0;//SWT.NO_BACKGROUND;
 
 		//SoSeparator.setNumRenderCaches(0);
 		//SceneGraph sg = new SceneGraphQuadMesh(r);
@@ -340,7 +365,7 @@ public class MainGLFW {
 
 		int overlap = 13;
 		//SceneGraph sg = new SceneGraphIndexedFaceSet(rw,re,overlap,Z_TRANSLATION);
-		sg = new SceneGraphIndexedFaceSetShader(rw, re, overlap, Z_TRANSLATION, max_i, trails);
+		sg = new SceneGraphIndexedFaceSetShader(rw, re, overlap, Z_TRANSLATION, max_i, trails, progressBar);
 		//SceneGraph sg = new ShadowTestSceneGraph();
 		rw = null; // for garbage collection
 		re = null; // for garbage collection
@@ -369,6 +394,8 @@ public class MainGLFW {
 		scenario.addQuest(new FirstApproachQuest());
 		// __________________________________________ Killing targets
 		scenario.addQuest(new TargetsKillingQuest());
+
+		int style = 0;//SWT.NO_BACKGROUND;
 
 		viewer = new SoQtWalkViewer(SoQtFullViewer.BuildFlag.BUILD_NONE, SoQtCameraController.Type.BROWSER,/*shell*/null, style) {
 
@@ -509,23 +536,7 @@ public class MainGLFW {
 				sg.aim(aim);
 			}
 		};
-		GLData glf = new GLData(/*GLProfile.getDefault()*/);
-		glf.name = "Mount Rainier Island";
-		glf.redSize = 8;//10;
-		glf.greenSize = 8;//10;
-		glf.blueSize = 8;//10;
-		glf.alphaSize = 0;
-		glf.depthSize = 32;
-		glf.doubleBuffer = true;
-		glf.majorVersion = 2;//3;
-		glf.minorVersion = 1;
-		glf.api = GLData.API.GL;
-		//glf.profile = GLData.Profile.COMPATIBILITY;
-		glf.debug = false;//true; has no effect
-		glf.grabCursor = true;
-		viewer.setFormat(glf, style);
 
-		viewer.buildWidget(style);
 		viewer.setHeadlight(false);
 
 
@@ -548,141 +559,6 @@ public class MainGLFW {
 
 		camera.position.setValue(0, 0, 0);
 		camera.orientation.setValue(new SbVec3f(0, 1, 0), -(float) Math.PI / 2.0f);
-
-		double previousTimeSec = 0;
-		boolean timeStop = false;
-		boolean fly = false;
-		boolean allowFly = false;
-
-		File saveGameFile = new File("savegame.mri");
-		if (saveGameFile.exists()) {
-			try {
-				InputStream in = new FileInputStream(saveGameFile);
-
-				Properties saveGameProperties = new Properties();
-
-				saveGameProperties.load(in);
-
-				float x = Float.valueOf(saveGameProperties.getProperty(HERO_X, String.valueOf(sg.STARTING_X)));
-
-				float y = Float.valueOf(saveGameProperties.getProperty(HERO_Y, String.valueOf(sg.STARTING_Y)));
-
-				float z = Float.valueOf(saveGameProperties.getProperty(HERO_Z, String.valueOf(sg.STARTING_Z/* - SCENE_POSITION.getZ()*/)));
-
-				previousTimeSec = Double.valueOf(saveGameProperties.getProperty(TIME, "0"));
-
-				camera.position.setValue(x, y, z - SCENE_POSITION.getZ());
-
-				timeStop = "true".equals(saveGameProperties.getProperty(TIME_STOP, "false"));
-
-				fly = "true".equals(saveGameProperties.getProperty(FLY, "false")) ? true : false;
-
-				allowFly = "true".equals(saveGameProperties.getProperty(ALLOW_FLY,"false"));
-
-				sg.loadShots(saveGameProperties);
-
-				loadingQuestIndex = Integer.valueOf(saveGameProperties.getProperty(QUEST_INDEX,"0"));
-
-				in.close();
-			} catch (FileNotFoundException e) {
-				e.printStackTrace();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-
-
-		} else {
-			camera.position.setValue(sg.STARTING_X, sg.STARTING_Y, sg.STARTING_Z - SCENE_POSITION.getZ());
-		}
-		viewer.getCameraController().changeCameraValues(camera);
-
-		viewer.getSceneHandler().setClearBeforeRender(false);
-		viewer.getSceneHandler().setBackgroundColor(/*new SbColor(0,0,1)*/SceneGraphIndexedFaceSetShader.SKY_COLOR.darker());
-
-		viewer.getSceneHandler().setTransparencyType(TransparencyType.BLEND/*SORTED_LAYERS_BLEND*/);
-
-		sg.setPosition(SCENE_POSITION.getX(), SCENE_POSITION.getY()/*,SCENE_POSITION.getZ()*/);
-
-		final double computerStartTimeCorrected = COMPUTER_START_TIME_SEC - (double) System.nanoTime() / 1e9;//60*60*4.5 / TimeConstants./*JMEMBA_TIME_ACCELERATION*/GTA_SA_TIME_ACCELERATION;
-
-		if (previousTimeSec == 0) {
-			viewer.setStartDate(computerStartTimeCorrected);
-		} else {
-			viewer.setStartDate(previousTimeSec - (double) System.nanoTime() / 1e9);
-		}
-
-		if (timeStop) {
-			viewer.toggleTimeStop();
-		}
-
-		viewer.setAllowToggleFly(allowFly);
-
-		if (fly) {
-			viewer.toggleFly();
-		}
-
-		viewer.addIdleListener((viewer1) -> {
-			double nowSec = viewer.getNow();
-			double nowHour = nowSec / 60 / 60;
-			double nowDay = 100;//nowHour / 24; // always summer
-			double nowGame = nowHour * TimeConstants./*JMEMBA_TIME_ACCELERATION*/GTA_SA_TIME_ACCELERATION;
-			double Phi = 47;
-			SbVec3f sunPosition = Soleil.soleil_xyz((float) nowDay, (float) nowGame, (float) Phi);
-			sg.setSunPosition(new SbVec3f(-sunPosition.y(), -sunPosition.x(), sunPosition.z()));
-		});
-		viewer.addIdleListener((viewer1) -> {
-			sg.idle();
-		});
-
-		//shell.open();
-
-		// create a cursor with a transparent image
-//	    Color white = display.getSystemColor(SWT.COLOR_WHITE);
-//	    Color black = display.getSystemColor(SWT.COLOR_BLACK);
-//	    PaletteData palette = new PaletteData(new RGB[] { white.getRGB(), black.getRGB() });
-//	    ImageData sourceData = new ImageData(16, 16, 1, palette);
-//	    sourceData.transparentPixel = 0;
-		Cursor cursor = new Cursor();//display, /*sourceData*/null, 0, 0);
-
-//	    shell.getDisplay().asyncExec(new Runnable() {
-//	        public void run() {
-//	    		shell.setFullScreen(true);
-//	            shell.forceActive();
-//	        }
-//	    });
-//	    shell.forceActive();
-//	    shell.forceFocus();
-
-		viewer.setCursor(cursor);
-
-		viewer.start();
-		viewer.updateLocation(new SbVec3f(0.0f, 0.0f, 0.0f),ForceProvider.Direction.STILL);
-
-
-		//viewer.getGLWidget().maximize();
-
-		// run the event loop as long as the window is open
-//		while (!shell.isDisposed()) {
-//		    // read the next OS event queue and transfer it to a SWT event
-//		    if (!display.readAndDispatch())
-//		     {
-//		    // if there are currently no other OS event to process
-//		    // sleep until the next OS event is available
-//			  //viewer.getSceneHandler().getSceneGraph().touch();
-//		        display.sleep();
-//		    	//viewer.idle();
-//		     }
-//		}
-		System.gc();
-		System.runFinalization();
-
-		GL2 gl2 = new GL2() {
-		};
-
-		int[] depthBits = new int[1];
-		gl2.glGetIntegerv(GL2.GL_DEPTH_BITS, depthBits);
-
-		System.out.println("Depth Buffer : " + depthBits[0]);
 
 		// _____________________________________________________ Physics with bullet physics
 
@@ -788,14 +664,14 @@ public class MainGLFW {
 		// _____________________________________________________ Physics with ODE4j
 
 		OdeHelper.initODE2(0);
-		DWorld world = OdeHelper.createWorld();
+		world = OdeHelper.createWorld();
 		world.setAutoDisableFlag(false);
 		world.setERP(0.2);
 		world.setCFM(1e-5);
 		world.setContactMaxCorrectingVel(0.5);
 		world.setContactSurfaceLayer(0.01);
-		DSpace space = OdeHelper.createHashSpace();
-		DJointGroup contactGroup = OdeHelper.createJointGroup();
+		space = OdeHelper.createHashSpace();
+		contactGroup = OdeHelper.createJointGroup();
 		SbVec3f cameraPositionValue = camera.position.getValue();
 		DGeom water = OdeHelper.createPlane(space, 0, 0, 1, -Z_TRANSLATION + 1000 - 150);
 
@@ -828,6 +704,163 @@ public class MainGLFW {
 		heightField.setQuaternion(q);
 		heightField.setPosition(-SCENE_POSITION.getX() + heightFieldWidth / 2, -SCENE_POSITION.getY() + sg.getExtraDY() + heightFieldDepth / 2, 0);
 
+		File saveGameFile = new File("savegame.mri");
+		if (saveGameFile.exists()) {
+			try {
+				InputStream in = new FileInputStream(saveGameFile);
+
+				Properties saveGameProperties = new Properties();
+
+				saveGameProperties.load(in);
+
+				float x = Float.valueOf(saveGameProperties.getProperty(HERO_X, String.valueOf(sg.STARTING_X)));
+
+				float y = Float.valueOf(saveGameProperties.getProperty(HERO_Y, String.valueOf(sg.STARTING_Y)));
+
+				float z = Float.valueOf(saveGameProperties.getProperty(HERO_Z, String.valueOf(sg.STARTING_Z/* - SCENE_POSITION.getZ()*/)));
+
+				previousTimeSec = Double.valueOf(saveGameProperties.getProperty(TIME, "0"));
+
+				camera.position.setValue(x, y, z - SCENE_POSITION.getZ());
+
+				timeStop = "true".equals(saveGameProperties.getProperty(TIME_STOP, "false"));
+
+				fly = "true".equals(saveGameProperties.getProperty(FLY, "false")) ? true : false;
+
+				allowFly = "true".equals(saveGameProperties.getProperty(ALLOW_FLY,"false"));
+
+				sg.loadShots(saveGameProperties);
+
+				loadingQuestIndex = Integer.valueOf(saveGameProperties.getProperty(QUEST_INDEX,"0"));
+
+				in.close();
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+
+
+		} else {
+			camera.position.setValue(sg.STARTING_X, sg.STARTING_Y, sg.STARTING_Z - SCENE_POSITION.getZ());
+		}
+		viewer.getCameraController().changeCameraValues(camera);
+
+		viewer.getSceneHandler().setClearBeforeRender(false);
+		viewer.getSceneHandler().setBackgroundColor(/*new SbColor(0,0,1)*/SceneGraphIndexedFaceSetShader.SKY_COLOR.darker());
+
+		viewer.getSceneHandler().setTransparencyType(TransparencyType.BLEND/*SORTED_LAYERS_BLEND*/);
+
+		sg.setPosition(SCENE_POSITION.getX(), SCENE_POSITION.getY()/*,SCENE_POSITION.getZ()*/);
+
+		SwingUtilities.invokeLater(() -> {
+			runVisu();
+		});
+	}
+
+	public static void runVisu() {
+		int style = 0;//SWT.NO_BACKGROUND;
+
+		// ____________________________________________________________________________________ Building OpenGL widget
+		GLData glf = new GLData(/*GLProfile.getDefault()*/);
+		glf.name = "Mount Rainier Island";
+		glf.redSize = 8;//10;
+		glf.greenSize = 8;//10;
+		glf.blueSize = 8;//10;
+		glf.alphaSize = 0;
+		glf.depthSize = 32;
+		glf.doubleBuffer = true;
+		glf.majorVersion = 2;//3;
+		glf.minorVersion = 1;
+		glf.api = GLData.API.GL;
+		//glf.profile = GLData.Profile.COMPATIBILITY;
+		glf.debug = false;//true; has no effect
+		glf.grabCursor = true;
+		viewer.setFormat(glf, style);
+
+		viewer.buildWidget(style);
+
+		final double computerStartTimeCorrected = COMPUTER_START_TIME_SEC - (double) System.nanoTime() / 1e9;//60*60*4.5 / TimeConstants./*JMEMBA_TIME_ACCELERATION*/GTA_SA_TIME_ACCELERATION;
+
+		if (previousTimeSec == 0) {
+			viewer.setStartDate(computerStartTimeCorrected);
+		} else {
+			viewer.setStartDate(previousTimeSec - (double) System.nanoTime() / 1e9);
+		}
+
+		if (timeStop) {
+			viewer.toggleTimeStop();
+		}
+
+		viewer.setAllowToggleFly(allowFly);
+
+		if (fly) {
+			viewer.toggleFly();
+		}
+
+		viewer.addIdleListener((viewer1) -> {
+			double nowSec = viewer.getNow();
+			double nowHour = nowSec / 60 / 60;
+			double nowDay = 100;//nowHour / 24; // always summer
+			double nowGame = nowHour * TimeConstants./*JMEMBA_TIME_ACCELERATION*/GTA_SA_TIME_ACCELERATION;
+			double Phi = 47;
+			SbVec3f sunPosition = Soleil.soleil_xyz((float) nowDay, (float) nowGame, (float) Phi);
+			sg.setSunPosition(new SbVec3f(-sunPosition.y(), -sunPosition.x(), sunPosition.z()));
+		});
+		viewer.addIdleListener((viewer1) -> {
+			sg.idle();
+		});
+
+		//shell.open();
+
+		// create a cursor with a transparent image
+//	    Color white = display.getSystemColor(SWT.COLOR_WHITE);
+//	    Color black = display.getSystemColor(SWT.COLOR_BLACK);
+//	    PaletteData palette = new PaletteData(new RGB[] { white.getRGB(), black.getRGB() });
+//	    ImageData sourceData = new ImageData(16, 16, 1, palette);
+//	    sourceData.transparentPixel = 0;
+		Cursor cursor = new Cursor();//display, /*sourceData*/null, 0, 0);
+
+//	    shell.getDisplay().asyncExec(new Runnable() {
+//	        public void run() {
+//	    		shell.setFullScreen(true);
+//	            shell.forceActive();
+//	        }
+//	    });
+//	    shell.forceActive();
+//	    shell.forceFocus();
+
+		viewer.setCursor(cursor);
+
+		viewer.start();
+		viewer.updateLocation(new SbVec3f(0.0f, 0.0f, 0.0f),ForceProvider.Direction.STILL);
+
+
+		//viewer.getGLWidget().maximize();
+
+		// run the event loop as long as the window is open
+//		while (!shell.isDisposed()) {
+//		    // read the next OS event queue and transfer it to a SWT event
+//		    if (!display.readAndDispatch())
+//		     {
+//		    // if there are currently no other OS event to process
+//		    // sleep until the next OS event is available
+//			  //viewer.getSceneHandler().getSceneGraph().touch();
+//		        display.sleep();
+//		    	//viewer.idle();
+//		     }
+//		}
+		System.gc();
+		System.runFinalization();
+
+		GL2 gl2 = new GL2() {
+		};
+
+		int[] depthBits = new int[1];
+		gl2.glGetIntegerv(GL2.GL_DEPTH_BITS, depthBits);
+
+		System.out.println("Depth Buffer : " + depthBits[0]);
+
 		// ______________________________________________________________________________________________________ planks
 		File planksFile = new File("planks.mri");
 		if (planksFile.exists()) {
@@ -853,7 +886,11 @@ public class MainGLFW {
 		world.setGravity(0, 0, -9.81);
 
 		final float above_ground = //4.5f; // Necessary for planks
-		0.2f; // Necessary when respawning on water
+				0.2f; // Necessary when respawning on water
+
+		SoCamera camera = viewer.getCameraController().getCamera();
+
+		SbVec3f cameraPositionValue = camera.position.getValue();
 
 		final DBody body = OdeHelper.createBody(world);
 		body.setPosition(cameraPositionValue.getX(), cameraPositionValue.getY(), cameraPositionValue.getZ() - /*1.75f / 2*/0.4f + 0.13f + above_ground);
@@ -1096,6 +1133,7 @@ public class MainGLFW {
 		firstDT[0] = true;
 
 		DVector3 saved_pos = new DVector3();
+
 		viewer.addIdleListener((viewer1) -> {
 
 			// TODO : getGroundZ() is not accurate
@@ -1328,21 +1366,21 @@ public class MainGLFW {
 			});
 
 			viewer.addIdleListener((viewer1) -> {
-						if (idTrail[0] == 0) {
-							return;
-						}
-						float ifloat = sg.getIFloat(sg.getPosition().x());
-						float jfloat = sg.getJFloat(sg.getPosition().y());
+				if (idTrail[0] == 0) {
+					return;
+				}
+				float ifloat = sg.getIFloat(sg.getPosition().x());
+				float jfloat = sg.getJFloat(sg.getPosition().y());
 
-						int i0 = (int)Math.floor(ifloat);
-						int j0 = (int)Math.floor(jfloat);
+				int i0 = (int)Math.floor(ifloat);
+				int j0 = (int)Math.floor(jfloat);
 
-						for( int di = -1; di<3; di++) {
-							for(int dj=-1;dj<3;dj++) {
-								sg.addTrail(i0+di,j0+dj);
-							}
-						}
-					});
+				for( int di = -1; di<3; di++) {
+					for(int dj=-1;dj<3;dj++) {
+						sg.addTrail(i0+di,j0+dj);
+					}
+				}
+			});
 
 			viewer.addKeyUpListener(SoKeyboardEvent.Key.O, () -> {
 				idTrail[0] = 0;
