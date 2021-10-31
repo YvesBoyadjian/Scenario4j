@@ -1905,6 +1905,7 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 			treePoint.setValue(x,y,z);
 			treesBSPTree.addPoint(treePoint,i);
 		}
+		progressBar.setValue(MAX_PROGRESS);
 	}
 		
 	SoGroup getDouglasTreesT(SbVec3f refPoint, final float[] distance,final JProgressBar progressBar) {
