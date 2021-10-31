@@ -1,6 +1,7 @@
 package application.scenegraph;
 
 import application.objects.Target;
+import application.objects.TargetBase;
 import jscenegraph.coin3d.inventor.lists.SbListFloat;
 import jscenegraph.database.inventor.SbBox3f;
 import jscenegraph.database.inventor.SbVec3f;
@@ -8,7 +9,7 @@ import jscenegraph.database.inventor.fields.SoMFVec3f;
 
 import java.util.Random;
 
-public class GroundSquirrels implements Target {
+public class GroundSquirrels extends TargetBase implements Target {
 
     public final static String GROUND_SQUIRREL_NAME = "Squirrel";
 

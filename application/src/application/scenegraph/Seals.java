@@ -6,6 +6,7 @@ package application.scenegraph;
 import java.util.Random;
 
 import application.objects.Target;
+import application.objects.TargetBase;
 import jscenegraph.database.inventor.SbBox3f;
 import jscenegraph.database.inventor.SbVec3f;
 import jscenegraph.database.inventor.fields.SoMFVec3f;
@@ -14,7 +15,7 @@ import jscenegraph.database.inventor.fields.SoMFVec3f;
  * @author Yves Boyadjian
  *
  */
-public class Seals implements Target {
+public class Seals extends TargetBase implements Target {
 
 	public static final String SEAL_NAME = "Seal";
 

@@ -1,5 +1,7 @@
 package application.objects;
 
+import jscenegraph.database.inventor.nodes.SoGroup;
+
 public interface Target {
 
     String targetName();
@@ -15,4 +17,8 @@ public interface Target {
     float getRatio();
 
     float getViewDistance();
+
+    void setGroup(SoGroup group, int instance);
+
+    void resurrect(int instance);
 }

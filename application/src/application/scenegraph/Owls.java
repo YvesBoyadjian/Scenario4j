@@ -1,12 +1,13 @@
 package application.scenegraph;
 
 import application.objects.Target;
+import application.objects.TargetBase;
 import jscenegraph.coin3d.inventor.lists.SbListFloat;
 import jscenegraph.database.inventor.SbBox3f;
 
 import java.util.Random;
 
-public abstract class Owls implements Target {
+public abstract class Owls extends TargetBase implements Target {
 
     public static final String SPOTTED_OWL_NAME = "Spotted Owl";
 

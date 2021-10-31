@@ -20,6 +20,8 @@ import application.MainGLFW;
 import application.nodes.SoTarget;
 import application.nodes.SoTargets;
 import application.objects.Target;
+import application.scenario.Scenario;
+import application.viewer.glfw.SoQtWalkViewer;
 import com.jogamp.opengl.GL2;
 
 import application.nodes.SoNoSpecularDirectionalLight;
@@ -48,6 +50,7 @@ import org.ode4j.math.DMatrix3C;
 import org.ode4j.ode.*;
 
 import static application.MainGLFW.MAX_PROGRESS;
+import static application.MainGLFW.SCENE_POSITION;
 
 /**
  * @author Yves Boyadjian
@@ -286,7 +289,7 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 
 	DBody heroFeetBody;
 
-	int currentQuestIndex = -1;
+	Scenario scenario;
 
 	public SceneGraphIndexedFaceSetShader(
 			Raster rw,
@@ -2150,6 +2153,7 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 			billboard.insertChild(c, 0);
 			//billboard.enableNotify(true);
 
+			targets.get(index).setGroup(billboard,instance);
 			shootTarget(targets.get(index),instance);
 			i++;
 		}
@@ -2417,5 +2421,49 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 			heroFeetBody.setLinearVel(0,0,0);
 			heroFeetBody.setAngularVel(0,0,0);
 		}
+	}
+
+	public void setHeroPosition(float x, float y, float z) {
+		camera.position.setValue(x,y,z - SCENE_POSITION.getZ());
+		camera.orientation.setValue(new SbVec3f(0, 1, 0), -(float) Math.PI / 2.0f);
+
+		SbVec3f cameraPositionValue = camera.position.getValue();
+
+		final float above_ground = //4.5f; // Necessary for planks
+				0.2f; // Necessary when respawning on water
+
+		heroBody.setPosition(cameraPositionValue.getX(), cameraPositionValue.getY(), cameraPositionValue.getZ() - /*1.75f / 2*/0.4f + 0.13f + above_ground);
+		heroBody.setLinearVel(0,0,0);
+
+		heroFeetBody.setPosition(
+				heroBody.getPosition().get0()/*cameraPositionValue.getX()*/,
+				heroBody.getPosition().get1()/*cameraPositionValue.getY()*/,
+				heroBody.getPosition().get2() /*cameraPositionValue.getZ() - 0.4f + 0.13f + above_ground*/ - 1.75f+ 2*0.4f);
+
+		heroFeetBody.setLinearVel(0,0,0);
+		heroFeetBody.setAngularVel(0,0,0);
+	}
+
+	public void setScenario(Scenario scenario) {
+		this.scenario = scenario;
+	}
+
+	public void resetScenario(SoQtWalkViewer viewer) {
+		scenario.start(0,viewer);
+	}
+
+	public void resurrectTheAnimals() {
+
+		int nb = shotTargetsIndices.size();
+		for( int i = 0; i< nb; i++) {
+			int indice = shotTargetsIndices.get(i);
+			int instance = shotTargetsInstances.get(i);
+			Target t = targets.get(indice);
+			t.resurrect(instance);
+		}
+
+		shotTargetsIndices.clear();
+		shotTargetsInstances.clear();
+		shotTargets.clear();
 	}
 }

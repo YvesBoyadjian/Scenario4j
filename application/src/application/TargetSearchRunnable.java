@@ -76,6 +76,7 @@ public class TargetSearchRunnable implements Runnable {
 											g.enableNotify(false);
 											g.insertChild(c, 0);
 											g.enableNotify(true);
+											t.setGroup(g,targetNode.getInstance());
 
 											main.shootTarget(t, targetNode.getInstance());
 

@@ -1,13 +1,14 @@
 package application.scenegraph;
 
 import application.objects.Target;
+import application.objects.TargetBase;
 import jscenegraph.database.inventor.SbBox3f;
 import jscenegraph.database.inventor.SbVec3f;
 import jscenegraph.database.inventor.fields.SoMFVec3f;
 
 import java.util.Random;
 
-public class BigFoots implements Target {
+public class BigFoots extends TargetBase implements Target {
 
     public static final String BIGFOOT_NAME = "Bigfoot";
 

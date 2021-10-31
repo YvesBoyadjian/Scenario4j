@@ -42,7 +42,7 @@ public class OptionDialog extends JDialog {
         setTitle("Game options");
         setContentPane(contentPane);
         //setModal(true);
-        getRootPane().setDefaultButton(buttonCancel);
+        getRootPane().setDefaultButton(buttonOK);
 
         this.viewer = viewer;
         this.sg = sg;
@@ -76,14 +76,14 @@ public class OptionDialog extends JDialog {
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowEvent e) {
-                onCancel();
+                onOK();
             }
         });
 
         // call onCancel() on ESCAPE
         contentPane.registerKeyboardAction(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                onCancel();
+                onOK();
             }
         }, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
     }
@@ -119,8 +119,13 @@ public class OptionDialog extends JDialog {
         if(viewer.isTimeStop()) {
             viewer.toggleTimeStop();
         }
-        viewer.onClose(true);
-        glfwSetWindowShouldClose(viewer.getGLWidget().getWindow(), true);
+        sg.setHeroPosition(sg.STARTING_X,sg.STARTING_Y,sg.STARTING_Z);
+        sg.resurrectTheAnimals();
+        sg.resetScenario(viewer);
+//        viewer.onClose(true);
+//        glfwSetWindowShouldClose(viewer.getGLWidget().getWindow(), true);
+        viewer.setVisible(true);
+        viewer.setFocus();
     }
 
     private void onLowest() {

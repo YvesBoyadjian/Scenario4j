@@ -16,6 +16,7 @@ public class Scenario {
 
     public Scenario(SceneGraphIndexedFaceSetShader sceneGraph){
         this.sceneGraph = sceneGraph;
+        this.sceneGraph.setScenario(this);
     }
 
     public void addQuest(Quest quest) {
