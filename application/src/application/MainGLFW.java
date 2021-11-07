@@ -1288,6 +1288,10 @@ public class MainGLFW {
 				}
 		);
 
+		viewer.addIdleListener((viewer1) -> {
+			sg.displayObjectives(viewer1);
+		});
+
 		final int[] id = new int[1];
 
 		final int[] idTrail = new int[1];

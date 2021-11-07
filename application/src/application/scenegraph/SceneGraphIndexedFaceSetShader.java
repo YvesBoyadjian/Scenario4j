@@ -238,6 +238,8 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 
 	final SoText2 messageDisplay = new SoText2();
 
+	final SoText2 offscreenTargetDisplay = new SoText2();
+
 	final SoSwitch oracleSwitch = new SoSwitch();
 
 	final SoSwitch oracleSwitchShadow = new SoSwitch();
@@ -1147,7 +1149,7 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 
 		billboardSeparator.addChild(color);
 
-		fpsDisplay.string.setValue("60.0 FPS");
+		//fpsDisplay.string.setValue("60.0 FPS");
 		fpsDisplay.enableNotify(false);
 
 		billboardSeparator.addChild(fpsDisplay);
@@ -1238,6 +1240,39 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 		viewFinderSeparator.addChild(aimSwitch);
 
 		sep.addChild(viewFinderSeparator);
+
+		// _____________________________________________________ OffscreenTargets
+
+		SoSeparator offscreenTargetSeparator = new SoSeparator();
+
+		SoOrthographicCamera offscreenTargetCamera = new SoOrthographicCamera();
+
+		offscreenTargetSeparator.addChild(offscreenTargetCamera);
+
+		textTransl = new SoTranslation();
+		textTransl.translation.setValue(0,0.9f,0);
+
+		offscreenTargetSeparator.addChild(textTransl);
+
+//		SoFont font = new SoFont();
+//		font.size.setValue(40.0f);
+
+		offscreenTargetSeparator.addChild(font);
+
+		color = new SoBaseColor();
+
+		color.rgb.setValue(1,1,0);
+
+		offscreenTargetSeparator.addChild(color);
+
+
+		//offscreenTargetDisplay.string.setValue("60.0 FPS");
+		offscreenTargetDisplay.enableNotify(false);
+		offscreenTargetDisplay.justification.setValue(SoText2.Justification.CENTER);
+
+		offscreenTargetSeparator.addChild(offscreenTargetDisplay);
+
+		sep.addChild(offscreenTargetSeparator);
 	}
 
 	private SoNode buildOracle(boolean shadow) {
@@ -2068,7 +2103,7 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 			return; // FPS disabled
 		}
 
-		String str = String.format("%.1f", fps);
+		String str = String.format("%.1f fps", fps);
 		//if (!Objects.equals(fpsDisplay.string.getValueAt(0),str)) { // Better foster frame regularity
 			fpsDisplay.string.setValue(str);
 		//}
@@ -2466,5 +2501,49 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 		shotTargetsIndices.clear();
 		shotTargetsInstances.clear();
 		shotTargets.clear();
+	}
+
+	public float getDistanceFromOracle() {
+		return (float)Math.sqrt(
+				(current_x - ORACLE_X)*(current_x - ORACLE_X) +
+						(current_y - ORACLE_Y)*(current_y - ORACLE_Y) +
+						(current_z - ORACLE_Z + zTranslation + 0.74f)*(current_z - ORACLE_Z + zTranslation + 0.74f)
+		);
+	}
+
+	public float getDistanceFromTrail() {
+		SbVec3f trans = transl.translation.getValue();
+
+		SbVec3f hero = new SbVec3f(current_x - trans.getX(),current_y - trans.getY(),current_z - trans.getZ());
+		int closest = trailsBSPTree.findClosest(hero);
+
+		float distance = Float.MAX_VALUE;
+
+		if( -1 != closest ) {
+			SbVec3f closestPoint = trailsBSPTree.getPoint(closest);
+			distance = (float)Math.sqrt(
+					(current_x - trans.getX() - closestPoint.getX())*(current_x - trans.getX() - closestPoint.getX()) +
+							(current_y - trans.getY() - closestPoint.getY())*(current_y - trans.getY() - closestPoint.getY()) +
+							(current_z - trans.getZ() - closestPoint.getZ())*(current_z - trans.getZ() - closestPoint.getZ())
+			);
+		}
+		return distance;
+	}
+
+	public void displayObjectives(SoQtWalkViewer viewer) {
+
+		String string1 = "Oracle distance: "+(int)getDistanceFromOracle()+ " m";
+
+		float distanceFromTrail = getDistanceFromTrail();
+
+		String string2 = "Trail distance: "+(int)distanceFromTrail+ " m";
+		offscreenTargetDisplay.string.set1Value(0,string1);
+		if( (1 == offscreenTargetDisplay.string.getNum() && distanceFromTrail > 4) ||
+				(2 == offscreenTargetDisplay.string.getNum() && distanceFromTrail > 2)) {
+			offscreenTargetDisplay.string.set1Value(1, string2);
+		}
+		else {
+			offscreenTargetDisplay.string.setNum(1);
+		}
 	}
 }
