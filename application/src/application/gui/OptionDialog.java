@@ -122,6 +122,10 @@ public class OptionDialog extends JDialog {
         sg.setHeroPosition(sg.STARTING_X,sg.STARTING_Y,sg.STARTING_Z);
         sg.resurrectTheAnimals();
         sg.resetScenario(viewer);
+        if(viewer.isFlying()) {
+            viewer.toggleFly();
+        }
+        viewer.setAllowToggleFly(false);
 //        viewer.onClose(true);
 //        glfwSetWindowShouldClose(viewer.getGLWidget().getWindow(), true);
         viewer.setVisible(true);
