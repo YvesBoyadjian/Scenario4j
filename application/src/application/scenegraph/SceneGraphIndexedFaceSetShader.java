@@ -2501,6 +2501,8 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 		shotTargetsIndices.clear();
 		shotTargetsInstances.clear();
 		shotTargets.clear();
+
+		targetDisplay.string.setNum(0);
 	}
 
 	public float getDistanceFromOracle() {
