@@ -779,53 +779,95 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 	    //douglasTexture.filename.setValue("ressource/texture-2058269_Steve_Wittmann_thethreedguy.jpg");
 	    //douglasTexture.filename.setValue("ressource/texture-2058270_Steve_Wittmann_thethreedguy.jpg");
 
-		String douglasPath = "ressource/texture-2058270_Steve_Wittmann_thethreedguy.jpg";
-	    File f = new File(douglasPath);
-	    if(!f.exists()) {
-	    	f = new File("application/"+douglasPath);
+		String douglasPath1 = "ressource/texture-2058270_Steve_Wittmann_thethreedguy.jpg";
+
+		final int[] wi1 = new int[1];
+		final int[] hi1 = new int[1];
+
+		MemoryBuffer b1 = loadTexture(douglasPath1,wi1,hi1);
+
+//		//int min1 = Math.min(wi1[0],hi1[0]);
+//		int max1 = Math.max(wi1[0],hi1[0]);
+//
+//		String douglasPath2 = "ressource/texture-2058269_Steve_Wittmann_thethreedguy.jpg";
+//
+//		final int[] wi2 = new int[1];
+//		final int[] hi2 = new int[1];
+//
+//		MemoryBuffer b2 = loadTexture(douglasPath2,wi2,hi2);
+//
+//		//int min2 = Math.min(wi2[0],hi2[0]);
+//		int max2 = Math.max(wi2[0],hi2[0]);
+//
+//		//int ratio = 8;
+//
+//		int nb_tiles_on_side = 6;
+//
+//		//int min1min2 = Math.min(min1,min2)*ratio/10;
+//		int max1max2 = Math.max(max1,max2);
+//
+////		int dw1 = wi1[0] - min1min2;
+////		int dh1 = hi1[0] - min1min2;
+////		int dw2 = wi2[0] - min1min2;
+////		int dh2 = hi2[0] - min1min2;
+//
+//		//int min3 = min1min2 * (10*10/ratio);
+//		int max3 = max1max2*nb_tiles_on_side;
+//
+//		int nb_images = nb_tiles_on_side*nb_tiles_on_side;//(10*10/ratio)*(10*10/ratio);
+//
+//		int nbPixels3 = max3*max3;//min3*min3;
+//
+//		MemoryBuffer b3 = MemoryBuffer.allocateBytes(nbPixels3*3);
+//
+//		Random r = new Random(37);
+//
+//		boolean[] im = new boolean[nb_images];
+//		int[] dx = new int[nb_images];
+//		int[] dy = new int[nb_images];
+//		for( int i=0; i< nb_images; i++) {
+//			im[i] = r.nextBoolean();
+//			//dx[i] = im[i] ? (int)((dw1+1)*r.nextDouble()*.9) : (int)((dw2+1)*r.nextDouble());
+//			//dy[i] = im[i] ? (int)((dh1+1)*r.nextDouble()) : (int)((dh2+1)*r.nextDouble());
+//			dx[i] = im[i] ? (int)((max1max2 - wi1[0])*r.nextDouble()) : (int)((max1max2 - wi2[0])*r.nextDouble());
+//			dy[i] = im[i] ? (int)((max1max2 - hi1[0])*r.nextDouble()) : (int)((max1max2 - hi2[0])*r.nextDouble());
+//		}
+//
+//		for(int i3=0; i3<max3;i3++) {
+//			for(int j3=0; j3<max3;j3++) {
+//
+//				int ii = i3/max1max2;
+//				int jj = j3/max1max2;
+//
+//				int no_im = ii + nb_tiles_on_side*jj;
+//
+//				boolean imb = im[no_im];
+//
+//				int i1 = (i3%max1max2 + dx[no_im])%wi1[0];
+//				int j1 = (j3%max1max2 + dy[no_im])%hi1[0];
+//
+//				int i2 = (i3%max1max2 + dx[no_im])%wi2[0];
+//				int j2 = (j3%max1max2 + dy[no_im])%hi2[0];
+//
+//				int index1 = 3*(i1 + j1*wi1[0]);
+//				int index2 = 3*(i2 + j2*wi2[0]);
+//
+//				int index3 = 3*(j3*max3+i3);
+//				b3.setByte(index3,imb ? b1.getByte(index1) : b2.getByte(index2));
+//				b3.setByte(index3+1, imb ? b1.getByte(index1+1) : b2.getByte(index2+1));
+//				b3.setByte(index3+2, imb ? b1.getByte(index1+2) : b2.getByte(index2+2));
+//			}
+//		}
+
+		SbVec2s s1 = new SbVec2s((short)wi1[0],(short)hi1[0]);
+//		SbVec2s s3 = new SbVec2s((short)max3,(short)max3);
+
+		int nc = 3;
+
+		//douglasTexture.image.setValue(s3, nc, b3);
+		if (null!=b1) {
+			douglasTexture.image.setValue(s1, nc, b1);
 		}
-	    
-	    try {
-		    InputStream is = new FileInputStream(f);
-			BufferedImage image = ImageIO.read(is);
-			
-			if(image != null) {
-			int wi = image.getWidth();
-			int hi = image.getHeight();
-		    
-		    int nc = 3;
-		    
-		    int nbPixels = wi*hi;
-		    
-		    MemoryBuffer bytesRGB = MemoryBuffer.allocateBytes(nbPixels*3);
-		    int j=0;
-		    for(int i=0; i< nbPixels;i++) {
-		    	int x = i%wi;
-		    	int y = hi - i/wi -1;
-		    	int rgb = image.getRGB(x, y);
-		    	
-		    	float r = (float)Math.pow(((rgb & 0x00FF0000) >>> 16)/255.0f,2.2f)*/*4f*/5f; // Adapted to 6500 K display
-		    	float g = (float)Math.pow(((rgb & 0x0000FF00) >>> 8)/255.0f,2.2f);
-		    	float b = (float)Math.pow(((rgb & 0x000000FF) >>> 0)/255.0f,2.2f)*/*1.5f*/1.47f; // Adapted to 6500 K display
-		    	r = Math.min(r,1);
-		    	g = Math.min(g,1);
-		    	b = Math.min(b,1);
-		    	bytesRGB.setByte(j, (byte)(r*255.0f)) ; j++;
-		    	bytesRGB.setByte(j, (byte)(g*255.0f)); j++;
-		    	bytesRGB.setByte(j, (byte)(b*255.0f)); j++;	    	
-		    }
-		    MemoryBuffer b = bytesRGB;
-		    
-		    SbVec2s s = new SbVec2s((short)wi,(short)hi);
-		    
-		    douglasTexture.image.setValue(s, nc, b);
-		    
-			}
-		    is.close();
-		} catch (IOException e) {
-		}
-	    
-	    
 	    douglasSep.addChild(transl);
 
 	    douglas_distance_trunk[0] = DOUGLAS_DISTANCE/2;
@@ -2547,5 +2589,50 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 		else {
 			offscreenTargetDisplay.string.setNum(1);
 		}
+	}
+
+	MemoryBuffer loadTexture(String douglasPath, final int[] wi, final int[] hi) {
+		File f = new File(douglasPath);
+		if(!f.exists()) {
+			f = new File("application/"+douglasPath);
+		}
+
+		MemoryBuffer buf = null;
+
+		try {
+			InputStream is = new FileInputStream(f);
+			BufferedImage image = ImageIO.read(is);
+
+			if(image != null) {
+				wi[0] = image.getWidth();
+				hi[0] = image.getHeight();
+
+				int nc = 3;
+
+				int nbPixels = wi[0]*hi[0];
+
+				MemoryBuffer bytesRGB = MemoryBuffer.allocateBytes(nbPixels*3);
+				int j=0;
+				for(int i=0; i< nbPixels;i++) {
+					int x = i%wi[0];
+					int y = hi[0] - i/wi[0] -1;
+					int rgb = image.getRGB(x, y);
+
+					float r = (float)Math.pow(((rgb & 0x00FF0000) >>> 16)/255.0f,2.2f)*/*4f*/5f; // Adapted to 6500 K display
+					float g = (float)Math.pow(((rgb & 0x0000FF00) >>> 8)/255.0f,2.2f);
+					float b = (float)Math.pow(((rgb & 0x000000FF) >>> 0)/255.0f,2.2f)*/*1.5f*/1.47f; // Adapted to 6500 K display
+					r = Math.min(r,1);
+					g = Math.min(g,1);
+					b = Math.min(b,1);
+					bytesRGB.setByte(j, (byte)(r*255.0f)) ; j++;
+					bytesRGB.setByte(j, (byte)(g*255.0f)); j++;
+					bytesRGB.setByte(j, (byte)(b*255.0f)); j++;
+				}
+				buf = bytesRGB;
+			}
+			is.close();
+		} catch (IOException e) {
+		}
+		return buf;
 	}
 }

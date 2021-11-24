@@ -141,6 +141,10 @@ public class DouglasChunk {
 		douglasColorsF = new int[nbVertices];
 		
 		douglasTexCoordsF = FloatMemoryBuffer.allocateFloats(nbVertices * 2);
+
+		float zoomFactor = 1;//6;
+
+		float ratio = 1;//1.5f;
 		
 		//ByteBuffer douglasTexCoordsFb = douglasTexCoordsF.toByteBuffer();/*.asFloatBuffer()*/;
 		
@@ -193,7 +197,7 @@ public class DouglasChunk {
 			douglasNormalsF.setFloat(vertexCoordIndice+2, 0.2f);
 			
 			douglasTexCoordsF.setFloat(texCoordIndice, 0.0f);
-			douglasTexCoordsF.setFloat(texCoordIndice+1, /*70.0f*/height);
+			douglasTexCoordsF.setFloat(texCoordIndice+1, /*70.0f*/height / zoomFactor);
 			
 			vertexCoordIndice += 3;
 			texCoordIndice += 2;
@@ -207,7 +211,7 @@ public class DouglasChunk {
 			douglasNormalsF.setFloat(vertexCoordIndice+2, 0.2f);
 			
 			douglasTexCoordsF.setFloat(texCoordIndice, 1.0f);
-			douglasTexCoordsF.setFloat(texCoordIndice+1, /*70.0f*/height);
+			douglasTexCoordsF.setFloat(texCoordIndice+1, /*70.0f*/height/ zoomFactor);
 			
 			vertexCoordIndice += 3;
 			texCoordIndice += 2;
@@ -221,7 +225,7 @@ public class DouglasChunk {
 			douglasNormalsF.setFloat(vertexCoordIndice+2, 0.2f);
 			
 			douglasTexCoordsF.setFloat(texCoordIndice, 2.0f);
-			douglasTexCoordsF.setFloat(texCoordIndice+1, /*70.0f*/height);
+			douglasTexCoordsF.setFloat(texCoordIndice+1, /*70.0f*/height/ zoomFactor);
 			
 			//foliage
 			vertexCoordIndice += 3;
@@ -261,7 +265,7 @@ public class DouglasChunk {
 			douglasNormalsF.setFloat(vertexCoordIndice+1,  (float)Math.sin(angleRadian2));
 			douglasNormalsF.setFloat(vertexCoordIndice+2, 0);
 			
-			douglasTexCoordsF.setFloat(texCoordIndice, /*10.0f*/foliageWidth);
+			douglasTexCoordsF.setFloat(texCoordIndice, /*10.0f*/foliageWidth/ zoomFactor * ratio);
 			douglasTexCoordsF.setFloat(texCoordIndice+1, 0.0f);
 			
 			vertexCoordIndice += 3;
@@ -278,7 +282,7 @@ public class DouglasChunk {
 			douglasNormalsF.setFloat(vertexCoordIndice+1, (float)Math.sin(angleRadian3));
 			douglasNormalsF.setFloat(vertexCoordIndice+2, 0);
 			
-			douglasTexCoordsF.setFloat(texCoordIndice, /*20.0f*/foliageWidth*2);
+			douglasTexCoordsF.setFloat(texCoordIndice, /*20.0f*/foliageWidth*2/ zoomFactor * ratio);
 			douglasTexCoordsF.setFloat(texCoordIndice+1, 0.0f);
 			
 			// end of foliage
