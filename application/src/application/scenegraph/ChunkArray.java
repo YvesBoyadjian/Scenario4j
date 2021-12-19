@@ -174,12 +174,10 @@ public class ChunkArray {
 //		}
 	}
 	
-	public void verticesPut(int index, float value) {
-		int vertexIndex = index/3;
+	public void verticesPut(int vertexIndex, float value) {
 		int i = vertexIndex/h;
 		int j = vertexIndex - i*h;
-		int coord = index - vertexIndex * 3;
-				
+
 //		Collection<Chunk> relevantChunks = getChunks(i,j);
 //		
 //		relevantChunks.forEach((c)-> {
@@ -189,7 +187,7 @@ public class ChunkArray {
 		
 		chunksForEach(i,j,(c)-> {
 			int chunkIndice = getInChunkIndice(c, i,j);
-			c.vertices[chunkIndice*3+coord] = value;
+			c.verticesZ[chunkIndice] = value;
 		});
 	}
 	
@@ -290,9 +288,9 @@ public class ChunkArray {
 		Chunk c = getOneChunk(i,j);
 		int chunkIndice = getInChunkIndice(c, i,j);
 		
-		ret[0] = c.vertices[chunkIndice*3+0];
-		ret[1] = c.vertices[chunkIndice*3+1];
-		ret[2] = c.vertices[chunkIndice*3+2];
+		ret[0] = c.verticesX(chunkIndice);
+		ret[1] = c.verticesY(chunkIndice);
+		ret[2] = c.verticesZ[chunkIndice];
 		return ret;
 	}
 	
@@ -308,7 +306,7 @@ public class ChunkArray {
 		
 		//ret[0] = c.vertices[chunkIndice*3+0];
 		//ret[1] = c.vertices[chunkIndice*3+1];
-		float ret_2 = c.vertices[chunkIndice*3+2];
+		float ret_2 = c.verticesZ[chunkIndice];
 		return ret_2;
 	}
 	
@@ -321,7 +319,7 @@ public class ChunkArray {
 		Chunk c = getOneChunk(i,j);
 		int chunkIndice = getInChunkIndice(c, i,j);
 		
-		return c.normals[chunkIndice*3+coord];
+		return (float)c.normals[chunkIndice*3+coord]/Short.MAX_VALUE;
 	}
 	
 	public byte colorsGet(int index) {
@@ -420,9 +418,9 @@ public class ChunkArray {
 		
 		chunksForEach(i,j,(c)-> {
 			int chunkIndice = getInChunkIndice(c, i,j);
-			c.normals[chunkIndice*3+0] = valueX;
-			c.normals[chunkIndice*3+1] = valueY;
-			c.normals[chunkIndice*3+2] = valueZ;
+			c.normals[chunkIndice*3+0] = (short)Math.round(Short.MAX_VALUE * valueX);
+			c.normals[chunkIndice*3+1] = (short)Math.round(Short.MAX_VALUE * valueY);
+			c.normals[chunkIndice*3+2] = (short)Math.round(Short.MAX_VALUE * valueZ);
 		});
 	}
 

@@ -211,7 +211,7 @@ public class SceneGraphIndexedFaceSet implements SceneGraph {
 					zmin = Math.min(zmin, z);
 					zmax = Math.max(zmax, z);
 				}
-				chunks.verticesPut(index*3+2, z);
+				chunks.verticesPut(index, z);
 				
 				ptV.setValue(chunks.verticesGet(index,xyz));
 				sceneBox.extendBy(ptV);

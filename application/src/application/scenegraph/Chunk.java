@@ -11,6 +11,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
+import java.nio.ShortBuffer;
 import java.util.Arrays;
 import java.util.BitSet;
 
@@ -48,8 +49,8 @@ public class Chunk {
 	private float x0;
 	private float y0;
 	
-	float[] vertices;
-	float[] normals;
+	float[] verticesZ;
+	short[] normals;
 	byte[] colors;
 	BitSet stone;
 	//int[] coordIndices;	
@@ -84,8 +85,8 @@ public class Chunk {
 	public void initArrays() {
 		
 		int nbVertices = chunkWidth *chunkWidth;
-		vertices = new float[nbVertices*3];
-		normals = new float[nbVertices*3];
+		verticesZ = new float[nbVertices];
+		normals = new short[nbVertices*3];
 		colors = new byte[nbVertices*4];
 		stone = new BitSet();
 		
@@ -106,6 +107,17 @@ public class Chunk {
 //		}
 //	}
 
+	float verticesX(int index) {
+		int i = index/chunkWidth;
+		return i * delta_x +x0;
+	}
+
+	float verticesY(int index) {
+		int i = index/chunkWidth;
+		int j = index - i*chunkWidth;
+		return (chunkWidth - j -1) * delta_y + y0;
+	}
+
 	public void initIndexedFaceSet() {
 		
 //	    SoVertexProperty vertexProperty = new SoVertexProperty();
@@ -116,10 +128,10 @@ public class Chunk {
 //	    vertexProperty.materialBinding.setValue(SoVertexProperty.Binding.PER_VERTEX_INDEXED);
 //	    vertexProperty.orderedRGBA.setValues(0, colors);
 	    
-	    int nbVertices = vertices.length /3;
+	    int nbVertices = verticesZ.length;
 	    final SbVec3f ptV = new SbVec3f();
 	    for(int i=0;i<nbVertices;i++) {
-	    	ptV.setValue(vertices[i*3], vertices[i*3+1], vertices[i*3+2]);
+	    	ptV.setValue(verticesX(i), verticesY(i), verticesZ[i]);
 	    	sceneBox.extendBy(ptV);
 	    }
 	    sceneCenter.setValue(sceneBox.getCenter());
@@ -342,10 +354,10 @@ public class Chunk {
 		
 		if(decimatedNormals[l] == null) {
 			
-			if(l==0) {
-				decimatedNormals[l] = FloatMemoryBuffer.allocateFromFloatArray(normals);
-			}
-			else {
+//			if(l==0) {
+//				decimatedNormals[l] = FloatMemoryBuffer.allocateFromFloatArray(normals);
+//			}
+//			else {
 		
 		int sourceChunkWidth = getDecimatedChunkWidth(0);
 		int decimatedChunkWidth = getDecimatedChunkWidth(l);
@@ -385,9 +397,9 @@ public class Chunk {
 						}
 						//int indice0 = i0*chunkWidth+j0;
 						int indice0 = i1*chunkWidth+j1;
-						decimatedNormals[indice*3] += normals[indice0*3];
-						decimatedNormals[indice*3+1] += normals[indice0*3+1];
-						decimatedNormals[indice*3+2] += normals[indice0*3+2];
+						decimatedNormals[indice*3] += (float)normals[indice0*3]/Short.MAX_VALUE;
+						decimatedNormals[indice*3+1] += (float)normals[indice0*3+1]/Short.MAX_VALUE;
+						decimatedNormals[indice*3+2] += (float)normals[indice0*3+2]/Short.MAX_VALUE;
 						nbc++;
 					}
 				}
@@ -399,7 +411,7 @@ public class Chunk {
 		}
 		this.decimatedNormals[l] = FloatMemoryBuffer.allocateFromFloatArray(decimatedNormals);
 			}
-		}
+//		}
 		return decimatedNormals[l];
 	}
 	
@@ -418,10 +430,10 @@ public class Chunk {
 		
 		if(decimatedVertices[l] == null) {
 			
-			if(l==0) {
-				decimatedVertices[l] = FloatMemoryBuffer.allocateFromFloatArray(vertices);
-			}
-			else {
+//			if(l==0) {
+//				decimatedVertices[l] = FloatMemoryBuffer.allocateFromFloatArray(vertices);
+//			}
+//			else {
 		
 			int decimatedChunkWidth = getDecimatedChunkWidth(l);
 			int nbVertices = decimatedChunkWidth *decimatedChunkWidth;
@@ -444,14 +456,14 @@ public class Chunk {
 					int j0 = fromSonToSource(j,l);//chunkWidth -1 - ((decimatedChunkWidth -1 -j) << l);
 					int indice0 = i0*chunkWidth+j0;
 					int indice = i*decimatedChunkWidth+j;
-					decimatedVertices[indice*3] = vertices[indice0*3];
-					decimatedVertices[indice*3+1] = vertices[indice0*3+1];
-					decimatedVertices[indice*3+2] = vertices[indice0*3+2];
+					decimatedVertices[indice*3] = verticesX(indice0);
+					decimatedVertices[indice*3+1] = verticesY(indice0);
+					decimatedVertices[indice*3+2] = verticesZ[indice0];
 				}
 			}
 			this.decimatedVertices[l] = FloatMemoryBuffer.allocateFromFloatArray(decimatedVertices);
 			}
-		}
+//		}
 		return decimatedVertices[l];
 	}
 
@@ -472,13 +484,13 @@ public class Chunk {
 		this.delta_y = delta_y;
 		this.x0 = x0;
 		this.y0 = y0;
-		for(int i=0;i<chunkWidth;i++) {
-		for(int j=0; j<chunkWidth;j++) {
-				int index = i*chunkWidth+j;
-				vertices[index*3+0] = i * delta_x +x0;
-				vertices[index*3+1] = (chunkWidth - j -1) * delta_y + y0;
-		}
-		}
+//		for(int i=0;i<chunkWidth;i++) {
+//		for(int j=0; j<chunkWidth;j++) {
+//				int index = i*chunkWidth+j;
+//				vertices[index*3+0] = i * delta_x +x0;
+//				vertices[index*3+1] = (chunkWidth - j -1) * delta_y + y0;
+//		}
+//		}
 	}
 
 	public SbVec3f getCenter() {
@@ -543,13 +555,13 @@ public class Chunk {
 		try {
 			FileInputStream fileInputStream = new FileInputStream(file);
 			
-			int nbZ = vertices.length / 3;									
+			int nbZ = verticesZ.length;
 			byte[] buffer = new byte[nbZ * Float.BYTES];
 			ByteBuffer bb = ByteBuffer.wrap(buffer);
 			FloatBuffer fb = bb.asFloatBuffer();
 			fileInputStream.read(buffer);
 			for( int i=0; i<nbZ; i++ ) {
-				vertices[3*i+2] = fb.get();
+				verticesZ[i] = fb.get();
 			}
 			
 			fileInputStream.close();
@@ -588,12 +600,12 @@ public class Chunk {
 		try {
 			FileOutputStream fileOutputStream = new FileOutputStream(file);
 			
-			int nbZ = vertices.length / 3;									
+			int nbZ = verticesZ.length;
 			byte[] buffer = new byte[nbZ * Float.BYTES];
 			ByteBuffer bb = ByteBuffer.wrap(buffer);
 			FloatBuffer fb = bb.asFloatBuffer();
 			for( int i=0; i<nbZ; i++ ) {
-				fb.put(vertices[3*i+2]);
+				fb.put(verticesZ[i]);
 			}
 			fileOutputStream.write(buffer);
 			
@@ -628,7 +640,7 @@ public class Chunk {
 
 	private int getNormalsFileLength() {
 		int nbVertices = chunkWidth *chunkWidth;
-		return nbVertices * 4 * 3;
+		return nbVertices * Short.BYTES * 3; //short
 	}
 
 	private int getStonesFileLength() {
@@ -694,9 +706,9 @@ public class Chunk {
 			//BufferedInputStream bufferedInputStream = new BufferedInputStream(fileInputStream);
 			
 			int nbN = normals.length;									
-			byte[] buffer = new byte[nbN * Float.BYTES];
+			byte[] buffer = new byte[nbN * Short.BYTES];
 			ByteBuffer bb = ByteBuffer.wrap(buffer);
-			FloatBuffer fb = bb.asFloatBuffer();
+			ShortBuffer fb = bb.asShortBuffer();
 			fileInputStream/*bufferedInputStream*/.read(buffer);
 			fb.get(normals);
 			
@@ -743,9 +755,9 @@ public class Chunk {
 			FileOutputStream fileOutputStream = new FileOutputStream(file);
 			
 			int nbN = normals.length;									
-			byte[] buffer = new byte[nbN * Float.BYTES];
+			byte[] buffer = new byte[nbN * Short.BYTES];
 			ByteBuffer bb = ByteBuffer.wrap(buffer);
-			FloatBuffer fb = bb.asFloatBuffer();
+			ShortBuffer fb = bb.asShortBuffer();
 			fb.put(normals);
 			fileOutputStream.write(buffer);
 			
