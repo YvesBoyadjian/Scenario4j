@@ -690,6 +690,8 @@ public class MainGLFW {
 				//pHeightData[index] = (float) (cameraPositionValue.getZ() - 1.75f + 0.13f - 0.01f);
 			}
 		}
+		sg.clearRasters();
+
 		double heightFieldWidth = sg.getWidth();
 		double heightFieldDepth = sg.getHeight();
 		int widthSamples = nbi;

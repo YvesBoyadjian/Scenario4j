@@ -475,7 +475,7 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 		
 		rw = null;
 		re = null;
-		
+
 		//sceneCenter.setValue(sceneBox.getCenter());
 		
 		boolean load_normals_and_stone_was_successfull = chunks.loadNormalsAndStones(); 
@@ -1436,6 +1436,14 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 			z= ZMIN;
 		}
 		return z;
+	}
+
+	/**
+	 * For garbage collecting
+	 */
+	public void clearRasters() {
+		re = null;
+		rw = null;
 	}
 
 	public int getNbI() {
