@@ -7,6 +7,8 @@ import jscenegraph.database.inventor.nodes.SoCamera;
 
 public class FirstApproachQuest implements Quest {
 
+    public final float NEAR_DISTANCE = 8;
+
     SceneGraphIndexedFaceSetShader sceneGraph;
 
     @Override
@@ -16,7 +18,7 @@ public class FirstApproachQuest implements Quest {
 
     @Override
     public boolean isAchieved(SoQtWalkViewer viewer) {
-        boolean achieved = getDistanceFromOracle(viewer) <= 8;
+        boolean achieved = getDistanceFromOracle(viewer) <= NEAR_DISTANCE;
         if(achieved) {
             System.out.println("Oracle found");
         }

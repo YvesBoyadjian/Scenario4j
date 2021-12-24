@@ -7,6 +7,8 @@ import jscenegraph.database.inventor.nodes.SoCamera;
 
 public class TargetsKillingQuest implements Quest {
 
+    public final float NEAR_DISTANCE = 8;
+
     SceneGraphIndexedFaceSetShader sceneGraph;
 
     @Override
@@ -16,7 +18,7 @@ public class TargetsKillingQuest implements Quest {
 
     @Override
     public boolean isAchieved(SoQtWalkViewer viewer) {
-        boolean achieved = getDistanceFromOracle(viewer) <= 4.5;
+        boolean achieved = getDistanceFromOracle(viewer) <= NEAR_DISTANCE;
         boolean allKilled = true;
         allKilled &= sceneGraph.haveShot(GroundSquirrels.GROUND_SQUIRREL_NAME);
         allKilled &= sceneGraph.haveShot(HoaryMarmots.HOARY_MARMOT_NAME);
@@ -57,6 +59,7 @@ public class TargetsKillingQuest implements Quest {
         viewer.setAllowToggleFly(true);
         String[] speech = {"Hooray, I now have enough to eat.","To show my gratitude, I'm allowing you to fly", "by pressing the 'F' key."};
         sceneGraph.talk(speech);
+        sceneGraph.stopBody();
         sceneGraph.setMessage("");
     }
 
