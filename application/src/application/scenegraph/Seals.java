@@ -83,7 +83,7 @@ public class Seals extends TargetBase implements Target {
 			float d2 = Math.abs(z-z2);
 			float d3 = Math.abs(z-z3);
 			float d4 = Math.abs(z-z4);
-			float dzMax = 0.2f;
+			float dzMax = 0.25f;
 			boolean isNotTooSteep = (d1<dzMax) && (d2<dzMax) && (d3<dzMax) && (d4<dzMax); 
 			
 			if( isNearWater && isAboveWater && isNotTooSteep ) {

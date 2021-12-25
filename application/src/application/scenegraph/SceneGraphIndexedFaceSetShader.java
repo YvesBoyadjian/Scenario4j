@@ -293,6 +293,12 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 
 	Scenario scenario;
 
+	boolean searchForSea;
+
+	final SbBSPTree beachBSPTree = new SbBSPTree();
+
+	boolean wasDisplayingTrailDistance;
+
 	public SceneGraphIndexedFaceSetShader(
 			Raster rw,
 			Raster re,
@@ -396,6 +402,8 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 			float sharp = 0.06f;
 			float sharp2 = 0.05f;
 
+			float zWater =  - 150 + getzTranslation() - CUBE_DEPTH /2;
+
 			for(int i=0;i<w;i++) {
 				for(int j=0; j<h;j++) {
 					int index = i*h+j;
@@ -438,9 +446,16 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 						zmax = Math.max(zmax, z);
 					}
 					chunks.verticesPut(index, z);
-					
-					ptV.setValue(chunks.verticesGet(index,xyz));
+
+					chunks.verticesGet(index,xyz);
+					//xyz[2] -= zTranslation;
+					ptV.setValue(xyz);
 					//sceneBox.extendBy(ptV);
+
+					// On the beach ?
+					if( Math.abs(ptV.getZ() - zWater) < 1) {
+						beachBSPTree.addPoint(ptV,null);
+					}
 					
 					//Color color = snow;
 					
@@ -2582,6 +2597,25 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 		return distance;
 	}
 
+	public float getDistanceFromBeach() {
+		SbVec3f trans = transl.translation.getValue();
+
+		SbVec3f hero = new SbVec3f(current_x - trans.getX(),current_y - trans.getY(),current_z - trans.getZ());
+		int closest = beachBSPTree.findClosest(hero);
+
+		float distance = Float.MAX_VALUE;
+
+		if(-1 != closest) {
+			SbVec3f closestPoint = beachBSPTree.getPoint(closest);
+			distance = (float)Math.sqrt(
+					(current_x - trans.getX() - closestPoint.getX())*(current_x - trans.getX() - closestPoint.getX()) +
+							(current_y - trans.getY() - closestPoint.getY())*(current_y - trans.getY() - closestPoint.getY()) +
+							(current_z - trans.getZ() - closestPoint.getZ())*(current_z - trans.getZ() - closestPoint.getZ())
+			);
+		}
+		return distance;
+	}
+
 	public void displayObjectives(SoQtWalkViewer viewer) {
 
 		String string1 = "Oracle distance: "+(int)getDistanceFromOracle()+ " m";
@@ -2590,13 +2624,29 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 
 		String string2 = "Trail distance: "+(int)distanceFromTrail+ " m";
 		offscreenTargetDisplay.string.set1Value(0,string1);
-		if( (1 == offscreenTargetDisplay.string.getNum() && distanceFromTrail > 4) ||
-				(2 == offscreenTargetDisplay.string.getNum() && distanceFromTrail > 2)) {
+
+		int numStrings = 1;
+
+		if( (!wasDisplayingTrailDistance && distanceFromTrail > 4) ||
+				(wasDisplayingTrailDistance && distanceFromTrail > 2)) {
 			offscreenTargetDisplay.string.set1Value(1, string2);
+			numStrings++;
+			wasDisplayingTrailDistance = true;
 		}
 		else {
-			offscreenTargetDisplay.string.setNum(1);
+			wasDisplayingTrailDistance = false;
 		}
+
+		if(searchForSea) {
+			float distanceFromSea = getDistanceFromBeach();
+			if(distanceFromSea > 20) {
+				String string3 = "Beach distance: "+(int)distanceFromSea+" m";
+				offscreenTargetDisplay.string.set1Value(numStrings,string3);
+				numStrings++;
+			}
+		}
+
+		offscreenTargetDisplay.string.setNum(numStrings);
 	}
 
 	MemoryBuffer loadTexture(String douglasPath, final int[] wi, final int[] hi) {
@@ -2642,5 +2692,9 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 		} catch (IOException e) {
 		}
 		return buf;
+	}
+
+	public void setSearchForSea(boolean searchForSea) {
+		this.searchForSea = searchForSea;
 	}
 }

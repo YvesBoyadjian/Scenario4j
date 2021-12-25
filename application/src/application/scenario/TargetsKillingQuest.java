@@ -30,6 +30,8 @@ public class TargetsKillingQuest implements Quest {
 
         achieved &= allKilled;
 
+        sceneGraph.setSearchForSea(false);
+
         if(!achieved) {
             boolean onlyMissingSeal = !sceneGraph.haveShot(Seals.SEAL_NAME);
             onlyMissingSeal &= sceneGraph.haveShot(GroundSquirrels.GROUND_SQUIRREL_NAME);
@@ -40,7 +42,7 @@ public class TargetsKillingQuest implements Quest {
             onlyMissingSeal &= sceneGraph.haveShot(BigFoots.BIGFOOT_NAME);
 
             if(onlyMissingSeal) {
-                sceneGraph.setMessage("You will find seals by the sea");
+                sceneGraph.setMessage("You will find seals by the sea, on the beach");
             }
             else {
                 if(allKilled) {
@@ -50,6 +52,7 @@ public class TargetsKillingQuest implements Quest {
                     sceneGraph.setMessage("");
                 }
             }
+            sceneGraph.setSearchForSea(onlyMissingSeal);
         }
         return achieved;
     }
@@ -60,7 +63,7 @@ public class TargetsKillingQuest implements Quest {
         String[] speech = {"Hooray, I now have enough to eat.","To show my gratitude, I'm allowing you to fly", "by pressing the 'F' key."};
         sceneGraph.talk(speech);
         sceneGraph.stopBody();
-        sceneGraph.setMessage("");
+        sceneGraph.setMessage("'F' key to toggle fly mode On or Off");
     }
 
     double getDistanceFromOracle(SoQtWalkViewer viewer) {

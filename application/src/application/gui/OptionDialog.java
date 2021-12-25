@@ -216,9 +216,15 @@ public class OptionDialog extends JDialog {
             // LOD_FACTOR_SHADOW
             spinnerLODFactorShadow.setModel(new SpinnerNumberModel((double)sg.getLevelOfDetailShadow(),0.05,2.0,0.05));
             // TREE_DISTANCE
-            spinnerTreeDistance.setModel(new SpinnerNumberModel((double)sg.getTreeDistance(),500,30000,500));
+            double treeDistance = (double)sg.getTreeDistance();
+            treeDistance = Math.max(500,treeDistance);
+            treeDistance = Math.min(30000,treeDistance);
+            spinnerTreeDistance.setModel(new SpinnerNumberModel(treeDistance,500,30000,500));
             // TREE_SHADOW_DISTANCE
-            spinnerTreeShadowDistance.setModel(new SpinnerNumberModel((double)sg.getTreeShadowDistance(),500,30000,500));
+            double treeShadowDistance = (double)sg.getTreeShadowDistance();
+            treeShadowDistance = Math.max(500,treeShadowDistance);
+            treeShadowDistance = Math.min(30000,treeShadowDistance);
+            spinnerTreeShadowDistance.setModel(new SpinnerNumberModel(treeShadowDistance,500,30000,500));
             // MAX_I
             spinnerMaxI.setModel(new SpinnerNumberModel(sg.getMaxI(),7000,14000,500));
             // VOLUMETRIC_SKY
