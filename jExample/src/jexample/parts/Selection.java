@@ -16,7 +16,7 @@ import jscenegraph.database.inventor.nodes.SoSeparator;
 import jscenegraph.database.inventor.nodes.SoSphere;
 import jscenegraph.database.inventor.nodes.SoTransform;
 import jscenegraph.interaction.inventor.nodes.SoSelection;
-import jsceneviewer.inventor.qt.viewers.SoQtExaminerViewer;
+import jsceneviewerawt.inventor.qt.viewers.SoQtExaminerViewer;
 
 /**
  * @author Yves Boyadjian

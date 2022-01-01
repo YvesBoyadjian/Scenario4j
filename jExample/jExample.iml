@@ -7,14 +7,15 @@
       <sourceFolder url="file://$MODULE_DIR$/src" isTestSource="false" />
     </content>
     <orderEntry type="inheritedJdk" />
-    <orderEntry type="module" module-name="jsceneviewer" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module" module-name="jscenegraph" />
     <orderEntry type="module" module-name="org.lwjglx" />
-    <orderEntry type="module" module-name="jsceneviewer" />
     <orderEntry type="module" module-name="jscenegraph" />
     <orderEntry type="module" module-name="org.lwjglx" />
-    <orderEntry type="library" name="ECLIPSE" level="application" />
-    <orderEntry type="module" module-name="lwjgl" />
+    <orderEntry type="module" module-name="jsceneviewer-awt" />
+    <orderEntry type="module" module-name="lwjgl-opengl" />
+    <orderEntry type="module" module-name="lwjgl3-awt" />
+    <orderEntry type="module" module-name="lwjgl-jawt" />
+    <orderEntry type="module" module-name="lwjgl-utils" />
   </component>
 </module>

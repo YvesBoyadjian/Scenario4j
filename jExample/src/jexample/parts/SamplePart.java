@@ -1,27 +1,9 @@
 package jexample.parts;
 
+import java.awt.*;
 import java.io.IOException;
 import java.net.URL;
 
-import javax.annotation.PostConstruct;
-import javax.inject.Inject;
-
-import org.eclipse.core.runtime.FileLocator;
-import org.eclipse.core.runtime.Platform;
-import org.eclipse.e4.ui.di.Focus;
-import org.eclipse.e4.ui.di.Persist;
-import org.eclipse.e4.ui.model.application.ui.MDirtyable;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.graphics.Rectangle;
-import org.eclipse.swt.layout.FillLayout;
-import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Monitor;
-import org.eclipse.swt.widgets.Shell;
-import org.lwjgl.glfw.GLFW;
-import org.lwjgl.opengl.GLDebugMessageCallbackI;
-import org.lwjgl.opengl.swt.GLData;
-import org.osgi.framework.Bundle;
 
 import jscenegraph.coin3d.fxviz.nodes.SoShadowGroup;
 import jscenegraph.coin3d.inventor.nodes.SoCoordinate3;
@@ -58,30 +40,29 @@ import jscenegraph.database.inventor.nodes.SoTextureCoordinate2;
 import jscenegraph.database.inventor.nodes.SoTranslation;
 import jscenegraph.database.inventor.nodes.SoTriangleStripSet;
 import jscenegraph.freecad.SoFC;
-import jsceneviewer.inventor.qt.SoQt;
-import jsceneviewer.inventor.qt.SoQtCameraController.Type;
-import jsceneviewer.inventor.qt.viewers.SoQtExaminerViewer;
-import jsceneviewer.inventor.qt.viewers.SoQtFullViewer.BuildFlag;
+import jsceneviewerawt.inventor.qt.SoQt;
+import jsceneviewerawt.inventor.qt.SoQtCameraController;
+import jsceneviewerawt.inventor.qt.viewers.SoQtExaminerViewer;
+import jsceneviewerawt.inventor.qt.viewers.SoQtFullViewer;
+
+import javax.swing.*;
 
 public class SamplePart {
 
-	public SoQtExaminerViewer viewer;
+	public static SoQtExaminerViewer viewer;
 
-	@Inject
-	private MDirtyable dirty;
 
-	@PostConstruct
-	public void createComposite(Composite parent) {
+	public static void createComposite(Container parent) {
 		//parent.setLayout(new GridLayout(1, false));
 
 		SoQt.init("demo");
-		SoFC.init();
+		//SoFC.init();
 		//SoDB.setDelaySensorTimeout(new SbTime(10.0));
 		//SoDB.setRealTimeInterval(new SbTime(10.0));
 		
-		int style = SWT.NO_BACKGROUND;
+		int style = 0;
 		
-		viewer = new SoQtExaminerViewer(BuildFlag.BUILD_ALL,Type.BROWSER,parent,style);
+		viewer = new SoQtExaminerViewer(SoQtFullViewer.BuildFlag.BUILD_ALL, SoQtCameraController.Type.BROWSER,parent,style);
 	    //viewer.setColorBitDepth (10);
 		//viewer.setAntialiasing(true, 16);
 		viewer.setHeadlight(true);
@@ -96,20 +77,8 @@ public class SamplePart {
 		
 	    viewer.buildWidget(style);
 	    
-	    Bundle bundle = Platform.getBundle("jExample");
-	    URL fileURL = bundle.getEntry("examples_iv/duck.iv");
-	    String fileStr = null;
-	    try {
-	    	URL url = FileLocator.resolve(fileURL);
-	    	//URI uri = fileURL.toURI();
-	    	//File file = new File(uri); 
-	        fileStr = url.getPath().substring(1);//file.getAbsolutePath();
-	    } /*catch (URISyntaxException e1) {
-	        e1.printStackTrace();
-	    } */catch (IOException e1) {
-	        e1.printStackTrace();
-	    }	    
-	    
+	    String fileStr = "jExample/examples_iv/duck.iv";
+
 	    viewer.setSceneGraph(
 	    		//SoMaterialBindingExample.createDemoSceneSoMaterialBinding()
 	    		//SoMaterialBindingExample.createDemoSceneSoMaterialIndexedBinding()
@@ -144,17 +113,7 @@ public class SamplePart {
 	    viewer.viewAll();
 	}
 
-	@Focus
-	public void setFocus() {
-		if(viewer != null)
-			viewer.setFocus();
-	}
 
-	@Persist
-	public void save() {
-		dirty.setDirty(false);
-	}
-	
 	static SoNode createDemoScene()
 {
     SoSeparator scene = new SoSeparator();
@@ -1135,7 +1094,7 @@ SoSeparator createPlanet2(float radius, float distance,
 	return root;	
 	}
 	
-	SoNode createDemoScenePerformance() {
+	static SoNode createDemoScenePerformance() {
 
 	//String fileName = "C:/eclipseWorkspaces/2-6-Performance/AztecCityI.iv"; // default model
 		//String fileName = "G:/eclipseWorkspaces/5-1-Tanky1/models/tank.wrl";
@@ -1153,7 +1112,7 @@ SoSeparator createPlanet2(float radius, float distance,
 	//String fileName = "C:/eclipseWorkspaces/inventor-2.1.5-10.src/inventor/data/models/buildings/Barcelona.wrl";
 		//String fileName = "C:/eclipseWorkspaces/inventor-2.1.5-10.src/inventor/data/models/buildings/windmill.iv";
 		//String fileName = "C:/eclipseWorkspaces/inventor-2.1.5-10.src/inventor/data/models/chess/chessboard.iv";
-		String fileName = "examples_iv/chair.iv";
+		String fileName = "jExample/examples_iv/chair.iv";
 	//String fileName = "C:/eclipseWorkspaces/inventor-2.1.5-10.src/inventor/data/models/vehicles/spacestation.iv";
 	//String fileName = "C:/eclipseWorkspaces/inventor-2.1.5-10.src/inventor/data/models/sgi/logo.iv";
 	//String fileName = "C:/eclipseWorkspaces/inventor-2.1.5-10.src/inventor/data/models/CyberHeads/josie.iv";
@@ -1360,46 +1319,41 @@ SoSeparator createPlanet2(float radius, float distance,
 	
 	public static void main(String[] args) {
 
-		Display display = new Display ();
-		Shell shell = new Shell(display);
-		
-		FillLayout fillLayout = new FillLayout();
-		fillLayout.type = SWT.VERTICAL;
-		shell.setLayout(fillLayout);
-		
-    	GLFW.glfwWindowHint(GLFW.GLFW_OPENGL_DEBUG_CONTEXT, GLFW.GLFW_TRUE);
-    	
-		SoQt.init("demo");
-		//SoDB.setDelaySensorTimeout(new SbTime(1.0/120.0));
-		//SoDB.setRealTimeInterval(new SbTime(1.0/120.0));
-		
-		int style = SWT.NO_BACKGROUND;
-		
-		SoQtExaminerViewer viewer = new SoQtExaminerViewer(BuildFlag.BUILD_ALL,Type.BROWSER,shell,style);
-	    //viewer.setColorBitDepth (10);
-		//viewer.setAntialiasing(true,4);
-		
-		viewer.setHeadlight(true);
-		
-	    viewer.buildWidget(style);
-	    
-	    viewer.setSceneGraph(/*createDemoScene()*//*Orbits*//*Shadows.main()*//*ShadowTest.create()*/Fog.getScene());
-	    
-	    shell.pack();
-		shell.setSize(700, 700);
-	    Monitor primary = display.getPrimaryMonitor();
-	    Rectangle bounds = primary.getBounds();
-	    Rectangle rect = shell.getBounds();
-	    
-	    int x = bounds.x + (bounds.width - rect.width) / 2;
-	    int y = bounds.y + (bounds.height - rect.height) / 2;
-	    
-	    shell.setLocation(x, y);		shell.open ();
-		shell.setLocation(x, y);
-		
-		while (!shell.isDisposed ()) {
-			if (!display.readAndDispatch ()) display.sleep ();
-		}
-		display.dispose ();
+		JFrame frame = new JFrame("VRMLViewer");
+		frame.getContentPane().setBackground(new Color(0,true));
+		frame.getContentPane().setLayout(new BorderLayout());
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.setLocationRelativeTo(null);
+
+		SwingUtilities.invokeLater(() -> {
+
+			boolean compo = false;
+
+			if(compo) {
+				createComposite(frame.getContentPane());
+			}
+			else {
+				SoQt.init("demo");
+				//SoDB.setDelaySensorTimeout(new SbTime(1.0/120.0));
+				//SoDB.setRealTimeInterval(new SbTime(1.0/120.0));
+
+				int style = 0;
+
+				SoQtExaminerViewer viewer = new SoQtExaminerViewer(SoQtFullViewer.BuildFlag.BUILD_ALL, SoQtCameraController.Type.BROWSER, frame.getContentPane(), style);
+				//viewer.setColorBitDepth (10);
+				//viewer.setAntialiasing(true,4);
+
+				viewer.setHeadlight(false);
+
+				viewer.buildWidget(style);
+
+				viewer.setSceneGraph(/*createDemoScene()*//*Orbits.main()*/Shadows.main()/*ShadowTest.create()*//*Fog.getScene()*/);
+			}
+		frame.pack();
+		frame.setSize(800,600);
+		frame.setVisible(true);
+		});
+
+
 }
 }

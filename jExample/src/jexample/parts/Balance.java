@@ -21,7 +21,7 @@ import jscenegraph.nodekits.inventor.nodekits.SoCameraKit;
 import jscenegraph.nodekits.inventor.nodekits.SoLightKit;
 import jscenegraph.nodekits.inventor.nodekits.SoSceneKit;
 import jscenegraph.nodekits.inventor.nodekits.SoShapeKit;
-import jsceneviewer.inventor.qt.SoQtRenderArea;
+import jsceneviewerawt.inventor.qt.SoQtRenderArea;
 
 /**
  * @author Yves Boyadjian

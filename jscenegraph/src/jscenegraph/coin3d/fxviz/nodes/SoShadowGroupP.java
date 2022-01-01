@@ -886,17 +886,20 @@ setFragmentShader(SoState state)
       boolean normalspot = false;
       String insidetest = "coord.x >= 0.0 && coord.x <= 1.0 && coord.y >= 0.0 && coord.y <= 1.0";
 		String nearinsidetest = "nearcoord.x >= 0.0 && nearcoord.x <= 1.0 && nearcoord.y >= 0.0 && nearcoord.y <= 1.0";
+		String nearinsidetest2 = nearinsidetest;
 
       SoLight light = this.shadowlights.operator_square_bracket(i).light;
       if (light.isOfType(SoSpotLight.getClassTypeId())) {
         SoSpotLight sl = (SoSpotLight) (light);
         if (sl.dropOffRate.getValue() >= 0.0f) {
-          insidetest = ")";
+          insidetest = "true";
+			nearinsidetest = "true";
           spotlight = true;
           normalspot = true;
         }
         else {
-          insidetest = ")";
+          insidetest = "true";
+			nearinsidetest = "true";
           dirspot = true;
         }
       }
@@ -935,15 +938,15 @@ setFragmentShader(SoState state)
       gen.addMainStatement("map.xy += map.zw / DISTRIBUTE_FACTOR;\n");
 		gen.addMainStatement("nearmap.xy += nearmap.zw / DISTRIBUTE_FACTOR;\n");
 //#endif
-		str = "if("+nearinsidetest+"){\n";
+		str = "if("+nearinsidetest2+"){\n";
 		gen.addMainStatement(str);
-		str = "shadeFactor = ((nearmap.x < 0.9999) && (nearShadowCoord"+i+".z > -1.0 &&"+nearinsidetest+")) "+
+		str = "shadeFactor = ((nearmap.x < 0.9999) && (nearShadowCoord"+i+".z > -1.0 && "+nearinsidetest+")) "+
 				"? VsmLookup(nearmap, (neardist - nearvalnear"+i+") / (farvalnear"+i+" - nearvalnear"+i+"), EPSILON, THRESHOLD) : 1.0;\n}else{\n";
 		gen.addMainStatement(str);
 
 
 
-      str = "shadeFactor = ((map.x < 0.9999) && (shadowCoord"+i+".z > -1.0 &&"+insidetest+")) "+
+      str = "shadeFactor = ((map.x < 0.9999) && (shadowCoord"+i+".z > -1.0 && "+insidetest+")) "+
                   "? VsmLookup(map, (dist - nearval"+i+") / (farval"+i+" - nearval"+i+"), EPSILON, THRESHOLD) : 1.0;\n}\n";
       gen.addMainStatement(str);
 
@@ -1299,6 +1302,9 @@ protected void endFragmentShader(SoShaderGenerator gen,SoEnvironmentElement.FogT
 updateSpotCamera(SoState state, SoShadowLightCache cache, final SbMatrix transform)
 {
   SoCamera cam = cache.camera;
+
+	SoCamera nearCam = cache.nearCamera;
+
   SoSpotLight light = (SoSpotLight) (cache.light);
 
   assert(cam.isOfType(SoPerspectiveCamera.getClassTypeId()));
@@ -1310,13 +1316,16 @@ updateSpotCamera(SoState state, SoShadowLightCache cache, final SbMatrix transfo
   dir.normalize();
   float cutoff = light.cutOffAngle.getValue();
   cam.position.setValue(pos);
+  nearCam.position.setValue(pos);
   // the maximum heightAngle we can render with a camera is < PI/2,.
   // The max cutoff is therefore PI/4. Some slack is needed, and 0.78
   // is about the maximum angle we can do.
   if (cutoff > 0.78f) cutoff = 0.78f;
 
   cam.orientation.setValue(new SbRotation(new SbVec3f(0.0f, 0.0f, -1.0f), dir));
+  nearCam.orientation.setValue(new SbRotation(new SbVec3f(0.0f, 0.0f, -1.0f), dir));
   ((SoPerspectiveCamera) cam).heightAngle.setValue(cutoff * 2.0f);
+	((SoPerspectiveCamera) nearCam).heightAngle.setValue(cutoff * 2.0f);
   SoShadowGroup.VisibilityFlag visflag = SoShadowGroup.VisibilityFlag.fromValue(this.master.visibilityFlag.getValue());
 
   float visnear = this.master.visibilityNearRadius.getValue();
@@ -1341,6 +1350,7 @@ updateSpotCamera(SoState state, SoShadowLightCache cache, final SbMatrix transfo
   if (needbbox) {
     SbXfBox3f worldbox = this.calcBBox(cache);
     SbBox3f box = cache.toCameraSpace(worldbox);
+	  SbBox3f nearbox = cache.toNearCameraSpace(worldbox);
 
     // Bounding box was calculated in camera space, so we need to "flip"
     // the box (because camera is pointing in the (0,0,-1) direction
@@ -1348,7 +1358,8 @@ updateSpotCamera(SoState state, SoShadowLightCache cache, final SbMatrix transfo
     cache.nearval = -box.getMax().getValueRead()[2];
     cache.farval = -box.getMin().getValueRead()[2];
 
-    //TODO : farvalnear, nearvalnear
+	  cache.nearvalnear = -nearbox.getMax().getValueRead()[2];
+	  cache.farvalnear = -nearbox.getMin().getValueRead()[2];
 
     int depthbits = 16;
     float r = (float) Math.pow(2.0, (double) depthbits);
@@ -1357,10 +1368,19 @@ updateSpotCamera(SoState state, SoShadowLightCache cache, final SbMatrix transfo
     if (cache.nearval < nearlimit) {
       cache.nearval = nearlimit;
     }
+
+	  float nearlimitnear = cache.farvalnear / r;
+
+	  if (cache.nearvalnear < nearlimitnear) {
+		  cache.nearvalnear = nearlimitnear;
+	  }
     float SLACK = 0.001f;
 
     cache.nearval = cache.nearval * (1.0f - SLACK);
     cache.farval = cache.farval * (1.0f + SLACK);
+
+	  cache.nearvalnear = cache.nearvalnear * (1.0f - SLACK);
+	  cache.farvalnear = cache.farvalnear * (1.0f + SLACK);
 
     if (visflag == SoShadowGroup.VisibilityFlag.LONGEST_BBOX_EDGE_FACTOR) {
       final float[] sx = new float[1],sy = new float[1],sz = new float[1];
@@ -1378,12 +1398,22 @@ updateSpotCamera(SoState state, SoShadowLightCache cache, final SbMatrix transfo
   if (visnear > 0.0f) cache.nearval = visnear;
   if (visfar > 0.0f) cache.farval = visfar;
 
+	if (visnear > 0.0f) cache.nearvalnear = visnear;
+	if (visfar > 0.0f) cache.farvalnear = visfar;
+
   if (cache.nearval != cam.nearDistance.getValue()) {
     cam.nearDistance.setValue(cache.nearval);
   }
   if (cache.farval != cam.farDistance.getValue()) {
     cam.farDistance.setValue(cache.farval);
   }
+
+	if (cache.nearvalnear != nearCam.nearDistance.getValue()) {
+		nearCam.nearDistance.setValue(cache.nearvalnear);
+	}
+	if (cache.farvalnear != nearCam.farDistance.getValue()) {
+		nearCam.farDistance.setValue(cache.farvalnear);
+	}
 
   float realfarval = cutoff >= 0.0f ? cache.farval / (float)(Math.cos(cutoff * 2.0f)) : cache.farval;
   cache.fragment_farval.value.setValue(realfarval);
@@ -1392,11 +1422,26 @@ updateSpotCamera(SoState state, SoShadowLightCache cache, final SbMatrix transfo
   cache.fragment_nearval.value.setValue(cache.nearval);
   cache.vsm_nearval.value.setValue(cache.nearval);
 
-  SbViewVolume vv = new SbViewVolume(cam.getViewVolume(1.0f));
+	cache.fragment_farvalnear.value.setValue(realfarval/*near*/);
+	cache.vsm_farvalnear.value.setValue(realfarval/*near*/);
+
+	cache.fragment_nearvalnear.value.setValue(cache.nearvalnear);
+	cache.vsm_nearvalnear.value.setValue(cache.nearvalnear);
+
+	cache.vsm_nearflag.value.setValue(0.0f);
+
+  vv.copyFrom(cam.getViewVolume(1.0f));
   final SbMatrix affine = new SbMatrix(), proj = new SbMatrix();
 
   vv.getMatrices(affine, proj);
   cache.matrix.copyFrom(affine.operator_mul(proj));
+
+	nearvv.copyFrom(/*new SbViewVolume(*/nearCam.getViewVolume(1.0f)/*)*/);
+	final SbMatrix naffine = new SbMatrix(), nproj = new SbMatrix();
+
+	nearvv.getMatrices(naffine, nproj);
+	cache.nearmatrix.copyFrom( naffine.operator_mul(nproj));
+
 }
 
 	private final SbViewVolume vv = new SbViewVolume(); // SINGLE_THREAD
@@ -1692,6 +1737,10 @@ void addDirectionalLight(SoShaderGenerator gen, int i) {
                 "gl_LightSource["+i+"].spotCosCutoff,"+
                 "eye, ecPosition3, normal, ambient, diffuse, specular);";
     gen.addMainStatement(str);
+	  if(needdist) {
+		  String neardist = "neardist = dist;";
+		  gen.addMainStatement(neardist);
+	  }
   }
   
   void addDirSpotLight(SoShaderGenerator gen, int i, boolean needdist /*= FALSE*/) {
@@ -1703,6 +1752,10 @@ void addDirectionalLight(SoShaderGenerator gen, int i) {
                 " vec3(gl_LightSource["+i+"].position),"+
                 " eye, ecPosition3, normal, diffuse, specular);";
     gen.addMainStatement(str);
+    if(needdist) {
+    	String neardist = "neardist = dist;";
+    	gen.addMainStatement(neardist);
+	}
   }
 
   void addPointLight(SoShaderGenerator gen, int i) {

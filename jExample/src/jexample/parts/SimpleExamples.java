@@ -1,10 +1,5 @@
 package jexample.parts;
 
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.layout.FillLayout;
-import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Shell;
-import org.lwjgl.opengl.swt.GLData;
 import jscenegraph.coin3d.inventor.nodes.SoCoordinate3;
 import jscenegraph.database.inventor.nodes.SoFaceSet;
 import jscenegraph.database.inventor.nodes.SoMaterial;
@@ -14,10 +9,15 @@ import jscenegraph.database.inventor.nodes.SoNormalBinding;
 import jscenegraph.database.inventor.nodes.SoSeparator;
 import jscenegraph.database.inventor.nodes.SoShapeHints;
 import jscenegraph.database.inventor.nodes.SoTriangleStripSet;
-import jsceneviewer.inventor.qt.SoQt;
-import jsceneviewer.inventor.qt.SoQtCameraController.Type;
-import jsceneviewer.inventor.qt.viewers.SoQtExaminerViewer;
-import jsceneviewer.inventor.qt.viewers.SoQtFullViewer.BuildFlag;
+import jsceneviewerawt.inventor.qt.SoQt;
+import jsceneviewerawt.inventor.qt.SoQtCameraController;
+import jsceneviewerawt.inventor.qt.viewers.SoQtExaminerViewer;
+import jsceneviewerawt.inventor.qt.viewers.SoQtFullViewer;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 
 public class SimpleExamples {
 
@@ -328,13 +328,13 @@ public class SimpleExamples {
 
 	public static void main(String[] argv)
 	{
-		Display display = new Display ();
-		Shell shell = new Shell(display);
-		
-		FillLayout fillLayout = new FillLayout();
-		fillLayout.type = SWT.VERTICAL;
-		shell.setLayout(fillLayout);
-		
+		JFrame frame = new JFrame("VRMLViewer");
+		frame.getContentPane().setBackground(new Color(0,true));
+		frame.getContentPane().setLayout(new BorderLayout());
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.setLocationRelativeTo(null);
+
+		SwingUtilities.invokeLater(() -> {
 
 	  // Initialize the Qt system:
 	  //QApplication app(argc, argv);
@@ -364,26 +364,62 @@ public class SimpleExamples {
 	  //--- Init the viewer and launch the app
 
 	  // Initialize an examiner viewer:
-	  SoQtExaminerViewer eviewer = new SoQtExaminerViewer(BuildFlag.BUILD_ALL,Type.BROWSER,shell);
+	  SoQtExaminerViewer eviewer = new SoQtExaminerViewer(SoQtFullViewer.BuildFlag.BUILD_ALL, SoQtCameraController.Type.BROWSER,frame.getContentPane());
 	  eviewer.setSceneGraph(root);
 	  
-	  eviewer.setFormat(eviewer.format(), 0);
+	  //eviewer.setFormat(eviewer.format(), 0);
 	  //eviewer.show();
 	  eviewer.buildWidget(0);
 
 	  // Pop up the main window.
 	  //SoQt::show(&mainwin);
-	  shell.open();
+		frame.pack();
+		frame.setSize(800,600);
+		frame.setVisible(true);
 
 	  // Loop until exit.
 	  //SoQt::mainLoop();
-		while (!shell.isDisposed ()) {
-			if (!display.readAndDispatch ()) display.sleep ();
-		}
 
 	  // Clean up resources.
 	  //delete eviewer;
-	  root.unref();
+		frame.addWindowListener(new WindowListener() {
+			@Override
+			public void windowOpened(WindowEvent e) {
+
+			}
+
+			@Override
+			public void windowClosing(WindowEvent e) {
+
+			}
+
+			@Override
+			public void windowClosed(WindowEvent e) {
+				root.unref();
+
+			}
+
+			@Override
+			public void windowIconified(WindowEvent e) {
+
+			}
+
+			@Override
+			public void windowDeiconified(WindowEvent e) {
+
+			}
+
+			@Override
+			public void windowActivated(WindowEvent e) {
+
+			}
+
+			@Override
+			public void windowDeactivated(WindowEvent e) {
+
+			}
+		});
+		});
 
 	  //return app.exec();
 	}

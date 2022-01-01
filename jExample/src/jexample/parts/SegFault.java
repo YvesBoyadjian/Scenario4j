@@ -3,12 +3,6 @@
  */
 package jexample.parts;
 
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.graphics.Rectangle;
-import org.eclipse.swt.layout.FillLayout;
-import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Monitor;
-import org.eclipse.swt.widgets.Shell;
 
 import jscenegraph.database.inventor.SbName;
 import jscenegraph.database.inventor.SoPath;
@@ -21,10 +15,15 @@ import jscenegraph.database.inventor.nodes.SoSeparator;
 import jscenegraph.interaction.inventor.SoInteraction;
 import jscenegraph.interaction.inventor.draggers.SoCenterballDragger;
 import jscenegraph.port.Destroyable;
-import jsceneviewer.inventor.qt.SoQt;
-import jsceneviewer.inventor.qt.SoQtCameraController.Type;
-import jsceneviewer.inventor.qt.viewers.SoQtExaminerViewer;
-import jsceneviewer.inventor.qt.viewers.SoQtFullViewer.BuildFlag;
+import jsceneviewerawt.inventor.qt.SoQt;
+import jsceneviewerawt.inventor.qt.SoQtCameraController;
+import jsceneviewerawt.inventor.qt.viewers.SoQtExaminerViewer;
+import jsceneviewerawt.inventor.qt.viewers.SoQtFullViewer;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 
 /**
  * @author BOYADJIAN
@@ -36,24 +35,25 @@ public class SegFault {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		Display display = new Display ();
-		Shell shell = new Shell(display);
-		
+		JFrame frame = new JFrame("VRMLViewer");
+		frame.getContentPane().setBackground(new Color(0,true));
+		frame.getContentPane().setLayout(new BorderLayout());
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.setLocationRelativeTo(null);
+
+		SwingUtilities.invokeLater(() -> {
 		SoQt.init();
 		
 		// An Annotation node must be used here because it delays the rendering
 		SoSeparator anno = new SoAnnotation();
 		
-		FillLayout fillLayout = new FillLayout();
-		fillLayout.type = SWT.VERTICAL;
-		shell.setLayout(fillLayout);
-		
-		int style = SWT.NO_BACKGROUND;
+
+		int style = 0;
 		
 		final boolean[] first = new boolean[1];
 		first[0] = true;
 		
-		SoQtExaminerViewer eviewer = new SoQtExaminerViewer(BuildFlag.BUILD_ALL,Type.BROWSER,shell,style)
+		SoQtExaminerViewer eviewer = new SoQtExaminerViewer(SoQtFullViewer.BuildFlag.BUILD_ALL, SoQtCameraController.Type.BROWSER,frame.getContentPane(),style)
 				{
 				// Use this function to add an Annotation node after the
 				// scene has been rendered
@@ -116,33 +116,58 @@ public class SegFault {
 	    
 		eviewer.setSceneGraph(root);
 
-	    shell.pack();
-		shell.setSize(700, 700);
-	    Monitor primary = display.getPrimaryMonitor();
-	    Rectangle bounds = primary.getBounds();
-	    Rectangle rect = shell.getBounds();
-	    
-	    int x = bounds.x + (bounds.width - rect.width) / 2;
-	    int y = bounds.y + (bounds.height - rect.height) / 2;
-	    
-	    shell.setLocation(x, y);		shell.open ();
-		shell.setLocation(x, y);
-		
-		while (!shell.isDisposed ()) {
-			if (!display.readAndDispatch ()) display.sleep ();
-		}
-		display.dispose ();
-		
+		frame.pack();
+		frame.setSize(800,600);
+		frame.setVisible(true);
+
+
 //		eviewer.show();
 //
 //		SoWin::show(mainwin);
 //		SoWin::mainLoop();
 
 		//delete eviewer;
-		root.unref();
-		anno.unref();
+			frame.addWindowListener(new WindowListener() {
+				@Override
+				public void windowOpened(WindowEvent e) {
+
+				}
+
+				@Override
+				public void windowClosing(WindowEvent e) {
+
+				}
+
+				@Override
+				public void windowClosed(WindowEvent e) {
+
+					root.unref();
+					anno.unref();
+				}
+
+				@Override
+				public void windowIconified(WindowEvent e) {
+
+				}
+
+				@Override
+				public void windowDeiconified(WindowEvent e) {
+
+				}
+
+				@Override
+				public void windowActivated(WindowEvent e) {
+
+				}
+
+				@Override
+				public void windowDeactivated(WindowEvent e) {
+
+				}
+			});
 		//SoWin::done();
 		//return 0;
+		});
 	}
 
 }

@@ -7,7 +7,7 @@ import jscenegraph.database.inventor.SbVec3f;
 import jscenegraph.database.inventor.nodes.SoCamera;
 import jscenegraph.database.inventor.sensors.SoFieldSensor;
 import jscenegraph.database.inventor.sensors.SoSensor;
-import jsceneviewer.inventor.qt.viewers.SoQtExaminerViewer;
+import jsceneviewerawt.inventor.qt.viewers.SoQtExaminerViewer;
 
 /**
  * @author Yves Boyadjian
@@ -15,7 +15,7 @@ import jsceneviewer.inventor.qt.viewers.SoQtExaminerViewer;
  */
 public class CameraSensor {
 
-	//Attachement d’un senseur de champ à la position d’une caméra. La fonction associée affiche la position de la caméra.
+	//Attachement dï¿½un senseur de champ ï¿½ la position dï¿½une camï¿½ra. La fonction associï¿½e affiche la position de la camï¿½ra.
 	public static void cameraChangedCB(Object data,SoSensor sensor)
 	  { SoCamera viewerCamera = (SoCamera )data;
 	    SbVec3f cameraPosition =
