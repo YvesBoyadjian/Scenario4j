@@ -27,6 +27,10 @@
 
 package jterrain;
 
+import java.awt.*;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
+import java.awt.event.WindowStateListener;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBuffer;
 import java.awt.image.DataBufferByte;
@@ -37,11 +41,7 @@ import java.io.IOException;
 import java.util.Objects;
 
 import javax.imageio.ImageIO;
-
-import org.eclipse.swt.layout.FillLayout;
-import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Shell;
+import javax.swing.*;
 
 import gnu.getopt.Getopt;
 import jscenegraph.coin3d.inventor.nodes.SoCoordinate3;
@@ -70,8 +70,8 @@ import jscenegraph.port.Destroyable;
 import jscenegraph.port.IntArray;
 import jscenegraph.port.SbVec2fArray;
 import jscenegraph.port.SbVec3fArray;
-import jsceneviewer.inventor.qt.SoQt;
-import jsceneviewer.inventor.qt.SoQtRenderArea;
+import jsceneviewerawt.inventor.qt.SoQt;
+import jsceneviewerawt.inventor.qt.SoQtRenderArea;
 import jterrain.chunkedlod.SoSimpleChunkedLoDTerrain;
 import jterrain.geomipmapping.SoSimpleGeoMipmapTerrain;
 import jterrain.profiler.PrProfiler;
@@ -369,6 +369,8 @@ public class SoTerrainTest {
 	  System.out.println( "\t-s\t\t\tEnable animation synchronization with time." );
 	}
 
+	static SoQtFreeViewer render_area;
+
 	public static void main(String argv[])
 	{
 		int argc = argv.length; // java port
@@ -527,13 +529,12 @@ public class SoTerrainTest {
 	  //putenv("COIN_AUTO_CACHING=0");
 
 	  /* Create window. */
-	  Display display = new Display();
-	  Shell window;
-	  if ((window = new Shell(display)/*SoQt.init(argc, argv, "SoTerrain Test Application")*/) == null)
-	  {
-	    System.exit(1);
-	  }
-	  
+		JFrame frame = new JFrame("VRMLViewer");
+		frame.getContentPane().setBackground(new Color(0,true));
+		frame.getContentPane().setLayout(new BorderLayout());
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.setLocationRelativeTo(null);
+
 	  SoQt.init();
 
 	  /* Initialization of custom Inventor classes. */
@@ -761,27 +762,37 @@ public class SoTerrainTest {
 	    }
 	    break;
 	  }
-	  
-	  window.setLayout(new FillLayout());
+
+		final String final_profile_name = profile_name;
+		final boolean final_is_full_screen = is_full_screen;
+		final boolean final_is_animation = is_animation;
+
+		SwingUtilities.invokeLater(() -> {
 
 	  /* Setup camera and render area. */
-	  SoQtFreeViewer render_area = new SoQtFreeViewer(window);
+	  render_area = new SoQtFreeViewer(frame.getContentPane());
+
 	  SoSceneManager scene_manager = new SoSceneManager();
 	  render_area.getCameraController().setHeadlight(false);
 	  render_area.getSceneHandler().setSceneManager(scene_manager);
 	  scene_manager.setRenderCallback(SoTerrainTest::renderCallback, render_area);
 	  scene_manager.activate();
+
+			frame.pack();
+			frame.setSize(800,600);
+			frame.setVisible(true);
+
 	  camera.viewAll(root, render_area.getSceneHandler().getViewportRegion());
 	  camera.nearDistance.setValue(0.01f);
 	  render_area.setSceneGraph(root);
 	  render_area.setTitle("SoTerrain Test Application");
 	  render_area.show();
-	  render_area.setFullScreen(is_full_screen);
+	  render_area.setFullScreen(final_is_full_screen);
 
 
 	  /* Run animation or set camera position and orientation. */
 	  SoTimerSensor camera_timer = null;
-	  if (is_animation)
+	  if (final_is_animation)
 	  {
 	    camera_timer = new SoTimerSensor(SoTerrainTest::cameraTimerCallback,
 	      camera);
@@ -793,23 +804,57 @@ public class SoTerrainTest {
 	    camera.position.setValue(0.365994f, 0.281897f, 0.023945f);
 	    camera.orientation.setValue(-0.452279f, 0.426091f, 0.537269f, -0.570291f);
 	  }
+			//camera.viewAll(root, render_area.getSceneHandler().getViewportRegion());
 
 	  /* Run application. */
-	  window.open();
-	  window.setSize((short)2500, (short)1400);
-	  window.setLocation(10, 10);
-	  
-	  while (!window.isDisposed ()) {
-			if (!display.readAndDispatch ()) display.sleep ();
-		}
-		display.dispose ();	 
 
-	  PrProfiler.PR_PRINT_RESULTS(profile_name);
+		//render_area.buildWidget(0);
+			final SoTimerSensor final_camera_timer = camera_timer;
 
-	  /* Free memory. */
-	  root.unref();
-	  Destroyable.delete(camera_timer);
-	  Destroyable.delete(render_area);
+		frame.addWindowListener(new WindowListener() {
+			@Override
+			public void windowOpened(WindowEvent e) {
+
+			}
+
+			@Override
+			public void windowClosing(WindowEvent e) {
+
+			}
+
+			@Override
+			public void windowClosed(WindowEvent e) {
+
+				PrProfiler.PR_PRINT_RESULTS(final_profile_name);
+
+				/* Free memory. */
+				root.unref();
+				Destroyable.delete(final_camera_timer);
+				Destroyable.delete(render_area);
+
+			}
+
+			@Override
+			public void windowIconified(WindowEvent e) {
+
+			}
+
+			@Override
+			public void windowDeiconified(WindowEvent e) {
+
+			}
+
+			@Override
+			public void windowActivated(WindowEvent e) {
+
+			}
+
+			@Override
+			public void windowDeactivated(WindowEvent e) {
+
+			}
+		});
+		});
 
 	  //return /*EXIT_SUCCESS*/0;
 	}

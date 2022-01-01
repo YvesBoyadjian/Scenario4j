@@ -44,12 +44,7 @@
 
 package jterrain;
 
-import java.awt.AWTException;
-import java.awt.Robot;
-
-import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Display;
+import java.awt.*;
 
 import jscenegraph.database.inventor.SbRotation;
 import jscenegraph.database.inventor.SbVec2s;
@@ -59,8 +54,8 @@ import jscenegraph.database.inventor.events.SoKeyboardEvent;
 import jscenegraph.database.inventor.events.SoLocation2Event;
 import jscenegraph.database.inventor.events.SoMouseButtonEvent;
 import jscenegraph.database.inventor.nodes.SoCamera;
-import jsceneviewer.inventor.qt.SoQtCameraController.Type;
-import jsceneviewer.inventor.qt.viewers.SoQtViewer;
+import jsceneviewerawt.inventor.qt.SoQtCameraController;
+import jsceneviewerawt.inventor.qt.viewers.SoQtViewer;
 
 /**
  * @author Yves Boyadjian
@@ -79,13 +74,13 @@ public class SoQtFreeViewer extends SoQtViewer {
 	 * Java port
 	 * @param parent
 	 */
-	public SoQtFreeViewer(Composite parent) {
+	public SoQtFreeViewer(Container parent) {
 		this(parent,null,true);
 	}
 	
-public SoQtFreeViewer(Composite parent, String name,
+public SoQtFreeViewer(Container parent, String name,
   boolean embed) {
-  super(parent, name, embed, Type.BROWSER, true);
+  super(parent, name, embed, SoQtCameraController.Type.BROWSER, true);
   sensitivity = 1.0f; invert = false;
 
   constructorCommon(true);
@@ -126,9 +121,9 @@ public void setInvertMouse( boolean enabled)
 * SoQtFreeViewer - protected
 ******************************************************************************/
 
-protected SoQtFreeViewer(Composite parent, String name,
+protected SoQtFreeViewer(Container parent, String name,
   boolean embed, boolean build) {
-  super(parent, name, embed, Type.BROWSER, build);
+  super(parent, name, embed, SoQtCameraController.Type.BROWSER, build);
   sensitivity = 1.0f; invert = false;
 
   constructorCommon(build);
@@ -317,15 +312,19 @@ private void constructorCommon(boolean buildNow)
 private SbVec2s getCenter()
 {
   /* Ziskani stredu okna relativne. */
-  Composite widget = getParentWidget();
-  return new SbVec2s((short)(widget.getSize().x / 2), (short)(widget.getSize().y / 2));
+  Container widget = getParentWidget();
+  return new SbVec2s((short)(widget.getSize().getWidth() / 2), (short)(widget.getSize().getHeight() / 2));
 }
 
 private SbVec2s getPosition()
 {
   /* Ziskani pocatku okna vuci obrazovce. */
-  Composite widget = getParentWidget();
-  Point position = widget.toDisplay(0, 0);
+  Container widget = getParentWidget();
+  Point position = widget.getMousePosition();// .toDisplay(0, 0);
+  if(null==position) {
+    return new SbVec2s();
+  }
+
   return new SbVec2s((short)position.x, (short)position.y);
 }
 
@@ -345,7 +344,10 @@ private void setCursorPosition(final SbVec2s position)
 {
   /* Ziskani absolutni pozice kurzoru. */
   //QPoint position = QCursor.pos();
-  Point position = Display.getCurrent().getCursorLocation();		  
+  Point position = getMousePosition();
+  if(null==position) {
+    return new SbVec2s();
+  }
   return new SbVec2s((short)position.x, (short)position.y);
 }
 	
