@@ -643,7 +643,7 @@ setVertexShader(SoState state)
     if (pointlight) gen.addNamedFunction(new SbName("lights/PointLight"), false);
 
     gen.addMainStatement("color = vec4(0,0,0,0);//gl_FrontLightModelProduct.sceneColor + "+
-                         "  accambient * gl_FrontMaterial.ambient + "+
+                         "  accambient * s4j_FrontMaterial.ambient + "+
                          "  accdiffuse * diffuCol +"+
                          "  accspecular * s4j_FrontMaterial.specular;\n"
                          );
@@ -689,7 +689,7 @@ setVertexShader(SoState state)
       spotlight = true;
       addSpotLight(gen, cache.lightid);
       str = "spotVertexColor"+i+" = \n"+
-                  "  ambient.rgb * gl_FrontMaterial.ambient.rgb + "+
+                  "  ambient.rgb * s4j_FrontMaterial.ambient.rgb + "+
                   "  diffuse.rgb * diffuCol.rgb + "+
                   "  specular.rgb * s4j_FrontMaterial.specular.rgb;\n";
       gen.addMainStatement(str);
@@ -798,6 +798,7 @@ setFragmentShader(SoState state)
 
 	gen.addDeclaration("struct FrontMaterial {", false);
 	gen.addDeclaration("    vec4 specular;",false);
+	gen.addDeclaration("    vec4 ambient;", false);
 	gen.addDeclaration("    float shininess;", false);
 	gen.addDeclaration("};",false);
 
@@ -1041,7 +1042,7 @@ setFragmentShader(SoState state)
 
       gen.addMainStatement("color += shadeFactor * diffuse.rgb * mydiffuse.rgb;");
       gen.addMainStatement("scolor += shadeFactor * s4j_FrontMaterial.specular.rgb * specular.rgb;\n");
-      gen.addMainStatement("color += ambient.rgb * gl_FrontMaterial.ambient.rgb;\n");
+      gen.addMainStatement("color += ambient.rgb * s4j_FrontMaterial.ambient.rgb;\n");
 
       endShadowLight(gen,cache.lightid,cache.texunit,i);
 
@@ -1070,7 +1071,7 @@ setFragmentShader(SoState state)
                                     "Unknown light type: "+
                                     l.getTypeId().getName().getString());
         }
-        gen.addMainStatement("color += ambient.rgb * gl_FrontMaterial.ambient.rgb + "+
+        gen.addMainStatement("color += ambient.rgb * s4j_FrontMaterial.ambient.rgb + "+
                              "diffuse.rgb * mydiffuse.rgb;\n");
         gen.addMainStatement("scolor += specular.rgb * s4j_FrontMaterial.specular.rgb;\n");
 		  gen.addMainStatement("// _______________________ End Light\n");
