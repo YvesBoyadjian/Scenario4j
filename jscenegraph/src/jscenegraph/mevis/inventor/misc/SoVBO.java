@@ -128,8 +128,8 @@ private		  boolean _ownsData;
 private		  boolean _hasSwappedRGBAData;
 private		  boolean _hadGLError;
 
-private		  static int _vboMinimumSizeLimit = 20;
-private		  static int _vboMaximumSizeLimit = 0x10000000;
+private		  static int _vboMinimumSizeLimit = 0;//20; CORE
+private		  static int _vboMaximumSizeLimit = 0x40000000;//0x10000000; CORE
 
 // COIN3D
 private /*GLenum*/int target;

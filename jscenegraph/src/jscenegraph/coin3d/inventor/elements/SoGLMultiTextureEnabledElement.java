@@ -103,7 +103,7 @@ public class SoGLMultiTextureEnabledElement extends SoMultiTextureEnabledElement
 	  case DISABLED:
 	    break;
 	  case TEXTURE2D:
-	    gl2.glDisable(GL2.GL_TEXTURE_2D);
+	    //gl2.glDisable(GL2.GL_TEXTURE_2D); CORE
 	    break;
 	  case RECTANGLE:
 	    gl2.glDisable(GL2.GL_TEXTURE_RECTANGLE/*_EXT*/);
@@ -122,7 +122,7 @@ public class SoGLMultiTextureEnabledElement extends SoMultiTextureEnabledElement
 	  case DISABLED:
 	    break;
 	  case TEXTURE2D:
-	    gl2.glEnable(GL2.GL_TEXTURE_2D);
+	    //gl2.glEnable(GL2.GL_TEXTURE_2D); CORE
 	    break;
 	  case RECTANGLE:
 	    gl2.glEnable(GL2.GL_TEXTURE_RECTANGLE/*_EXT*/);

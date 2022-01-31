@@ -29,7 +29,7 @@ public class OverallTexture {
 		this.ca = chunkArray;
 		
 		texture = new SoTexture2();
-		texture.image.setValue(new SbVec2s((short)ca.getW(),(short)ca.getH()),3,getImage2(), true);
+		texture.image.setValue(new SbVec2s((short)ca.getW(),(short)ca.getH()),3,false, getImage2(), true);
 	}
 
 	private MemoryBuffer getImage2() {

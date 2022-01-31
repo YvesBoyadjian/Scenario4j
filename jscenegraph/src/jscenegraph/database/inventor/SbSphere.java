@@ -98,6 +98,8 @@ public class SbSphere implements Mutable {
 
 	private final SbVec3f     center = new SbVec3f();
 	private float       radius;
+
+	private final SbVec3f dummy = new SbVec3f();
 		   
     //! Constructors.
 	public SbSphere()  {}
@@ -271,7 +273,7 @@ public  void
 public boolean
 pointInside(final SbVec3f p)
 {
-  return (p.operator_minus(center)).length() < radius;
+  return (p.operator_minus(center,dummy)).length() < radius;
 }
 
 }

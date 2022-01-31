@@ -2836,11 +2836,11 @@ public interface GL2 extends GL2ES1, GL2GL3 {
 	public static final int GL_GENERATE_MIPMAP_HINT_SGIS     = 0x8192;
 	  	  	  
 	default void glBegin(int arg) {
-		org.lwjgl.opengl.GL11.glBegin(arg);
+		// org.lwjgl.opengl.GL11.glBegin(arg); CORE
 	}
 
 	default void glEnd() {
-		org.lwjgl.opengl.GL11.glEnd();
+		// org.lwjgl.opengl.GL11.glEnd(); CORE
 	}
 
 	default void glDisable(int arg) {
@@ -2852,7 +2852,7 @@ public interface GL2 extends GL2ES1, GL2GL3 {
 	}
 
 	default void glEnableClientState(int arg) {
-		org.lwjgl.opengl.GL11.glEnableClientState(arg);
+		// org.lwjgl.opengl.GL11.glEnableClientState(arg); CORE
 	}
 
 	default void glBindBuffer(int arg1, int arg2) {
@@ -2860,7 +2860,7 @@ public interface GL2 extends GL2ES1, GL2GL3 {
 	}
 
 	default void glEndList() {
-		org.lwjgl.opengl.GL11.glEndList();
+		// org.lwjgl.opengl.GL11.glEndList(); CORE
 	}
 
 	default void glFlush() {
@@ -2872,7 +2872,7 @@ public interface GL2 extends GL2ES1, GL2GL3 {
 	}
 
 	default void glDisableClientState(int arg) {
-		org.lwjgl.opengl.GL11.glDisableClientState(arg);
+		// org.lwjgl.opengl.GL11.glDisableClientState(arg); CORE
 	}
 
 	default void glEnableVertexAttribArray(int arg) {
@@ -2888,14 +2888,14 @@ public interface GL2 extends GL2ES1, GL2GL3 {
 	}
 
 	default void glVertex3fv(float[] arg1, int arg2) {
-		if(arg2 == 0)
-			org.lwjgl.opengl.GL11.glVertex3fv( arg1);
-		else {
+		if(arg2 == 0) {
+//			org.lwjgl.opengl.GL11.glVertex3fv(arg1); CORE
+		} else {
 			float[] three = new float[3];
 			three[0] = arg1[arg2];
 			three[1] = arg1[arg2+1];
 			three[2] = arg1[arg2+2];
-			org.lwjgl.opengl.GL11.glVertex3fv( three);
+			// org.lwjgl.opengl.GL11.glVertex3fv( three); CORE
 		}
 	}
 
@@ -2904,7 +2904,7 @@ public interface GL2 extends GL2ES1, GL2GL3 {
 	}
 
 	default void glMatrixMode(int arg) {
-		org.lwjgl.opengl.GL11.glMatrixMode(arg);
+		// org.lwjgl.opengl.GL11.glMatrixMode(arg); CORE
 	}
 
 	default void glAccum(int arg1, float arg2) {
@@ -2952,11 +2952,11 @@ public interface GL2 extends GL2ES1, GL2GL3 {
 
 	
 	default void glPopMatrix() {
-		org.lwjgl.opengl.GL11.glPopMatrix();
+		// org.lwjgl.opengl.GL11.glPopMatrix(); CORE
 	}
 
 	default void glTranslatef(float arg1, float arg2, float arg3) {
-		org.lwjgl.opengl.GL11.glTranslatef(arg1,arg2,arg3);
+		// org.lwjgl.opengl.GL11.glTranslatef(arg1,arg2,arg3); CORE
 	}
 
 	default void glMaterialfv(int arg1, int arg2, float[] arg3, int arg4) {
@@ -2964,7 +2964,7 @@ public interface GL2 extends GL2ES1, GL2GL3 {
 	}
 
 	default void glMaterialfv(int arg1, int arg2, float[] arg3) {
-		org.lwjgl.opengl.GL11.glMaterialfv(arg1,arg2,arg3);
+		// org.lwjgl.opengl.GL11.glMaterialfv(arg1,arg2,arg3); CORE
 	}
 
 	default void glClear(int arg) {
@@ -2979,7 +2979,7 @@ public interface GL2 extends GL2ES1, GL2GL3 {
 	}
 	
 	default void glNormal3fv(float[] arg1) {
-		org.lwjgl.opengl.GL11.glNormal3fv( arg1);
+		// org.lwjgl.opengl.GL11.glNormal3fv( arg1); CORE
 	}
 
 	default void glTexCoord2f(float arg1, float arg2) {
@@ -2991,11 +2991,11 @@ public interface GL2 extends GL2ES1, GL2GL3 {
 	}
 
 	default void glLightf(int arg1, int arg2, float arg3) {
-		org.lwjgl.opengl.GL11.glLightf(arg1,arg2,arg3);
+		// org.lwjgl.opengl.GL11.glLightf(arg1,arg2,arg3); CORE
 	}
 
 	default void glVertex2fv(float[] arg1, int arg2) {
-		org.lwjgl.opengl.GL11.glVertex2fv(arg1);
+		//org.lwjgl.opengl.GL11.glVertex2fv(arg1); CORE
 	}
 
 	default void glPixelStorei(int arg1, int arg2) {
@@ -3007,11 +3007,11 @@ public interface GL2 extends GL2ES1, GL2GL3 {
 	}
 
 	default void glLightfv(int arg1, int arg2, float[] arg3, int arg4) {
-		org.lwjgl.opengl.GL11.glLightfv(arg1,arg2,arg3);
+		// org.lwjgl.opengl.GL11.glLightfv(arg1,arg2,arg3); CORE
 	}
 
 	default void glPushMatrix() {
-		org.lwjgl.opengl.GL11.glPushMatrix();
+		// org.lwjgl.opengl.GL11.glPushMatrix(); CORE
 	}
 
 	default void glLoadIdentity() {
@@ -3019,7 +3019,7 @@ public interface GL2 extends GL2ES1, GL2GL3 {
 	}
 
 	default void glShadeModel(int arg) {
-		org.lwjgl.opengl.GL11.glShadeModel(arg);
+		// org.lwjgl.opengl.GL11.glShadeModel(arg); CORE
 	}
 
 	default void glDepthMask(boolean arg) {
@@ -3031,11 +3031,11 @@ public interface GL2 extends GL2ES1, GL2GL3 {
 	}
 
 	default void glFogf(int arg1, float arg2) {
-		org.lwjgl.opengl.GL11.glFogf(arg1,arg2);
+		// org.lwjgl.opengl.GL11.glFogf(arg1,arg2); CORE
 	}
 
 	default void glLoadMatrixf(float[] arg1, int arg2) {
-		org.lwjgl.opengl.GL11.glLoadMatrixf(arg1);
+		// org.lwjgl.opengl.GL11.glLoadMatrixf(arg1); CORE
 	}
 
 	default void glTexCoord2fv(float[] arg1, int arg2) {
@@ -3043,7 +3043,7 @@ public interface GL2 extends GL2ES1, GL2GL3 {
 	}
 
 	default void glNewList(int arg1, int arg2) {
-		org.lwjgl.opengl.GL11.glNewList(arg1,arg2);
+		// org.lwjgl.opengl.GL11.glNewList(arg1,arg2); CORE
 	}
 
 	default void glTexCoord4fv(float[] arg1, int arg2) {
@@ -3063,7 +3063,7 @@ public interface GL2 extends GL2ES1, GL2GL3 {
 	}
 
 	default void glNormal3f(float arg1, float arg2, float arg3) {
-		org.lwjgl.opengl.GL11.glNormal3f(arg1,arg2,arg3);
+		// org.lwjgl.opengl.GL11.glNormal3f(arg1,arg2,arg3); CORE
 	}
 
 	default void glDrawBuffer(int arg) {
@@ -3119,15 +3119,15 @@ ByteBuffer data ) {
 	}
 
 	default void glCallList(int arg) {
-		org.lwjgl.opengl.GL11.glCallList(arg);
+		// org.lwjgl.opengl.GL11.glCallList(arg); CORE
 	}
 
 	default void glLightModeli(int arg1, int arg2) {
-		org.lwjgl.opengl.GL11.glLightModeli(arg1,arg2);
+		// org.lwjgl.opengl.GL11.glLightModeli(arg1,arg2); CORE
 	}
 
 	default void glColorPointer(int arg1, int glUnsignedByte, int arg3, int i) {
-		org.lwjgl.opengl.GL11.glColorPointer(arg1, glUnsignedByte, arg3, i);
+		// org.lwjgl.opengl.GL11.glColorPointer(arg1, glUnsignedByte, arg3, i); CORE
 	}
 
 	default void glColorPointer(int arg1, int arg2, int arg3, FloatBuffer arg4) {
@@ -3211,7 +3211,7 @@ ByteBuffer data ) {
 	}
 
 	default void glTexEnvi(int arg1, int arg2, int arg3) {
-		org.lwjgl.opengl.GL11.glTexEnvi(arg1,arg2,arg3);
+		// org.lwjgl.opengl.GL11.glTexEnvi(arg1,arg2,arg3); CORE
 	}
 
 	default int glGetTexEnvi(int arg1, int arg2) {
@@ -3223,11 +3223,16 @@ ByteBuffer data ) {
 	}
 
 	default void glRasterPos3f(float arg1, float arg2, float arg3) {
-		org.lwjgl.opengl.GL11.glRasterPos3f(arg1,arg2,arg3);
+		// org.lwjgl.opengl.GL11.glRasterPos3f(arg1,arg2,arg3); CORE
 	}
 
 	default void glBitmap(int arg1, int arg2, float arg3, float arg4, float arg5, float arg6, byte[] arg7, int arg8) {
 		org.lwjgl.opengl.GL11.glBitmap(arg1,arg2,arg3,arg4,arg5,arg6, Buffers.newDirectByteBuffer(arg7,arg8));
+	}
+
+    default void glBitmap(int width, int height, float xorig, float yorig,
+	float xmove, float ymove, ByteBuffer bitmap) {
+		// org.lwjgl.opengl.GL11.glBitmap(width,height,xorig,yorig,xmove,ymove,bitmap); CORE
 	}
 
 	default void glOrtho(double arg1, double arg2, double arg3, double arg4, double arg5, double arg6) {
@@ -3244,12 +3249,16 @@ ByteBuffer data ) {
 
 	default void glCallLists(int arg1, int arg2, ByteBuffer arg3) {
 		if(arg1!=0) { // test for Intel HD 630 driver
-			org.lwjgl.opengl.GL11.glCallLists(arg2, arg3);
+			//org.lwjgl.opengl.GL11.glCallLists(arg2, arg3); CORE
 		}
 	}
 
+    default void glCallLists(int arg1, ByteBuffer string) {
+		// org.lwjgl.opengl.GL11.glCallLists(arg1,string); CORE
+	}
+
 	default void glListBase(int arg) {
-		org.lwjgl.opengl.GL11.glListBase(arg);
+		// org.lwjgl.opengl.GL11.glListBase(arg); CORE
 	}
 
 	default void glVertex2fv(FloatBuffer object) {
@@ -3265,11 +3274,11 @@ ByteBuffer data ) {
 	}
 
 	default void glRasterPos3fv(float[] arg1, int arg2) {
-		org.lwjgl.opengl.GL11.glRasterPos3fv(arg1);
+		// org.lwjgl.opengl.GL11.glRasterPos3fv(arg1); CORE
 	}
 
 	default void glVertexPointer(int arg1, int arg2, int arg3, int arg4) {
-		org.lwjgl.opengl.GL11.glVertexPointer( arg1, arg2, arg3, arg4);
+		// org.lwjgl.opengl.GL11.glVertexPointer( arg1, arg2, arg3, arg4); CORE
 	}
 
 	default void glVertexPointer(int arg1, int glFloat, int arg3, ByteBuffer dataPtr) {
@@ -3281,7 +3290,7 @@ ByteBuffer data ) {
 	}
 
 	default void glNormalPointer(int arg1, int arg2, int arg3) {
-		org.lwjgl.opengl.GL11.glNormalPointer(arg1, arg2, arg3);
+		// org.lwjgl.opengl.GL11.glNormalPointer(arg1, arg2, arg3); CORE
 	}
 
 	default void glNormalPointer(int glFloat, int arg2, ByteBuffer dataPtr) {
@@ -3301,7 +3310,7 @@ ByteBuffer data ) {
 	}
 
 	default void glTexCoordPointer(int arg1, int arg2, int arg3, int arg4) {
-		org.lwjgl.opengl.GL11.glTexCoordPointer(arg1,arg2,arg3,arg4);
+		// org.lwjgl.opengl.GL11.glTexCoordPointer(arg1,arg2,arg3,arg4); CORE
 	}
 
 	default void glTexCoordPointer(int arg1, int glFloat, int arg3, FloatBuffer dataPtr) {
@@ -3349,15 +3358,15 @@ ByteBuffer data ) {
 	}
 
 	default void glColorMaterial(int glFrontAndBack, int glDiffuse) {
-		org.lwjgl.opengl.GL11.glColorMaterial( glFrontAndBack, glDiffuse);
+		// org.lwjgl.opengl.GL11.glColorMaterial( glFrontAndBack, glDiffuse); CORE
 	}
 
 	default void glMaterialf(int glFrontAndBack, int glShininess, float f) {
-		org.lwjgl.opengl.GL11.glMaterialf( glFrontAndBack, glShininess, f);
+		// org.lwjgl.opengl.GL11.glMaterialf( glFrontAndBack, glShininess, f); CORE
 	}
 
 	default int glGenLists(int i) {
-		return org.lwjgl.opengl.GL11.glGenLists(i);
+		return 0; //org.lwjgl.opengl.GL11.glGenLists(i); CORE
 	}
 
 	default void glColor3f(float arg1, float arg2, float arg3) {
@@ -3382,7 +3391,7 @@ ByteBuffer data ) {
 	}
 
 	default void glDeleteLists(int i, int num) {
-		org.lwjgl.opengl.GL11.glDeleteLists(i,num);
+		// org.lwjgl.opengl.GL11.glDeleteLists(i,num); CORE
 	}
 
 	default void glDrawArrays(int arg1, int arg2, int arg3) {
@@ -3508,7 +3517,7 @@ ByteBuffer data ) {
 	}
 
 	default void glClientActiveTexture(int texture) {
-		org.lwjgl.opengl.GL13.glClientActiveTexture(texture);
+		// org.lwjgl.opengl.GL13.glClientActiveTexture(texture); CORE
 	}
 
 	default void glVertexAttrib1fARB(int index, float x) {
@@ -3574,7 +3583,7 @@ ByteBuffer data ) {
 	}
 
 	default void glColor4ub(byte red, byte green, byte blue, byte alpha) {
-		org.lwjgl.opengl.GL11.glColor4ub(red, green, blue, alpha);
+		// org.lwjgl.opengl.GL11.glColor4ub(red, green, blue, alpha); CORE
 	}
 
 	default void glBlendFuncSeparate(int rgbsrc, int rgbdst, int alphasrc, int alphadst) {
@@ -3590,7 +3599,7 @@ ByteBuffer data ) {
 	}
 
 	default void glTexCoord2fv(float[] v) {
-		org.lwjgl.opengl.GL11.glTexCoord2fv(v);
+		// org.lwjgl.opengl.GL11.glTexCoord2fv(v); CORE
 	}
 
 	default void glTexCoord3f(float f, float g, float h) {
@@ -3598,7 +3607,7 @@ ByteBuffer data ) {
 	}
 
 	default void glVertex3f(float x, float y, float z) {
-		org.lwjgl.opengl.GL11.glVertex3f(x, y, z);
+		//org.lwjgl.opengl.GL11.glVertex3f(x, y, z); CORE
 	}
 
 	default void glMultiTexCoord2f(int target, float s, float t) {
@@ -3691,5 +3700,53 @@ ByteBuffer data ) {
 
 	default void glFinish() {
 		org.lwjgl.opengl.GL11.glFinish();
+	}
+
+	default void glRotatef(float angle, float x, float y, float z) {
+		// org.lwjgl.opengl.GL11.glRotatef(angle, x, y, z); CORE
+	}
+
+	default int glGetFramebufferAttachmentParameteriv(int target, int attachment, int pname) {
+		final int[] params = new int[1];
+		org.lwjgl.opengl.GL43C.glGetFramebufferAttachmentParameteriv(target,attachment,pname,params);
+		return params[0];
+	}
+
+	default void glGenVertexArrays(int nb, int[] array) {
+		assert(nb == array.length);
+		org.lwjgl.opengl.GL43C.glGenVertexArrays(array);
+	}
+
+	default void glBindVertexArray(int vao) {
+		org.lwjgl.opengl.GL43C.glBindVertexArray(vao);
+	}
+
+    default void glLightModelfv( int arg1, float[] values) {
+		// org.lwjgl.opengl.GL11.glLightModelfv(arg1,values); CORE
+	}
+
+        default void glFogfv(int arg1, float[] values) {
+		// org.lwjgl.opengl.GL11.glFogfv(arg1,values); CORE
+		}
+
+	default String glGetProgramInfoLog(int programHandle) {
+		return org.lwjgl.opengl.GL20C.glGetProgramInfoLog(programHandle);
+	}
+
+	default void glUniform4fv(int location, int num, float[] value) {
+		assert(num == value.length/4);
+		org.lwjgl.opengl.GL40C.glUniform4fv(location,value);
+	}
+
+	default int glGetUniformLocation(int pHandle, String name) {
+		return org.lwjgl.opengl.GL40C.glGetUniformLocation(pHandle,name);
+	}
+
+	default void glUniform1f(int location, float value) {
+		org.lwjgl.opengl.GL40C.glUniform1f(location,value);
+	}
+
+	default void glUniform1i(int location, int value) {
+		org.lwjgl.opengl.GL40C.glUniform1i(location,value);
 	}
 }

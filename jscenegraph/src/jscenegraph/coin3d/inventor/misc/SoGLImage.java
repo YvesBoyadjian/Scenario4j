@@ -669,8 +669,9 @@ checkTransparency()
 
   final SbVec3s size = new SbVec3s();
   final int[] numcomponents = new int[1];
+  final boolean[] srgb = new boolean[1];
   MemoryBuffer bytes = (this.image!=null) ?
-    this.image.getValue(size, numcomponents) : null;
+    this.image.getValue(size, numcomponents, srgb) : null;
 
   if (bytes == null) {
     if (this.glcomp == 2 || this.glcomp == 4) {
@@ -743,8 +744,9 @@ createGLDisplayList(SoState state)
 {
   final SbVec3s size = new SbVec3s();
   final int[] numcomponents = new int[1];
+  final boolean[] srgb = new boolean[1];
   MemoryBuffer bytes =
-    this.image != null ? this.image.getValue(size, numcomponents) : null;
+    this.image != null ? this.image.getValue(size, numcomponents,srgb) : null;
 
   if (this.pbuffer == null && bytes == null) return null;
 
@@ -798,7 +800,7 @@ createGLDisplayList(SoState state)
                               xsize, ysize, zsize,
                               dl.getType() == SoGLDisplayList.Type.DISPLAY_LIST,
                               mipmap,
-                              this.border);
+                              this.border,srgb[0]);
   }
   dl.close(state);
   return dl;
@@ -931,7 +933,7 @@ public void
                                 int w, int h, int d,
                                 boolean dlist, //FIXME: Not in use (kintel 20011129)
                                 boolean mipmap,
-                                int border)
+                                int border, boolean srgb)
 {
   cc_glglue glw = SoGL.sogl_glue_instance(state);
   this.glsize.copyFrom(new SbVec3s((short) w, (short) h, (short) d));
@@ -941,7 +943,7 @@ public void
     (this.flags & SoGLImage.Flags.COMPRESSED.getValue())!=0 &&
     SoGLDriverDatabase.isSupported(glw, SoGLDriverDatabase.SO_GL_TEXTURE_COMPRESSION);
   int internalFormat =
-    Gl.coin_glglue_get_internal_texture_format(glw, numComponents, compress);
+    Gl.coin_glglue_get_internal_texture_format(glw, numComponents, compress, srgb);
   int dataFormat = Gl.coin_glglue_get_texture_format(glw, numComponents);
 
   GL2 gl2 = state.getGL2();
@@ -979,7 +981,7 @@ public void
       //                                         w, h, d, dataFormat,
       //                                         GL_UNSIGNED_BYTE, texture);
 
-      fast_mipmap(state, w, h, d, numComponents, texture, false, compress);
+      fast_mipmap(state, w, h, d, numComponents,srgb, texture, false, compress);
     }
   }
   else { // 2D textures
@@ -1004,10 +1006,10 @@ public void
     }
     // prefer GL_SGIS_generate_mipmap to glGenerateMipmap. It seems to
     // be better supported in drivers.
-    else if (mipmap && SoGLDriverDatabase.isSupported(glw, "GL_SGIS_generate_mipmap")) {
-      gl2.glTexParameteri(target, GL2.GL_GENERATE_MIPMAP_SGIS, GL2.GL_TRUE);
-      mipmapimage = false;
-    }
+//    else if (mipmap && SoGLDriverDatabase.isSupported(glw, "GL_SGIS_generate_mipmap")) { CORE
+//      gl2.glTexParameteri(target, GL2.GL_GENERATE_MIPMAP_SGIS, GL2.GL_TRUE);
+//      mipmapimage = false;
+//    }
     // using glGenerateMipmap() while creating a display list is not
     // supported (even if the display list is never used). This is
     // probably because the OpenGL driver creates each mipmap level by
@@ -1027,18 +1029,18 @@ public void
                    border, dataFormat, GL2.GL_UNSIGNED_BYTE, texture.toByteBuffer() /*Buffers.newDirectByteBuffer(texture)*/);
 
       if (generatemipmap) {
-        boolean wasenabled = true;
-        // Woraround for ATi driver bug. GL_TEXTURE_2D needs to be
-        // enabled when using glGenerateMipmap(), according to
-        // dicussions on the opengl.org forums.
-        if (glw.vendor_is_ati) {
-          if (!gl2.glIsEnabled(GL2.GL_TEXTURE_2D)) {
-            wasenabled = false;
-            gl2.glEnable(GL2.GL_TEXTURE_2D);
-          }
-        }
+//        boolean wasenabled = true;
+//        // Woraround for ATi driver bug. GL_TEXTURE_2D needs to be
+//        // enabled when using glGenerateMipmap(), according to
+//        // dicussions on the opengl.org forums.
+//        if (glw.vendor_is_ati) {
+//          if (!gl2.glIsEnabled(GL2.GL_TEXTURE_2D)) {
+//            wasenabled = false;
+//            gl2.glEnable(GL2.GL_TEXTURE_2D);
+//          }
+//        }
         SoGL.cc_glglue_glGenerateMipmap(glw, target);
-        if (!wasenabled) gl2.glDisable(GL2.GL_TEXTURE_2D);
+//        if (!wasenabled) gl2.glDisable(GL2.GL_TEXTURE_2D);
       }
     }
     else { // mipmaps
@@ -1049,7 +1051,7 @@ public void
       //   (void)GLUWrapper().gluBuild2DMipmaps(GL_TEXTURE_2D, internalFormat,
       //                                         w, h, dataFormat,
       //                                         GL_UNSIGNED_BYTE, texture);
-      fast_mipmap(state, w, h, numComponents, texture, false, compress);
+      fast_mipmap(state, w, h, numComponents,srgb, texture, false, compress);
     }
     // apply the texture filters
     this.applyFilter(mipmapfilter,gl2);
@@ -1101,20 +1103,21 @@ contextCleanup(int context, Object closure)
 
 public void setData(MemoryBuffer bytes,
         final SbVec3s  size,
-        final int numcomponents) {
-	setData(bytes,size,numcomponents, Wrap.REPEAT,Wrap.REPEAT,Wrap.REPEAT,0.5f,0,null);
+        final int numcomponents, final boolean srgb) {
+	setData(bytes,size,numcomponents, srgb, Wrap.REPEAT,Wrap.REPEAT,Wrap.REPEAT,0.5f,0,null);
 }
 
 public void
 setData(MemoryBuffer bytes,
                    final SbVec3s  size,
                    final int numcomponents,
+                    final boolean srgb,
                     Wrap wraps,
                     Wrap wrapt,
                     Wrap wrapr,
                     float quality)
 {
-	setData(bytes,size,numcomponents, wraps,wrapt,wrapr,quality,0,null);
+	setData(bytes,size,numcomponents, srgb, wraps,wrapt,wrapr,quality,0,null);
 }
 /*!
   3D setData() wrapper. Supplies raw data, size and numcomponents instead of
@@ -1125,6 +1128,7 @@ public void
 setData(MemoryBuffer bytes,
                    final SbVec3s  size,
                    final int numcomponents,
+                    final boolean srgb,
                     Wrap wraps,
                     Wrap wrapt,
                     Wrap wrapr,
@@ -1132,7 +1136,7 @@ setData(MemoryBuffer bytes,
                     int border,
                    SoState createinstate)
 {
-  this.dummyimage.setValuePtr(size, numcomponents, bytes);
+  this.dummyimage.setValuePtr(size, numcomponents, srgb, bytes);
   this.setData(this.dummyimage,
                 wraps, wrapt, wrapr, quality,
                 border, createinstate);
@@ -1217,7 +1221,8 @@ setData(final SbImage image,
 
     final SbVec3s size = new SbVec3s();
     final int[] nc = new int[1];
-    MemoryBuffer bytes = image.getValue(size, nc);
+    final boolean[] srgb = new boolean[1];
+    MemoryBuffer bytes = image.getValue(size, nc, srgb);
     copyok = copyok && bytes != null && (size.operator_equal_equal(this.glsize)) && (nc[0] == this.glcomp);
 
     boolean is3D = (size.getValue()[2]==0)?false:true;
@@ -1241,10 +1246,10 @@ setData(final SbImage image,
 
       if (dl.isMipMapTextureObject()) {
         if (is3D)
-          fast_mipmap(createinstate, size.getValue()[0], size.getValue()[1], size.getValue()[2], nc[0], bytes,
+          fast_mipmap(createinstate, size.getValue()[0], size.getValue()[1], size.getValue()[2], nc[0], srgb[0], bytes,
                       true, compress);
         else
-          fast_mipmap(createinstate, size.getValue()[0], size.getValue()[1], nc[0], bytes,
+          fast_mipmap(createinstate, size.getValue()[0], size.getValue()[1], nc[0], srgb[0], bytes,
                       true, compress);
       }
       else {
@@ -1299,23 +1304,25 @@ an SbImage. Creates a temporary image, then calls the read setData().
 public void setData(MemoryBuffer bytes,
         final SbVec2s size,
         final int numcomponents,
+        final boolean srgb,
         final Wrap wraps,
         final Wrap wrapt,
         final float quality) {
-	setData(bytes,size,numcomponents,wraps,wrapt,quality,0,null);
+	setData(bytes,size,numcomponents,srgb,wraps,wrapt,quality,0,null);
 }
 
 public void
 setData(MemoryBuffer bytes,
                  final SbVec2s size,
                  final int numcomponents,
+                 final boolean srgb,
                  final Wrap wraps,
                  final Wrap wrapt,
                  final float quality,
                  final int border,
                  final SoState createinstate)
 {
-	this/*.pimpl*/.dummyimage.setValuePtr(size, numcomponents, bytes);
+	this/*.pimpl*/.dummyimage.setValuePtr(size, numcomponents, srgb, bytes);
 	this.setData(this/*.pimpl*/.dummyimage,
               wraps, wrapt, quality,
               border, createinstate);
@@ -1438,14 +1445,14 @@ isOfType(SoType type)
 
 // fast mipmap creation. no repeated memory allocations.
 public static void
-fast_mipmap(SoState state, int width, int height, int nc,
+fast_mipmap(SoState state, int width, int height, int nc,boolean srgb,
             MemoryBuffer data, boolean useglsubimage,
             boolean compress)
 {
 	GL2 gl2 = state.getGL2();
 	
   final cc_glglue glw = SoGL.sogl_glue_instance(state);
-  int internalFormat = Gl.coin_glglue_get_internal_texture_format(glw, nc, compress);
+  int internalFormat = Gl.coin_glglue_get_internal_texture_format(glw, nc, compress,srgb);
   /*GLenum*/int format = Gl.coin_glglue_get_texture_format(glw, nc);
   int levels = compute_log(width);
   int level = compute_log(height);
@@ -1530,11 +1537,11 @@ halve_image( int width,  int height,  int nc,
 // fast mipmap creation. no repeated memory allocations. 3D version.
 public static void
 fast_mipmap(SoState  state, int width, int height, int depth,
-            int nc, MemoryBuffer data, boolean useglsubimage,
+            int nc, boolean srgb, MemoryBuffer data, boolean useglsubimage,
             boolean compress)
 {
   final cc_glglue glw = SoGL.sogl_glue_instance(state);
-  int internalFormat = Gl.coin_glglue_get_internal_texture_format(glw, nc, compress);
+  int internalFormat = Gl.coin_glglue_get_internal_texture_format(glw, nc, compress,srgb);
   /*GLenum*/int format = Gl.coin_glglue_get_texture_format(glw, nc);
   int levels = compute_log(Math.max(Math.max(width, height), depth));
 

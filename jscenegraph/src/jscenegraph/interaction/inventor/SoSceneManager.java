@@ -7,6 +7,7 @@ import static com.jogamp.opengl.GL.GL_COLOR_BUFFER_BIT;
 import static com.jogamp.opengl.GL.GL_DEPTH_BITS;
 import static com.jogamp.opengl.GL.GL_DEPTH_BUFFER_BIT;
 import static com.jogamp.opengl.GL.GL_LEQUAL;
+import static org.lwjgl.opengl.GL30C.*;
 
 import com.jogamp.opengl.GL2;
 
@@ -176,8 +177,16 @@ public void getAntialiasing(final boolean[] smoothing, final int[] numPasses)
     	 GL2 gl = getGL();
 	       // reinitialize if necessary
 	       if (graphicsInitNeeded) {
+
 	           final int[] numBits = new int[1];
+	           int err =GL_NO_ERROR;
+	           do {
+	           	err = glGetError();
+			   } while(err != GL_NO_ERROR && err != GL_INVALID_OPERATION);
 	           gl.glGetIntegerv(GL_DEPTH_BITS, numBits,0);
+	           if(glGetError()!=GL_NO_ERROR) {
+				   numBits[0] = gl.glGetFramebufferAttachmentParameteriv(GL_DRAW_FRAMEBUFFER, GL_DEPTH, GL_FRAMEBUFFER_ATTACHMENT_DEPTH_SIZE);
+			   }
 	           needZbuffer = (numBits[0] != 0); // FALSE for overlay windows !
 	           if (needZbuffer)
 	               gl.glDepthFunc(GL_LEQUAL); // needed for hidden line rendering

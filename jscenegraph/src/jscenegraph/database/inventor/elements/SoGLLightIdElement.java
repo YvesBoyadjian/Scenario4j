@@ -150,7 +150,7 @@ increment(SoState state)
         return -1;
 
     // It's a valid source, so enable it
-    gl2.glEnable((int)(GL2.GL_LIGHT0 + elt.data));
+    //gl2.glEnable((int)(GL2.GL_LIGHT0 + elt.data)); CORE
 
     return elt.data;
 }
@@ -175,6 +175,9 @@ getMaxGLSources(GL2 gl2)
         final int[]   max = new int[1];
         gl2.glGetIntegerv(GL2.GL_MAX_LIGHTS, max,0);
         maxGLSources = max[0];
+        if(0 == maxGLSources) {
+            maxGLSources = 9999; // CORE
+        }
     }
 
     return maxGLSources;
@@ -220,9 +223,9 @@ pop(SoState state, SoElement prevTopElement)
     // Disable previous light(s), if valid. All lights between the
     // previous element and this one should be turned off.
     max = getMaxGLSources(gl2);
-    for (i = (int) prevElt.data; i > data; i--)
-        if (i < max)
-            gl2.glDisable((int)(GL2.GL_LIGHT0 + i));
+//    for (i = (int) prevElt.data; i > data; i--)
+//        if (i < max)
+//            gl2.glDisable((int)(GL2.GL_LIGHT0 + i)); CORE
 }
 
 public static int

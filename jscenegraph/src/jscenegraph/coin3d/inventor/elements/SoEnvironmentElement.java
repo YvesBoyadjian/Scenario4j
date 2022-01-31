@@ -93,15 +93,39 @@ public class SoEnvironmentElement extends SoReplacedElement {
 		    fogStart[0] = 0.0f;
 		  }
 
-		  public static int
-		  getFogType(SoState state)
-		  {
-		    final SoEnvironmentElement element = (SoEnvironmentElement)
-		      (
-		       SoElement.getConstElement(state, classStackIndexMap.get(SoEnvironmentElement.class))
-		       );
-		    return element.fogType[0];
-		  }
+	  public static int
+	  getFogType(SoState state)
+	  {
+		final SoEnvironmentElement element = (SoEnvironmentElement)
+		  (
+		   SoElement.getConstElement(state, classStackIndexMap.get(SoEnvironmentElement.class))
+		   );
+		return element.fogType[0];
+	  }
+
+	//! FIXME: write doc.
+
+	public static SbColor
+		getFogColor(SoState state)
+		{
+	  	SoEnvironmentElement element = (SoEnvironmentElement)
+				(
+						SoElement.getConstElement(state, classStackIndexMap.get(SoEnvironmentElement.class))
+		 );
+			return element.fogColor;
+		}
+
+//! FIXME: write doc.
+
+	public static float
+	getFogVisibility(SoState state)
+	{
+  SoEnvironmentElement element = (SoEnvironmentElement)
+			(
+					SoElement.getConstElement(state, classStackIndexMap.get(SoEnvironmentElement.class))
+     );
+		return element.fogVisibility[0];
+	}
 
 
 public void

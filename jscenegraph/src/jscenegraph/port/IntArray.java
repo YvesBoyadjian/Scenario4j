@@ -55,6 +55,10 @@ public class IntArray extends Indexable<Integer> implements IntBufferAble {
 		return values.length - start;
 	}
 
+	public long sizeof() {
+		return (long)length()*Integer.BYTES;
+	}
+
 	@Override
 	public void setO(int i, Integer object) {
 		values[i+start] = object;

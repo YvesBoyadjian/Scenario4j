@@ -215,6 +215,10 @@ private        int                 depth;
 
 	}
 
+	public void postPop(SoState state) {
+
+	}
+
 	// Returns the stack index for an element instance.
 	public int getStackIndex() {
 		 return stackIndex;

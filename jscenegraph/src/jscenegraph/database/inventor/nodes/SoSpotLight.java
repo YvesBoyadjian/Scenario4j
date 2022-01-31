@@ -219,7 +219,7 @@ GLRender(SoGLRenderAction action)
         return;
 
     SoLightElement.add(state, this, SoModelMatrixElement.get(state).operator_mul(
-            SoViewingMatrixElement.get(state)));
+            SoViewingMatrixElement.get(state)),id);
 
     //
     // Create a new source and send it to GL. The SoGLLightIdElement

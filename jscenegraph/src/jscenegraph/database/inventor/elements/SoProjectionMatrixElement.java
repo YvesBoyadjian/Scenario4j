@@ -117,7 +117,7 @@ set(SoState state, SoNode node,
         getElement(state, classStackIndexMap.get(SoProjectionMatrixElement.class), node);
 
     if (elt != null)
-        elt.setElt(matrix);
+        elt.setElt(matrix,state);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -148,7 +148,7 @@ get(SoState state)
 // Use: protected, virtual
 
 protected void
-setElt(SbMatrix matrix)
+setElt(SbMatrix matrix, SoState state)
 //
 ////////////////////////////////////////////////////////////////////////
 {

@@ -499,7 +499,9 @@ setupToRender(SoState state)
 {
     otherOpen = SoCacheElement.anyOpen(state);
 
-    if (!otherOpen && list == null) {
+    final boolean core = true; // CORE
+
+    if (!otherOpen && list == null && !core) {
         list = new SoGLDisplayList(state,
                                    SoGLDisplayList.Type.DISPLAY_LIST,
                                    numChars);
@@ -509,7 +511,7 @@ setupToRender(SoState state)
     	
     	GL2 gl2 = state.getGL2();
         // Set correct list base
-        glListBase(list.getFirstIndex());
+        gl2.glListBase(list.getFirstIndex());
         list.addDependency(state);
     }
 }
@@ -613,7 +615,7 @@ drawCharacter(char c, GL2 gl2)
     final FLbitmap bmap = getBitmap(uc);
     
     if (bmap != null)
-        glBitmap(bmap.width, bmap.height, bmap.xorig, bmap.yorig,
+        gl2.glBitmap(bmap.width, bmap.height, bmap.xorig, bmap.yorig,
              bmap.xmove, bmap.ymove, Buffers.newDirectByteBuffer(bmap.bitmap));
 //#ifdef DEBUG
     else SoDebugError.post("SoBitmapFontCache::drawCharacter", 
@@ -722,7 +724,7 @@ hasDisplayList(char c, GL2 gl2)
     if (displayListDict.find(key, value)) return true;
 
     // If we don't and we can't build one, return FALSE.
-    if (otherOpen) return false;
+    if (otherOpen || null == list) return false; // CORE
     
     // Build one:
     gl2.glNewList(list.getFirstIndex()+key, GL2.GL_COMPILE);
@@ -749,7 +751,7 @@ callLists(ByteBuffer string, int len, GL2 gl2)
 ////////////////////////////////////////////////////////////////////////
 {
 
-    glCallLists(GL2.GL_2_BYTES, string);
+    gl2.glCallLists(GL2.GL_2_BYTES, string);
 }
 
 

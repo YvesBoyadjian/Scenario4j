@@ -262,13 +262,13 @@ public void init(SoState stateptr)
     GLSendBits                  = 0;   
      
     
-    gl2.glDisable(GL2.GL_POLYGON_STIPPLE);
+    //gl2.glDisable(GL2.GL_POLYGON_STIPPLE); CORE
 
     byte[] rgba = new byte[1];
     gl2.glGetBooleanv(GL2.GL_RGBA_MODE, rgba,0);
     if (rgba[0] == 0) this.colorIndex = true;
     else {
-      this.sendPackedDiffuse(0xccccccff);
+      this.sendPackedDiffuse(state,0xccccccff);
     }
     
 }
@@ -1039,7 +1039,7 @@ reset(SoState state, int bitmask)
             gl2.glIndexi((int)this.coinstate.colorindexarray.get(0));
           }
           else {
-            this.sendPackedDiffuse(this.packedpointer.get(0)|this.transpmask);
+            this.sendPackedDiffuse(state,this.packedpointer.get(0)|this.transpmask);
           }
           this.opencacheflags &= ~FLAG_FORCE_DIFFUSE;
         }
@@ -2133,7 +2133,7 @@ sendDiffuseByIndex(int index)
 	      // same test.  We also need to send the color here to work around
 	      // an nVIDIA bug
 	      //if (col != this.glState.diffuse) // YB : reactivate the test, as bug should have been corrected (maybe a bug in Coin3D ? Need to send the color)
-	        this.sendPackedDiffuse(col);
+	        this.sendPackedDiffuse(state,col);
 	    }
 	
 //    final float[] col4 = new float[4];
@@ -2326,8 +2326,8 @@ public static void
     public void
    sendLightModel( int model)
    {
-     if (model == SoLazyElement.LightModel.PHONG.getValue()) gl2.glEnable(GL2.GL_LIGHTING);
-     else gl2.glDisable(GL2.GL_LIGHTING);
+     //if (model == SoLazyElement.LightModel.PHONG.getValue()) gl2.glEnable(GL2.GL_LIGHTING);
+     //else gl2.glDisable(GL2.GL_LIGHTING); CORE
      this.glState.GLLightModel = model;
      this.cachebitmask |= SoLazyElement.masks.LIGHT_MODEL_MASK.getValue();
    }
@@ -2350,7 +2350,7 @@ sendAlphaTest(int func, float value)
     gl2.glEnable(GL2.GL_ALPHA_TEST);
   }
   else {
-    gl2.glDisable(GL2.GL_ALPHA_TEST);
+    //gl2.glDisable(GL2.GL_ALPHA_TEST); CORE
   }
   this.cachebitmask |= SoLazyElement.masks.ALPHATEST_MASK.getValue();
   this.glState.alphatestfunc = func;
@@ -2359,7 +2359,7 @@ sendAlphaTest(int func, float value)
 
    
    public void
-   sendPackedDiffuse( int col)
+   sendPackedDiffuse(SoState state, int col)
    {
      gl2.glColor4ub(( byte)((col>>24)&0xff),
                 ( byte)((col>>16)&0xff),
@@ -2367,7 +2367,43 @@ sendAlphaTest(int func, float value)
                 ( byte)(col&0xff));
      this.glState.diffuse = col;
      this.cachebitmask |= SoLazyElement.masks.DIFFUSE_MASK.getValue();
+
+     sendDiffuseToGL(state);
    }
+
+    float[] rgba = new float[4];
+
+    /**
+     * CORE
+     * @param state
+     */
+   public void sendDiffuseToGL(SoState state) {
+
+       if(!state.isElementEnabled(classStackIndexMap.get(SoGLShaderProgramElement.class))) {
+           return;
+       }
+
+        SoGLShaderProgram program = SoGLShaderProgramElement.get(state);
+        if( null != program && program.isEnabled()) {
+            int pHandle = program.getGLSLShaderProgramHandle(state);
+            if( 0 < pHandle ) {
+                int colorLocation = state.getGL2().glGetUniformLocation(pHandle, "s4j_ColorUniform");
+                if ( 0 <= colorLocation ) {
+                    int col = this.glState.diffuse;
+                    short red = (short)((col>>24)&0xff);
+                    short green = (short)((col>>16)&0xff);
+                    short blue = (short)((col>>8)&0xff);
+                    short alpha = (short)(col&0xff);
+                    rgba[0] = (float)red/255.0f;
+                    rgba[1] = (float)green/255.0f;
+                    rgba[2] = (float)blue/255.0f;
+                    rgba[3] = (float)alpha/255.0f;
+                    state.getGL2().glUniform4fv(colorLocation,1,rgba);
+                }
+            }
+        }
+    }
+
 
    public static void
    send_gl_material(int pname, final SbColor  color, GL2 gl2)
@@ -2397,6 +2433,26 @@ sendAlphaTest(int func, float value)
    public void
    sendSpecular(final SbColor color)
    {
+
+       SoGLShaderProgram shaderprogram =
+               (SoGLShaderProgram)(SoGLShaderProgramElement.get(state));
+       if(null != shaderprogram) {
+           int pHandle = shaderprogram.getGLSLShaderProgramHandle(state);
+            if(0 < pHandle) {
+                String name = "s4j_FrontMaterial.specular";
+                int specularLocation = gl2.glGetUniformLocation(pHandle,
+                        name);
+                if(0 <= specularLocation) {
+                    float[] value4 = new float[4];
+                    value4[0] = color.getX();
+                    value4[1] = color.getY();
+                    value4[2] = color.getZ();
+                    value4[3] = 1.0f;
+                    gl2.glUniform4fv(specularLocation,1,value4);
+                }
+            }
+       }
+
      send_gl_material(GL2.GL_SPECULAR, color,gl2);
      this.glState.specular.copyFrom(color);
      this.cachebitmask |= SoLazyElement.masks.SPECULAR_MASK.getValue();
@@ -2406,6 +2462,21 @@ sendAlphaTest(int func, float value)
 public void
 sendShininess( float shine)
 {
+
+    SoGLShaderProgram shaderprogram =
+            (SoGLShaderProgram)(SoGLShaderProgramElement.get(state));
+    if(null != shaderprogram) {
+        int pHandle = shaderprogram.getGLSLShaderProgramHandle(state);
+        if(0 < pHandle) {
+            String name = "s4j_FrontMaterial.shininess";
+            int shininessLocation = gl2.glGetUniformLocation(pHandle,
+                    name);
+            if(0 <= shininessLocation) {
+                gl2.glUniform1f(shininessLocation,shine*128.0f);
+            }
+        }
+    }
+
   gl2.glMaterialf(GL2.GL_FRONT_AND_BACK, GL2.GL_SHININESS, shine*128.0f);
   this.glState.GLShininess = shine;
   this.cachebitmask |= SoLazyElement.masks.SHININESS_MASK.getValue();
@@ -2416,7 +2487,7 @@ public void
 sendTransparency( int stipplenum) 
 {
   if (stipplenum == 0) {
-    gl2.glDisable(GL2.GL_POLYGON_STIPPLE);
+    //gl2.glDisable(GL2.GL_POLYGON_STIPPLE); CORE
   }
   else {
     if (this.glState.GLStippleNum <= 0) gl2.glEnable(GL2.GL_POLYGON_STIPPLE);

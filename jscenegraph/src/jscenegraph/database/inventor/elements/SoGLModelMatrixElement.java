@@ -56,6 +56,8 @@ package jscenegraph.database.inventor.elements;
 
 import com.jogamp.opengl.GL2;
 
+import jscenegraph.coin3d.shaders.SoGLShaderProgram;
+import jscenegraph.coin3d.shaders.inventor.elements.SoGLShaderProgramElement;
 import jscenegraph.database.inventor.SbMatrix;
 import jscenegraph.database.inventor.SbRotation;
 import jscenegraph.database.inventor.SbVec3f;
@@ -92,14 +94,14 @@ import static org.lwjgl.opengl.GL30.*;
  */
 public class SoGLModelMatrixElement extends SoModelMatrixElement {
 
-  private
+    private
     //! We need to save the state to access the viewing matrix
-    SoState             state;
+    SoState state;
 
     //! And we need to remember the nodeId of the viewing matrix
     //! element to see if it changes between pushMatrixElt() and
     //! popMatrixElt().
-    private long            viewEltNodeId;
+    private long viewEltNodeId;
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -108,17 +110,17 @@ public class SoGLModelMatrixElement extends SoModelMatrixElement {
 //
 // Use: public
 
-public void
-init(SoState _state)
+    public void
+    init(SoState _state)
 //
 ////////////////////////////////////////////////////////////////////////
-{
-    // Do normal initialization stuff
-    super.init(_state);
+    {
+        // Do normal initialization stuff
+        super.init(_state);
 
-    // Save state in instance in case we need it later
-    state = _state;
-}
+        // Save state in instance in case we need it later
+        state = _state;
+    }
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -127,26 +129,28 @@ init(SoState _state)
 //
 // Use: public
 
-public void
-push(SoState _state)
+    public void
+    push(SoState _state)
 //
 ////////////////////////////////////////////////////////////////////////
-{
-    // Save the old matrix first, just in case
-    super.push(_state);
+    {
+        // Save the old matrix first, just in case
+        super.push(_state);
 
-    // Save state in instance in case we need it later
-    state = _state;
-    
-    GL2 gl2 = state.getGL2();
+        // Save state in instance in case we need it later
+        state = _state;
 
-    gl2.glPushMatrix();
+        //updateStateParameters(); // CORE
 
-    // And remember the viewMatrixElement nodeId from our parent:
-    SoGLModelMatrixElement mtxElt = 
-        (SoGLModelMatrixElement ) getNextInStack();
-    viewEltNodeId = mtxElt.viewEltNodeId;
-}
+        GL2 gl2 = state.getGL2();
+
+        gl2.glPushMatrix();
+
+        // And remember the viewMatrixElement nodeId from our parent:
+        SoGLModelMatrixElement mtxElt =
+                (SoGLModelMatrixElement) getNextInStack();
+        viewEltNodeId = mtxElt.viewEltNodeId;
+    }
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -155,14 +159,19 @@ push(SoState _state)
 //
 // Use: public
 
-public void
-pop(SoState state,  SoElement elt)
+    public void
+    pop(SoState state, SoElement elt)
 //
 ////////////////////////////////////////////////////////////////////////
-{
-	GL2 gl2 = state.getGL2();
-    gl2.glPopMatrix();
-}
+    {
+        GL2 gl2 = state.getGL2();
+        gl2.glPopMatrix();
+    }
+
+    public void postPop(SoState state) {
+
+        updateStateParameters(); // CORE
+    }
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -173,29 +182,31 @@ pop(SoState state,  SoElement elt)
 //
 // Use: protected, virtual
 
-protected void
-makeEltIdentity()
+    protected void
+    makeEltIdentity()
 //
 ////////////////////////////////////////////////////////////////////////
-{
-    // Since the GL stores a model-view matrix, which is composed of
-    // both the view matrix and the model matrix, we have to resend
-    // the view matrix to effectively make the model matrix identity.
-    // First we have to access the view matrix from the state and then
-    // set the model matrix to that value. Accessing the view matrix
-    // will "capture" that element, which is necessary for caching to
-    // detect the affects of changes to the view matrix on this
-    // operation.
-	GL2 gl2 = state.getGL2();
+    {
+        // Since the GL stores a model-view matrix, which is composed of
+        // both the view matrix and the model matrix, we have to resend
+        // the view matrix to effectively make the model matrix identity.
+        // First we have to access the view matrix from the state and then
+        // set the model matrix to that value. Accessing the view matrix
+        // will "capture" that element, which is necessary for caching to
+        // detect the affects of changes to the view matrix on this
+        // operation.
+        GL2 gl2 = state.getGL2();
 
-    final SbMatrix viewMat = SoGLViewingMatrixElement.get(state);
+        final SbMatrix viewMat = SoGLViewingMatrixElement.get(state);
 
-    // Set the matrix in the element to identity
-    super.makeEltIdentity();
+        // Set the matrix in the element to identity
+        super.makeEltIdentity();
 
-    // Send the current viewing matrix to GL
-    gl2.glLoadMatrixf((float []) viewMat.toGL(),0);
-}
+        updateStateParameters(); // CORE
+
+        // Send the current viewing matrix to GL
+        gl2.glLoadMatrixf((float[]) viewMat.toGL(), 0);
+    }
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -205,24 +216,26 @@ makeEltIdentity()
 //
 // Use: protected
 
-protected void
-setElt(final SbMatrix matrix)
+    protected void
+    setElt(final SbMatrix matrix)
 //
 ////////////////////////////////////////////////////////////////////////
-{
-    // See the comments in makeEltIdentity() as to why we need to deal
-    // with the viewing matrix
+    {
+        // See the comments in makeEltIdentity() as to why we need to deal
+        // with the viewing matrix
 
-    final SbMatrix viewMat = SoGLViewingMatrixElement.get(state);
+        final SbMatrix viewMat = SoGLViewingMatrixElement.get(state);
 
-    // Set the matrix in the element to the given one
-    super.setElt(matrix);
-    
-    GL2 gl2 = state.getGL2();
+        // Set the matrix in the element to the given one
+        super.setElt(matrix);
 
-    // Send the product of the viewing matrix and the given matrix to GL
-    gl2.glLoadMatrixf((float []) (matrix.operator_mul(viewMat)).toGL(),0);
-}
+        updateStateParameters(); // CORE
+
+        GL2 gl2 = state.getGL2();
+
+        // Send the product of the viewing matrix and the given matrix to GL
+        gl2.glLoadMatrixf((float[]) (matrix.operator_mul(viewMat)).toGL(), 0);
+    }
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -231,15 +244,17 @@ setElt(final SbMatrix matrix)
 //
 // Use: protected, virtual
 
-protected void
-multElt(final SbMatrix matrix)
+    protected void
+    multElt(final SbMatrix matrix)
 //
 ////////////////////////////////////////////////////////////////////////
-{
-    super.multElt(matrix);
-    
-    glMultMatrixf((float []) matrix.toGL());
-}
+    {
+        super.multElt(matrix);
+
+        updateStateParameters(); // CORE
+
+        glMultMatrixf((float[]) matrix.toGL());
+    }
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -248,21 +263,23 @@ multElt(final SbMatrix matrix)
 //
 // Use: public, virtual
 
-public void
-translateEltBy(final SbVec3f translation)
+    public void
+    translateEltBy(final SbVec3f translation)
 //
 ////////////////////////////////////////////////////////////////////////
-{
-    super.translateEltBy(translation);
+    {
+        super.translateEltBy(translation);
 
-    if (translation.getX() == 0f && translation.getY() == 0f && translation.getZ() == 0f) { // YB Koin3D
-        return;
+        if (translation.getX() == 0f && translation.getY() == 0f && translation.getZ() == 0f) { // YB Koin3D
+            return;
+        }
+
+        updateStateParameters(); // CORE
+
+        GL2 gl2 = state.getGL2();
+
+        gl2.glTranslatef(translation.getX(), translation.getY(), translation.getZ());
     }
-    
-    GL2 gl2 = state.getGL2();
-
-    gl2.glTranslatef(translation.getX(), translation.getY(), translation.getZ());
-}
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -271,26 +288,30 @@ translateEltBy(final SbVec3f translation)
 //
 // Use: public, virtual
 
-private final SbVec3f     axis = new SbVec3f(); // SINGLE_THREAD
-private final float[]       angle = new float[1]; // SINGLE_THREAD
+    private final SbVec3f axis = new SbVec3f(); // SINGLE_THREAD
+    private final float[] angle = new float[1]; // SINGLE_THREAD
 
-public void
-rotateEltBy(final SbRotation rotation)
+    public void
+    rotateEltBy(final SbRotation rotation)
 //
 ////////////////////////////////////////////////////////////////////////
-{
-    axis.constructor();
-    angle[0] = 0;
+    {
+        axis.constructor();
+        angle[0] = 0;
 
-    super.rotateEltBy(rotation);
+        super.rotateEltBy(rotation);
 
-    rotation.getValue(axis, angle);
+        rotation.getValue(axis, angle);
 
-    if ( angle[0] == 0f ) { // YB Koin3D
-        return;
+        if (angle[0] == 0f) { // YB Koin3D
+            return;
+        }
+
+        updateStateParameters(); // CORE
+
+        new GL2() {
+        }.glRotatef(angle[0] * (180.0f / (float) Math.PI), axis.getX(), axis.getY(), axis.getZ());
     }
-    glRotatef(angle[0] * (180.0f / (float) Math.PI), axis.getX(), axis.getY(), axis.getZ());
-}
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -299,21 +320,23 @@ rotateEltBy(final SbRotation rotation)
 //
 // Use: public, virtual
 
-public void
-scaleEltBy(final SbVec3f scaleFactor)
+    public void
+    scaleEltBy(final SbVec3f scaleFactor)
 //
 ////////////////////////////////////////////////////////////////////////
-{
-    super.scaleEltBy(scaleFactor);
+    {
+        super.scaleEltBy(scaleFactor);
 
-    if(scaleFactor.getX() == 1f && scaleFactor.getY() == 1f && scaleFactor.getZ() == 1f ) { // YB Koin3D
-        return;
+        if (scaleFactor.getX() == 1f && scaleFactor.getY() == 1f && scaleFactor.getZ() == 1f) { // YB Koin3D
+            return;
+        }
+
+        updateStateParameters(); // CORE
+
+        GL2 gl2 = state.getGL2();
+
+        glScalef(scaleFactor.getX(), scaleFactor.getY(), scaleFactor.getZ());
     }
-    
-    GL2 gl2 = state.getGL2();
-
-    glScalef(scaleFactor.getX(), scaleFactor.getY(), scaleFactor.getZ());
-}
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -323,29 +346,29 @@ scaleEltBy(final SbVec3f scaleFactor)
 //
 // Use: public, static
 
-public SbMatrix
-pushMatrixElt()
+    public SbMatrix
+    pushMatrixElt()
 //
 ////////////////////////////////////////////////////////////////////////
-{
-    //
-    // There's no cache dependency here, because we only care if the
-    // nodeId changes when traversing our children, we don't really
-    // care about the particular value of the ViewingMatrixElement.
-    // Well, actually I'm lying a little here.  IF you happened to
-    // instance a camera both above and below a TransformSeparator,
-    // and THEN you replaced the instance above the TransformSeparator
-    // with another camera, AND the TransformSeparator was in a cache,
-    // you'll get incorrect behavior.  I'm not going to worry about
-    // that case...
-    //
-    viewEltNodeId = SoGLViewingMatrixElement.getNodeId(state);
-    
-    GL2 gl2 =state.getGL2();
+    {
+        //
+        // There's no cache dependency here, because we only care if the
+        // nodeId changes when traversing our children, we don't really
+        // care about the particular value of the ViewingMatrixElement.
+        // Well, actually I'm lying a little here.  IF you happened to
+        // instance a camera both above and below a TransformSeparator,
+        // and THEN you replaced the instance above the TransformSeparator
+        // with another camera, AND the TransformSeparator was in a cache,
+        // you'll get incorrect behavior.  I'm not going to worry about
+        // that case...
+        //
+        viewEltNodeId = SoGLViewingMatrixElement.getNodeId(state);
 
-    gl2.glPushMatrix();
-    return super.pushMatrixElt();
-}
+        GL2 gl2 = state.getGL2();
+
+        gl2.glPushMatrix();
+        return super.pushMatrixElt();
+    }
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -355,22 +378,34 @@ pushMatrixElt()
 //
 // Use: public, static
 
-public void
-popMatrixElt(final SbMatrix matrix)
+    public void
+    popMatrixElt(final SbMatrix matrix)
 //
 ////////////////////////////////////////////////////////////////////////
-{
-	GL2 gl2 = state.getGL2();
-	
-    gl2.glPopMatrix();
-    super.popMatrixElt(matrix);
+    {
+        GL2 gl2 = state.getGL2();
 
-    long afterNodeId = SoGLViewingMatrixElement.getNodeId(state);
+        gl2.glPopMatrix();
+        super.popMatrixElt(matrix);
 
-    if (afterNodeId != viewEltNodeId) {
-        // Camera underneth us, must reset:
-        setElt(matrix);
+        updateStateParameters(); // CORE
+
+        long afterNodeId = SoGLViewingMatrixElement.getNodeId(state);
+
+        if (afterNodeId != viewEltNodeId) {
+            // Camera underneth us, must reset:
+            setElt(matrix);
+        }
     }
-}
 
+    private void updateStateParameters() { // CORE
+
+        SoGLShaderProgram sp = SoGLShaderProgramElement.get(state);
+
+        if(null!=sp &&sp.isEnabled())
+        {
+            // Dependent of SoModelMatrixElement
+            sp.updateStateParameters(state);
+        }
+    }
 }

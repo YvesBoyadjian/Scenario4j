@@ -17,7 +17,7 @@ import jscenegraph.mevis.inventor.misc.SoVBO;
  */
 public class FloatMemoryBuffer extends MemoryBuffer {
 	
-	public final static int MINIMUM_FLOATS_FOR_BUFFER = SoVBO.getVertexCountMinLimit() * 3;
+	public final static int MINIMUM_FLOATS_FOR_BUFFER = 12;//SoVBO.getVertexCountMinLimit() * 3;
 	
 	private float[] floatArray;
 	
@@ -100,9 +100,16 @@ public class FloatMemoryBuffer extends MemoryBuffer {
 			int destPos,
 			int length
 	) {
-		for(int i=0; i<length; i++) {
-			dest.setFloat(i+destPos,src.getFloat(i+srcPos));
-		}
+		FloatBuffer destSlice = dest.toFloatBuffer().position(destPos).slice();
+		FloatBuffer srcSlice = src.toFloatBuffer().position(srcPos).slice().limit(length);
+		destSlice.put(srcSlice);
+
+		dest.toFloatBuffer().position(0);
+		src.toFloatBuffer().position(0);
+
+//		for(int i=0; i<length; i++) {
+//			dest.setFloat(i+destPos,src.getFloat(i+srcPos));
+//		}
 	}
 
 	public void setFloats(float[] srcFloats, int numFloats) {

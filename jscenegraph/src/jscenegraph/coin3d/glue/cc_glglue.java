@@ -14,6 +14,7 @@ import org.lwjgl.opengl.GL30;
 import org.lwjgl.opengl.GLCapabilities;
 import org.lwjgl.system.MemoryStack;
 
+import static com.jogamp.opengl.GL.GL_NO_ERROR;
 import static org.lwjgl.system.MemoryStack.*;
 import static org.lwjgl.system.MemoryUtil.*;
 
@@ -80,7 +81,7 @@ public class cc_glglue {
 	       did something wrong while creating it.
 	    */
 	    int glerr = GL11.glGetError();
-	    while (glerr != GL2.GL_NO_ERROR) {
+	    while (glerr != GL_NO_ERROR) {
 	      Gl_wgl.cc_debugerror_postwarning("cc_glglue_instance",
 	                                "Error when setting up the GL context. This can happen if "+
 	                                "there is no current context, or if the context has been set "+
@@ -102,8 +103,12 @@ public class cc_glglue {
 	vendorstr = (String)GL11.glGetString(GL2.GL_VENDOR);
 	
     rendererstr = (String)GL11.glGetString(GL2.GL_RENDERER);
+
+    int dummyError = GL11.glGetError();
+
     extensionsstr = (String)GL11.glGetString(GL2.GL_EXTENSIONS);
 
+    int extensionStrError = GL11.glGetError();
     /* Randall O'Reilly reports that the above call is deprecated from OpenGL 3.0
        onwards and may, particularly on some Linux systems, return NULL.
 
@@ -111,7 +116,7 @@ public class cc_glglue {
        The following code, supplied by Randall, implements this to end up with the
        same result as the old method.
     */
-    if (extensionsstr == null || extensionsstr.trim().isEmpty()) {
+    if (extensionsstr == null || extensionsstr.trim().isEmpty() || extensionStrError != GL_NO_ERROR) {
       // COIN_PFNGLGETSTRINGIPROC glGetStringi = NULL;
       // glGetStringi = (COIN_PFNGLGETSTRINGIPROC)cc_glglue_getprocaddress(gi, "glGetStringi");
     	GLCapabilities c = GL.getCapabilities();
@@ -157,7 +162,14 @@ public class cc_glglue {
 	    max_texture_size = gltmp[0];
 
 	    gl2.glGetIntegerv(GL2.GL_MAX_LIGHTS, gltmp);
-	    max_lights = (int) gltmp[0];
+
+	    int maxLightsError = GL11.glGetError();
+
+	    if(GL_NO_ERROR == maxLightsError)
+	    	max_lights = (int) gltmp[0];
+	    else {
+	    	max_lights = 16384; // Let's be optimistic
+		}
 	    
 	    maxtextureunits = 1; /* when multitexturing is not available */
 	    //if (w->glActiveTexture) {
@@ -229,6 +241,10 @@ public class cc_glglue {
 
 	public void glUniformMatrix4fvARB(int location, int i, boolean b, float[] value) {
 		ARBShaderObjects.glUniformMatrix4fvARB(location,b,value);
+	}
+
+	public void glUniformMatrix3fvARB(int location, int i, boolean b, float[] value) {
+		ARBShaderObjects.glUniformMatrix3fvARB(location,b,value);
 	}
 
 	public void glUniform1iARB(int location, int value) {

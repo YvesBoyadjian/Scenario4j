@@ -36,6 +36,8 @@ public class SoShaderParameterMatrix extends SoUniformShaderParameter {
 	
 	public final SoSFMatrix value = new SoSFMatrix();
 
+	private final float[] valueLinear = new float[16];
+
 	public static void initClass()
 	{
 	  //SO_NODE_INTERNAL_INIT_CLASS(SoShaderParameterMatrix,
@@ -61,7 +63,7 @@ public class SoShaderParameterMatrix extends SoUniformShaderParameter {
 	public void updateParameter(SoGLShaderObject shader) {
 		  this.ensureParameter(shader);
 
-		  this.getGLShaderParameter(shader.getCacheContext()).setMatrix(shader,  this.value.getValue().getValueLinear()/*[0]*/,
+		  this.getGLShaderParameter(shader.getCacheContext()).setMatrix(shader,  this.value.getValue().getValueLinear(valueLinear)/*[0]*/,
 		                                                                   this.name.getValue()/*.getString()*/,
 		                                                                   this.identifier.getValue());
 	}

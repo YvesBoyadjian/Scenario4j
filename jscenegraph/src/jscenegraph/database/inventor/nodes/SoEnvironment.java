@@ -238,7 +238,7 @@ public void GLRender(SoGLRenderAction action)
     // intensity, with 1.0 alpha
     v3.copyFrom( ambientColor.getValue().operator_mul(ambientIntensity.getValue()));
     v4.setValue(v3.getValueRead()[0], v3.getValueRead()[1], v3.getValueRead()[2], 1.0f);
-    glLightModelfv(GL2.GL_LIGHT_MODEL_AMBIENT, v4.getValueRead());
+    gl2.glLightModelfv(GL2.GL_LIGHT_MODEL_AMBIENT, v4.getValueRead());
 
     //////////////////////
     //
@@ -281,8 +281,8 @@ public void GLRender(SoGLRenderAction action)
             visibility = vol.getFarDist();
         }
 
-        gl2.glEnable(GL2.GL_FOG);
-        glFogfv(GL2.GL_FOG_COLOR, fogColor.getValue().getValueRead()); //FIXME
+        //gl2.glEnable(GL2.GL_FOG); CORE
+        gl2.glFogfv(GL2.GL_FOG_COLOR, fogColor.getValue().getValueRead()); //FIXME
 
         switch (type) {
 
@@ -298,7 +298,7 @@ public void GLRender(SoGLRenderAction action)
             break;
             
           case FOG:
-        	  gl2.glEnable(GL2.GL_FOG);
+        	  //gl2.glEnable(GL2.GL_FOG); CORE
         	  gl2.glFogf(GL2.GL_FOG_MODE,         GL2.GL_EXP);
         	  gl2.glFogf(GL2.GL_FOG_DENSITY,      computeDensity(visibility, false));
             break;

@@ -30,7 +30,7 @@ public class DirectionalLight {
 			  "  nDotVP = max(0.0, dot(normal, light_vector));\n"+
 			  "  nDotHV = max(0.0, dot(normal, light_halfVector));\n"+
 			  "\n"+
-			  "  float shininess = gl_FrontMaterial.shininess;\n"+
+			  "  float shininess = s4j_FrontMaterial.shininess;\n"+
 			  "  if (nDotVP == 0.0)\n"+
 			  "    pf = 0.0;\n"+
 			  "  else\n"+
@@ -58,7 +58,7 @@ public class DirectionalLight {
 			  "  nDotVP = max(0.0, dot(normal, light_vector));\n"+
 			  "  nDotHV = max(0.0, dot(normal, light_halfVector));\n"+
 			  "\n"+
-			  "  float shininess = gl_FrontMaterial.shininess;\n"+
+			  "  float shininess = s4j_FrontMaterial.shininess;\n"+
 			  "  if (nDotVP == 0.0)\n"+
 			  "    pf = 0.0;\n"+
 			  "  else\n"+

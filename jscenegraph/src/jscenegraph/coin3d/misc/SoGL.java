@@ -1,11 +1,15 @@
 package jscenegraph.coin3d.misc;
 
+import static com.jogamp.opengl.GL.*;
 import static org.lwjgl.glfw.GLFW.glfwMakeContextCurrent;
+import static org.lwjgl.opengl.GL11C.GL_QUADS;
 
 import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.Map;
 
+import jscenegraph.port.*;
+import jscenegraph.port.memorybuffer.MemoryBuffer;
 import org.lwjgl.opengl.GL;
 import org.lwjgl.opengl.GLCapabilities;
 
@@ -33,18 +37,6 @@ import jscenegraph.database.inventor.elements.SoShapeStyleElement;
 import jscenegraph.database.inventor.errors.SoDebugError;
 import jscenegraph.database.inventor.misc.SoBasic;
 import jscenegraph.database.inventor.misc.SoState;
-import jscenegraph.port.CString;
-import jscenegraph.port.Ctx;
-import jscenegraph.port.FloatArray;
-import jscenegraph.port.FloatBufferAble;
-import jscenegraph.port.IntArrayPtr;
-import jscenegraph.port.MutableSbVec3fArray;
-import jscenegraph.port.SbColorArray;
-import jscenegraph.port.SbVec2fArray;
-import jscenegraph.port.SbVec3fArray;
-import jscenegraph.port.SbVec4fArray;
-import jscenegraph.port.Util;
-import jscenegraph.port.VoidPtr;
 import jscenegraph.port.memorybuffer.FloatMemoryBuffer;
 
 public class SoGL {
@@ -1777,7 +1769,28 @@ static int sogl_cube_vindices[] =
   2, 3, 7, 6
 };
 
-static float sogl_cube_texcoords[] =
+    static int sogl_cube_triangle_vindices[] =
+            {
+                    0, 1, 3,
+                    0, 3, 2,
+
+                    5, 4, 6,
+                    5, 6, 7,
+
+                    1, 5, 7,
+                    1, 7, 3,
+
+                    4, 0, 2,
+                    4, 2, 6,
+
+                    4, 5, 1,
+                    4, 1, 0,
+
+                    2, 3, 7,
+                    2, 7, 6
+            };
+
+    static float sogl_cube_texcoords[] =
 {
   1.0f, 1.0f,
   0.0f, 1.0f,
@@ -1831,6 +1844,41 @@ sogl_generate_cube_vertices(SbVec3fArray varray,
 static final float[] dummy_buffer_2d = new float[2]; // SINGLE_THREAD
 
 static final SbVec3fArray varray = new SbVec3fArray(FloatMemoryBuffer.allocateFloats(8*3)); // SINGLE_THREAD
+
+    static int indices[] =
+    {
+//        0, 1, 3, 3, 1, 2,
+//                1, 5, 2, 2, 5, 6,
+//                5, 4, 6, 6, 4, 7,
+//                4, 0, 7, 7, 0, 3,
+//                3, 2, 7, 7, 2, 6,
+//                4, 5, 0, 0, 5, 1
+            //Top
+            2, 6, 7,
+            2, 3, 7,
+
+            //Bottom
+            0, 4, 5,
+            0, 1, 5,
+
+            //Left
+            0, 2, 6,
+            0, 4, 6,
+
+            //Right
+            1, 3, 7,
+            1, 5, 7,
+
+            //Front
+            0, 2, 3,
+            0, 1, 3,
+
+            //Back
+            4, 6, 7,
+            4, 5, 7
+    };
+
+//    static final IntArray iarray = new IntArray(0,indices);
 static final int[] maxunit = new int[1]; // SINGLE_THREAD
 static final float[] dummy3 = new float[3]; // SINGLE_THREAD
 
@@ -1865,8 +1913,9 @@ sogl_render_cube( float width,
                          width * 0.5f,
                          height * 0.5f,
                          depth * 0.5f);
+
   gl2.glBegin(GL2.GL_QUADS);
-  IntArrayPtr iptr = new IntArrayPtr(sogl_cube_vindices);
+  IntArrayPtr triangle_iptr = new IntArrayPtr(/*sogl_cube_vindices*/sogl_cube_triangle_vindices);
   int u;
   
   //SbVec3fArray cn = new SbVec3fArray(FloatMemoryBuffer.allocateFromFloatArray(sogl_cube_normals));
@@ -1874,30 +1923,109 @@ sogl_render_cube( float width,
   
   dummy3[0] = dummy3[1] = dummy3[2] = 0;
 
+  SbVec3fArray vboArray = new SbVec3fArray(FloatMemoryBuffer.allocateFloats(3 * 6 * 6));
+  int vboIndex = 0;
+
+    SbVec3fArray normalArray = new SbVec3fArray(FloatMemoryBuffer.allocateFloats(3 * 6 * 6));
+    int normalIndex = 0;
+
+    SbVec2fArray tarray = new SbVec2fArray(FloatMemoryBuffer.allocateFloats(2 * 6 * 6));
+    int tIndex = 0;
+
+  final int[] j = new int[6];
+  j[0] = 0;
+  j[1] = 1;
+  j[2] = 2;
+  j[3] = 0;
+  j[4] = 2;
+  j[5] = 3;
+
   for (int i = 0; i < 6; i++) { // 6 quads
-    if ((flags & SOGL_NEED_NORMALS)!=0)
-      gl2.glNormal3fv(/*sogl_cube_normals[i*3]*/cn.get3Floats(i,dummy3));
+    if ((flags & SOGL_NEED_NORMALS)!=0) {
+        gl2.glNormal3fv(/*sogl_cube_normals[i*3]*/cn.get3Floats(i, dummy3));
+    }
     if ((flags & SOGL_MATERIAL_PER_PART)!=0)
       material.send(i, true);
-    for (int j = 0; j < 4; j++) {
+    for (int jj = 0; jj < 6; jj++) {
       if ((flags & SOGL_NEED_3DTEXCOORDS)!=0) {
-    	  gl2.glTexCoord3fv(sogl_cube_3dtexcoords[iptr.get()]);
+    	  gl2.glTexCoord3fv(sogl_cube_3dtexcoords[triangle_iptr.get()]);
       }
       else if ((flags & SOGL_NEED_TEXCOORDS)!=0) {
-    	  gl2.glTexCoord2fv(/*&sogl_cube_texcoords[j<<1]*/ct.get(j).getValueRead(dummy_buffer_2d));
+    	  gl2.glTexCoord2fv(/*&sogl_cube_texcoords[j<<1]*/ct.get(j[jj]).getValueRead(dummy_buffer_2d));
+    	  tarray.setO(tIndex,ct.get(j[jj])); tIndex++;
       }
       if ((flags & SOGL_NEED_MULTITEXCOORDS)!=0) {
         for (u = 1; u <= maxunit[0]; u++) {
           if (unitenabled[u]) {
             SoGL.cc_glglue_glMultiTexCoord2fv(glue, (int) (GL2.GL_TEXTURE0 + u),
-                                         /*&sogl_cube_texcoords[j<<1]*/ct.get(j).getValueRead(dummy_buffer_2d));
+                                         /*&sogl_cube_texcoords[j<<1]*/ct.get(j[jj]).getValueRead(dummy_buffer_2d));
           }
         }
       }
-      gl2.glVertex3fv(varray.get3Floats(iptr.get(),dummy3),0); iptr.plusPlus();
+      gl2.glVertex3fv(varray.get3Floats(triangle_iptr.get(),dummy3),0);
+      vboArray.setO(vboIndex,varray.get(triangle_iptr.get())); vboIndex++;
+
+        if ((flags & SOGL_NEED_NORMALS)!=0) {
+            normalArray.setO(normalIndex,cn.get(i)); normalIndex++;
+        }
+
+      triangle_iptr.plusPlus();
     }
   }
   gl2.glEnd();
+
+    // ________________________________________________ Vertex coords
+    final int[] vbo = new int[1];
+
+    gl2.glGenBuffers(1,vbo);
+    gl2.glBindBuffer(GL_ARRAY_BUFFER,vbo[0]);
+    gl2.glBufferData(GL_ARRAY_BUFFER,vboArray.sizeof(),vboArray.toFloatBuffer(),GL_STATIC_DRAW);
+
+    gl2.glVertexAttribPointer(0,3,GL_FLOAT,false,/*3*Float.BYTES*/0,0);
+
+    gl2.glEnableVertexAttribArray(0);
+
+    // ________________________________________________ Normal coords
+    final int[] normal_vbo = new int[1];
+
+    gl2.glGenBuffers(1,normal_vbo);
+    gl2.glBindBuffer(GL_ARRAY_BUFFER,normal_vbo[0]);
+    gl2.glBufferData(GL_ARRAY_BUFFER,normalArray.sizeof(),normalArray.toFloatBuffer(),GL_STATIC_DRAW);
+
+    gl2.glVertexAttribPointer(1,3,GL_FLOAT,false,/*3*Float.BYTES*/0,0);
+
+    gl2.glEnableVertexAttribArray(1);
+
+// __________________________________________________ Texture coords
+    final int[] tbo = new int[1];
+
+    gl2.glGenBuffers(1, tbo);
+    gl2.glBindBuffer(GL_ARRAY_BUFFER,tbo[0]);
+    gl2.glBufferData(GL_ARRAY_BUFFER,tarray.sizeof(),tarray.toFloatBuffer(),GL_STATIC_DRAW);
+
+    gl2.glVertexAttribPointer(2,2,GL_FLOAT,false,0,0);
+
+    gl2.glEnableVertexAttribArray(2);
+
+//    final int[] ebo = new int[1];
+//
+//    gl2.glGenBuffers(1,ebo);
+//    gl2.glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,ebo[0]);
+//    gl2.glBufferData(GL_ELEMENT_ARRAY_BUFFER,iarray.sizeof(),iarray.toIntBuffer(),GL_STATIC_DRAW);
+//
+//    gl2.glDrawElements(GL2.GL_TRIANGLES,iarray.length(),GL_UNSIGNED_INT,0);
+    gl2.glDrawArrays(GL_TRIANGLES,0,(int)vboArray.length());
+
+    gl2.glBindBuffer(GL_ARRAY_BUFFER,0);
+
+    gl2.glDisableVertexAttribArray(0);
+    gl2.glDisableVertexAttribArray(1);
+    gl2.glDisableVertexAttribArray(2);
+
+//    gl2.glDeleteBuffers(1,ebo);
+  gl2.glDeleteBuffers(1,vbo);
+    gl2.glDeleteBuffers(1,normal_vbo);
+  gl2.glDeleteBuffers(1,tbo);
 
   if (state != null) {
     // always encourage auto caching for cubes
@@ -1973,6 +2101,14 @@ sogl_render_cylinder( float radius,
     float t = 0.0f;
     float inc = 1.0f / slices;
 
+      SbVec3fArray sideVertexVboArray = new SbVec3fArray(FloatMemoryBuffer.allocateFloats(129*3*2));
+      SbVec3fArray sideNormalVboArray = new SbVec3fArray(FloatMemoryBuffer.allocateFloats(129*3*2));
+      IntArray sideVertexEboArray = new IntArray(128*3*2);
+
+      int sideVertexVboArrayIndex = 0;
+      int sideNormalVboArrayIndex = 0;
+      int sideVertexEboArrayIndex = 0;
+
     while (i <= slices) {
       if ((flags & SOGL_NEED_TEXCOORDS)!=0) {
     	  gl2.glTexCoord2f(t, 1.0f);
@@ -1982,6 +2118,8 @@ sogl_render_cylinder( float radius,
       }
       if ((flags & SOGL_NEED_NORMALS)!=0) {
     	  gl2.glNormal3fv(normals.get(i).getValueRead());
+          sideNormalVboArray.get(sideNormalVboArrayIndex).setValue(normals.get(i));sideNormalVboArrayIndex++;
+          sideNormalVboArray.get(sideNormalVboArrayIndex).setValue(normals.get(i));sideNormalVboArrayIndex++;
       }
       if ((flags & SOGL_NEED_MULTITEXCOORDS)!=0) {
         for (u = 1; u <= maxunit[0]; u++) {
@@ -1992,8 +2130,26 @@ sogl_render_cylinder( float radius,
         }
       }
 
+      if(i<slices) {
+          sideVertexEboArray.set(sideVertexEboArrayIndex, sideVertexVboArrayIndex);
+          sideVertexEboArrayIndex++;
+          sideVertexEboArray.set(sideVertexEboArrayIndex, sideVertexVboArrayIndex + 1);
+          sideVertexEboArrayIndex++;
+          sideVertexEboArray.set(sideVertexEboArrayIndex, sideVertexVboArrayIndex + 2);
+          sideVertexEboArrayIndex++;
+          sideVertexEboArray.set(sideVertexEboArrayIndex, sideVertexVboArrayIndex+ 2);
+          sideVertexEboArrayIndex++;
+          sideVertexEboArray.set(sideVertexEboArrayIndex, sideVertexVboArrayIndex + 1);
+          sideVertexEboArrayIndex++;
+          sideVertexEboArray.set(sideVertexEboArrayIndex, sideVertexVboArrayIndex + 3);
+          sideVertexEboArrayIndex++;
+      }
       SbVec3f c = coords.get(i);
+
       gl2.glVertex3f(c.getValueRead()[0], h2, c.getValueRead()[2]);
+
+      sideVertexVboArray.get(sideVertexVboArrayIndex).setValue(c.getValueRead()[0], h2, c.getValueRead()[2]); sideVertexVboArrayIndex++;
+
       if ((flags & SOGL_NEED_TEXCOORDS)!=0) {
     	  gl2.glTexCoord2f(t, 0.0f);
       }
@@ -2008,13 +2164,54 @@ sogl_render_cylinder( float radius,
           }
         }
       }
+
       gl2.glVertex3f(c.getValueRead()[0], c.getValueRead()[1], c.getValueRead()[2]);
+
+      sideVertexVboArray.get(sideVertexVboArrayIndex).setValue(c.getValueRead()[0], -h2, c.getValueRead()[2]); sideVertexVboArrayIndex++;
+
       i++;
       t += inc;
     }
 
     matnr++;
     gl2.glEnd();
+
+    final int[] side_vertex_vbo = new int[1];
+
+    gl2.glGenBuffers(1,side_vertex_vbo);
+    gl2.glBindBuffer(GL_ARRAY_BUFFER,side_vertex_vbo[0]);
+    gl2.glBufferData(GL_ARRAY_BUFFER,sideVertexVboArray.sizeof(),sideVertexVboArray.toFloatBuffer(),GL_STATIC_DRAW);
+
+    gl2.glVertexAttribPointer(0,3,GL_FLOAT,false,0,0);
+    gl2.glEnableVertexAttribArray(0);
+
+    final int[] side_normal_vbo = new int[1];
+
+    gl2.glGenBuffers(1,side_normal_vbo);
+    gl2.glBindBuffer(GL_ARRAY_BUFFER,side_normal_vbo[0]);
+    gl2.glBufferData(GL_ARRAY_BUFFER,sideNormalVboArray.sizeof(),sideNormalVboArray.toFloatBuffer(),GL_STATIC_DRAW);
+
+    gl2.glVertexAttribPointer(1,3,GL_FLOAT,false,0,0);
+    gl2.glEnableVertexAttribArray(1);
+
+    final int[] side_vertex_ebo = new int[1];
+
+    gl2.glGenBuffers(1,side_vertex_ebo);
+    gl2.glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,side_vertex_ebo[0]);
+    gl2.glBufferData(GL_ELEMENT_ARRAY_BUFFER,sideVertexEboArray.sizeof(),sideVertexEboArray.toIntBuffer(),GL_STATIC_DRAW);
+
+    gl2.glDrawElements(GL_TRIANGLES,sideVertexEboArray.length(),GL_UNSIGNED_INT,0);
+
+      gl2.glDisableVertexAttribArray(0);
+      gl2.glDisableVertexAttribArray(1);
+
+      gl2.glBindBuffer(GL_ARRAY_BUFFER,0);
+
+    gl2.glDeleteBuffers(1,side_vertex_vbo);
+    gl2.glDeleteBuffers(1,side_normal_vbo);
+
+    gl2.glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,0);
+    gl2.glDeleteBuffers(1,side_vertex_ebo);
   }
 
   if ((flags & (SOGL_NEED_TEXCOORDS|SOGL_NEED_3DTEXCOORDS|SOGL_NEED_MULTITEXCOORDS))!=0 &&
@@ -2093,13 +2290,14 @@ sogl_render_cylinder( float radius,
 public static void
 sogl_generate_3d_circle(SbVec3fArray coords, int num, float radius, float y)
 {
-  float delta = 2.0f*(float)(Math.PI)/(float)(num);
+  float deltaAngle = 2.0f*(float)(Math.PI)/(float)(num);
   float angle = 0.0f;
   for (int i = 0; i < num; i++) {
-    coords.get(i).setX( -(float)(Math.sin(angle)) * radius);
-    coords.get(i).setY( y);
-    coords.get(i).setZ( -(float)(Math.cos(angle)) * radius);
-    angle += delta;
+      SbVec3f coordsi = coords.get(i);
+    coordsi.setX( -(float)(Math.sin(angle)) * radius);
+    coordsi.setY( y);
+    coordsi.setZ( -(float)(Math.cos(angle)) * radius);
+    angle += deltaAngle;
   }
 }
 

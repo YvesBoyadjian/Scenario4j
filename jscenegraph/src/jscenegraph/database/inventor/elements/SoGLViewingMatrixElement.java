@@ -56,6 +56,8 @@ package jscenegraph.database.inventor.elements;
 
 import com.jogamp.opengl.GL2;
 
+import jscenegraph.coin3d.shaders.SoGLShaderProgram;
+import jscenegraph.coin3d.shaders.inventor.elements.SoGLShaderProgramElement;
 import jscenegraph.database.inventor.SbMatrix;
 import jscenegraph.database.inventor.misc.SoState;
 
@@ -148,6 +150,12 @@ pop(SoState state, SoElement prevElt)
     //}
 }
 
+public void postPop(SoState state) {
+
+    updateStateParameters(); // CORE
+
+}
+
 ////////////////////////////////////////////////////////////////////////
 //
 // Description:
@@ -182,7 +190,9 @@ send()
 
     final boolean[] modelIsIdent = new boolean[1];
     final SbMatrix modelMat = SoModelMatrixElement.get(state, modelIsIdent);
-    
+
+    updateStateParameters(); // CORE
+
     GL2 gl2 = state.getGL2();
 
     if (! modelIsIdent[0]) {
@@ -213,6 +223,17 @@ getNodeId(SoState state)
     return vme.SoReplacedElement_getNodeId();
 }
 
+
+    private void updateStateParameters() { // CORE
+
+        SoGLShaderProgram sp = SoGLShaderProgramElement.get(state);
+
+        if(null!=sp &&sp.isEnabled())
+        {
+            // Dependent of SoModelMatrixElement
+            sp.updateStateParameters(state);
+        }
+    }
 
 
 

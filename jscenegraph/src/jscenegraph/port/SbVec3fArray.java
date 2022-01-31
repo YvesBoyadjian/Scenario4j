@@ -66,6 +66,10 @@ public class SbVec3fArray extends Indexable<SbVec3f> implements ByteBufferAble, 
 		return valuesArray.numFloats() - delta*3;
 	}
 
+	public long sizeof() {
+		return getSizeFloat()*Float.BYTES;
+	}
+
 	public SbVec3f get(int index) {
 		return new SbVec3f(valuesArray, (index+delta)*3);
 	}

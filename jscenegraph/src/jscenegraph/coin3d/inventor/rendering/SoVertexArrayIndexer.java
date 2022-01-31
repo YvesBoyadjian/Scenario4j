@@ -178,16 +178,18 @@ public class SoVertexArrayIndexer implements Destroyable {
 	                               int v2,
 	                               int v3)
 	{
-	  if (this.target == 0) this.target = GL2.GL_QUADS;
-	  if (this.target == GL2.GL_QUADS) {
-	    this.addIndex(v0);
-	    this.addIndex(v1);
-	    this.addIndex(v2);
-	    this.addIndex(v3);
-	  }
-	  else {
-	    this.getNext().addQuad(v0,v1,v2,v3);
-	  }
+		addTriangle(v0, v1, v2);
+		addTriangle(v0, v2, v3);
+//	  if (this.target == 0) this.target = GL2.GL_QUADS;
+//	  if (this.target == GL2.GL_QUADS) {
+//	    this.addIndex(v0);
+//	    this.addIndex(v1);
+//	    this.addIndex(v2);
+//	    this.addIndex(v3);
+//	  }
+//	  else {
+//	    this.getNext().addQuad(v0,v1,v2,v3);
+//	  }
 	}
 
 	/*!
@@ -295,7 +297,8 @@ public class SoVertexArrayIndexer implements Destroyable {
 	          UShortPtr dst = (UShortPtr) 
 	            (this.vbo.allocBufferData(this.indexarray.getLength()*Short.BYTES).toUShortPtr());
 	          IntArrayPtr src = this.indexarray.getArrayPtr();
-	          for (int i = 0; i < this.indexarray.getLength(); i++) {
+	          int indexArrayLength = this.indexarray.getLength();
+	          for (int i = 0; i < indexArrayLength; i++) {
 	            dst.set(i, src.get(i));
 	          }
 	        }

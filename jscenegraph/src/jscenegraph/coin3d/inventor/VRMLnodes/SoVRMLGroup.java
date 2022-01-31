@@ -70,7 +70,7 @@ public class SoVRMLGroup extends SoVRMLParent {
   };
 
 	
-	protected static int numRenderCaches = 2;
+	protected static int numRenderCaches = 0;//2; CORE
 	
 	  public final SoSFEnum renderCaching = new SoSFEnum();
 	  public final SoSFEnum boundingBoxCaching = new SoSFEnum();

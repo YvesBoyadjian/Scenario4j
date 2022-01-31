@@ -75,18 +75,25 @@ public class MemoryBuffer implements Destroyable, ByteBufferAble {
 
 	public void setBytes(MemoryBuffer srcBytes, int numBytes) {
 		updateByteBuffer();
-		
-		for( int index = 0; index < numBytes; index++) {
-			byteBuffer.put(index,srcBytes.getByte(index));
-		}
+
+		ByteBuffer src = srcBytes.toByteBuffer().slice().limit(numBytes);
+		byteBuffer.position(0).put(src);
+		byteBuffer.position(0);
+
+//		for( int index = 0; index < numBytes; index++) {
+//			byteBuffer.put(index,srcBytes.getByte(index));
+//		}
 	}
 
 	public void setBytes(byte[] srcBytes, int numBytes) {
 		updateByteBuffer();
-		
-		for( int index = 0; index < numBytes; index++) {
-			byteBuffer.put(index,srcBytes[index]);
-		}
+
+		byteBuffer.position(0).put(srcBytes,0,numBytes);
+		byteBuffer.position(0);
+
+//		for( int index = 0; index < numBytes; index++) {
+//			byteBuffer.put(index,srcBytes[index]);
+//		}
 	}
 
 	public byte getByte(int index) {

@@ -5,6 +5,8 @@ package jscenegraph.database.inventor.elements;
 
 import com.jogamp.opengl.GL2;
 
+import jscenegraph.coin3d.shaders.SoGLShaderProgram;
+import jscenegraph.coin3d.shaders.inventor.elements.SoGLShaderProgramElement;
 import jscenegraph.database.inventor.SbMatrix;
 import jscenegraph.database.inventor.misc.SoState;
 
@@ -47,8 +49,14 @@ pop(SoState state, SoElement prevElt)
         capture(state);
 
         // Restore previous projection matrix
-        send();
+        send(state);
     //}
+}
+
+public void postPop(SoState state) {
+
+	updateStateParameters(state);
+
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -59,13 +67,13 @@ pop(SoState state, SoElement prevElt)
 // Use: protected, virtual
 
 protected void
-setElt(final SbMatrix matrix)
+setElt(final SbMatrix matrix, SoState state)
 //
 ////////////////////////////////////////////////////////////////////////
 {
     // Set matrix in element
     projectionMatrix.copyFrom(matrix);
-    send();
+    send(state);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -76,13 +84,15 @@ setElt(final SbMatrix matrix)
 // Use: private
 
 private void
-send()
+send(SoState state)
 //
 ////////////////////////////////////////////////////////////////////////
 {
 	gl2.glMatrixMode(GL2.GL_PROJECTION);
     gl2.glLoadMatrixf((float []) projectionMatrix.toGL(),0);
     gl2.glMatrixMode(GL2.GL_MODELVIEW);
+
+    updateStateParameters(state);
 }
 
 //java port
@@ -91,5 +101,16 @@ public void push(SoState state) {
 	super.push(state);
 }
 
+
+	private void updateStateParameters(SoState state) { // CORE
+
+		SoGLShaderProgram sp = SoGLShaderProgramElement.get(state);
+
+		if(null!=sp &&sp.isEnabled())
+		{
+			// Dependent of SoModelMatrixElement
+			sp.updateStateParameters(state);
+		}
+	}
 
 }

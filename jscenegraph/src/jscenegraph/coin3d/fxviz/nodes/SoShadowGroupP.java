@@ -30,11 +30,7 @@ import jscenegraph.coin3d.inventor.nodes.SoShaderObject;
 import jscenegraph.coin3d.inventor.nodes.SoTextureUnit;
 import jscenegraph.coin3d.inventor.nodes.SoVertexShader;
 import jscenegraph.coin3d.misc.SoGL;
-import jscenegraph.coin3d.shaders.inventor.nodes.SoShaderParameter1f;
-import jscenegraph.coin3d.shaders.inventor.nodes.SoShaderParameter1i;
-import jscenegraph.coin3d.shaders.inventor.nodes.SoShaderParameter4f;
-import jscenegraph.coin3d.shaders.inventor.nodes.SoShaderParameterMatrix;
-import jscenegraph.coin3d.shaders.inventor.nodes.SoShaderProgram;
+import jscenegraph.coin3d.shaders.inventor.nodes.*;
 import jscenegraph.database.inventor.SbBox3f;
 import jscenegraph.database.inventor.SbMatrix;
 import jscenegraph.database.inventor.SbName;
@@ -248,10 +244,10 @@ public class SoShadowGroupP implements Destroyable {
 	      else {
 	        SoGL.cc_glglue_glActiveTexture(glue, /*(GLenum)*/ ((int)(GL2.GL_TEXTURE0) + unit));
 	        if (enable) {
-	        	gl2.glEnable(GL2.GL_TEXTURE_2D);
+	        	//gl2.glEnable(GL2.GL_TEXTURE_2D); CORE
 	        }
 	        else {
-	  		  	gl2.glDisable(GL2.GL_TEXTURE_2D);
+	  		  	//gl2.glDisable(GL2.GL_TEXTURE_2D); CORE
 	        }
 	        
 	        SoGL.cc_glglue_glActiveTexture(glue, GL2.GL_TEXTURE0);
@@ -530,7 +526,19 @@ setVertexShader(SoState state)
   int i;
   SoShaderGenerator gen = this.vertexgenerator;
   gen.reset(false);
-  gen.setVersion("#version 120"); // YB : necessary for Intel Graphics HD 630
+  gen.setVersion("#version 400 core"); // YB : necessary for Intel Graphics HD 630
+
+	gen.addDeclaration("layout (location = 0) in vec3 s4j_Vertex;",false);
+	gen.addDeclaration("layout (location = 1) in vec3 s4j_Normal;",false);
+	gen.addDeclaration("layout (location = 2) in vec2 s4j_MultiTexCoord0;",false);
+	gen.addDeclaration("layout (location = 3) in vec4 s4j_Color;",false);
+
+	gen.addDeclaration("uniform mat4 s4j_ModelViewMatrix;",false);
+	gen.addDeclaration("uniform mat4 s4j_ProjectionMatrix;",false);
+	gen.addDeclaration("uniform mat3 s4j_NormalMatrix;",false);
+
+	gen.addDeclaration("uniform vec4 s4j_ColorUniform;",false);
+	gen.addDeclaration("uniform bool s4j_PerVertexColor;",false);
 
   boolean storedinvalid = SoCacheElement.setInvalid(false);
 
@@ -580,15 +588,19 @@ setVertexShader(SoState state)
   gen.addDeclaration("varying vec3 fragmentNormal;", false);
   gen.addDeclaration("varying vec3 perVertexColor;", false);
 
+  gen.addDeclaration("varying vec2 texCoord;",false);
+
+  gen.addDeclaration("varying vec4 frontColor;",false);
+
   boolean dirlight = false;
   boolean pointlight = false;
   boolean spotlight = false;
   String str = "";
 
-  gen.addMainStatement("vec4 ecPosition = gl_ModelViewMatrix * gl_Vertex;\n"+
+  gen.addMainStatement("vec4 ecPosition = s4j_ModelViewMatrix * vec4(s4j_Vertex, 1.0);\n"+
                        "ecPosition3 = ecPosition.xyz / ecPosition.w;");
 
-  gen.addMainStatement("vec3 normal = normalize(gl_NormalMatrix * gl_Normal);\n"+
+  gen.addMainStatement("vec3 normal = normalize(s4j_NormalMatrix * s4j_Normal);\n"+
                        "vec3 eye = -normalize(ecPosition3);\n"+
                        "vec4 ambient;\n"+
                        "vec4 diffuse;\n"+
@@ -596,9 +608,12 @@ setVertexShader(SoState state)
                        "vec4 accambient = vec4(0.0);\n"+
                        "vec4 accdiffuse = vec4(0.0);\n"+
                        "vec4 accspecular = vec4(0.0);\n"+
-                       "vec4 color;\n");
+                       "vec4 color;\n"+
+		  "vec4 diffuCol;");
 
   gen.addMainStatement("fragmentNormal = normal;");
+
+	gen.addMainStatement("diffuCol = s4j_ColorUniform; if(s4j_PerVertexColor) diffuCol = s4j_Color;");
 
   if (!perpixelother[0]) {
     for (i = 0; i < lights.getLength(); i++) {
@@ -627,14 +642,14 @@ setVertexShader(SoState state)
     if (dirlight) gen.addNamedFunction(new SbName("lights/DirectionalLight"), false);
     if (pointlight) gen.addNamedFunction(new SbName("lights/PointLight"), false);
 
-    gen.addMainStatement("color = gl_FrontLightModelProduct.sceneColor + "+
+    gen.addMainStatement("color = vec4(0,0,0,0);//gl_FrontLightModelProduct.sceneColor + "+
                          "  accambient * gl_FrontMaterial.ambient + "+
-                         "  accdiffuse * gl_Color +"+
-                         "  accspecular * gl_FrontMaterial.specular;\n"
+                         "  accdiffuse * diffuCol +"+
+                         "  accspecular * s4j_FrontMaterial.specular;\n"
                          );
   }
   else {
-    gen.addMainStatement("color = gl_FrontLightModelProduct.sceneColor;\n");
+    gen.addMainStatement("color = vec4(0,0,0,0);//gl_FrontLightModelProduct.sceneColor;\n");
   }
 
   if (numshadowlights != 0) {
@@ -675,8 +690,8 @@ setVertexShader(SoState state)
       addSpotLight(gen, cache.lightid);
       str = "spotVertexColor"+i+" = \n"+
                   "  ambient.rgb * gl_FrontMaterial.ambient.rgb + "+
-                  "  diffuse.rgb * gl_Color.rgb + "+
-                  "  specular.rgb * gl_FrontMaterial.specular.rgb;\n";
+                  "  diffuse.rgb * diffuCol.rgb + "+
+                  "  specular.rgb * s4j_FrontMaterial.specular.rgb;\n";
       gen.addMainStatement(str);
     }
   }
@@ -698,14 +713,14 @@ setVertexShader(SoState state)
     break;
   }
   gen.addMainStatement("perVertexColor = vec3(clamp(color.r, 0.0, 1.0), clamp(color.g, 0.0, 1.0), clamp(color.b, 0.0, 1.0));\n"+
-                       "gl_TexCoord[0] = gl_TextureMatrix[0] * gl_MultiTexCoord0;\n"+
-                       "gl_TexCoord[1] = gl_TextureMatrix[1] * gl_MultiTexCoord1;\n"+
-                       "gl_Position = ftransform();\n"+
-                       "gl_FrontColor = gl_Color;\n");
+                       "texCoord = s4j_MultiTexCoord0;\n"+
+                       "gl_TexCoord[1] = gl_MultiTexCoord1;\n"+
+                       "gl_Position = s4j_ProjectionMatrix * s4j_ModelViewMatrix * vec4(s4j_Vertex, 1.0);\n"+
+                       "frontColor = diffuCol;\n");
 
   if (this.hasclipplanes) {
     if (SoGLDriverDatabase.isSupported(glue, SoGLDriverDatabase.SO_GL_GLSL_CLIP_VERTEX_HW)) {
-      gen.addMainStatement("gl_ClipVertex = gl_ModelViewMatrix * gl_Vertex;\n");
+      gen.addMainStatement("gl_ClipVertex = s4j_ModelViewMatrix * vec4(s4j_Vertex, 1.0);\n");
     }
   }
 
@@ -727,6 +742,25 @@ setVertexShader(SoState state)
 		  this.vertexshader.parameter.set1Value(this.vertexshader.parameter.getNum(), this.texturematrix[i]);
 		  this.vertexshader.parameter.set1Value(this.vertexshader.parameter.getNum(), this.neartexturematrix[i]);
 	  }
+
+
+	  final SoShaderStateMatrixParameter mvs = new SoShaderStateMatrixParameter();
+	  mvs.name.setValue("s4j_ModelViewMatrix");
+	  mvs.matrixType.setValue(SoShaderStateMatrixParameter.MatrixType.MODELVIEW);
+
+	  final SoShaderStateMatrixParameter ps = new SoShaderStateMatrixParameter();
+	  ps.name.setValue("s4j_ProjectionMatrix");
+	  ps.matrixType.setValue(SoShaderStateMatrixParameter.MatrixType.PROJECTION);
+
+	  final SoShaderStateMatrixParameter ns = new SoShaderStateMatrixParameter();
+	  ns.name.setValue("s4j_NormalMatrix");
+	  ns.matrixType.setValue(SoShaderStateMatrixParameter.MatrixType.MODELVIEW);
+	  ns.matrixTransform.setValue(SoShaderStateMatrixParameter.MatrixTransform.INVERSE_TRANSPOSE_3);
+
+	  vertexshader.parameter.set1Value(vertexshader.parameter.getNum(), mvs);
+	  vertexshader.parameter.set1Value(vertexshader.parameter.getNum(), ps);
+	  vertexshader.parameter.set1Value(vertexshader.parameter.getNum(), ns);
+
 //#if 0 // for debugging
 //    fprintf(stderr,"new vertex program: %s\n",
 //            gen.getShaderProgram().getString());
@@ -748,7 +782,30 @@ setFragmentShader(SoState state)
 
   SoShaderGenerator gen = this.fragmentgenerator;
   gen.reset(false);
-  gen.setVersion("#version 120"); // YB : necessary for MESA 3D for Windows
+  gen.setVersion("#version 400 core"); // YB : necessary for MESA 3D for Windows
+
+	gen.addDeclaration("struct LightSource {",false);
+	gen.addDeclaration("    vec4 ambient;",false);
+	gen.addDeclaration("    vec4 diffuse;",false);
+	gen.addDeclaration("    vec4 specular;",false);
+	gen.addDeclaration("    vec4 position;", false);
+	gen.addDeclaration("};",false);
+
+	gen.addDeclaration("struct Fog {",false);
+	gen.addDeclaration("    vec4 color;",false);
+	gen.addDeclaration("    float density;",false);
+	gen.addDeclaration("};",false);
+
+	gen.addDeclaration("struct FrontMaterial {", false);
+	gen.addDeclaration("    vec4 specular;",false);
+	gen.addDeclaration("    float shininess;", false);
+	gen.addDeclaration("};",false);
+
+	gen.addDeclaration("uniform Fog s4j_Fog;",false);
+
+	gen.addDeclaration("uniform FrontMaterial s4j_FrontMaterial;",false);
+
+	gen.addDeclaration("layout(location = 0) out vec4 s4j_FragColor;",false);
 
   final boolean[] perpixelspot = new boolean[1];
   final boolean[] perpixelother = new boolean[1];
@@ -768,6 +825,13 @@ setFragmentShader(SoState state)
   SoCacheElement.set(state, this.fragmentshadercache);
 
   int numshadowlights = this.shadowlights.getLength();
+
+	final SoNodeList lights = SoLightElement.getLights(state);
+
+	if(0 < (lights.getLength() + numshadowlights)) {
+	  gen.addDeclaration("uniform LightSource s4j_LightSource[" + (lights.getLength()+numshadowlights) + "];", false);
+  }
+
   boolean dirspot = false;
 
   // ATi doesn't seem to support gl_FrontFace in hardware. We've only
@@ -842,7 +906,11 @@ setFragmentShader(SoState state)
   gen.addDeclaration("varying vec3 fragmentNormal;", false);
   gen.addDeclaration("varying vec3 perVertexColor;", false);
 
-  final SoNodeList lights = SoLightElement.getLights(state);
+	gen.addDeclaration("varying vec2 texCoord;",false);
+
+	gen.addDeclaration("varying vec4 frontColor;",false);
+
+  //final SoNodeList lights = SoLightElement.getLights(state); already called
 
   if (numshadowlights != 0) {
     gen.addNamedFunction("vsm/VsmLookup", false);
@@ -856,8 +924,8 @@ setFragmentShader(SoState state)
   gen.addMainStatement("vec4 ambient = vec4(0.0);\n"+
                        "vec4 diffuse = vec4(0.0);\n"+
                        "vec4 specular = vec4(0.0);\n"+ // YB
-                       "vec4 mydiffuse = gl_Color;\n"+
-                       "vec4 texcolor = (coin_texunit0_model != 0) ? texture2D(textureMap0, gl_TexCoord[0].xy) : vec4(1.0);\n");
+                       "vec4 mydiffuse = frontColor;\n"+
+                       "vec4 texcolor = (coin_texunit0_model != 0) ? texture2D(textureMap0, texCoord) : vec4(1.0);\n");
 
   if (this.numtexunitsinscene > 1) {
     gen.addMainStatement("if (coin_texunit1_model != 0) texcolor *= texture2D(textureMap1, gl_TexCoord[1].xy);\n");
@@ -968,8 +1036,11 @@ setFragmentShader(SoState state)
           gen.addMainStatement("shadeFactor = 1.0 - shadeFactor;\n");
         }
       }
+
+      //gen.addMainStatement("shadeFactor = 1- 0.0001*shadeFactor;");
+
       gen.addMainStatement("color += shadeFactor * diffuse.rgb * mydiffuse.rgb;");
-      gen.addMainStatement("scolor += shadeFactor * gl_FrontMaterial.specular.rgb * specular.rgb;\n");
+      gen.addMainStatement("scolor += shadeFactor * s4j_FrontMaterial.specular.rgb * specular.rgb;\n");
       gen.addMainStatement("color += ambient.rgb * gl_FrontMaterial.ambient.rgb;\n");
 
       endShadowLight(gen,cache.lightid,cache.texunit,i);
@@ -1001,7 +1072,7 @@ setFragmentShader(SoState state)
         }
         gen.addMainStatement("color += ambient.rgb * gl_FrontMaterial.ambient.rgb + "+
                              "diffuse.rgb * mydiffuse.rgb;\n");
-        gen.addMainStatement("scolor += specular.rgb * gl_FrontMaterial.specular.rgb;\n");
+        gen.addMainStatement("scolor += specular.rgb * s4j_FrontMaterial.specular.rgb;\n");
 		  gen.addMainStatement("// _______________________ End Light\n");
       }
 
@@ -1023,7 +1094,7 @@ setFragmentShader(SoState state)
         }
       }
       //String str; java port
-      str = "dist = length(vec3(gl_LightSource["+lights.getLength()+i+"].position) - ecPosition3);\n"+
+      str = "dist = length(vec3(s4j_LightSource["+lights.getLength()+i+"].position) - ecPosition3);\n"+
                   "coord = 0.5 * (shadowCoord"+i+".xyz / shadowCoord"+i+".w + vec3(1.0));\n"+
                   "map = texture2D(shadowMap"+i+", coord.xy);\n"+
 //#ifdef USE_NEGATIVE
@@ -1033,6 +1104,7 @@ setFragmentShader(SoState state)
                   "map.xy += map.zw / DISTRIBUTE_FACTOR;\n"+
 //#endif
                   "shadeFactor = (shadowCoord"+i+".z > -1.0"+insidetest/*.getString()*/+" ? VsmLookup(map, (dist - nearval"+i+")/(farval"+i+"-nearval"+i+"), EPSILON, THRESHOLD) : 1.0;\n"+
+
                   "color += shadeFactor * spotVertexColor"+i+";\n";
       gen.addMainStatement(str);
     }
@@ -1060,7 +1132,7 @@ setFragmentShader(SoState state)
   
   gen.addMainStatement("color = pow(color,vec3(0.47f))+vec3(noise1,noise2,noise3);\n"); // YB CHANGE GAMMA CORRECTION
 
-  gen.addMainStatement("gl_FragColor = vec4(color, mydiffuse.a);");
+  gen.addMainStatement("s4j_FragColor = vec4(color, mydiffuse.a);");
   gen.addDeclaration("uniform sampler2D textureMap0;\n", false);
   gen.addDeclaration("uniform int coin_texunit0_model;\n", false);
   if (this.numtexunitsinscene > 1) {
@@ -1278,19 +1350,19 @@ protected void endFragmentShader(SoShaderGenerator gen,SoEnvironmentElement.FogT
 			break;
 		case FOG:
 			//gen.addMainStatement("float fog = exp(-gl_Fog.density * gl_FogFragCoord);\n");
-			gen.addMainStatement("float fog = exp(-gl_Fog.density * abs(ecPosition3.z));\n");
-			gen.setVersion("#version 120"); // YB : Nvidia cards need at least version 120
+			gen.addMainStatement("float fog = exp(-s4j_Fog.density * abs(ecPosition3.z));\n");
+			gen.setVersion("#version 400 core"); // YB : Nvidia cards need at least version 120
 			break;
 		case SMOKE:
 			//gen.addMainStatement("float fogfrag =  gl_FogFragCoord;");
 			gen.addMainStatement("float fogfrag =  abs(ecPosition3.z);");
-			gen.addMainStatement("float fogdens =  gl_Fog.density;");
+			gen.addMainStatement("float fogdens =  s4j_Fog.density;");
 			gen.addMainStatement("float fog = exp(-fogdens * fogdens * fogfrag * fogfrag);\n");
-			gen.setVersion("#version 120"); // YB : Nvidia cards need at least version 120
+			gen.setVersion("#version 400 core"); // YB : Nvidia cards need at least version 120
 			break;
 	}
 	if (fogType != SoEnvironmentElement.FogType.NONE) {
-		gen.addMainStatement("color = mix(gl_Fog.color.rgb, color, clamp(fog, 0.0, 1.0));\n");
+		gen.addMainStatement("color = mix(s4j_Fog.color.rgb, color, clamp(fog, 0.0, 1.0));\n");
 	}
 }
 
@@ -1697,9 +1769,9 @@ private void getQuality(SoState state, boolean[] perpixelspot, boolean[] perpixe
 
 void initLightMaterial(SoShaderGenerator gen, int i) {
     String str;
-    str = "ambient = gl_LightSource["+i+"].ambient;\n"+
-                "diffuse = gl_LightSource["+i+"].diffuse;\n"+
-                "specular = gl_LightSource["+i+"].specular;\n";
+    str = "ambient = s4j_LightSource["+i+"].ambient;\n"+
+                "diffuse = s4j_LightSource["+i+"].diffuse;\n"+
+                "specular = s4j_LightSource["+i+"].specular;\n";
     gen.addMainStatement(str);
   }
 
@@ -1714,9 +1786,9 @@ void initLightMaterial(SoShaderGenerator gen, int i) {
 void addDirectionalLight(SoShaderGenerator gen, int i) {
     initLightMaterial(gen, i);
     String str;
-    str = "DirectionalLight(normalize(vec3(gl_LightSource["+i+"].position)),"+
+    str = "DirectionalLight(normalize(vec3(s4j_LightSource["+i+"].position)),"+
     		"normalize(eye),"+
-                "normalize(normalize(vec3(gl_LightSource["+i+"].position))+normalize(eye)), normal, diffuse, specular);";
+                "normalize(normalize(vec3(s4j_LightSource["+i+"].position))+normalize(eye)), normal, diffuse, specular);";
     gen.addMainStatement(str);
   }
 
@@ -1728,7 +1800,7 @@ void addDirectionalLight(SoShaderGenerator gen, int i) {
     String dist = needdist ? "dist = " : "";
     String str;
     str = dist+" SpotLight("+
-                "vec3(gl_LightSource["+i+"].position),"+
+                "vec3(s4j_LightSource["+i+"].position),"+
                 "vec3(gl_LightSource["+i+"].constantAttenuation,"+
                 "     gl_LightSource["+i+"].linearAttenuation,"+
                 "     gl_LightSource["+i+"].quadraticAttenuation),"+
@@ -1749,7 +1821,7 @@ void addDirectionalLight(SoShaderGenerator gen, int i) {
     String str;
     str = dist+" DirSpotLight("+
                 " -normalize(vec3(gl_LightSource["+i+"].spotDirection)),"+
-                " vec3(gl_LightSource["+i+"].position),"+
+                " vec3(s4j_LightSource["+i+"].position),"+
                 " eye, ecPosition3, normal, diffuse, specular);";
     gen.addMainStatement(str);
     if(needdist) {
@@ -1762,7 +1834,7 @@ void addDirectionalLight(SoShaderGenerator gen, int i) {
     initLightMaterial(gen, i);
     String str;
     str = "PointLight("+
-                "vec3(gl_LightSource["+i+"].position),"+
+                "vec3(s4j_LightSource["+i+"].position),"+
                 "vec3(gl_LightSource["+i+"].constantAttenuation,"+
                 "     gl_LightSource["+i+"].linearAttenuation,"+
                 "     gl_LightSource["+i+"].quadraticAttenuation),"+

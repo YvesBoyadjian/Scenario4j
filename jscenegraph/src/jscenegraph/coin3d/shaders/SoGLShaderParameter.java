@@ -41,6 +41,7 @@ public interface SoGLShaderParameter {
    void set4fv( SoGLShaderObject  shader,  int num,  float[] value,  String name,  int id);
 
    void setMatrix( SoGLShaderObject  shader,  float[] value,  String name,  int id);
+   void setMatrix3( SoGLShaderObject  shader,  float[] value,  String name,  int id);
    void setMatrixArray( SoGLShaderObject  shader,  int num,  float[] value,  String name,  int id);
 
    void set1i( SoGLShaderObject  shader,  int value,  String name,  int id);

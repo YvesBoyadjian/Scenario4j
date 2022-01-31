@@ -157,7 +157,7 @@ cc_glglue_glTexSubImage2D(final cc_glglue w,
 */
 public static int coin_glglue_get_internal_texture_format(final cc_glglue glw,
                                               int numcomponents,
-                                              boolean compress)
+                                              boolean compress, boolean srgb)
 {
   /*GLenum*/int format;
   if (compress) {
@@ -187,7 +187,7 @@ public static int coin_glglue_get_internal_texture_format(final cc_glglue glw,
       format = usenewenums ? GL2.GL_LUMINANCE8_ALPHA8 : GL2.GL_LUMINANCE_ALPHA;
       break;
     case 3:
-      format = usenewenums ? GL2.GL_RGB8 : GL2.GL_RGB;
+      format = usenewenums ? (srgb ? GL2.GL_SRGB8 :GL2.GL_RGB8) : GL2.GL_RGB;
       break;
     case 4:
     default:

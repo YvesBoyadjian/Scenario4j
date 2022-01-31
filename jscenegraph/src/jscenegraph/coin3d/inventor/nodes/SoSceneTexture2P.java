@@ -259,7 +259,7 @@ public class SoSceneTexture2P implements Destroyable {
 		    // just disable all active light source
 		    int numlights = SoLightElement.getLights(state).getLength();
 		    for (i = 0; i < numlights; i++) {
-		      gl2.glDisable((int) (GL2.GL_LIGHT0 + i));
+		      //gl2.glDisable((int) (GL2.GL_LIGHT0 + i)); CORE
 		    }
 		    float[] oldclearcolor = new float[4];
 		    gl2.glGetFloatv(GL2.GL_COLOR_CLEAR_VALUE, oldclearcolor);
@@ -321,7 +321,7 @@ public class SoSceneTexture2P implements Destroyable {
 
 		    // enable lights again
 		    for (i = 0; i < numlights; i++) {
-		      gl2.glEnable((int) (GL2.GL_LIGHT0 + i));
+		      //gl2.glEnable((int) (GL2.GL_LIGHT0 + i)); CORE
 		    }
 		    state.pop();
 
@@ -486,6 +486,7 @@ public class SoSceneTexture2P implements Destroyable {
 		      this.glimage.setData(this.offscreenbuffer,
 		                             this.glcontextsize,
 		                             4,
+		                             false,
 		                             SoSceneTexture2.translateWrap(SoSceneTexture2.Wrap.fromValue(this.api.wrapS.getValue())),
 		                             SoSceneTexture2.translateWrap(SoSceneTexture2.Wrap.fromValue(this.api.wrapT.getValue())),
 		                             quality);

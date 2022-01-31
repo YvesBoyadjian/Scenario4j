@@ -318,11 +318,12 @@ public GLData format()
 			firstVisibility = false;
 			visibilityChanged(true);
 		}
-	      GL2 gl2 = new GL2() {};  // get the OpenGL 2 graphics context
-	      paintGL(gl2);
-	      if(_autoBufferSwapOn) {
-	    	  swapBuffers();
-	      }    	
+		redraw();
+//	      GL2 gl2 = new GL2() {};  // get the OpenGL 2 graphics context
+//	      paintGL(gl2);
+//	      if(_autoBufferSwapOn) {
+//	    	  swapBuffers();
+//	      }
     }
     
     private

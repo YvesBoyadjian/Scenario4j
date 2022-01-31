@@ -125,6 +125,7 @@ public class SoSFImage extends SoSField<Object> {
     final SbVec2s             size = new SbVec2s();           //!< Width and height of image
     private int         numComponents;  //!< Number of components per pixel
     private MemoryBuffer     bytes;          //!< Array of pixels
+    private boolean srgb = true;   //!< true if SRGB image
 
 	@Override
 	protected Object constructor() {
@@ -171,11 +172,11 @@ public void destructor()
 // Use: public
 
 public void
-setValue(final SbVec2s s, int nc, MemoryBuffer b) {
-	setValue(s,nc,b,false);
+setValue(final SbVec2s s, int nc, boolean srgb, MemoryBuffer b) {
+	setValue(s,nc, srgb, b,false);
 }
 public void
-setValue(final SbVec2s s, int nc, MemoryBuffer b, boolean dontCopy)
+setValue(final SbVec2s s, int nc, boolean srgb, MemoryBuffer b, boolean dontCopy)
 //
 ////////////////////////////////////////////////////////////////////////
 {
@@ -186,6 +187,7 @@ setValue(final SbVec2s s, int nc, MemoryBuffer b, boolean dontCopy)
 
     size.copyFrom(s);
     numComponents = nc;
+    this.srgb = srgb;
     
     int numBytes = (int)size.getValue()[0]*size.getValue()[1]*numComponents;
 
@@ -214,7 +216,7 @@ setValue(final SbVec2s s, int nc, MemoryBuffer b, boolean dontCopy)
 //
 // Use: public
 
-public MemoryBuffer getValue(final SbVec2s s, final int[] nc)
+public MemoryBuffer getValue(final SbVec2s s, final int[] nc, final boolean[] srgb)
 //
 ////////////////////////////////////////////////////////////////////////
 {
@@ -222,6 +224,7 @@ public MemoryBuffer getValue(final SbVec2s s, final int[] nc)
 
     s.copyFrom(size);
     nc[0] = numComponents;
+    srgb[0] = this.srgb;
     
     return bytes;
 }
@@ -239,8 +242,9 @@ public SoSFImage operator_equal(final SoSFImage f)
 {
     final SbVec2s s = new SbVec2s();
     final int[] nc = new int[1];
-    MemoryBuffer b = f.getValue(s, nc);
-    setValue(s, nc[0], b);
+    final boolean[] srgb = new boolean[1];
+    MemoryBuffer b = f.getValue(s, nc, srgb);
+    setValue(s, nc[0], srgb[0], b);
 
     return this;
 }
@@ -274,12 +278,13 @@ public boolean operator_equal_equal(
 //
 // Use: public
 
-public MemoryBuffer startEditing(final SbVec2s s, final int[] nc)
+public MemoryBuffer startEditing(final SbVec2s s, final int[] nc, final boolean[] srgb)
 //
 ////////////////////////////////////////////////////////////////////////
 {
     s.copyFrom(size);
     nc[0] = numComponents;
+    srgb[0] = this.srgb;
     return bytes;
 }
 

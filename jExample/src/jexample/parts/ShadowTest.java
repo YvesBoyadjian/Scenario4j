@@ -87,7 +87,7 @@ public class ShadowTest {
 			array[i] = -1;
 		}
 	    array[1] = array[3] = array[5] = 0;
-		tex.image.setValue(new SbVec2s((short)size,(short)size),3,MemoryBuffer.allocateFromByteArray(array));
+		tex.image.setValue(new SbVec2s((short)size,(short)size),3,true,MemoryBuffer.allocateFromByteArray(array));
 	    
 	    sep2.addChild(tex);
 	    

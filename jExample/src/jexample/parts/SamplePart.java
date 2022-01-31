@@ -5,47 +5,35 @@ import java.io.IOException;
 import java.net.URL;
 
 
+import com.jogamp.opengl.GL2;
 import jscenegraph.coin3d.fxviz.nodes.SoShadowGroup;
-import jscenegraph.coin3d.inventor.nodes.SoCoordinate3;
-import jscenegraph.coin3d.inventor.nodes.SoTexture2;
-import jscenegraph.coin3d.inventor.nodes.SoVertexProperty;
+import jscenegraph.coin3d.inventor.nodes.*;
+import jscenegraph.coin3d.shaders.inventor.nodes.SoShaderParameterMatrix;
+import jscenegraph.coin3d.shaders.inventor.nodes.SoShaderProgram;
+import jscenegraph.coin3d.shaders.inventor.nodes.SoShaderStateMatrixParameter;
 import jscenegraph.database.inventor.SbColor;
+import jscenegraph.database.inventor.SbMatrix;
 import jscenegraph.database.inventor.SbVec2f;
 import jscenegraph.database.inventor.SoDB;
+import jscenegraph.database.inventor.actions.SoGLRenderAction;
 import jscenegraph.database.inventor.actions.SoGLRenderAction.TransparencyType;
+import jscenegraph.database.inventor.elements.SoModelMatrixElement;
+import jscenegraph.database.inventor.elements.SoProjectionMatrixElement;
+import jscenegraph.database.inventor.elements.SoViewingMatrixElement;
 import jscenegraph.database.inventor.engines.SoElapsedTime;
-import jscenegraph.database.inventor.nodes.SoBaseColor;
-import jscenegraph.database.inventor.nodes.SoCamera;
-import jscenegraph.database.inventor.nodes.SoCone;
-import jscenegraph.database.inventor.nodes.SoCube;
-import jscenegraph.database.inventor.nodes.SoCylinder;
-import jscenegraph.database.inventor.nodes.SoDirectionalLight;
-import jscenegraph.database.inventor.nodes.SoDrawStyle;
-import jscenegraph.database.inventor.nodes.SoEnvironment;
-import jscenegraph.database.inventor.nodes.SoFile;
-import jscenegraph.database.inventor.nodes.SoGroup;
-import jscenegraph.database.inventor.nodes.SoIndexedFaceSet;
-import jscenegraph.database.inventor.nodes.SoIndexedTriangleStripSet;
-import jscenegraph.database.inventor.nodes.SoLightModel;
-import jscenegraph.database.inventor.nodes.SoMaterial;
-import jscenegraph.database.inventor.nodes.SoMaterialBinding;
-import jscenegraph.database.inventor.nodes.SoNode;
-import jscenegraph.database.inventor.nodes.SoPerspectiveCamera;
-import jscenegraph.database.inventor.nodes.SoPointLight;
-import jscenegraph.database.inventor.nodes.SoRotationXYZ;
-import jscenegraph.database.inventor.nodes.SoSeparator;
-import jscenegraph.database.inventor.nodes.SoSphere;
-import jscenegraph.database.inventor.nodes.SoText3;
-import jscenegraph.database.inventor.nodes.SoTextureCoordinate2;
-import jscenegraph.database.inventor.nodes.SoTranslation;
-import jscenegraph.database.inventor.nodes.SoTriangleStripSet;
+import jscenegraph.database.inventor.misc.SoState;
+import jscenegraph.database.inventor.nodes.*;
 import jscenegraph.freecad.SoFC;
 import jsceneviewerawt.inventor.qt.SoQt;
 import jsceneviewerawt.inventor.qt.SoQtCameraController;
 import jsceneviewerawt.inventor.qt.viewers.SoQtExaminerViewer;
 import jsceneviewerawt.inventor.qt.viewers.SoQtFullViewer;
+import org.lwjgl.opengl.GLDebugMessageCallback;
 
 import javax.swing.*;
+
+import static org.lwjgl.opengl.GL11C.glEnable;
+import static org.lwjgl.opengl.GL43C.*;
 
 public class SamplePart {
 
@@ -120,7 +108,13 @@ public class SamplePart {
     scene.ref();
 //    SoTransformManip manip = new SoTransformManip();
 //    scene.addChild (manip);
-    scene.addChild (new SoCube());
+
+	SoCube cube = new SoCube();
+	cube.height.setValue(0.5f);
+	cube.depth.setValue(0.5f);
+	cube.width.setValue(0.5f);
+
+    scene.addChild (cube);
     //scene.addChild (new SoCone());
     //scene.addChild (new SoSphere());
     return scene;
@@ -1339,15 +1333,99 @@ SoSeparator createPlanet2(float radius, float distance,
 
 				int style = 0;
 
-				SoQtExaminerViewer viewer = new SoQtExaminerViewer(SoQtFullViewer.BuildFlag.BUILD_ALL, SoQtCameraController.Type.BROWSER, frame.getContentPane(), style);
+				SoQtExaminerViewer viewer = new SoQtExaminerViewer(SoQtFullViewer.BuildFlag.BUILD_ALL, SoQtCameraController.Type.BROWSER, frame.getContentPane(), style) {
+					public void initializeGL(GL2 gl2) {
+						super.initializeGL(gl2);
+
+						int error = glGetError();
+						glEnable(GL_DEBUG_OUTPUT);
+						error = glGetError();
+						glDebugMessageCallback(new GLDebugMessageCallback() {
+							@Override
+							public void invoke(int i, int i1, int i2, int i3, int length, long message, long l1) {
+								System.err.println("OpenGL Error : "+ getMessage(length,message));
+							}
+						}, 0);
+						error = glGetError();
+						glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
+						error = glGetError();
+
+						final int[] vao = new int[1];
+						gl2.glGenVertexArrays(1,vao);
+						gl2.glBindVertexArray(vao[0]);
+
+						System.out.println("init");
+					}
+				};
 				//viewer.setColorBitDepth (10);
 				//viewer.setAntialiasing(true,4);
 
-				viewer.setHeadlight(false);
+				viewer.setHeadlight(true);
 
 				viewer.buildWidget(style);
 
-				viewer.setSceneGraph(/*createDemoScene()*//*Orbits.main()*/Shadows.main()/*ShadowTest.create()*//*Fog.getScene()*/);
+				SoSeparator mainSep = new SoSeparator();
+
+				SoShaderProgram program = new SoShaderProgram();
+
+				SoVertexShader vs = new SoVertexShader();
+
+				vs.sourceType.setValue(SoShaderObject.SourceType.GLSL_PROGRAM);
+				vs.sourceProgram.setValue(
+					"#version 330 core\n"+
+					"layout (location = 0) in vec3 aPos;\n"+
+							"uniform mat4 s4j_ModelViewMatrix;\n"+
+							"uniform mat4 s4j_ProjectionMatrix;\n"+
+					"void main()\n"+
+					"{\n"+
+					"gl_Position = s4j_ProjectionMatrix * s4j_ModelViewMatrix * vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"+
+					"}\n");
+
+				final SoShaderStateMatrixParameter mvs = new SoShaderStateMatrixParameter();
+				mvs.name.setValue("s4j_ModelViewMatrix");
+				mvs.matrixType.setValue(SoShaderStateMatrixParameter.MatrixType.MODELVIEW);
+
+				final SoShaderStateMatrixParameter ps = new SoShaderStateMatrixParameter();
+				ps.name.setValue("s4j_ProjectionMatrix");
+				ps.matrixType.setValue(SoShaderStateMatrixParameter.MatrixType.PROJECTION);
+
+				vs.parameter.set1Value(0, mvs);
+				vs.parameter.set1Value(1, ps);
+
+				program.shaderObject.set1Value(0, vs);
+
+				SoFragmentShader fs = new SoFragmentShader();
+
+				fs.sourceType.setValue(SoShaderObject.SourceType.GLSL_PROGRAM);
+				fs.sourceProgram.setValue(
+						"#version 330 core\n"+
+								"out vec4 FragColor;\n"+
+						"void main()\n"+
+								"{\n"+
+								"FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"+
+								"}\n"
+				);
+
+				program.shaderObject.set1Value(1, fs);
+
+				mainSep.addChild(program);
+
+				SoTexture2 texture2d = new SoTexture2();
+
+				texture2d.filename.setValue("C:\\Users\\boyadjian\\Pictures\\MountRainierIslandScreenShot.jpg");
+
+				mainSep.addChild(texture2d);
+
+				mainSep.addChild(createDemoScene());
+
+				SoTranslation translation = new SoTranslation();
+				translation.translation.setValue(0.3f,0.3f,0.3f);
+
+				mainSep.addChild(translation);
+
+				mainSep.addChild(createDemoScene());
+
+				viewer.setSceneGraph(mainSep/*Orbits.main()*//*Shadows.main()*//*ShadowTest.create()*//*Fog.getScene()*/);
 			}
 		frame.pack();
 		frame.setSize(800,600);

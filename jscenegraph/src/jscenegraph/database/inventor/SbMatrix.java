@@ -1287,7 +1287,7 @@ multLeft(final SbMatrix m)
 	 * Use this method to transform points from object coordinates to 
 	 * world coordinates. 
 	 * 
-	 * @param src
+	 * @param src_
 	 * @param dst
 	 */
 	public void 	multVecMatrix (final SbVec3f src_, final SbVec3f dst)  {
@@ -1309,6 +1309,30 @@ multLeft(final SbMatrix m)
 	          
 	          dst.setValue(x/w, y/w, z/w);
 	     	}
+
+
+/*!
+  \overload
+*/
+	public void
+	multVecMatrix(final SbVec4f src, final SbVec4f dst)
+	{
+		// Checks if the "this" matrix is equal to the identity matrix.  See
+		// also code comments at the start of SbMatrix::multRight().
+		if (IS_IDENTITY(this.matrix)) { dst.copyFrom(src); return; }
+
+  float[] t0 = (this).matrix[0];
+  float[] t1 = (this).matrix[1];
+  float[] t2 = (this).matrix[2];
+  float[] t3 = (this).matrix[3];
+
+		final SbVec4f s = new SbVec4f(src);
+
+		dst.s(0, (s.getX()*t0[0] + s.getY()*t1[0] + s.getZ()*t2[0] + s.getW()*t3[0]));
+		dst.s(1, (s.getX()*t0[1] + s.getY()*t1[1] + s.getZ()*t2[1] + s.getW()*t3[1]));
+		dst.s(2, (s.getX()*t0[2] + s.getY()*t1[2] + s.getZ()*t2[2] + s.getW()*t3[2]));
+		dst.s(3, (s.getX()*t0[3] + s.getY()*t1[3] + s.getZ()*t2[3] + s.getW()*t3[3]));
+	}
 
     //
      // Multiplies given row vector by matrix, giving vector result
@@ -1908,13 +1932,25 @@ public void jacobi3(final float[] evalues,
 
     /**
      * Java port
-     * @param i
+     * @param index
      * @return
      */
 	public float getValueAt(int index) {
 		int i = index / 4;
 		int j = index % 4;
 		
+		return matrix[i][j];
+	}
+
+	/**
+	 * Java port
+	 * @param index
+	 * @return
+	 */
+	public float getValueAt3(int index) {
+		int i = index / 3;
+		int j = index % 3;
+
 		return matrix[i][j];
 	}
 
@@ -1928,6 +1964,20 @@ public void jacobi3(final float[] evalues,
 			valueLinear[i] = getValueAt(i);
 		}
 		return valueLinear;
+	}
+
+	public float[] getValueLinear(float[] valueLinear) {
+		for(int i=0; i< 16;i++) {
+			valueLinear[i] = getValueAt(i);
+		}
+		return valueLinear;
+	}
+
+	public float[] getValueLinear3(float[] valueLinear3) {
+		for(int i=0; i< 9;i++) {
+			valueLinear3[i] = getValueAt3(i);
+		}
+		return valueLinear3;
 	}
 
 	public boolean operator_not_equal(SbMatrix value) {

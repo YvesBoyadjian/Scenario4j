@@ -179,7 +179,8 @@ public class SoVRMLPixelTexture extends SoVRMLTexture {
 
         final int[] nc = new int[1];
         final SbVec2s size = new SbVec2s();
-   final MemoryBuffer bytes = this.image.getValue(size, nc);
+        final boolean[] srgb = new boolean[1];
+   final MemoryBuffer bytes = this.image.getValue(size, nc, srgb);
 
         if (size.operator_equal_equal(new SbVec2s((short)0, (short)0))) {
             SoMultiTextureEnabledElement.set(state, this, unit, false);
@@ -223,8 +224,9 @@ public class SoVRMLPixelTexture extends SoVRMLTexture {
         if (!pimpl.glimagevalid) {
         final int[] nc = new int[1];
         final SbVec2s size = new SbVec2s();
+        final boolean[] srgb = new boolean[1];
     final MemoryBuffer bytes =
-                this.image.getValue(size, nc);
+                this.image.getValue(size, nc, srgb);
         SoTextureScalePolicyElement.Policy scalepolicy =
                 SoTextureScalePolicyElement.get(state);
         boolean needbig = (scalepolicy == SoTextureScalePolicyElement.Policy.FRACTURE);
@@ -247,7 +249,7 @@ public class SoVRMLPixelTexture extends SoVRMLTexture {
         }
 
         if (bytes != null && size.operator_not_equal(new SbVec2s((short)0,(short)0))) {
-            pimpl.glimage.setData(bytes, size, nc[0],
+            pimpl.glimage.setData(bytes, size, nc[0],srgb[0],
                     pixeltexture_translate_wrap(this.repeatS.getValue()),
             pixeltexture_translate_wrap(this.repeatT.getValue()),
             quality);

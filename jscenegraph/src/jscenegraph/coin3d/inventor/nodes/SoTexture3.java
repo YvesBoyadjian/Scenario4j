@@ -288,7 +288,8 @@ GLRender(SoGLRenderAction  action)
   if (!this.glimagevalid) {
     final int[] nc = new int[1];
     final SbVec3s size = new SbVec3s();
-    final MemoryBuffer bytes = this.images.getValue(size, nc);
+    final boolean[] srgb = new boolean[1];
+    final MemoryBuffer bytes = this.images.getValue(size, nc, srgb);
     //FIXME: 3D support in SoGLBigImage (kintel 20011113)
 //      SbBool needbig =
 //        SoTextureScalePolicyElement::get(state) ==
@@ -315,7 +316,7 @@ GLRender(SoGLRenderAction  action)
     }
 
     if (bytes != null && size.operator_not_equal(new SbVec3s((short)0,(short)0,(short)0))) {
-      this.glimage.setData(bytes, size, nc[0],
+      this.glimage.setData(bytes, size, nc[0],srgb[0],
                              translateWrap(SoTexture3.Wrap.fromValue(this.wrapS.getValue())),
                              translateWrap(SoTexture3.Wrap.fromValue(this.wrapT.getValue())),
                              translateWrap(SoTexture3.Wrap.fromValue(this.wrapR.getValue())),
@@ -351,7 +352,8 @@ SoTexture3_doAction(SoAction action)
 
   final int[] nc = new int[1];
   final SbVec3s size = new SbVec3s();
-  final MemoryBuffer bytes = this.images.getValue(size, nc);
+  final boolean[] srgb = new boolean[1];
+  final MemoryBuffer bytes = this.images.getValue(size, nc, srgb);
 
   if (size.operator_not_equal(new SbVec3s((short)0,(short)0,(short)0))) {
     SoMultiTextureImageElement.set(state, this, unit,
@@ -461,7 +463,8 @@ loadFilenames(SoInput  in)
       if (tmpimage.readFile(filename, sl.getArrayPtr(), sl.getLength())) {
         final int[] nc = new int[1];
         final SbVec3s size = new SbVec3s();
-        MemoryBuffer imgbytes = tmpimage.getValue(size, nc);
+        final boolean[] srgb = new boolean[1];
+        MemoryBuffer imgbytes = tmpimage.getValue(size, nc, srgb);
         if (size.getValue()[2]==0) size.getValue()[2]=1;
         if (this.images.isDefault()) { // First time => allocate memory
           volumeSize.setValue(size.getValue()[0],
@@ -493,7 +496,7 @@ loadFilenames(SoInput  in)
           // filenames as a notify will cause a filenames.setDefault(TRUE).
           boolean oldnotify = this.images.enableNotify(false);
           MemoryBuffer volbytes = this.images.startEditing(volumeSize,
-                                                              volumenc);
+                                                              volumenc, srgb);
           Util.memcpy(volbytes,(int)(size.getValue()[0])*(int)(size.getValue()[1])*(int)(size.getValue()[2])*nc[0]*n,
                  imgbytes, (int)(size.getValue()[0])*(int)(size.getValue()[1])*(int)(size.getValue()[2])*nc[0]);
           this.images.finishEditing();

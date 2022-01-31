@@ -65,7 +65,8 @@ public class SoSFImage3 extends SoSField<SbImage> {
 
   // allocate image data and get new pointer back
   value.setValue(size, nc[0], null);
-  MemoryBuffer pixblock = value.getValue(size, nc);
+  final boolean[] srgb = new boolean[1];
+  MemoryBuffer pixblock = value.getValue(size, nc, srgb);
 
   // The binary image format of 2.1 and later tries to be less
   // wasteful when storing images.
@@ -98,9 +99,9 @@ public class SoSFImage3 extends SoSField<SbImage> {
   \a nc to the number of components in the image.
 */
 public MemoryBuffer
-getValue(final SbVec3s size, final int[]  nc) 
+getValue(final SbVec3s size, final int[]  nc, final boolean[] srgb)
 {
-  return this.value.getValue(size, nc);
+  return this.value.getValue(size, nc, srgb);
 }
 
 	/*!
@@ -128,9 +129,9 @@ setValue(final SbVec3s size, int nc,
   until you call finishEditing().
 */
 public MemoryBuffer
-startEditing(final SbVec3s size, final int[] nc)
+startEditing(final SbVec3s size, final int[] nc, final boolean[] srgb)
 {
-  return this./*image*/value.getValue(size, nc);
+  return this./*image*/value.getValue(size, nc, srgb);
 }
 
 /*!

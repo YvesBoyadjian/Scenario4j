@@ -52,8 +52,8 @@ public class SoVolumetricShadowGroupP extends SoShadowGroupP {
         if(!getMaster().isVolumetricActive.getValue()) {
             return;
         }
-        gen.addMainStatement("sunDirection = normalize(vec3(gl_LightSource["+index+"].position));");
-        gen.addMainStatement("g_SunColor = gl_LightSource["+index+"].diffuse.rgb;");
+        gen.addMainStatement("sunDirection = normalize(vec3(s4j_LightSource["+index+"].position));");
+        gen.addMainStatement("g_SunColor = s4j_LightSource["+index+"].diffuse.rgb;");
         //gen.addMainStatement("g_ShadowViewProjectionMatrix = gl_TextureMatrix["+texunit+"];");
         gen.addMainStatement("g_ShadowViewProjectionMatrix = textureMatrix"+shadowlightnumber+";");
 
@@ -80,7 +80,7 @@ public class SoVolumetricShadowGroupP extends SoShadowGroupP {
         gen.addMainStatement("  currentPosition += step;");
         gen.addMainStatement("}");
         gen.addMainStatement("accumFog /= NB_STEPS;");
-        gen.addMainStatement("colorFog += accumFog * rayLength * gl_Fog.density;\n");
+        gen.addMainStatement("colorFog += accumFog * rayLength * s4j_Fog.density;\n");
     }
 
     protected void endFragmentShader(SoShaderGenerator gen, SoEnvironmentElement.FogType fogType) {
@@ -96,8 +96,8 @@ public class SoVolumetricShadowGroupP extends SoShadowGroupP {
             case HAZE:
                 break;
             case FOG:
-                gen.addMainStatement("float fog = exp(-gl_Fog.density * abs(ecPosition3.z));");
-                gen.addMainStatement("color = mix(gl_Fog.color.rgb, color, clamp(fog, 0.0, 1.0));");
+                gen.addMainStatement("float fog = exp(-s4j_Fog.density * abs(ecPosition3.z));");
+                gen.addMainStatement("color = mix(s4j_Fog.color.rgb, color, clamp(fog, 0.0, 1.0));");
                 //gen.addMainStatement("color = color * clamp(fog, 0.0, 1.0);");
                 gen.addMainStatement("color += colorFog;");
                 break;

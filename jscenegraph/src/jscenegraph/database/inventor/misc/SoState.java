@@ -481,6 +481,7 @@ public class SoState implements Destroyable {
 				assert(prev != null);
 				prev.pop(this, elem);
 				this.stack[idx] = prev;
+				prev.postPop(this);
 			}
 		}
 		pimpl.pushstore.elements.truncate(0);

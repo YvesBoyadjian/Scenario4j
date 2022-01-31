@@ -1072,8 +1072,8 @@ beginTraversal(SoNode node)
 
     // we are always using GL_COLOR_MATERIAL in Coin
     gl2.glColorMaterial(GL2.GL_FRONT_AND_BACK, GL2.GL_DIFFUSE);
-    gl2.glEnable(GL2.GL_COLOR_MATERIAL);
-    gl2.glEnable(GL2.GL_NORMALIZE);
+    //gl2.glEnable(GL2.GL_COLOR_MATERIAL); CORE
+    //gl2.glEnable(GL2.GL_NORMALIZE); CORE
 
     // initialize the depth function to the default Coin/Inventor
     // value.  SoGLDepthBufferElement doesn't check for this, it just
@@ -1088,7 +1088,7 @@ beginTraversal(SoNode node)
       gl2.glEnable(GL_LINE_SMOOTH);
     }
     else {
-      gl2.glDisable(GL_POINT_SMOOTH);
+      //gl2.glDisable(GL_POINT_SMOOTH); CORE
       gl2.glDisable(GL_LINE_SMOOTH);
     }
   }

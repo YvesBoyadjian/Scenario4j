@@ -132,11 +132,11 @@ public class SoQtRenderArea extends SoQtGLWidget {
 	    glf.depthSize = 24;
 	    glf.doubleBuffer = true;
 	    // YB : must be compatible with software rendering Mesa3D for Windows, and Linux on VirtualBox
-	    glf.majorVersion = 2;//4; 
-	    glf.minorVersion = 1;//0;
+	    glf.majorVersion = 4;//2;
+	    glf.minorVersion = 0;//1;
 	    glf.api = GLData.API.GL;
-	    //glf.profile = GLData.Profile.COMPATIBILITY; //no profile for 3.1
-	    glf.debug = false; //true; debug profile not always available in Linux
+	    glf.profile = GLData.Profile.CORE;//COMPATIBILITY; //no profile for 3.1
+	    glf.debug = true;// false; //true; debug profile not always available in Linux
 	    // Call setFormat from parent class to avoid early construction of decoration which will fail
 	    super.setFormat(glf);
 

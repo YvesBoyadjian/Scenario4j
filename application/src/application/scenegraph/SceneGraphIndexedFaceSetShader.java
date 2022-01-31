@@ -570,6 +570,10 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 	    environment.fogVisibility.setValue(5e4f);
 	    
 	    sep.addChild(environment);
+
+	    SoComplexity complexity = new SoComplexity();
+	    complexity.textureQuality.setValue(0.9f);
+	    sep.addChild(complexity);
 	    
 	    SoDepthBuffer depthBuffer1 = new SoDepthBuffer();
 	    depthBuffer1.clamp.setValue(true);
@@ -881,7 +885,7 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 
 		//douglasTexture.image.setValue(s3, nc, b3);
 		if (null!=b1) {
-			douglasTexture.image.setValue(s1, nc, b1);
+			douglasTexture.image.setValue(s1, nc, false, b1);
 		}
 	    douglasSep.addChild(transl);
 
@@ -1009,6 +1013,11 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 			};
 			targetsSeparator.setReferencePoint(targetsRefPoint);
 			targetsSeparator.setCameraDirection(cameraDirection);
+
+			SoBaseColor targetsColor = new SoBaseColor();
+			targetsColor.rgb.setValue(1,1,1);
+			targetsSeparator.addChild(targetsColor);
+
 		//sealsSeparator.renderCaching.setValue(SoSeparator.CacheEnabled.ON);
 		
 		//SoTranslation sealsTranslation = new SoTranslation();
@@ -2077,8 +2086,9 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 						newGigaTexture.ref();
 						final SbVec2s s = new SbVec2s();
 						final int[] nc = new int[1];
-						MemoryBuffer mb = newGigaTexture.image.getValue(s,nc);
-						gigaTexture.image.setValue(s,nc[0],mb, true);
+						final boolean[] srgb = new boolean[1];
+						MemoryBuffer mb = newGigaTexture.image.getValue(s,nc,srgb);
+						gigaTexture.image.setValue(s,nc[0],srgb[0],mb, true);
 						newGigaTexture.unref();
 					});
 				}
@@ -2491,8 +2501,10 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 		return trails.size();
 	}
 
+	final SbSphere nearSphere = new SbSphere(new SbVec3f(), 2.1f);
+
 	public boolean isNearTrails(SbVec3f point) {
-		final SbSphere nearSphere = new SbSphere(point, 2.1f);
+		nearSphere.setValue(point, 2.1f);
 		final SbListInt points = new SbListInt();
 		trailsBSPTree.findPoints(nearSphere, points);
 		return points.size() > 0;

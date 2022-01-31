@@ -227,7 +227,7 @@ public static void urlSensorCB(Object data, SoSensor sensor)
         //cc_sched_wait_all(SoVRMLImageTextureP::scheduler); TODO YB
       }
 
-      thisp.pimpl.image.setValuePtr(new SbVec2s((short)0,(short)0), 0, (MemoryBuffer)null); // YB java port
+      thisp.pimpl.image.setValuePtr(new SbVec2s((short)0,(short)0), 0, false, (MemoryBuffer)null); // YB java port
     }
   }
 }

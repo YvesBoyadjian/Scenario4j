@@ -138,5 +138,14 @@ public class SbVec2fArray extends Indexable<SbVec2f> implements FloatBufferAble,
 		Destroyable.delete(valuesArray);
 		valuesArray = null;
 	}
-	
+
+
+	public int getSizeFloat() {
+		return valuesArray.numFloats() - delta*2;
+	}
+
+	public long sizeof() {
+		return getSizeFloat()*Float.BYTES;
+	}
+
 }

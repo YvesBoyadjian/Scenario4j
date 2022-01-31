@@ -102,11 +102,24 @@ package jscenegraph.database.inventor.nodes;
 import static com.jogamp.opengl.GL.GL_ARRAY_BUFFER;
 import static com.jogamp.opengl.GL.GL_FLOAT;
 import static com.jogamp.opengl.GL.GL_UNSIGNED_BYTE;
+import static com.jogamp.opengl.GL2.GL_LIGHTING_BIT;
 import static com.jogamp.opengl.fixedfunc.GLPointerFunc.GL_COLOR_ARRAY;
 import static com.jogamp.opengl.fixedfunc.GLPointerFunc.GL_NORMAL_ARRAY;
 import static com.jogamp.opengl.fixedfunc.GLPointerFunc.GL_TEXTURE_COORD_ARRAY;
 import static com.jogamp.opengl.fixedfunc.GLPointerFunc.GL_VERTEX_ARRAY;
+import static jscenegraph.coin3d.misc.SoGL.sogl_glue_instance;
+import static org.lwjgl.opengl.GL11.*;
 
+import jscenegraph.coin3d.inventor.elements.*;
+import jscenegraph.coin3d.inventor.elements.gl.SoGLMultiTextureImageElement;
+import jscenegraph.coin3d.inventor.misc.SoGLBigImage;
+import jscenegraph.coin3d.inventor.misc.SoGLImage;
+import jscenegraph.coin3d.shaders.SoGLSLShaderProgram;
+import jscenegraph.coin3d.shaders.SoGLShaderProgram;
+import jscenegraph.coin3d.shaders.inventor.elements.SoGLShaderProgramElement;
+import jscenegraph.coin3d.shaders.inventor.nodes.SoShaderProgram;
+import jscenegraph.database.inventor.*;
+import jscenegraph.database.inventor.elements.*;
 import org.lwjglx.util.glu.GLUtessellator;
 import org.lwjglx.util.glu.GLUtessellatorCallback;
 import org.lwjglx.util.glu.GLUtessellatorCallbackAdapter;
@@ -118,31 +131,12 @@ import com.jogamp.opengl.glu.gl2.GLUgl2;
 
 import jscenegraph.coin3d.fxviz.elements.SoShadowStyleElement;
 import jscenegraph.coin3d.glue.cc_glglue;
-import jscenegraph.coin3d.inventor.elements.SoGLMultiTextureEnabledElement;
-import jscenegraph.coin3d.inventor.elements.SoMultiTextureCoordinateElement;
-import jscenegraph.coin3d.inventor.elements.SoMultiTextureEnabledElement;
 import jscenegraph.coin3d.inventor.elements.gl.SoGLVertexAttributeElement;
 import jscenegraph.coin3d.inventor.lists.SbList;
 import jscenegraph.coin3d.inventor.lists.SbListInt;
 import jscenegraph.coin3d.inventor.misc.SoGLDriverDatabase;
 import jscenegraph.coin3d.inventor.threads.SbStorage;
 import jscenegraph.coin3d.misc.SoGL;
-import jscenegraph.database.inventor.SbBasic;
-import jscenegraph.database.inventor.SbBox2f;
-import jscenegraph.database.inventor.SbBox3f;
-import jscenegraph.database.inventor.SbColor;
-import jscenegraph.database.inventor.SbMatrix;
-import jscenegraph.database.inventor.SbTime;
-import jscenegraph.database.inventor.SbVec2f;
-import jscenegraph.database.inventor.SbVec2fSingle;
-import jscenegraph.database.inventor.SbVec2s;
-import jscenegraph.database.inventor.SbVec3f;
-import jscenegraph.database.inventor.SbVec3fSingle;
-import jscenegraph.database.inventor.SbVec4f;
-import jscenegraph.database.inventor.SbXfBox3f;
-import jscenegraph.database.inventor.SoPickedPoint;
-import jscenegraph.database.inventor.SoPrimitiveVertex;
-import jscenegraph.database.inventor.SoType;
 import jscenegraph.database.inventor.actions.SoAction;
 import jscenegraph.database.inventor.actions.SoCallbackAction;
 import jscenegraph.database.inventor.actions.SoGLRenderAction;
@@ -154,21 +148,6 @@ import jscenegraph.database.inventor.caches.SoBoundingBoxCache;
 import jscenegraph.database.inventor.details.SoDetail;
 import jscenegraph.database.inventor.details.SoFaceDetail;
 import jscenegraph.database.inventor.details.SoPointDetail;
-import jscenegraph.database.inventor.elements.SoCacheElement;
-import jscenegraph.database.inventor.elements.SoComplexityElement;
-import jscenegraph.database.inventor.elements.SoComplexityTypeElement;
-import jscenegraph.database.inventor.elements.SoCoordinateElement;
-import jscenegraph.database.inventor.elements.SoDrawStyleElement;
-import jscenegraph.database.inventor.elements.SoGLCacheContextElement;
-import jscenegraph.database.inventor.elements.SoGLLazyElement;
-import jscenegraph.database.inventor.elements.SoLazyElement;
-import jscenegraph.database.inventor.elements.SoModelMatrixElement;
-import jscenegraph.database.inventor.elements.SoPickStyleElement;
-import jscenegraph.database.inventor.elements.SoProjectionMatrixElement;
-import jscenegraph.database.inventor.elements.SoShapeHintsElement;
-import jscenegraph.database.inventor.elements.SoShapeStyleElement;
-import jscenegraph.database.inventor.elements.SoViewingMatrixElement;
-import jscenegraph.database.inventor.elements.SoViewportRegionElement;
 import jscenegraph.database.inventor.errors.SoDebugError;
 import jscenegraph.database.inventor.fields.SoFieldData;
 import jscenegraph.database.inventor.misc.SoNotList;
@@ -334,18 +313,31 @@ public abstract class SoShape extends SoNode implements Destroyable {
     }
   } else {
 	  gl2.glVertexPointer(3, GL_FLOAT, 0, vertexOffset);
+	  gl2.glVertexAttribPointer(0,3,GL_FLOAT,false,0, vertexOffset);
+
     gl2.glEnableClientState(GL_VERTEX_ARRAY);
+    gl2.glEnableVertexAttribArray(0);
+
     if (useNormals) {
     	gl2.glNormalPointer(GL_FLOAT, 0, normalOffset);
+    	gl2.glVertexAttribPointer(1,3,GL_FLOAT,false,0,normalOffset);
+
       gl2.glEnableClientState(GL_NORMAL_ARRAY);
+      gl2.glEnableVertexAttribArray(1);
     }
     if (useTexCoords) {
     	gl2.glTexCoordPointer(2, GL_FLOAT, 0, texCoordOffset);
+    	gl2.glVertexAttribPointer(2,2,GL_FLOAT,false,0,texCoordOffset);
+
       gl2.glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+      gl2.glEnableVertexAttribArray(2);
     }
     if (useColors) {
     	gl2.glColorPointer(4, GL_UNSIGNED_BYTE, 0, colorOffset);
+    	gl2.glVertexAttribPointer(3,4,GL_FLOAT,false,0,colorOffset);
+
       gl2.glEnableClientState(GL_COLOR_ARRAY);
+      gl2.glEnableVertexAttribArray(3);
     }
   }
       
@@ -369,14 +361,18 @@ public abstract class SoShape extends SoNode implements Destroyable {
     }
   } else {
 	  gl2.glDisableClientState(GL_VERTEX_ARRAY);
+      gl2.glDisableVertexAttribArray(0);
     if (useNormals) {
     	gl2.glDisableClientState(GL_NORMAL_ARRAY);
+        gl2.glDisableVertexAttribArray(1);
     }
     if (useTexCoords) {
     	gl2.glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+        gl2.glDisableVertexAttribArray(2);
     }
     if (useColors) {
     	gl2.glDisableClientState(GL_COLOR_ARRAY);
+        gl2.glDisableVertexAttribArray(3);
     }
   }      
       }
@@ -631,10 +627,18 @@ SoShape_shouldGLRender(SoGLRenderAction action) // YB FIXME : use COIN3D version
         SoDrawStyleElement.Style.INVISIBLE)
         return false;
 
+        if (pimpl.bboxcache != null && !state.isCacheOpen() && !SoCullElement.completelyInside(state)) {
+        if (pimpl.bboxcache.isValid(state)) {
+            if (SoCullElement.cullTest(state, pimpl.bboxcache.getProjectedBox())) {
+                return false;
+            }
+        }
+    }
+
     boolean transparent = (shapestyleflags & (SoShapeStyleElement.Flags.TRANSP_TEXTURE.getValue()|
             SoShapeStyleElement.Flags.TRANSP_MATERIAL.getValue())) != 0;
 
-    
+
     if ((shapestyleflags & SoShapeStyleElement.Flags.SHADOWMAP.getValue())!=0) {
         if (transparent) return false;
         int style = SoShadowStyleElement.get(state);
@@ -659,6 +663,280 @@ SoShape_shouldGLRender(SoGLRenderAction action) // YB FIXME : use COIN3D version
     return true;
 }
 
+///*!
+//  \COININTERNAL
+//*/
+//    protected boolean
+//    SoShape_shouldGLRender(SoGLRenderAction action)
+//    {
+//        SoState state = action.getState();
+//
+//        SoShapeStyleElement shapestyle = SoShapeStyleElement.get(state);
+//        int shapestyleflags = shapestyle.getFlags();
+//
+//        if ((shapestyleflags & SoShapeStyleElement.Flags.INVISIBLE.getValue())!=0)
+//            return false;
+//
+//        if (pimpl.bboxcache != null && !state.isCacheOpen() && !SoCullElement.completelyInside(state)) {
+//        if (pimpl.bboxcache.isValid(state)) {
+//            if (SoCullElement.cullTest(state, pimpl.bboxcache.getProjectedBox())) {
+//                return false;
+//            }
+//        }
+//    }
+//
+//        boolean transparent = (shapestyleflags & (SoShapeStyleElement.Flags.TRANSP_TEXTURE.getValue()|
+//                SoShapeStyleElement.Flags.TRANSP_MATERIAL.getValue())) != 0;
+//
+//        if ((shapestyleflags & SoShapeStyleElement.Flags.SHADOWMAP.getValue())!=0) {
+//            if (transparent) return false;
+//            int style = SoShadowStyleElement.get(state);
+//            if ((style & SoShadowStyleElement.StyleFlags.CASTS_SHADOW.getValue())!=0) return true;
+//            return false;
+//        }
+//
+//        if (action.handleTransparency(transparent))
+//            return false;
+//
+//        if ((shapestyleflags & SoShapeStyleElement.Flags.BBOXCMPLX.getValue())!=0) {
+//            this.GLRenderBoundingBox(action);
+//            return false;
+//        }
+//
+//        // test if we should sort triangles before rendering
+//        if (transparent && (shapestyleflags & SoShapeStyleElement.Flags.TRANSP_SORTED_TRIANGLES.getValue())!=0) {
+//            // lock since pvcache is shared among all threads
+//            pimpl.lock();
+//            this.validatePVCache(action);
+//
+//            int arrays = SoPrimitiveVertexCache::NORMAL|SoPrimitiveVertexCache::COLOR;
+//            SoGLMultiTextureImageElement.Model model;
+//            final SbColor blendcolor = new SbColor();
+//            SoGLImage glimage = SoGLMultiTextureImageElement.get(state, 0, model, blendcolor);
+//            if (glimage != null) arrays |= SoPrimitiveVertexCache::TEXCOORD;
+//
+//            final SoMaterialBundle mb = new SoMaterialBundle(action);
+//            mb.sendFirst();
+//            pimpl.setupShapeHints(this, state);
+//            pimpl.pvcache.depthSortTriangles(state);
+//            pimpl.pvcache.renderTriangles(state, arrays);
+//            if (pimpl.pvcache.getNumLineIndices() ||
+//                    pimpl.pvcache.getNumPointIndices()) {
+//      SoNormalElement nelem = SoNormalElement.getInstance(state);
+//                if (nelem.getNum() == 0) {
+//                    glPushAttrib(GL_LIGHTING_BIT);
+//                    glDisable(GL_LIGHTING);
+//                    arrays &= SoPrimitiveVertexCache::NORMAL;
+//                }
+//                pimpl.pvcache.renderLines(state, arrays);
+//                pimpl.pvcache.renderPoints(state, arrays);
+//
+//                if (nelem.getNum() == 0) {
+//                    glPopAttrib();
+//                }
+//            }
+//            pimpl.unlock();
+//            mb.destructor();
+//            return false; // tell shape _not_ to render
+//        }
+//
+//        if ((shapestyleflags & SoShapeStyleElement.Flags.BIGIMAGE.getValue())!=0) {
+//            final SoGLMultiTextureImageElement.Model[] model = new SoGLMultiTextureImageElement.Model[1];
+//            final SbColor blendcolor = new SbColor();
+//            SoGLImage glimage = SoGLMultiTextureImageElement.get(state, 0, model, blendcolor);
+//            if (glimage != null &&
+//                    glimage.isOfType(SoGLBigImage.getClassTypeId()) &&
+//            SoGLMultiTextureEnabledElement.get(state, 0)) {
+//
+//                // don't attempt to cache bigimage shapes
+//                if (state.isCacheOpen()) {
+//                    SoCacheElement.invalidate(state);
+//                }
+//                SoGLCacheContextElement.shouldAutoCache(state,
+//                        SoGLCacheContextElement.AutoCache.DONT_AUTO_CACHE.getValue());
+//
+//                soshape_staticdata shapedata = soshape_get_staticdata();
+//
+//                // do this before generating triangles to get correct
+//                // material for lines and point (only triangles are handled for now).
+//                final SoMaterialBundle mb = new SoMaterialBundle(action);
+//                mb.sendFirst();
+//                shapedata.currentbundle = mb; //ptr
+//
+//                SoGLBigImage big = (SoGLBigImage) glimage;
+//
+//                shapedata.rendermode = SoShapeRenderMode.BIGTEXTURE.getValue();
+//
+//                soshape_bigtexture bigtex = soshape_get_bigtexture(shapedata, action.getCacheContext());
+//                shapedata.currentbigtexture = bigtex;
+//                bigtex.beginShape(big, SoTextureQualityElement.get(state));
+//                this.generatePrimitives(action);
+//                // endShape() returns whether more/less detailed textures need to be
+//                // fetched. We force a redraw if this is needed.
+//                if (bigtex.endShape(state, this, mb) == false) {
+//                    action.getCurPath().getHead().touch();
+//                }
+//                shapedata.rendermode = SoShapeRenderMode.NORMAL.getValue();
+//
+//                mb.destructor();
+//                return false;
+//            }
+//        }
+//
+//    cc_glglue glue = sogl_glue_instance(state);
+//
+//        if ((shapestyleflags & SoShapeStyleElement.Flags.BUMPMAP.getValue())!=0) {
+//    SoNodeList lights = SoLightElement.getLights(state);
+//            if (lights.getLength() != 0) {
+//                // lock since bumprender and pvcache is shared among all threads
+//                pimpl.lock();
+//                if (pimpl.bumprender == null) {
+//                    pimpl.bumprender = new soshape_bumprender();
+//                }
+//                this.validatePVCache(action);
+//                if (pimpl.pvcache.getNumTriangleIndices() == 0) {
+//                    pimpl.unlock();
+//                    return true;
+//                }
+//                SoGLLazyElement.getInstance(state).send(state, SoLazyElement.masks.ALL_MASK.getValue());
+//
+//                glPushAttrib(GL_DEPTH_BUFFER_BIT);
+//                glDepthFunc(GL_LEQUAL);
+//                glDisable(GL_LIGHTING);
+//
+//                glColor3f(1.0f, 1.0f, 1.0f);
+//                pimpl.setupShapeHints(this, state);
+//      int numlights = lights.getLength();
+//                for (int i = 0; i < numlights; i++) {
+//                    // fetch matrix that convert the light from its object space
+//                    // to the OpenGL world space
+//                    SbMatrix lm = new SbMatrix(SoLightElement.getMatrix(state, i));
+//
+//                    // convert light back to this objects' object space
+//                    SbMatrix m = SoModelMatrixElement.get(state).operator_mul(
+//                            SoViewingMatrixElement.get(state));
+//                    m = m.inverse();
+//                    m.multLeft(lm);
+//
+//
+//                    // bumprender is shared among all threads, so we need to lock
+//                    // when we get here since some internal arrays are used while
+//                    // rendering
+//                    //
+//                    // FIXME: about the above comment; i don't see any locking...?
+//                    // -mortene.
+//                    pimpl.bumprender.renderBump(state, pimpl.pvcache,
+//                            (SoLight) lights.operator_square_bracket(i), m);
+//
+//                    if (i == 0) glEnable(GL_BLEND);
+//                    if (i == numlights-1) {
+//                        glBlendFunc(GL_DST_COLOR, GL_ZERO);
+//                    }
+//                    else if (i == 0) {
+//                        glBlendFunc(GL_ONE, GL_ONE);
+//                    }
+//                }
+//
+//
+//                SoGLLazyElement.getInstance(state).reset(state,
+//                        SoLazyElement.masks.DIFFUSE_MASK.getValue());
+//                final SoMaterialBundle mb = new SoMaterialBundle(action);
+//                mb.sendFirst();
+//                pimpl.setupShapeHints(this, state);
+//                pimpl.bumprender.renderNormal(state, pimpl.pvcache);
+//
+//      SbColor spec = new SbColor(SoLazyElement.getSpecular(state));
+//                if (spec.getX() != 0 || spec.getY() != 0 || spec.getZ() != 0) { // Is the spec. color black?
+//
+//                    // Can the hardware do specular bump maps?
+//                    if (glue.has_arb_fragment_program &&
+//                            glue.has_arb_vertex_program) {
+//
+//                        SoGLLazyElement.getInstance(state).reset(state,
+//                                SoLazyElement.masks.DIFFUSE_MASK.getValue());
+//                        glEnable(GL_BLEND);
+//                        glBlendFunc(GL_ONE, GL_ONE);
+//
+//                        for (int i = 0; i < numlights; i++) {
+//                            SbMatrix lm = new SbMatrix(SoLightElement.getMatrix(state, i));
+//                            SbMatrix m = SoModelMatrixElement.get(state).operator_mul(
+//                                    SoViewingMatrixElement.get(state));
+//                            m = m.inverse();
+//                            m.multLeft(lm);
+//                            pimpl.bumprender.renderBumpSpecular(state, pimpl.pvcache,
+//                                    (SoLight) lights.operator_square_bracket(i), m);
+//                        }
+//                    }
+//
+//                }
+//
+//
+//                pimpl.unlock();
+//
+//                glPopAttrib();
+//                // we used two units in the bumpmap code
+//                SoGLMultiTextureImageElement.restore(state, 0);
+//                SoGLMultiTextureImageElement.restore(state, 1);
+//                SoGLLazyElement.getInstance(state).reset(state,
+//                        SoLazyElement.masks.LIGHT_MODEL_MASK.getValue()|
+//                                SoLazyElement.masks.BLENDING_MASK.getValue());
+//
+//                mb.destructor();
+//                return false;
+//            }
+//        }
+//
+//
+//        if ((shapestyleflags & SoShapeStyleElement.Flags.VERTEXARRAY.getValue())!=0) {
+//            // lock since pvcache is shared among all threads
+//            pimpl.lock();
+//            this.validatePVCache(action);
+//            pimpl.unlock();
+//
+//            SoGLCacheContextElement.shouldAutoCache(state,
+//                    SoGLCacheContextElement.AutoCache.DONT_AUTO_CACHE.getValue());
+//            int arrays = SoPrimitiveVertexCache::NORMAL|SoPrimitiveVertexCache::COLOR;
+//            final SoGLMultiTextureImageElement.Model[] model = new SoMultiTextureImageElement.Model[1];
+//            final SbColor blendcolor = new SbColor();
+//            SoGLImage glimage = SoGLMultiTextureImageElement.get(state, 0, model, blendcolor);
+//            if (glimage != null) arrays |= SoPrimitiveVertexCache::TEXCOORD;
+//            final SoMaterialBundle mb = new SoMaterialBundle(action);
+//            mb.sendFirst();
+//            pimpl.setupShapeHints(this, state);
+//            pimpl.pvcache.renderTriangles(state, arrays);
+//            if (pimpl.pvcache.getNumLineIndices() ||
+//                    pimpl.pvcache.getNumPointIndices()) {
+//      SoNormalElement nelem = SoNormalElement.getInstance(state);
+//                if (nelem.getNum() == 0) {
+//                    glPushAttrib(GL_LIGHTING_BIT);
+//                    glDisable(GL_LIGHTING);
+//                    arrays &= SoPrimitiveVertexCache::NORMAL;
+//                }
+//                pimpl.pvcache.renderLines(state, arrays);
+//                pimpl.pvcache.renderPoints(state, arrays);
+//
+//                if (nelem.getNum() == 0) {
+//                    glPopAttrib();
+//                }
+//            }
+//            mb.destructor();
+//            // we have rendered, return FALSE
+//            return false;
+//        }
+//
+////#if COIN_DEBUG && 0 // enable this to test generatePrimitives() rendering
+////        SoMaterialBundle mb(action);
+////        mb.sendFirst();
+////        soshape_get_staticdata().currentbundle = &mb;  // needed in the primitive callbacks
+////        this.generatePrimitives(action);
+////        return FALSE;
+////#else // generatePrimitives() rendering
+//        if (pimpl.rendercnt < ((1<<SoShapeP::RENDERCNT_BITS)-1)) {
+//        pimpl.rendercnt++;
+//    }
+//        return true; // let the shape node render the geometry using OpenGL
+////#endif // ! generatePrimitives() rendering
+//    }
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -1734,7 +2012,7 @@ public void
 getBBox(SoAction action, final SbBox3f box, final SbVec3f center)
 {
   SoState state = action.getState();
-  boolean isvalid = pimpl.bboxcache != null && pimpl.bboxcache.isValid(state);
+  boolean isvalid = (pimpl.bboxcache != null) && pimpl.bboxcache.isValid(state);
   if (isvalid) {
     box.copyFrom(pimpl.bboxcache.getProjectedBox());
     // we know center will be set, so just fetch it from the cache
@@ -1989,7 +2267,7 @@ startVertexArray(SoGLRenderAction action,
                           boolean colorpervertex)
 {
   SoState state = action.getState();
-  final cc_glglue glue = SoGL.sogl_glue_instance(state);
+  final cc_glglue glue = sogl_glue_instance(state);
   final SoGLVBOElement vboelem = SoGLVBOElement.getInstance(state);
   final int contextid = action.getCacheContext();
 
@@ -2021,12 +2299,25 @@ startVertexArray(SoGLRenderAction action,
     }
     if (colorvbo != null) {
       SoGL.cc_glglue_glColorPointer(glue, 4, GL_UNSIGNED_BYTE, 0, dataptr);
+
+      glue.glVertexAttribPointerARB(3,4, GL_UNSIGNED_BYTE,true, 0, dataptr);
     }
     else {
       SoGL.cc_glglue_glColorPointer(glue, 3, GL_FLOAT, 0, dataptr);
     }
     SoGL.cc_glglue_glEnableClientState(glue, GL_COLOR_ARRAY);
+
+    glue.glEnableVertexAttribArrayARB(3);
+
+    int pHandle = SoGLShaderProgramElement.get(state).getGLSLShaderProgramHandle(state);
+    if(pHandle >0 ) {
+        int perVertexLocation = state.getGL2().glGetUniformLocation(pHandle, "s4j_PerVertexColor");
+        if (perVertexLocation >= 0) {
+            state.getGL2().glUniform1i(perVertexLocation, 1);
+        }
+    }
   }
+
   if (texpervertex) {
     SoMultiTextureCoordinateElement mtelem = null;
     boolean[] enabledunits = null;
@@ -2075,7 +2366,12 @@ startVertexArray(SoGLRenderAction action,
           }
         }
         SoGL.cc_glglue_glTexCoordPointer(glue, dim, GL_FLOAT, 0, tptr);
+
+        glue.glVertexAttribPointerARB(2,2,GL_FLOAT,GL_FALSE != 0,0,tptr);
+
         SoGL.cc_glglue_glEnableClientState(glue, GL_TEXTURE_COORD_ARRAY);
+
+        glue.glEnableVertexAttribArrayARB(2);
       }
     }
   }
@@ -2094,8 +2390,14 @@ startVertexArray(SoGLRenderAction action,
       }
     }
     SoGL.cc_glglue_glNormalPointer(glue, GL_FLOAT, 0, dataptr);
+
+    glue.glVertexAttribPointerARB(1,3,GL_FLOAT,GL_FALSE!=0,0,dataptr);
+
     SoGL.cc_glglue_glEnableClientState(glue, GL_NORMAL_ARRAY);
+
+    glue.glEnableVertexAttribArrayARB(1);
   }
+
   /*GLvoid*/FloatBufferAble dataptr = null;
   if (vertexvbo != null) {
     vertexvbo.bindBuffer(contextid);
@@ -2107,7 +2409,12 @@ startVertexArray(SoGLRenderAction action,
   }
   SoGL.cc_glglue_glVertexPointer(glue, coords.is3D() ? 3 : 4, GL_FLOAT, 0,
                             dataptr);
+
+  glue.glVertexAttribPointerARB(0, coords.is3D() ? 3 : 4, GL_FLOAT, GL_FALSE != 0, 0, dataptr);
+
   SoGL.cc_glglue_glEnableClientState(glue, GL_VERTEX_ARRAY);
+
+  glue.glEnableVertexAttribArrayARB(0);
 
   SoGLVertexAttributeElement.getInstance(state).enableVBO(action);
 
@@ -2130,7 +2437,7 @@ finishVertexArray(SoGLRenderAction action,
                            boolean colorpervertex)
 {
   SoState state = action.getState();
-  cc_glglue glue = SoGL.sogl_glue_instance(state);
+  cc_glglue glue = sogl_glue_instance(state);
 
   if (vbo) {
     if (!SoGLDriverDatabase.isSupported(glue, SoGLDriverDatabase.SO_GL_VBO_IN_DISPLAYLIST)) {
@@ -2142,8 +2449,14 @@ finishVertexArray(SoGLRenderAction action,
     SoGL.cc_glglue_glBindBuffer(glue, GL_ARRAY_BUFFER, 0);
   }
   SoGL.cc_glglue_glDisableClientState(glue, GL_VERTEX_ARRAY);
-  if (normpervertex) {
+
+   glue.glDisableVertexAttribArrayARB(0);
+
+    if (normpervertex) {
     SoGL.cc_glglue_glDisableClientState(glue, GL_NORMAL_ARRAY);
+
+      glue.glDisableVertexAttribArrayARB(1);
+
   }
   if (texpervertex) {
     final int[] lastenabled = new int[1];
@@ -2163,6 +2476,8 @@ finishVertexArray(SoGLRenderAction action,
 	  SoGL.cc_glglue_glClientActiveTexture(glue, GL2.GL_TEXTURE0 + i);
 	}
         SoGL.cc_glglue_glDisableClientState(glue, GL_TEXTURE_COORD_ARRAY);
+
+          glue.glDisableVertexAttribArrayARB(2);
       }
     }
     SoGL.cc_glglue_glClientActiveTexture(glue, GL2.GL_TEXTURE0);
@@ -2172,6 +2487,16 @@ finishVertexArray(SoGLRenderAction action,
     lelem.reset(state, SoLazyElement.masks.DIFFUSE_MASK.getValue());
 
     SoGL.cc_glglue_glDisableClientState(glue, GL_COLOR_ARRAY);
+
+      glue.glDisableVertexAttribArrayARB(3);
+
+      int pHandle = SoGLShaderProgramElement.get(state).getGLSLShaderProgramHandle(state);
+      if(pHandle >0 ) {
+          int perVertexLocation = state.getGL2().glGetUniformLocation(pHandle, "s4j_PerVertexColor");
+          if (perVertexLocation >= 0) {
+              state.getGL2().glUniform1i(perVertexLocation, 0);
+          }
+      }
   }
 
   SoGLVertexAttributeElement.getInstance(state).disableVBO(action);
@@ -2193,14 +2518,14 @@ finishVertexArray(SoGLRenderAction action,
   \verbatim
   SoPrimitiveVertex vertex;
 
-  this->beginShape(action, SoShape::POLYGON);
+  this.beginShape(action, SoShape::POLYGON);
   vertex.setPoint(SbVec3f(0.0f, 0.0f, 0.0f));
-  this->shapeVertex(&vertex);
+  this.shapeVertex(&vertex);
   vertex.setPoint(SbVec3f(1.0f, 0.0f, 0.0f));
-  this->shapeVertex(&vertex);
+  this.shapeVertex(&vertex);
   vertex.setPoint(SbVec3f(1.0f, 1.0f, 0.0f));
-  this->shapeVertex(&vertex);
-  this->endShape();
+  this.shapeVertex(&vertex);
+  this.endShape();
   \endverbatim
 
   Note that the SoPrimitiveVertex instance can simply be placed on the
@@ -2264,7 +2589,7 @@ static void
 soshape_destruct_staticdata(Object closure)
 {
   soshape_staticdata data = (soshape_staticdata) closure;
-//  for (int i = 0; i < data->bigtexturelist->getLength(); i++) {
+//  for (int i = 0; i < data.bigtexturelist.getLength(); i++) {
 //    delete (*(data.bigtexturelist))[i];
 //  }
 //  delete data.bigtexturelist;
@@ -2282,6 +2607,42 @@ soshape_get_staticdata()
   return (soshape_staticdata) soshape_staticstorage.get();
 }
 
+
+//    public void
+//    validatePVCache(SoGLRenderAction action)
+//    {
+//        SoState state = action.getState();
+//        if (pimpl.pvcache == null ||
+//            !pimpl.pvcache.isValid(state)) {
+//        if (pimpl.pvcache) {
+//            pimpl.pvcache.unref();
+//        }
+//        // we don't want to create display list caches while building the VBOs
+//        SoCacheElement.invalidate(state);
+//
+//        soshape_staticdata shapedata = soshape_get_staticdata();
+//        boolean storedinvalid = SoCacheElement.setInvalid(false);
+//        // must push state to make cache dependencies work
+//        state.push();
+//        pimpl.pvcache = new SoPrimitiveVertexCache(state);
+//        pimpl.pvcache.ref();
+//        SoCacheElement.set(state, pimpl.pvcache);
+//        shapedata.rendermode = SoShapeRenderMode.PVCACHE.getValue();
+//        this.generatePrimitives(action);
+//        shapedata.rendermode = SoShapeRenderMode.NORMAL.getValue();
+//        // needed for out old bumpmap handling
+//        if (pimpl.bumprender) pimpl.bumprender.calcTangentSpace(pimpl.pvcache);
+//        // this _must_ be called after creating the pvcache
+//
+//        // FIXME: consider if we should call a virtual function here to
+//        // enable subclasses to modify the primtive vertex cache. Must be
+//        // done before to state->pop() call.
+//        state.pop();
+//        SoCacheElement.setInvalid(storedinvalid);
+//        pimpl.pvcache.close(state);
+//        pimpl.testSetupShapeHints(this);
+//    }
+//    }
 
 	  
 	 }

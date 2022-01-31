@@ -10,7 +10,7 @@ import java.nio.FloatBuffer;
 
 public class DoubleMemoryBuffer extends MemoryBuffer {
 
-    public final static int MINIMUM_DOUBLES_FOR_BUFFER = SoVBO.getVertexCountMinLimit() * 3;
+    public final static int MINIMUM_DOUBLES_FOR_BUFFER = 12;//SoVBO.getVertexCountMinLimit() * 3;
 
     private double[] doubleArray;
 

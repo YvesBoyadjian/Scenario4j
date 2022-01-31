@@ -54,6 +54,7 @@
 package jscenegraph.coin3d.inventor.elements;
 
 import jscenegraph.coin3d.inventor.lists.SbList;
+import jscenegraph.coin3d.inventor.lists.SbListInt;
 import jscenegraph.database.inventor.SbMatrix;
 import jscenegraph.database.inventor.SoNodeList;
 import jscenegraph.database.inventor.elements.SoAccumulatedElement;
@@ -70,6 +71,7 @@ public class SoLightElement extends SoAccumulatedElement {
 
 		  protected final SoNodeList lights = new SoNodeList();
 		  protected SbList<SbMatrix> matrixlist;
+		  protected SbListInt indexList;
 
 		private
 
@@ -114,7 +116,8 @@ public void destructor()
 */
 public static void
 add(SoState state, SoLight light,
-                    final SbMatrix matrix)
+                    final SbMatrix matrix,
+    final int index)
 {
   SoLightElement elem =
     (SoLightElement)
@@ -126,10 +129,14 @@ add(SoState state, SoLight light,
     int i = elem.lights.getLength();
     elem.lights.append(light);
     elem.addNodeId(light);
-    if (i >= elem.matrixlist.getLength())
-      elem.matrixlist.append(matrix);
-    else
-      elem.matrixlist.operator_square_bracket(i, matrix);
+    if (i >= elem.matrixlist.getLength()) {
+        elem.matrixlist.append(matrix);
+        elem.indexList.append(index);
+    }
+    else {
+        elem.matrixlist.operator_square_bracket(i, matrix);
+        elem.indexList.operator_square_bracket(i, index);
+    }
   }
 }
 
@@ -160,12 +167,27 @@ getMatrix(SoState state, int index)
   return elem.matrixlist./*getArrayPtr()*/operator_square_bracket(index);
 }
 
+    /*!
+      Get index of light in shader.
+    */
+    public static int
+    getIndex(SoState state, int index)
+    {
+        SoLightElement elem = (SoLightElement)
+                (
+                        SoElement.getConstElement(state, classStackIndexMap.get(SoLightElement.class))
+                );
+        assert(index >= 0 && index < elem.matrixlist.getLength());
+        return elem.indexList./*getArrayPtr()*/operator_square_bracket(index);
+    }
+
 // doc from parent
 public void
 init(SoState state)
 {
   super.init(state);
   this.matrixlist = new SbList<SbMatrix>();
+  this.indexList = new SbListInt();
   this.didalloc.state = true;
 }
 
@@ -187,6 +209,7 @@ push(SoState state)
   for (i = 0; i < numLights; i++)
     this.lights.append(prev.lights.operator_square_bracket(i));
   this.matrixlist = prev.matrixlist; // just pass pointer to list
+    this.indexList = prev.indexList;
   this.copyNodeIds(prev);
 }
 }

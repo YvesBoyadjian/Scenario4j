@@ -30,6 +30,9 @@ import java.util.HashMap;
 import com.jogamp.opengl.GL2;
 
 import jscenegraph.coin3d.glue.cc_glglue;
+import jscenegraph.coin3d.inventor.elements.SoDepthBufferElement;
+import jscenegraph.coin3d.inventor.elements.SoEnvironmentElement;
+import jscenegraph.coin3d.inventor.elements.SoLightElement;
 import jscenegraph.coin3d.inventor.elements.SoMultiTextureImageElement;
 import jscenegraph.coin3d.inventor.elements.gl.SoGLMultiTextureImageElement;
 import jscenegraph.coin3d.inventor.misc.SoContextHandler;
@@ -47,8 +50,7 @@ import jscenegraph.coin3d.shaders.inventor.nodes.SoUniformShaderParameter;
 import jscenegraph.database.inventor.*;
 import jscenegraph.database.inventor.actions.SoGLRenderAction;
 import jscenegraph.database.inventor.actions.SoSearchAction;
-import jscenegraph.database.inventor.elements.SoGLCacheContextElement;
-import jscenegraph.database.inventor.elements.SoLazyElement;
+import jscenegraph.database.inventor.elements.*;
 import jscenegraph.database.inventor.errors.SoDebugError;
 import jscenegraph.database.inventor.fields.SoField;
 import jscenegraph.database.inventor.fields.SoFieldData;
@@ -57,6 +59,8 @@ import jscenegraph.database.inventor.fields.SoSFBool;
 import jscenegraph.database.inventor.fields.SoSFEnum;
 import jscenegraph.database.inventor.fields.SoSFString;
 import jscenegraph.database.inventor.misc.SoState;
+import jscenegraph.database.inventor.nodes.SoDirectionalLight;
+import jscenegraph.database.inventor.nodes.SoLight;
 import jscenegraph.database.inventor.nodes.SoNode;
 import jscenegraph.database.inventor.nodes.SoSubNode;
 import jscenegraph.database.inventor.sensors.SoNodeSensor;
@@ -415,6 +419,128 @@ updateParameters(SoState state)
   /*PRIVATE(this).*/updateAllParameters(cachecontext);
   /*PRIVATE(this).*/updateStateMatrixParameters(cachecontext, state);
   /*PRIVATE(this).*/updateCoinParameters(cachecontext, state);
+  updateLights(cachecontext, state);
+  updateColor(state);
+}
+
+public void updateColor(SoState state) {
+
+    SoGLShaderProgram shaderprogram =
+            (SoGLShaderProgram)(SoGLShaderProgramElement.get(state));
+
+    int pHandle = shaderprogram.getGLSLShaderProgramHandle(state);
+
+    if(pHandle <= 0) return;
+
+    SoGLLazyElement lazyElement = SoGLLazyElement.getInstance(state);
+    lazyElement.sendDiffuseToGL(state);
+}
+
+public void updateLights(final int cachecontext, SoState state) {
+
+    SoGLShaderProgram shaderprogram =
+            (SoGLShaderProgram)(SoGLShaderProgramElement.get(state));
+
+    int pHandle = shaderprogram.getGLSLShaderProgramHandle(state);
+
+    if(pHandle <= 0) return;
+
+    final SoNodeList lights = SoLightElement.getLights(state);
+
+    int numLights = lights.getLength();
+
+    GL2 gl2 = state.getGL2();
+
+    for(int i=0; i < numLights; i++) {
+        SoLight light = (SoLight) lights.operator_square_bracket(i);
+        if(light instanceof SoDirectionalLight) {
+            SoDirectionalLight dirLight = (SoDirectionalLight) light;
+            {
+                String positionName = "s4j_LightSource[" + SoLightElement.getIndex(state, i) + "].position";
+                int positionLocation = gl2.glGetUniformLocation(pHandle,
+                        ( /*COIN_GLchar **/String) positionName);
+
+                if (0 <= positionLocation) {
+                    SbVec3f lightDir = dirLight.direction.getValue();
+
+                    SbVec4f value4 = new SbVec4f();
+                    value4.setValue(-lightDir.getX(),
+                            -lightDir.getY(),
+                            -lightDir.getZ(),
+                            0);
+
+                    final SbMatrix lighttoworld = SoLightElement.getMatrix(state, i);
+
+                    lighttoworld.multVecMatrix(value4, value4);
+                    value4.setValue(3, 0);
+
+                    gl2.glUniform4fv(positionLocation, 1, value4.getValueRead());
+
+//                if( 5 == i ) {
+//                    System.out.println("light 5 x = "+value4.getX()+" y = "+value4.getY());
+//                    SbMatrix modelMat = SoModelMatrixElement.get(state);
+//                    SbMatrix viewingMat = SoViewingMatrixElement.get(state);
+//                    //System.out.println("modelMat x = "+viewingMat.toGL()[0]);
+//                }
+                }
+            }
+            {
+                String diffuseName = "s4j_LightSource[" + SoLightElement.getIndex(state, i) + "].diffuse";
+                int diffuseLocation = gl2.glGetUniformLocation(pHandle,
+                        ( /*COIN_GLchar **/String) diffuseName);
+
+                if (0 <= diffuseLocation) {
+                    final SbVec3f v3 = new SbVec3f();
+                    final SbVec4fSingle v4 = new SbVec4fSingle();
+
+                    // RGBA intensities of source are the product of the color and
+                    // intensity, with 1.0 alpha
+                    v3.copyFrom(dirLight.color.getValue().operator_mul(dirLight.intensity.getValue()));
+                    v4.setValue(v3.getValueRead()[0], v3.getValueRead()[1], v3.getValueRead()[2], 1.0f);
+
+                    gl2.glUniform4fv(diffuseLocation, 1, v4.getValue());
+                }
+            }
+            {
+                String specularName = "s4j_LightSource[" + SoLightElement.getIndex(state, i) + "].specular";
+                int specularLocation = gl2.glGetUniformLocation(pHandle,
+                        ( /*COIN_GLchar **/String) specularName);
+
+                if (0 <= specularLocation) {
+                    final SbVec3f v3 = new SbVec3f();
+                    final SbVec4fSingle v4 = new SbVec4fSingle();
+
+                    // RGBA intensities of source are the product of the color and
+                    // intensity, with 1.0 alpha
+                    v3.copyFrom(dirLight.color.getValue().operator_mul(dirLight.intensity.getValue()));
+                    v4.setValue(v3.getValueRead()[0], v3.getValueRead()[1], v3.getValueRead()[2], 1.0f);
+
+                    gl2.glUniform4fv(specularLocation, 1, v4.getValue());
+                }
+            }
+        }
+    }
+
+    SbColor fogColor = SoEnvironmentElement.getFogColor(state);
+
+    String fogColorName = "s4j_Fog.color";
+    int fogColorLocation = gl2.glGetUniformLocation(pHandle,fogColorName);
+    if(0 <= fogColorLocation) {
+        SbVec4fSingle fogColor4 = new SbVec4fSingle();
+        fogColor4.setValue(fogColor.getX(),fogColor.getY(),fogColor.getZ(),1.0f);
+
+        gl2.glUniform4fv(fogColorLocation,1,fogColor4.getValue());
+    }
+
+    float visibility = SoEnvironmentElement.getFogVisibility(state);
+
+    float density = 4.0f / visibility;
+
+    String fogDensityName = "s4j_Fog.density";
+    int fogDensityLocation = gl2.glGetUniformLocation(pHandle,fogDensityName);
+    if(0 <= fogDensityLocation) {
+        gl2.glUniform1f(fogDensityLocation,density);
+    }
 }
 
 // sets this.cachedSourceType to [ARB|CG|GLSL]_PROGRAM
@@ -707,7 +833,7 @@ updateAllParameters(final int cachecontext)
 }
 
 // Update state matrix paramaters
-private void
+public void //CORE
 updateStateMatrixParameters(final int cachecontext, SoState state)
 {
 //#define STATE_PARAM SoShaderStateMatrixParameter

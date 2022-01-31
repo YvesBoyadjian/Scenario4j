@@ -342,6 +342,7 @@ public void GLRender(SoGLRenderAction action)
 	  // FIXME: (Martin 2004-09-21) find an alternative to invalidating the cache
 	  SoCacheElement.invalidate(state);
 
+	this.glShaderProgram.setOwner(this); // CORE
 	  this.glShaderProgram.removeShaderObjects();
 	  this.glShaderProgram.setEnableCallback(this.enablecb,
 	                                          this.enablecbclosure);

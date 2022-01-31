@@ -406,7 +406,7 @@ public class SoSeparator extends SoGroup implements Destroyable {
 	   private
 		        //! Each separator that is created will contain up to this many
 		        //! render caches.
-		        static int          numRenderCaches = 2;
+		        static int          numRenderCaches = 0;//2; CORE
 		    
 	private	        SoBoundingBoxCache  bboxCache;     //!< Cache for bounding boxes
 	private	        SoGLCacheList       cacheList;     //!< Caches for GL rendering

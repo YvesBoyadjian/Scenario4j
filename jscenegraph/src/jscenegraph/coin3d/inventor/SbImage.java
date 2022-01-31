@@ -24,7 +24,9 @@
 
 package jscenegraph.coin3d.inventor;
 
+import java.awt.color.ColorSpace;
 import java.awt.image.BufferedImage;
+import java.awt.image.ColorModel;
 import java.io.IOException;
 import java.nio.file.Path;
 
@@ -55,7 +57,8 @@ public class SbImage implements Destroyable {
 	  private MemoryBuffer  bytes;
 	  //DataType datatype;
 	  private final SbVec3s size = new SbVec3s();
-	  int bpp;
+	  private int bpp;
+	  private boolean srgb;
 	  private String schedulename;
 	  SbImageScheduleReadCB schedulecb;
 	  Object scheduleclosure;
@@ -168,10 +171,10 @@ private void freeData() {
   Returns the 2D image data.
 */
 public MemoryBuffer
-getValue(SbVec2s size, final int[] bytesperpixel)
+getValue(SbVec2s size, final int[] bytesperpixel, final boolean[] srgb)
 {
   final SbVec3s tmpsize = new SbVec3s();
-  MemoryBuffer bytes = this.getValue(tmpsize, bytesperpixel);
+  MemoryBuffer bytes = this.getValue(tmpsize, bytesperpixel, srgb);
   size.setValue(tmpsize.getValue()[0], tmpsize.getValue()[1]);
   return bytes;
 }
@@ -184,7 +187,7 @@ getValue(SbVec2s size, final int[] bytesperpixel)
   \since Coin 2.0
 */
 public MemoryBuffer
-getValue(final SbVec3s  size, final int[] bytesperpixel)
+getValue(final SbVec3s  size, final int[] bytesperpixel, final boolean[] srgb)
 {
   this.readLock();
   if (this.schedulecb != null) {
@@ -197,6 +200,7 @@ getValue(final SbVec3s  size, final int[] bytesperpixel)
   }
   size.copyFrom(this.size);
   bytesperpixel[0] = bpp;
+  srgb[0] = this.srgb;
   MemoryBuffer bytes = this.bytes;
   this.readUnlock();
   return bytes;
@@ -302,8 +306,9 @@ readFile(final String  filename,
 //    simage_wrapper().simage_read_image(finalname, 
 //                                        w, h, nc);
   final int[] w = new int[1], h = new int[1], nc = new int[1];
+  final boolean[] srgb = new boolean[1];
   final MemoryBuffer[] simagedata = new MemoryBuffer[1];
-  readImage(finalname, w, h, nc, 
+  readImage(finalname, w, h, nc, srgb,
 		  simagedata);
   if (simagedata[0] != null) {
     //FIXME: Add 3'rd dimension (kintel 20011110)
@@ -312,7 +317,7 @@ readFile(final String  filename,
                            (short)(h[0]),
                            (short)(0)
                            ),
-                    nc[0], simagedata[0]);
+                    nc[0], srgb[0], simagedata[0]);
 //    // NB, this is a trick. We use setValuePtr() to set the size
 //    // and data pointer, and then we change the data type to simage
 //    // peder, 2002-03-22
@@ -377,11 +382,11 @@ readUnlock()
   \since Coin 2.0
 */
 public void
-setValuePtr(final SbVec2s size, final int bytesperpixel,
+setValuePtr(final SbVec2s size, final int bytesperpixel, final boolean srgb,
                      MemoryBuffer bytes)
 {
   final SbVec3s tmpsize = new SbVec3s(size.getValue()[0], size.getValue()[1], (short)0);
-  this.setValuePtr(tmpsize, bytesperpixel, bytes);
+  this.setValuePtr(tmpsize, bytesperpixel, srgb, bytes);
 }
 
 
@@ -397,7 +402,7 @@ setValuePtr(final SbVec2s size, final int bytesperpixel,
   \since Coin 2.0
 */
 public void
-setValuePtr(final SbVec3s size, int bytesperpixel,
+setValuePtr(final SbVec3s size, int bytesperpixel, boolean srgb,
                      MemoryBuffer bytes)
 {
   this.writeLock();
@@ -408,6 +413,7 @@ setValuePtr(final SbVec3s size, int bytesperpixel,
   //this.datatype = SbImage.SETVALUEPTR_DATA; TODO
   this.size.copyFrom( size);
   this.bpp = bytesperpixel;
+  this.srgb = srgb;
   this.writeUnlock();
 }
 
@@ -458,8 +464,14 @@ public void destructor() {
 //
 // Use: static, protected
 
-public static boolean readImage(final String fname, final int[] w, final int[] h, final int[] nc, 
-                      final MemoryBuffer[] bytes)
+public static boolean readImage(
+        final String fname,
+        final int[] w,
+        final int[] h,
+        final int[] nc,
+        final boolean[] srgb,
+        final MemoryBuffer[] bytes
+)
 //
 ////////////////////////////////////////////////////////////////////////
 {
@@ -493,7 +505,7 @@ public static boolean readImage(final String fname, final int[] w, final int[] h
     if (!in.openFile(fname.getString(), TRUE))
         return FALSE;
 */
-    if (ReadImage(in, w, h, nc, bytes))
+    if (ReadImage(in, w, h, nc, srgb, bytes))
         return true;
 
     //java port
@@ -506,8 +518,14 @@ public static boolean readImage(final String fname, final int[] w, final int[] h
     }
 }
 
-private static boolean ReadImage(final SoInput in, final int[] w, final int[] h, final int[] nc,  
-        MemoryBuffer[] bytes) {
+private static boolean ReadImage(
+        final SoInput in,
+        final int[] w,
+        final int[] h,
+        final int[] nc,
+        final boolean[] srgb,
+        MemoryBuffer[] bytes
+) {
 
     FILE fp = in.getCurFile();
     
@@ -523,6 +541,15 @@ private static boolean ReadImage(final SoInput in, final int[] w, final int[] h,
 		h[0] = image.getHeight();
 	    
 	    nc[0] = 3;
+
+	    srgb[0] = true;
+        ColorModel colorModel = image.getColorModel();
+        if(null != colorModel) {
+            ColorSpace colorSpace = colorModel.getColorSpace();
+            if( null != colorSpace) {
+                srgb[0] = colorSpace.isCS_sRGB();
+            }
+        }
 	    
 	    int nbPixels = w[0]*h[0];
 	    

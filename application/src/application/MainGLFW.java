@@ -85,6 +85,7 @@ import jsceneviewerglfw.Display;
 import jsceneviewerglfw.GLData;
 import jsceneviewerglfw.SWT;
 import loader.TerrainLoader;
+import org.lwjgl.opengl.GLDebugMessageCallback;
 import org.ode4j.math.DQuaternion;
 import org.ode4j.math.DVector3;
 import org.ode4j.math.DVector3C;
@@ -94,6 +95,9 @@ import org.ode4j.ode.internal.ErrorHdl;
 import org.ode4j.ode.internal.Rotation;
 
 import static com.badlogic.gdx.physics.bullet.collision.CollisionConstants.DISABLE_DEACTIVATION;
+import static org.lwjgl.opengl.GL11C.glEnable;
+import static org.lwjgl.opengl.GL11C.glGetError;
+import static org.lwjgl.opengl.GL43C.*;
 
 /**
  * @author Yves Boyadjian
@@ -535,6 +539,28 @@ public class MainGLFW {
 			protected void onAim(SoMouseButtonEvent event, boolean aim) {
 				sg.aim(aim);
 			}
+			public void initializeGL(GL2 gl2) {
+				super.initializeGL(gl2);
+
+//				int error = glGetError();
+//				glEnable(GL_DEBUG_OUTPUT);
+//				error = glGetError();
+//				glDebugMessageCallback(new GLDebugMessageCallback() {
+//					@Override
+//					public void invoke(int i, int i1, int i2, int i3, int length, long message, long l1) {
+//						System.err.println("OpenGL Error : "+ getMessage(length,message));
+//					}
+//				}, 0);
+//				error = glGetError();
+//				glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
+//				error = glGetError();
+
+				final int[] vao = new int[1];
+				gl2.glGenVertexArrays(1,vao);
+				gl2.glBindVertexArray(vao[0]);
+
+				System.out.println("init");
+			}
 		};
 
 		viewer.setHeadlight(false);
@@ -748,7 +774,7 @@ public class MainGLFW {
 		}
 		viewer.getCameraController().changeCameraValues(camera);
 
-		viewer.getSceneHandler().setClearBeforeRender(false);
+		viewer.getSceneHandler().setClearBeforeRender(/*false*/true);
 		viewer.getSceneHandler().setBackgroundColor(/*new SbColor(0,0,1)*/SceneGraphIndexedFaceSetShader.SKY_COLOR.darker());
 
 		viewer.getSceneHandler().setTransparencyType(TransparencyType.BLEND/*SORTED_LAYERS_BLEND*/);
@@ -772,10 +798,10 @@ public class MainGLFW {
 		glf.alphaSize = 0;
 		glf.depthSize = 32;
 		glf.doubleBuffer = true;
-		glf.majorVersion = 2;//3;
-		glf.minorVersion = 1;
+		glf.majorVersion = 4;//2;//3;
+		glf.minorVersion = 0;//1;
 		glf.api = GLData.API.GL;
-		//glf.profile = GLData.Profile.COMPATIBILITY;
+		glf.profile = GLData.Profile.CORE;
 		glf.debug = false;//true; has no effect
 		glf.grabCursor = true;
 		viewer.setFormat(glf, style);

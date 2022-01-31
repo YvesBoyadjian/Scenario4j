@@ -131,7 +131,8 @@ load(String srcStr)
 	    		srcStr);	  
   }
 
-  if (flag[0]==0) this.shaderHandle = 0;
+  if (flag[0]==0)
+    this.shaderHandle = 0;
 }
 
 public void

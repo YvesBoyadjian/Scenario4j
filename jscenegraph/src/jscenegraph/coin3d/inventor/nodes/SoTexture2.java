@@ -167,7 +167,7 @@ public SoTexture2()
 
   nodeHeader.SO_NODE_ADD_FIELD(filename,"filename", (""));
   SbImage img = new SbImage();
-  img.setValuePtr(new SbVec2s((short)0, (short)0), 0, null);
+  img.setValuePtr(new SbVec2s((short)0, (short)0), 0, false, null);
   nodeHeader.SO_NODE_ADD_FIELD(image,"image", img);
   nodeHeader.SO_NODE_ADD_FIELD(wrapS,"wrapS", (Wrap.REPEAT.getValue()));
   nodeHeader.SO_NODE_ADD_FIELD(wrapT,"wrapT", (Wrap.REPEAT.getValue()));
@@ -287,8 +287,9 @@ GLRender(SoGLRenderAction action)
       (!needbig && glimagetype.operator_not_equal(SoGLImage.getClassTypeId()))) {
     final int[] nc = new int[1];
     final SbVec2s size = new SbVec2s();
+    final boolean[] srgb = new boolean[1];
     MemoryBuffer bytes =
-      this.image.getValue(size, nc);
+      this.image.getValue(size, nc, srgb);
     
     if (needbig &&
         (glimagetype.operator_not_equal(SoGLBigImage.getClassTypeId()))) {
@@ -311,7 +312,7 @@ GLRender(SoGLRenderAction action)
     }
 
     if (bytes != null && size.operator_not_equal(new SbVec2s((short)0,(short)0))) {
-      this.pimpl.glimage.setData(bytes, size, nc[0],
+      this.pimpl.glimage.setData(bytes, size, nc[0],srgb[0],
                              translateWrap(Wrap.fromValue(this.wrapS.getValue())),
                              translateWrap(Wrap.fromValue(this.wrapT.getValue())),
                              quality);
@@ -379,7 +380,8 @@ SoTexture2_doAction(SoAction action)
 
   final int[] nc = new int[1];
   final SbVec2s size = new SbVec2s();
-  MemoryBuffer bytes = this.image.getValue(size, nc);
+  final boolean[] srgb = new boolean[1];
+  MemoryBuffer bytes = this.image.getValue(size, nc, srgb);
   
   // if a filename has been set, but the file has not been loaded, supply
   // a dummy texture image to make sure texture coordinates are generated.
@@ -484,11 +486,12 @@ loadFilename()
                           sl.getArrayPtr(), sl.getLength())) {
       final int[] nc = new int[1];
       final SbVec2s size = new SbVec2s();
-      MemoryBuffer bytes = tmpimage.getValue(size, nc);
+      final boolean[] srgb = new boolean[1];
+      MemoryBuffer bytes = tmpimage.getValue(size, nc, srgb);
       // disable notification on image while setting data from filename
       // as a notify will cause a filename.setDefault(TRUE).
       boolean oldnotify = this.image.enableNotify(false);
-      this.image.setValue(size, nc[0], bytes);
+      this.image.setValue(size, nc[0], srgb[0], bytes);
       this.image.enableNotify(oldnotify);
       this.pimpl.glimagevalid = false; // recreate GL image in next GLRender()
       retval = true;
@@ -517,7 +520,7 @@ filenameSensorCB(Object data, SoSensor sensor)
   else if (thisp.filename.getValue().equals("")) {
     // setting filename to "" should reset the node to its initial state
     thisp.setReadStatus(0);
-    thisp.image.setValue(new SbVec2s((short)0,(short)0), 0, null);
+    thisp.image.setValue(new SbVec2s((short)0,(short)0), 0,false, null);
     thisp.image.setDefault(true);
     thisp.filename.setDefault(true);
   }

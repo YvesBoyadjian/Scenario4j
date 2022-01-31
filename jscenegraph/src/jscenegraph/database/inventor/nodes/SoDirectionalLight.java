@@ -65,10 +65,9 @@ import static com.jogamp.opengl.fixedfunc.GLLightingFunc.GL_SPOT_EXPONENT;
 import com.jogamp.opengl.GL2;
 
 import jscenegraph.coin3d.inventor.elements.SoLightElement;
-import jscenegraph.database.inventor.SbVec3f;
-import jscenegraph.database.inventor.SbVec4f;
-import jscenegraph.database.inventor.SbVec4fSingle;
-import jscenegraph.database.inventor.SoType;
+import jscenegraph.coin3d.shaders.SoGLShaderProgram;
+import jscenegraph.coin3d.shaders.inventor.elements.SoGLShaderProgramElement;
+import jscenegraph.database.inventor.*;
 import jscenegraph.database.inventor.actions.SoGLRenderAction;
 import jscenegraph.database.inventor.elements.SoGLLightIdElement;
 import jscenegraph.database.inventor.elements.SoModelMatrixElement;
@@ -196,7 +195,7 @@ GLRender(SoGLRenderAction action)
 
     
     SoLightElement.add(state, this, SoModelMatrixElement.get(state).operator_mul( 
-            SoViewingMatrixElement.get(state)));
+            SoViewingMatrixElement.get(state)),id);
 
     //
     // Create a new source and send it to GL. The SoGLLightIdElement
@@ -230,6 +229,19 @@ GLRender(SoGLRenderAction action)
     gl2.glLightf( id, GL_SPOT_CUTOFF, 180.0f);
 
     // Attenuation does not matter for directional sources.
+
+    updateStateParameters(state);
 }
+
+    private void updateStateParameters(SoState state) { // CORE
+
+        SoGLShaderProgram sp = SoGLShaderProgramElement.get(state);
+
+        if(null!=sp &&sp.isEnabled())
+        {
+            // Dependent of SoModelMatrixElement
+            sp.updateStateParameters(state);
+        }
+    }
 
 }

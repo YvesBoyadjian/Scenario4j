@@ -103,7 +103,7 @@ init(SoState state)
     // Make sure OpenGL normalizes normal vectors. (This is disabled
     // by default.) Since our normals are likely to be scaled at some
     // point, we'll play it safe.
-    gl2.glEnable(GL2.GL_NORMALIZE);
+    //gl2.glEnable(GL2.GL_NORMALIZE); CORE
 }
 
 ////////////////////////////////////////////////////////////////////////

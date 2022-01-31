@@ -66,6 +66,8 @@ public class SbBSPTree implements Destroyable {
 		  private final SbListInt indices = new SbListInt(4);
 		  private SbListIndexable<SbVec3f, SbVec3fArray> pointsArray; //ptr
 
+		final SbVec3fSingle min = new SbVec3fSingle(), max = new SbVec3fSingle();
+
 		public coin_bspnode(SbListIndexable<SbVec3f, SbVec3fArray> ptsarray) {
 		  //indices = new SbListInt(4);
 		
@@ -222,7 +224,6 @@ public void
 findPoints(final SbSphere sphere, final SbListInt array)
 {
   if (this.left != null) {
-    final SbVec3fSingle min = new SbVec3fSingle(), max = new SbVec3fSingle();
     max.copyFrom(sphere.getCenter());
     min.copyFrom(sphere.getCenter());
     min.getValue()[this.dimension] -= sphere.getRadius();

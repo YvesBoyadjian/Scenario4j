@@ -65,7 +65,8 @@ public class SoShaderStateMatrixParameter extends SoUniformShaderParameter {
 		    IDENTITY(0),
 		    TRANSPOSE(1),
 		    INVERSE(2),
-		    INVERSE_TRANSPOSE(3);
+		    INVERSE_TRANSPOSE(3),
+              INVERSE_TRANSPOSE_3(4);
 
 			  private int value;
 			  
@@ -88,7 +89,9 @@ public class SoShaderStateMatrixParameter extends SoUniformShaderParameter {
 		  // Unlike in other parameter classes, here value is not a field because 
 		  // it is updated dynamically from the state.
 		  final SbMatrix value = new SbMatrix();
-	  
+
+		private final float[] valueLinear = new float[16];
+		private final float[] valueLinear3 = new float[9];
 	
 public static void initClass()
 {
@@ -174,11 +177,21 @@ public void updateParameter(SoGLShaderObject shader)
   }
   else {
     // if not CG then set the value retrieved from state before
-	this.getGLShaderParameter(shader.getCacheContext()).setMatrix(
-        shader,
-        value.getValueLinear(),
-        this.name.getValue()/*.getString()*/,
-        this.identifier.getValue());
+      if(MatrixTransform.INVERSE_TRANSPOSE_3.getValue() != matrixTransform.getValue()) {
+          this.getGLShaderParameter(shader.getCacheContext()).setMatrix(
+                  shader,
+                  value.getValueLinear(valueLinear),
+                  this.name.getValue()/*.getString()*/,
+                  this.identifier.getValue());
+      }
+      else {
+          this.getGLShaderParameter(shader.getCacheContext()).setMatrix3(
+            shader,
+            valueLinear3,
+            name.getValue(),
+            identifier.getValue()
+          );
+      }
   }
 }
 
@@ -188,23 +201,23 @@ public void updateParameter(SoGLShaderObject shader)
 public void
 updateValue(SoState state)
 {
-  SbMatrix matrix = SbMatrix.identity();
+  final SbMatrix matrix = SbMatrix.identity();
   switch (MatrixType.fromValue(this.matrixType.getValue())) {
     case MODELVIEW: {
-      matrix = SoModelMatrixElement.get(state);
+      matrix.copyFrom(SoModelMatrixElement.get(state));
       matrix.multRight(SoViewingMatrixElement.get(state));
     } break;
     case PROJECTION: {
-      matrix = SoProjectionMatrixElement.get(state); 
+      matrix.copyFrom(SoProjectionMatrixElement.get(state));
     } break;
     case TEXTURE: {
       int unit = SoTextureUnitElement.get(state);
-      matrix = SoGLMultiTextureMatrixElement.get(state, unit);
+      matrix.copyFrom(SoGLMultiTextureMatrixElement.get(state, unit));
     } break;
     case MODELVIEW_PROJECTION: {
-      matrix = SoModelMatrixElement.get(state);
+      matrix.copyFrom(SoModelMatrixElement.get(state));
       matrix.multRight(SoViewingMatrixElement.get(state));
-      matrix.multRight(SoProjectionMatrixElement.get(state)); 
+      matrix.multRight(SoProjectionMatrixElement.get(state));
     } break;
     default: assert(false);// && "illegal matrix type"); break;
   }
@@ -214,6 +227,9 @@ updateValue(SoState state)
   case TRANSPOSE: value.copyFrom(matrix.transpose()); break;
   case INVERSE: value.copyFrom(matrix.inverse()); break;
   case INVERSE_TRANSPOSE: value.copyFrom(matrix.inverse().transpose()); break;
+      case INVERSE_TRANSPOSE_3: value.copyFrom(matrix.inverse().transpose());
+      value.getValueLinear3(valueLinear3);
+      break;
   default: assert(false);// && "illegal matrix transform type"); break;
   }
 }

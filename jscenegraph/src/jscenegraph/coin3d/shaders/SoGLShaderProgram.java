@@ -27,11 +27,14 @@ import com.jogamp.opengl.GL2;
 
 import jscenegraph.coin3d.glue.cc_glglue;
 import jscenegraph.coin3d.inventor.lists.SbList;
+import jscenegraph.coin3d.inventor.nodes.SoShaderObject;
 import jscenegraph.coin3d.misc.SoGL;
+import jscenegraph.coin3d.shaders.inventor.nodes.SoShaderProgram;
 import jscenegraph.coin3d.shaders.inventor.nodes.SoShaderProgramEnableCB;
 import jscenegraph.database.inventor.SbName;
 import jscenegraph.database.inventor.elements.SoGLCacheContextElement;
 import jscenegraph.database.inventor.misc.SoState;
+import jscenegraph.database.inventor.nodes.SoNode;
 
 /**
  * @author Yves Boyadjian
@@ -47,7 +50,8 @@ public class SoGLShaderProgram {
 	private SoShaderProgramEnableCB enablecb;
 	private Object enablecbclosure;
 	private final SbList <Integer> objectids = new SbList<>();
-	
+
+    private SoShaderProgram owner;
 
 public SoGLShaderProgram()
 {
@@ -66,6 +70,10 @@ public void destructor()
   //delete this.cgShaderProgram;
   this.glslShaderProgram.destructor();
 }
+
+  public void setOwner(SoShaderProgram program) {
+    this.owner = program;
+  }
 
 public void
 addShaderObject(SoGLShaderObject shader)
@@ -152,6 +160,20 @@ updateCoinParameter(SoState state,  final SbName name,   int value)
     if (!enabled) this.disable(state);
   }
 }
+
+  public void updateStateParameters(SoState state) { // CORE
+  if(this.owner != null) {
+    int cachecontext = SoGLCacheContextElement.get(state);
+    int cnt = owner.shaderObject.getNumNodes();
+    for (int i = 0; i <cnt; i++) {
+      SoNode node = owner.shaderObject.operator_square_bracket(i).get();
+      if (node.isOfType(SoShaderObject.getClassTypeId())) {
+        ((SoShaderObject )node).updateStateMatrixParameters(cachecontext, state);
+        ((SoShaderObject )node).updateLights(cachecontext,state);
+      }
+    }
+  }
+  }
 
 public void
 addProgramParameter(int name, int value)

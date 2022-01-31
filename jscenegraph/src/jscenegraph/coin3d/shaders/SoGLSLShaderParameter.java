@@ -152,6 +152,14 @@ setMatrix( SoGLShaderObject shader,
     shader.GLContext().glUniformMatrix4fvARB(this.location,1,false,value);
 }
 
+  public void
+  setMatrix3( SoGLShaderObject shader,
+             float[] value,  String  name,
+             int id)
+  {
+    if (this.isValid(shader, name, GL2.GL_FLOAT_MAT3_ARB))
+      shader.GLContext().glUniformMatrix3fvARB(this.location,1,false,value);
+  }
   
 public void
 setMatrixArray( SoGLShaderObject shader,

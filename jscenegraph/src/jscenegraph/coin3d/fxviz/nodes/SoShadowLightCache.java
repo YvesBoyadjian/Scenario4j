@@ -16,12 +16,7 @@ import jscenegraph.coin3d.inventor.nodes.SoTransparencyType;
 import jscenegraph.coin3d.inventor.nodes.SoVertexShader;
 import jscenegraph.coin3d.misc.SoGL;
 import jscenegraph.coin3d.misc.Tidbits;
-import jscenegraph.coin3d.shaders.inventor.nodes.SoShaderParameter1f;
-import jscenegraph.coin3d.shaders.inventor.nodes.SoShaderParameter1i;
-import jscenegraph.coin3d.shaders.inventor.nodes.SoShaderParameter4f;
-import jscenegraph.coin3d.shaders.inventor.nodes.SoShaderParameterArray1f;
-import jscenegraph.coin3d.shaders.inventor.nodes.SoShaderParameterArray2f;
-import jscenegraph.coin3d.shaders.inventor.nodes.SoShaderProgram;
+import jscenegraph.coin3d.shaders.inventor.nodes.*;
 import jscenegraph.database.inventor.SbBox3f;
 import jscenegraph.database.inventor.SbColor;
 import jscenegraph.database.inventor.SbMatrix;
@@ -395,19 +390,47 @@ createVSMProgram()
   SoShaderGenerator fgen = this.vsm_fragment_generator;
 
   vgen.reset(false);
-  vgen.setVersion("#version 120"); // YB : necessary for Intel Graphics HD 630
+  vgen.setVersion("#version 400 core"); // YB : necessary for Intel Graphics HD 630
+
+  vgen.addDeclaration("uniform mat4 s4j_ModelViewMatrix;",false);
+  vgen.addDeclaration("uniform mat4 s4j_ProjectionMatrix;",false);
+  //vgen.addDeclaration("uniform mat3 s4j_NormalMatrix;",false);
 
   boolean dirlight = this.light.isOfType(SoDirectionalLight.getClassTypeId());
 
+  vgen.addDeclaration("layout (location = 0) in vec3 s4j_Vertex;",false);
+
   vgen.addDeclaration("varying vec3 light_vec;", false);
-  vgen.addMainStatement("light_vec = (gl_ModelViewMatrix * gl_Vertex).xyz;\n"+
-                        "gl_Position = ftransform();");
+  vgen.addMainStatement("light_vec = (s4j_ModelViewMatrix * vec4(s4j_Vertex,1.0)).xyz;\n"+
+                        "gl_Position = s4j_ProjectionMatrix * s4j_ModelViewMatrix * vec4(s4j_Vertex,1.0);//ftransform();");
 
   vshader.sourceProgram.setValue( vgen.getShaderProgram());
   vshader.sourceType.setValue( SoShaderObject.SourceType.GLSL_PROGRAM);
 
+
+
+  final SoShaderStateMatrixParameter mvs = new SoShaderStateMatrixParameter();
+  mvs.name.setValue("s4j_ModelViewMatrix");
+  mvs.matrixType.setValue(SoShaderStateMatrixParameter.MatrixType.MODELVIEW);
+
+  final SoShaderStateMatrixParameter ps = new SoShaderStateMatrixParameter();
+  ps.name.setValue("s4j_ProjectionMatrix");
+  ps.matrixType.setValue(SoShaderStateMatrixParameter.MatrixType.PROJECTION);
+
+//  final SoShaderStateMatrixParameter ns = new SoShaderStateMatrixParameter();
+//  ns.name.setValue("s4j_NormalMatrix");
+//  ns.matrixType.setValue(SoShaderStateMatrixParameter.MatrixType.MODELVIEW);
+//  ns.matrixTransform.setValue(SoShaderStateMatrixParameter.MatrixTransform.INVERSE_TRANSPOSE_3);
+
+  vshader.parameter.set1Value(vshader.parameter.getNum(), mvs);
+  vshader.parameter.set1Value(vshader.parameter.getNum(), ps);
+  //vshader.parameter.set1Value(vshader.parameter.getNum(), ns);
+
+
   fgen.reset(false);
-  fgen.setVersion("#version 120"); // YB : necessary for Intel Graphics HD 630
+  fgen.setVersion("#version 400 core"); // YB : necessary for Intel Graphics HD 630
+
+  fgen.addDeclaration("layout(location = 0) out vec4 s4j_FragColor;",false);
   
 //#ifdef DISTRIBUTE_FACTOR
   String str;
@@ -435,8 +458,8 @@ createVSMProgram()
                         "vec2 f = fract(m * DISTRIBUTE_FACTOR);\n"+
 
 //#ifdef USE_NEGATIVE
-                        "gl_FragColor.rg = (m - (f / DISTRIBUTE_FACTOR)) * 2.0 - vec2(1.0, 1.0);\n"+
-                        "gl_FragColor.ba = f * 2.0 - vec2(1.0, 1.0);\n"
+                        "s4j_FragColor.rg = (m - (f / DISTRIBUTE_FACTOR)) * 2.0 - vec2(1.0, 1.0);\n"+
+                        "s4j_FragColor.ba = f * 2.0 - vec2(1.0, 1.0);\n"
 //#else // USE_NEGATIVE
 //                        "gl_FragColor.rg = m - (f / DISTRIBUTE_FACTOR);\n"
 //                        "gl_FragColor.ba = f;\n"

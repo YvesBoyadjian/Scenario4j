@@ -27,6 +27,9 @@ package jscenegraph.coin3d.shaders;
 import java.util.HashMap;
 import java.util.Map;
 
+import jscenegraph.coin3d.inventor.nodes.SoShaderObject;
+import jscenegraph.database.inventor.errors.SoDebugError;
+import jscenegraph.database.inventor.nodes.SoNode;
 import org.lwjgl.opengl.ARBShaderObjects;
 
 import com.jogamp.opengl.GL2;
@@ -121,6 +124,9 @@ enable( cc_glglue g)
   this.ensureLinking(g);
 
   if (this.isExecutable) {
+
+    SoGLSLShaderObject.didOpenGLErrorOccur("SoGLSLShaderProgram::enable() : previous errors",g); // YB : fixing bug in Coin3D
+
     /*COIN_GLhandle*/int programhandle = this.getProgramHandle(g, true);
     g.glUseProgramObjectARB(programhandle);
 
@@ -198,6 +204,12 @@ ensureLinking( cc_glglue  g)
                                  GL2.GL_OBJECT_LINK_STATUS_ARB,didLink);
 
     this.isExecutable = (didLink[0] != 0);
+
+    if(!isExecutable) { // linking failed
+      String infoLog = g.getGL2().glGetProgramInfoLog(programHandle);
+      SoDebugError.post("SoGLSLShaderProgram::ensureLinking",infoLog);
+    }
+
     this.neededlinking = true;
   }
 }
