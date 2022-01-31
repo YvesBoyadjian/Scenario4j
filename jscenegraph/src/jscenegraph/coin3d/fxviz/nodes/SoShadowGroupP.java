@@ -709,12 +709,12 @@ setVertexShader(SoState state)
   case HAZE:
   case FOG:
   case SMOKE:
-    gen.addMainStatement("gl_FogFragCoord = abs(ecPosition3.z);\n");
+    //gen.addMainStatement("gl_FogFragCoord = abs(ecPosition3.z);\n"); CORE
     break;
   }
   gen.addMainStatement("perVertexColor = vec3(clamp(color.r, 0.0, 1.0), clamp(color.g, 0.0, 1.0), clamp(color.b, 0.0, 1.0));\n"+
                        "texCoord = s4j_MultiTexCoord0;\n"+
-                       "gl_TexCoord[1] = gl_MultiTexCoord1;\n"+
+                       //"gl_TexCoord[1] = gl_MultiTexCoord1;\n"+ CORE
                        "gl_Position = s4j_ProjectionMatrix * s4j_ModelViewMatrix * vec4(s4j_Vertex, 1.0);\n"+
                        "frontColor = diffuCol;\n");
 
