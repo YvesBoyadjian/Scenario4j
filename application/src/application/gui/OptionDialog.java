@@ -30,7 +30,7 @@ public class OptionDialog extends JDialog {
     SoQtWalkViewer viewer;
     SceneGraphIndexedFaceSetShader sg;
 
-    public static final double DEFAULT_SHADOW_PRECISION = 0.15;
+    public static final double DEFAULT_SHADOW_PRECISION = 0.075;
     public static final double DEFAULT_LOD_FACTOR = 0.5;
     public static final double DEFAULT_LOD_FACTOR_SHADOW = 0.5;
     public static final double DEFAULT_TREE_DISTANCE = 3000;
@@ -133,7 +133,7 @@ public class OptionDialog extends JDialog {
     }
 
     private void onLowest() {
-        setShadowPrecision(0.05);
+        setShadowPrecision(0.025);
         setLODFactor(0.05);
         setLODFactorShadow(0.05);
         setTreeDistance(500);
@@ -143,7 +143,7 @@ public class OptionDialog extends JDialog {
     }
 
     private void onLow() {
-        setShadowPrecision(0.05);
+        setShadowPrecision(0.025);
         setLODFactor(0.25);
         setLODFactorShadow(0.25);
         setTreeDistance(1500);
@@ -183,11 +183,11 @@ public class OptionDialog extends JDialog {
     }
 
     private void onExtreme() {
-        setShadowPrecision(0.4);
+        setShadowPrecision(0.3);
         setLODFactor(2.0);
         setLODFactorShadow(2.0);
-        setTreeDistance(30000);
-        setTreeShadowDistance(30000);
+        setTreeDistance(15000);
+        setTreeShadowDistance(6000);
         setIslandDepth(14000);
         setVolumetricSky(true);
     }
@@ -210,7 +210,7 @@ public class OptionDialog extends JDialog {
     public void setVisible(boolean b) {
         if(b) {
             // SHADOW_PRECISION
-            spinnerShadowgroup.setModel(new SpinnerNumberModel((double)sg.getShadowGroup().precision.getValue(),0.05,1.0,0.05));
+            spinnerShadowgroup.setModel(new SpinnerNumberModel((double)sg.getShadowGroup().precision.getValue(),0.025,1.0,0.025));
             // LOD_FACTOR
             spinnerLODFactor.setModel(new SpinnerNumberModel((double)sg.getLevelOfDetail(),0.05,2.0,0.05));
             // LOD_FACTOR_SHADOW
