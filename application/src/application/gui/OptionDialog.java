@@ -133,7 +133,7 @@ public class OptionDialog extends JDialog {
     }
 
     private void onLowest() {
-        setShadowPrecision(0.025);
+        setShadowPrecision(0.01);
         setLODFactor(0.05);
         setLODFactorShadow(0.05);
         setTreeDistance(500);
@@ -143,7 +143,7 @@ public class OptionDialog extends JDialog {
     }
 
     private void onLow() {
-        setShadowPrecision(0.025);
+        setShadowPrecision(0.02);
         setLODFactor(0.25);
         setLODFactorShadow(0.25);
         setTreeDistance(1500);
@@ -199,7 +199,7 @@ public class OptionDialog extends JDialog {
         sg.setLevelOfDetailShadow((float)((double)((Double)((SpinnerNumberModel)spinnerLODFactorShadow.getModel()).getNumber())));
         sg.setTreeDistance((float)((double)((Double)((SpinnerNumberModel)spinnerTreeDistance.getModel()).getNumber())));
         sg.setTreeShadowDistance((float)((double)((Double)((SpinnerNumberModel)spinnerTreeShadowDistance.getModel()).getNumber())));
-        sg.setMaxI(((int)((Integer)((SpinnerNumberModel)spinnerMaxI.getModel()).getNumber())));
+        sg.setMaxI(((int)((SpinnerNumberModel)spinnerMaxI.getModel()).getNumber()));
         boolean volumetric = volumetricSkyCheckBox.getModel().isSelected();
         sg.getShadowGroup().isVolumetricActive.setValue(volumetric);
         sg.getEnvironment().fogColor.setValue(volumetric ? sg.SKY_COLOR.darker().darker().darker().darker().darker().darker() : sg.SKY_COLOR.darker());
@@ -209,22 +209,23 @@ public class OptionDialog extends JDialog {
 
     public void setVisible(boolean b) {
         if(b) {
+            final double delta = 1e-5;
             // SHADOW_PRECISION
-            spinnerShadowgroup.setModel(new SpinnerNumberModel((double)sg.getShadowGroup().precision.getValue(),0.025,1.0,0.025));
+            spinnerShadowgroup.setModel(new SpinnerNumberModel((double)sg.getShadowGroup().precision.getValue(),0.01 - delta,0.4 + delta,0.01));
             // LOD_FACTOR
-            spinnerLODFactor.setModel(new SpinnerNumberModel((double)sg.getLevelOfDetail(),0.05,2.0,0.05));
+            spinnerLODFactor.setModel(new SpinnerNumberModel((double)sg.getLevelOfDetail(),0.05 - delta,2.0 + delta,0.05));
             // LOD_FACTOR_SHADOW
-            spinnerLODFactorShadow.setModel(new SpinnerNumberModel((double)sg.getLevelOfDetailShadow(),0.05,2.0,0.05));
+            spinnerLODFactorShadow.setModel(new SpinnerNumberModel((double)sg.getLevelOfDetailShadow(),0.05 - delta,2.0 + delta,0.05));
             // TREE_DISTANCE
             double treeDistance = (double)sg.getTreeDistance();
             treeDistance = Math.max(500,treeDistance);
             treeDistance = Math.min(30000,treeDistance);
-            spinnerTreeDistance.setModel(new SpinnerNumberModel(treeDistance,500,30000,500));
+            spinnerTreeDistance.setModel(new SpinnerNumberModel(treeDistance,500 - delta,30000 + delta,500));
             // TREE_SHADOW_DISTANCE
             double treeShadowDistance = (double)sg.getTreeShadowDistance();
             treeShadowDistance = Math.max(500,treeShadowDistance);
             treeShadowDistance = Math.min(30000,treeShadowDistance);
-            spinnerTreeShadowDistance.setModel(new SpinnerNumberModel(treeShadowDistance,500,30000,500));
+            spinnerTreeShadowDistance.setModel(new SpinnerNumberModel(treeShadowDistance,500 - delta,30000 + delta,500));
             // MAX_I
             spinnerMaxI.setModel(new SpinnerNumberModel(sg.getMaxI(),7000,14000,500));
             // VOLUMETRIC_SKY

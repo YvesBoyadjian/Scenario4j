@@ -370,7 +370,7 @@ public class SoShadowGroup extends SoSeparator {
 
 		nodeHeader.SO_NODE_ADD_FIELD(isActive,"isActive", (true));
 		nodeHeader.SO_NODE_ADD_FIELD(intensity,"intensity", (0.5f));
-		nodeHeader.SO_NODE_ADD_FIELD(precision,"precision", (0.5f));
+		nodeHeader.SO_NODE_ADD_FIELD(precision,"precision", (0.05f));
 		nodeHeader.SO_NODE_ADD_FIELD(quality,"quality", (0.5f));
 		nodeHeader.SO_NODE_ADD_FIELD(shadowCachingEnabled,"shadowCachingEnabled", (true));
 		nodeHeader.SO_NODE_ADD_FIELD(visibilityNearRadius,"visibilityNearRadius", (-1.0f));
