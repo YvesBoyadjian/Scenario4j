@@ -12,6 +12,7 @@ import java.nio.charset.Charset;
 
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.ARBImaging;
+import org.lwjgl.opengl.ARBShaderObjects;
 import org.lwjgl.opengl.ARBVertexBufferObject;
 import org.lwjgl.system.MemoryStack;
 
@@ -3748,5 +3749,10 @@ ByteBuffer data ) {
 
 	default void glUniform1i(int location, int value) {
 		org.lwjgl.opengl.GL40C.glUniform1i(location,value);
+	}
+
+	default void glUniformMatrix4fvARB(int location, int num, boolean b, FloatBuffer value) {
+		assert ( 1 == num);
+		ARBShaderObjects.glUniformMatrix4fvARB(location,b,value);
 	}
 }

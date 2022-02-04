@@ -25,6 +25,7 @@
 package jscenegraph.coin3d.shaders;
 
 import java.nio.ByteBuffer;
+import java.nio.FloatBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 
@@ -44,7 +45,7 @@ import jscenegraph.port.Util;
 public class SoGLSLShaderParameter implements SoGLShaderParameter {
 	
 private
-  int location;
+SoGLSLShaderProgram.Handle.Uniform location;
 private String cacheName;
 private /*GLsizei*/int cacheSize;
 private /*GLenum*/int cacheType;
@@ -55,7 +56,7 @@ private int programid;
 
 public SoGLSLShaderParameter()
 {
-  this.location  = -1;
+  this.location  = new SoGLSLShaderProgram.Handle.Uniform(); location.location = -1;
   this.cacheType = GL2.GL_FLOAT;
   this.cacheName = "";
   this.cacheSize =  0;
@@ -79,7 +80,7 @@ set1f( SoGLShaderObject  shader,
                               float value,  String name,  int id)
 {
   if (this.isValid(shader, name, GL2.GL_FLOAT))
-    shader.GLContext().glUniform1fARB(this.location, value);
+    shader.GLContext().glUniform1fARB(this.location.location, value);
 }
 
 public void
@@ -87,7 +88,7 @@ set2f( SoGLShaderObject  shader,
                               float[] value,  String name,  int id)
 {
   if (this.isValid(shader, name, GL2.GL_FLOAT_VEC2_ARB))
-    shader.GLContext().glUniform2fARB(this.location, value[0], value[1]);
+    shader.GLContext().glUniform2fARB(this.location.location, value[0], value[1]);
 }
 
 public void
@@ -95,7 +96,7 @@ set3f( SoGLShaderObject  shader,
                               float[] v,  String name,  int id)
 {
   if (this.isValid(shader, name, GL2.GL_FLOAT_VEC3_ARB))
-    shader.GLContext().glUniform3fARB(this.location, v[0], v[1], v[2]);
+    shader.GLContext().glUniform3fARB(this.location.location, v[0], v[1], v[2]);
 }
 
 public void
@@ -103,7 +104,7 @@ set4f( SoGLShaderObject  shader,
                               float[] v,  String name,  int id)
 {
   if (this.isValid(shader, name, GL2.GL_FLOAT_VEC4_ARB))
-    shader.GLContext().glUniform4fARB(this.location, v[0], v[1], v[2], v[3]);
+    shader.GLContext().glUniform4fARB(this.location.location, v[0], v[1], v[2], v[3]);
 }
 
 
@@ -113,7 +114,7 @@ set1fv( SoGLShaderObject  shader,  int num,
 {
   final int[] cnt = new int[1]; cnt[0] = num;
   if (this.isValid(shader, name, GL2.GL_FLOAT, cnt))
-    shader.GLContext().glUniform1fvARB(this.location, cnt[0], value);
+    shader.GLContext().glUniform1fvARB(this.location.location, cnt[0], value);
 }
 
 public void
@@ -122,7 +123,7 @@ set2fv( SoGLShaderObject  shader,  int num,
 {
   final int[] cnt = new int[1]; cnt[0] = num;
   if (this.isValid(shader, name, GL2.GL_FLOAT_VEC2_ARB, cnt))
-    shader.GLContext().glUniform2fvARB(this.location, cnt[0], value);
+    shader.GLContext().glUniform2fvARB(this.location.location, cnt[0], value);
 }
 
 public void
@@ -131,7 +132,7 @@ set3fv( SoGLShaderObject  shader,  int num,
 {
   final int[] cnt = new int[1]; cnt[0] = num;
   if (this.isValid(shader, name, GL2.GL_FLOAT_VEC3_ARB, cnt))
-    shader.GLContext().glUniform3fvARB(this.location, cnt[0], value);
+    shader.GLContext().glUniform3fvARB(this.location.location, cnt[0], value);
 }
 
 public void
@@ -140,16 +141,18 @@ set4fv( SoGLShaderObject  shader,  int num,
 {
   final int[] cnt = new int[1]; cnt[0] = num;
   if (this.isValid(shader, name, GL2.GL_FLOAT_VEC4_ARB, cnt))
-    shader.GLContext().glUniform4fvARB(this.location, cnt[0], value);
+    shader.GLContext().glUniform4fvARB(this.location.location, cnt[0], value);
 }
 
 public void
-setMatrix( SoGLShaderObject shader,
-                                  float[] value,  String  name,
-                                  int id)
+setMatrix(SoGLShaderObject shader,
+          FloatBuffer value, String  name,
+          int id)
 {
-  if (this.isValid(shader, name, GL2.GL_FLOAT_MAT4_ARB))
-    shader.GLContext().glUniformMatrix4fvARB(this.location,1,false,value);
+  if (this.isValid(shader, name, GL2.GL_FLOAT_MAT4_ARB)) {
+    //shader.GLContext().glUniformMatrix4fvARB(this.location.location, 1, false, value);
+    location.glUniformMatrix4fvARB(shader.GLContext().getGL2(), 1, false, value);
+  }
 }
 
   public void
@@ -158,7 +161,7 @@ setMatrix( SoGLShaderObject shader,
              int id)
   {
     if (this.isValid(shader, name, GL2.GL_FLOAT_MAT3_ARB))
-      shader.GLContext().glUniformMatrix3fvARB(this.location,1,false,value);
+      shader.GLContext().glUniformMatrix3fvARB(this.location.location,1,false,value);
   }
   
 public void
@@ -168,7 +171,7 @@ setMatrixArray( SoGLShaderObject shader,
 {
   final int[] cnt = new int[1]; cnt[0] = num;
   if (this.isValid(shader, name, GL2.GL_FLOAT_MAT4_ARB, cnt))
-    shader.GLContext().glUniformMatrix4fvARB(this.location,cnt[0],false,value);
+    shader.GLContext().glUniformMatrix4fvARB(this.location.location,cnt[0],false,value);
 }
 
 
@@ -177,7 +180,7 @@ set1i( SoGLShaderObject  shader,
                               int value,  String  name,  int id)
 {
   if (this.isValid(shader, name, GL2.GL_INT))
-    shader.GLContext().glUniform1iARB(this.location, value);
+    shader.GLContext().glUniform1iARB(this.location.location, value);
 }
 
 public void
@@ -186,7 +189,7 @@ set2i( SoGLShaderObject  shader,
                               int id)
 {
   if (this.isValid(shader, name, GL2.GL_INT_VEC2_ARB))
-    shader.GLContext().glUniform2iARB(this.location, value[0], value[1]);
+    shader.GLContext().glUniform2iARB(this.location.location, value[0], value[1]);
 }
 
 public void
@@ -195,7 +198,7 @@ set3i( SoGLShaderObject  shader,
                               int id)
 {
   if (this.isValid(shader, name, GL2.GL_INT_VEC3_ARB))
-    shader.GLContext().glUniform3iARB(this.location, v[0], v[1], v[2]);
+    shader.GLContext().glUniform3iARB(this.location.location, v[0], v[1], v[2]);
 }
 
 public void
@@ -204,7 +207,7 @@ set4i( SoGLShaderObject  shader,
                               int id)
 {
   if (this.isValid(shader, name, GL2.GL_INT_VEC4_ARB))
-    shader.GLContext().glUniform4iARB(this.location, v[0], v[1], v[2], v[3]);
+    shader.GLContext().glUniform4iARB(this.location.location, v[0], v[1], v[2], v[3]);
 }
 
 public void
@@ -214,7 +217,7 @@ set1iv( SoGLShaderObject  shader,
                                int id)
 {
   if (this.isValid(shader, name, GL2.GL_INT))
-    shader.GLContext().glUniform1ivARB(this.location, num, (int[]) value);
+    shader.GLContext().glUniform1ivARB(this.location.location, num, (int[]) value);
 }
 
 public void
@@ -224,7 +227,7 @@ set2iv( SoGLShaderObject  shader,
                                int id)
 {
   if (this.isValid(shader, name, GL2.GL_INT_VEC2_ARB))
-    shader.GLContext().glUniform2ivARB(this.location, num, ( int[])value);
+    shader.GLContext().glUniform2ivARB(this.location.location, num, ( int[])value);
 }
 
 public void
@@ -234,7 +237,7 @@ set3iv( SoGLShaderObject  shader,
                                int id)
 {
   if (this.isValid(shader, name, GL2.GL_INT_VEC3_ARB))
-    shader.GLContext().glUniform3ivARB(this.location, num, ( int[])v);
+    shader.GLContext().glUniform3ivARB(this.location.location, num, ( int[])v);
 }
 
 public void
@@ -244,7 +247,7 @@ set4iv( SoGLShaderObject  shader,
                                int id)
 {
   if (this.isValid(shader, name, GL2.GL_INT_VEC4_ARB))
-    shader.GLContext().glUniform4ivARB(this.location, num, ( int[])v);
+    shader.GLContext().glUniform4ivARB(this.location.location, num, ( int[])v);
 }
 
 //#include <stdio.h>
@@ -260,14 +263,14 @@ isValid( SoGLShaderObject  shader,
   assert(shader!=null);
   assert(shader.shaderType() == SoShader.Type.GLSL_SHADER);
   
-  /*COIN_GLhandle*/int pHandle = ((SoGLSLShaderObject)shader).programHandle;
+  /*COIN_GLhandle*/int pHandle = ((SoGLSLShaderObject)shader).programHandle.handle;
   int pId = ((SoGLSLShaderObject)shader).programid;
   
   // return true if uniform isn't active. We warned the user about
   // this when we found it to be inactive.
-  if ((pId == this.programid) && (this.location > -1) && !this.isActive) return true;
+  if ((pId == this.programid) && (this.location.location > -1) && !this.isActive) return true;
   
-  if ((pId == this.programid) && (this.location > -1) && 
+  if ((pId == this.programid) && (this.location.location > -1) &&
       Objects.equals(this.cacheName,name) && (this.cacheType == type)) {
     if (num != null) { // assume: ARRAY
       if (this.cacheSize < num[0]) {
@@ -284,11 +287,11 @@ isValid( SoGLShaderObject  shader,
    cc_glglue g = shader.GLContext();
   
   this.cacheSize = 0;  
-  this.location = g.glGetUniformLocationARB(pHandle,
+  this.location.location = g.glGetUniformLocationARB(pHandle,
                                               ( /*COIN_GLchar **/String)name);
   this.programid = pId;
   
-  if (this.location == -1)  {
+  if (this.location.location == -1)  {
 //#if COIN_DEBUG
     SoDebugError.postWarning("SoGLSLShaderParameter::isValid",
                               "parameter '"+name+"' not found in program.");

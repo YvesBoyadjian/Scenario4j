@@ -140,8 +140,6 @@ public class SoGLModelMatrixElement extends SoModelMatrixElement {
         // Save state in instance in case we need it later
         state = _state;
 
-        //updateStateParameters(); // CORE
-
         GL2 gl2 = state.getGL2();
 
         gl2.glPushMatrix();
@@ -288,29 +286,29 @@ public class SoGLModelMatrixElement extends SoModelMatrixElement {
 //
 // Use: public, virtual
 
-    private final SbVec3f axis = new SbVec3f(); // SINGLE_THREAD
-    private final float[] angle = new float[1]; // SINGLE_THREAD
+//    private final SbVec3f axis = new SbVec3f(); // SINGLE_THREAD
+//    private final float[] angle = new float[1]; // SINGLE_THREAD
 
     public void
     rotateEltBy(final SbRotation rotation)
 //
 ////////////////////////////////////////////////////////////////////////
     {
-        axis.constructor();
-        angle[0] = 0;
+//        axis.constructor();
+//        angle[0] = 0;
 
         super.rotateEltBy(rotation);
 
-        rotation.getValue(axis, angle);
-
-        if (angle[0] == 0f) { // YB Koin3D
-            return;
-        }
+//        rotation.getValue(axis, angle);
+//
+//        if (angle[0] == 0f) { // YB Koin3D
+//            return;
+//        }
 
         updateStateParameters(); // CORE
 
-        new GL2() {
-        }.glRotatef(angle[0] * (180.0f / (float) Math.PI), axis.getX(), axis.getY(), axis.getZ());
+//        new GL2() {
+//        }.glRotatef(angle[0] * (180.0f / (float) Math.PI), axis.getX(), axis.getY(), axis.getZ());
     }
 
 ////////////////////////////////////////////////////////////////////////
@@ -400,12 +398,12 @@ public class SoGLModelMatrixElement extends SoModelMatrixElement {
 
     private void updateStateParameters() { // CORE
 
-        SoGLShaderProgram sp = SoGLShaderProgramElement.get(state);
-
-        if(null!=sp &&sp.isEnabled())
-        {
-            // Dependent of SoModelMatrixElement
-            sp.updateStateParameters(state);
-        }
+//        SoGLShaderProgram sp = SoGLShaderProgramElement.get(state);
+//
+//        if(null!=sp &&sp.isEnabled())
+//        {
+//            // Dependent of SoModelMatrixElement
+//            sp.updateStateParameters(state);
+//        }
     }
 }

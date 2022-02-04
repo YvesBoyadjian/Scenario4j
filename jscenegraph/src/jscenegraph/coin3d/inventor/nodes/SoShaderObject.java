@@ -38,11 +38,7 @@ import jscenegraph.coin3d.inventor.elements.gl.SoGLMultiTextureImageElement;
 import jscenegraph.coin3d.inventor.misc.SoContextHandler;
 import jscenegraph.coin3d.inventor.misc.SoGLDriverDatabase;
 import jscenegraph.coin3d.misc.SoGL;
-import jscenegraph.coin3d.shaders.SoGLARBShaderObject;
-import jscenegraph.coin3d.shaders.SoGLCgShaderObject;
-import jscenegraph.coin3d.shaders.SoGLSLShaderObject;
-import jscenegraph.coin3d.shaders.SoGLShaderObject;
-import jscenegraph.coin3d.shaders.SoGLShaderProgram;
+import jscenegraph.coin3d.shaders.*;
 import jscenegraph.coin3d.shaders.inventor.elements.SoGLShaderProgramElement;
 import jscenegraph.coin3d.shaders.inventor.nodes.SoMFUniformShaderParameter;
 import jscenegraph.coin3d.shaders.inventor.nodes.SoShaderStateMatrixParameter;
@@ -441,9 +437,9 @@ public void updateLights(final int cachecontext, SoState state) {
     SoGLShaderProgram shaderprogram =
             (SoGLShaderProgram)(SoGLShaderProgramElement.get(state));
 
-    int pHandle = shaderprogram.getGLSLShaderProgramHandle(state);
+    SoGLSLShaderProgram.Handle pHandle = shaderprogram.getGLSLShaderProgramHandleClass(state);
 
-    if(pHandle <= 0) return;
+    if(!SoGLSLShaderProgram.Handle.isValid(pHandle)) return;
 
     final SoNodeList lights = SoLightElement.getLights(state);
 
@@ -457,10 +453,10 @@ public void updateLights(final int cachecontext, SoState state) {
             SoDirectionalLight dirLight = (SoDirectionalLight) light;
             {
                 String positionName = "s4j_LightSource[" + SoLightElement.getIndex(state, i) + "].position";
-                int positionLocation = gl2.glGetUniformLocation(pHandle,
+                SoGLSLShaderProgram.Handle.Uniform positionLocation = pHandle.glGetUniformLocation(gl2,
                         ( /*COIN_GLchar **/String) positionName);
 
-                if (0 <= positionLocation) {
+                if (SoGLSLShaderProgram.Handle.Uniform.isValid( positionLocation)) {
                     SbVec3f lightDir = dirLight.direction.getValue();
 
                     SbVec4f value4 = new SbVec4f();
@@ -474,7 +470,7 @@ public void updateLights(final int cachecontext, SoState state) {
                     lighttoworld.multVecMatrix(value4, value4);
                     value4.setValue(3, 0);
 
-                    gl2.glUniform4fv(positionLocation, 1, value4.getValueRead());
+                    positionLocation.glUniform4fv(gl2, 1, value4.getValueRead());
 
 //                if( 5 == i ) {
 //                    System.out.println("light 5 x = "+value4.getX()+" y = "+value4.getY());
@@ -486,10 +482,10 @@ public void updateLights(final int cachecontext, SoState state) {
             }
             {
                 String diffuseName = "s4j_LightSource[" + SoLightElement.getIndex(state, i) + "].diffuse";
-                int diffuseLocation = gl2.glGetUniformLocation(pHandle,
+                SoGLSLShaderProgram.Handle.Uniform diffuseLocation = pHandle.glGetUniformLocation(gl2,
                         ( /*COIN_GLchar **/String) diffuseName);
 
-                if (0 <= diffuseLocation) {
+                if (SoGLSLShaderProgram.Handle.Uniform.isValid( diffuseLocation)) {
                     final SbVec3f v3 = new SbVec3f();
                     final SbVec4fSingle v4 = new SbVec4fSingle();
 
@@ -498,15 +494,15 @@ public void updateLights(final int cachecontext, SoState state) {
                     v3.copyFrom(dirLight.color.getValue().operator_mul(dirLight.intensity.getValue()));
                     v4.setValue(v3.getValueRead()[0], v3.getValueRead()[1], v3.getValueRead()[2], 1.0f);
 
-                    gl2.glUniform4fv(diffuseLocation, 1, v4.getValue());
+                    diffuseLocation.glUniform4fv(gl2, 1, v4.getValue());
                 }
             }
             {
                 String specularName = "s4j_LightSource[" + SoLightElement.getIndex(state, i) + "].specular";
-                int specularLocation = gl2.glGetUniformLocation(pHandle,
+                SoGLSLShaderProgram.Handle.Uniform specularLocation = pHandle.glGetUniformLocation(gl2,
                         ( /*COIN_GLchar **/String) specularName);
 
-                if (0 <= specularLocation) {
+                if (SoGLSLShaderProgram.Handle.Uniform.isValid( specularLocation)) {
                     final SbVec3f v3 = new SbVec3f();
                     final SbVec4fSingle v4 = new SbVec4fSingle();
 
@@ -515,7 +511,7 @@ public void updateLights(final int cachecontext, SoState state) {
                     v3.copyFrom(dirLight.color.getValue().operator_mul(dirLight.intensity.getValue()));
                     v4.setValue(v3.getValueRead()[0], v3.getValueRead()[1], v3.getValueRead()[2], 1.0f);
 
-                    gl2.glUniform4fv(specularLocation, 1, v4.getValue());
+                    specularLocation.glUniform4fv(gl2, 1, v4.getValue());
                 }
             }
         }
@@ -524,12 +520,12 @@ public void updateLights(final int cachecontext, SoState state) {
     SbColor fogColor = SoEnvironmentElement.getFogColor(state);
 
     String fogColorName = "s4j_Fog.color";
-    int fogColorLocation = gl2.glGetUniformLocation(pHandle,fogColorName);
-    if(0 <= fogColorLocation) {
+    SoGLSLShaderProgram.Handle.Uniform fogColorLocation = pHandle.glGetUniformLocation(gl2,fogColorName);
+    if(SoGLSLShaderProgram.Handle.Uniform.isValid( fogColorLocation)) {
         SbVec4fSingle fogColor4 = new SbVec4fSingle();
         fogColor4.setValue(fogColor.getX(),fogColor.getY(),fogColor.getZ(),1.0f);
 
-        gl2.glUniform4fv(fogColorLocation,1,fogColor4.getValue());
+        fogColorLocation.glUniform4fv(gl2,1,fogColor4.getValue());
     }
 
     float visibility = SoEnvironmentElement.getFogVisibility(state);
@@ -537,9 +533,9 @@ public void updateLights(final int cachecontext, SoState state) {
     float density = 4.0f / visibility;
 
     String fogDensityName = "s4j_Fog.density";
-    int fogDensityLocation = gl2.glGetUniformLocation(pHandle,fogDensityName);
-    if(0 <= fogDensityLocation) {
-        gl2.glUniform1f(fogDensityLocation,density);
+    SoGLSLShaderProgram.Handle.Uniform fogDensityLocation = pHandle.glGetUniformLocation(gl2,fogDensityName);
+    if(SoGLSLShaderProgram.Handle.Uniform.isValid( fogDensityLocation)) {
+        fogDensityLocation.glUniform1f(gl2,density);
     }
 }
 

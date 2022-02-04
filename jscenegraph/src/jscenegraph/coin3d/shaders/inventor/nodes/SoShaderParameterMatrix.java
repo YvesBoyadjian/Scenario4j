@@ -10,6 +10,9 @@ import jscenegraph.database.inventor.fields.SoFieldData;
 import jscenegraph.database.inventor.fields.SoMFFloat;
 import jscenegraph.database.inventor.fields.SoSFMatrix;
 import jscenegraph.database.inventor.nodes.SoSubNode;
+import org.lwjgl.BufferUtils;
+
+import java.nio.FloatBuffer;
 
 /**
  * @author Yves Boyadjian
@@ -38,6 +41,8 @@ public class SoShaderParameterMatrix extends SoUniformShaderParameter {
 
 	private final float[] valueLinear = new float[16];
 
+	private final FloatBuffer valueBuffer = BufferUtils.createFloatBuffer(16);
+
 	public static void initClass()
 	{
 	  //SO_NODE_INTERNAL_INIT_CLASS(SoShaderParameterMatrix,
@@ -63,7 +68,7 @@ public class SoShaderParameterMatrix extends SoUniformShaderParameter {
 	public void updateParameter(SoGLShaderObject shader) {
 		  this.ensureParameter(shader);
 
-		  this.getGLShaderParameter(shader.getCacheContext()).setMatrix(shader,  this.value.getValue().getValueLinear(valueLinear)/*[0]*/,
+		  this.getGLShaderParameter(shader.getCacheContext()).setMatrix(shader,  this.value.getValue().getValueFloatBuffer(valueBuffer)/*[0]*/,
 		                                                                   this.name.getValue()/*.getString()*/,
 		                                                                   this.identifier.getValue());
 	}

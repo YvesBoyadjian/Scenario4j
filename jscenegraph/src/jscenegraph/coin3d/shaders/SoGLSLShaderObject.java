@@ -42,7 +42,7 @@ import jscenegraph.port.Util;
  */
 public class SoGLSLShaderObject extends SoGLShaderObject {
 
-	int programHandle;
+	SoGLSLShaderProgram.Handle programHandle;
 	private	  /*COIN_GLhandle*/int shaderHandle;
 	private	  boolean isattached;
 	int programid;
@@ -53,7 +53,7 @@ public class SoGLSLShaderObject extends SoGLShaderObject {
 public SoGLSLShaderObject( int cachecontext) {
   super(cachecontext);
 
-  this.programHandle = 0;
+  this.programHandle = new SoGLSLShaderProgram.Handle();
   this.shaderHandle = 0;
   this.isattached = false;
   this.programid = 0;
@@ -141,7 +141,7 @@ unload()
   this.detach();
   if (this.shaderHandle != 0) { this.glctx.glDeleteObjectARB(this.shaderHandle); }
   this.shaderHandle = 0;
-  this.programHandle = 0;
+  this.programHandle = new SoGLSLShaderProgram.Handle();
   this.programid = 0;
 }
 
@@ -154,15 +154,15 @@ getNewParameter()
 // *************************************************************************
 
 public void
-attach(/*COIN_GLhandle*/int programHandle)
+attach(/*COIN_GLhandle*/SoGLSLShaderProgram.Handle programHandle)
 {
-  if (programHandle <= 0 || this.programHandle == programHandle) return;
+  if (programHandle.handle <= 0 || this.programHandle == programHandle) return;
 
   detach();
 
   if (this.shaderHandle != 0) {
     this.programHandle = programHandle;
-    this.glctx.glAttachObjectARB(this.programHandle, this.shaderHandle);
+    this.glctx.glAttachObjectARB(this.programHandle.handle, this.shaderHandle);
     this.isattached = true;
   }
 }
@@ -170,10 +170,10 @@ attach(/*COIN_GLhandle*/int programHandle)
 public void
 detach()
 {
-  if (this.isattached && this.programHandle != 0 && this.shaderHandle != 0) {
-    this.glctx.glDetachObjectARB(this.programHandle, this.shaderHandle);
+  if (this.isattached && this.programHandle.handle != 0 && this.shaderHandle != 0) {
+    this.glctx.glDetachObjectARB(this.programHandle.handle, this.shaderHandle);
     this.isattached = false;
-    this.programHandle = 0;
+    this.programHandle = new SoGLSLShaderProgram.Handle();
   }
 }
 
@@ -256,8 +256,9 @@ didOpenGLErrorOccur( String source, cc_glglue g)
 public void 
 updateCoinParameter(SoState state, final SbName name, SoShaderParameter  param, int value)
 {
-  /*COIN_GLhandle*/int pHandle = this.programHandle;
-  if (pHandle != 0) {
+  /*COIN_GLhandle*/
+  SoGLSLShaderProgram.Handle pHandle = this.programHandle;
+  if (pHandle.handle != 0) {
     cc_glglue glue = this.GLContext();
     
     // FIXME: set up a dict for the supported Coin variables 
@@ -267,7 +268,7 @@ updateCoinParameter(SoState state, final SbName name, SoShaderParameter  param, 
       if (p.value.getValue() != value) p.value.operator_assign(value);
     }
     else {
-      int location = glue.glGetUniformLocationARB(pHandle,
+      SoGLSLShaderProgram.Handle.Uniform location = pHandle.glGetUniformLocation(glue.getGL2(),
                                                      (/*const COIN_GLchar **/String)name.getString());
       
 //#if 0
@@ -275,8 +276,8 @@ updateCoinParameter(SoState state, final SbName name, SoShaderParameter  param, 
 //              state.getAction().getTypeId().getName().getString(),
 //              name.getString(), location, pHandle);
 //#endif
-      if (location >= 0) {
-        glue.glUniform1iARB(location, value);
+      if (SoGLSLShaderProgram.Handle.Uniform.isValid(location)) {
+        glue.glUniform1iARB(location.location, value);
       }
     }
   }

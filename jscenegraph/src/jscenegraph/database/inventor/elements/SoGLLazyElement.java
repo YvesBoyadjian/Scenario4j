@@ -61,6 +61,7 @@ import com.jogamp.opengl.GL2;
 import jscenegraph.coin3d.glue.cc_glglue;
 import jscenegraph.coin3d.misc.SoGL;
 import jscenegraph.coin3d.misc.Tidbits;
+import jscenegraph.coin3d.shaders.SoGLSLShaderProgram;
 import jscenegraph.coin3d.shaders.SoGLShaderProgram;
 import jscenegraph.coin3d.shaders.inventor.elements.SoGLShaderProgramElement;
 import jscenegraph.database.inventor.SbBasic;
@@ -2385,10 +2386,10 @@ sendAlphaTest(int func, float value)
 
         SoGLShaderProgram program = SoGLShaderProgramElement.get(state);
         if( null != program && program.isEnabled()) {
-            int pHandle = program.getGLSLShaderProgramHandle(state);
-            if( 0 < pHandle ) {
-                int colorLocation = state.getGL2().glGetUniformLocation(pHandle, "s4j_ColorUniform");
-                if ( 0 <= colorLocation ) {
+            SoGLSLShaderProgram.Handle pHandle = program.getGLSLShaderProgramHandleClass(state);
+            if( SoGLSLShaderProgram.Handle.isValid(pHandle) ) {
+                SoGLSLShaderProgram.Handle.Uniform colorLocation = pHandle.glGetUniformLocation(state.getGL2(), "s4j_ColorUniform");
+                if ( SoGLSLShaderProgram.Handle.Uniform.isValid(colorLocation) ) {
                     int col = this.glState.diffuse;
                     short red = (short)((col>>24)&0xff);
                     short green = (short)((col>>16)&0xff);
@@ -2398,7 +2399,7 @@ sendAlphaTest(int func, float value)
                     rgba[1] = (float)green/255.0f;
                     rgba[2] = (float)blue/255.0f;
                     rgba[3] = (float)alpha/255.0f;
-                    state.getGL2().glUniform4fv(colorLocation,1,rgba);
+                    colorLocation.glUniform4fv(state.getGL2(),1,rgba);
                 }
             }
         }

@@ -198,6 +198,15 @@ getGLSLShaderProgramHandle(SoState state)
   return this.glslShaderProgram.getProgramHandle(glctx);
 }
 
+  public SoGLSLShaderProgram.Handle
+  getGLSLShaderProgramHandleClass(SoState state)
+  {
+    int cachecontext = SoGLCacheContextElement.get(state);
+    cc_glglue glctx = SoGL.cc_glglue_instance(cachecontext);
+
+    return this.glslShaderProgram.getProgramHandleClass(glctx);
+  }
+
 public boolean 
 glslShaderProgramLinked()  
 {

@@ -180,6 +180,7 @@
 
 package jscenegraph.database.inventor;
 
+import java.nio.FloatBuffer;
 import java.util.function.DoubleConsumer;
 
 import jscenegraph.port.Mutable;
@@ -1978,6 +1979,13 @@ public void jacobi3(final float[] evalues,
 			valueLinear3[i] = getValueAt3(i);
 		}
 		return valueLinear3;
+	}
+
+	public FloatBuffer getValueFloatBuffer(FloatBuffer valueLinear) {
+		for(int i=0; i< 16;i++) {
+			valueLinear.put(i, getValueAt(i));
+		}
+		return valueLinear;
 	}
 
 	public boolean operator_not_equal(SbMatrix value) {

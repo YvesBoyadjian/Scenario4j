@@ -1882,6 +1882,10 @@ static final SbVec3fArray varray = new SbVec3fArray(FloatMemoryBuffer.allocateFl
 static final int[] maxunit = new int[1]; // SINGLE_THREAD
 static final float[] dummy3 = new float[3]; // SINGLE_THREAD
 
+static SbVec3fArray vboArray = new SbVec3fArray(FloatMemoryBuffer.allocateFloats(3 * 6 * 6)); // SINGLE_THREAD
+static SbVec3fArray normalArray = new SbVec3fArray(FloatMemoryBuffer.allocateFloats(3 * 6 * 6)); // SINGLE_THREAD
+static SbVec2fArray tarray = new SbVec2fArray(FloatMemoryBuffer.allocateFloats(2 * 6 * 6)); // SINGLE_THREAD
+
 public static void
 sogl_render_cube( float width,
                   float height,
@@ -1923,13 +1927,10 @@ sogl_render_cube( float width,
   
   dummy3[0] = dummy3[1] = dummy3[2] = 0;
 
-  SbVec3fArray vboArray = new SbVec3fArray(FloatMemoryBuffer.allocateFloats(3 * 6 * 6));
   int vboIndex = 0;
 
-    SbVec3fArray normalArray = new SbVec3fArray(FloatMemoryBuffer.allocateFloats(3 * 6 * 6));
     int normalIndex = 0;
 
-    SbVec2fArray tarray = new SbVec2fArray(FloatMemoryBuffer.allocateFloats(2 * 6 * 6));
     int tIndex = 0;
 
   final int[] j = new int[6];

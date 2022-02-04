@@ -361,11 +361,15 @@ GLRender(SoGLRenderAction action)
   else if (do3DTextures) flags |= SoGL.SOGL_NEED_3DTEXCOORDS;
   if (sendNormals) flags |= SoGL.SOGL_NEED_NORMALS;
 
-  SoGL.sogl_render_cube(width.getValue(),
-                   height.getValue(),
-                   depth.getValue(),
-                   mb,
-                   flags, state);
+//  SoGL.sogl_render_cube(width.getValue(), //COIN3D
+//                   height.getValue(),
+//                   depth.getValue(),
+//                   mb,
+//                   flags, state);
+
+    GLRenderVertexArray(action,
+    sendNormals, doTextures);
+
   mb.destructor(); // java port
 }
 
@@ -640,11 +644,19 @@ rayPickBoundingBox(SoRayPickAction action, final SbBox3f bbox)
 }
 
 
-void GLRenderVertexArray(SoGLRenderAction action,
+    // 6 faces with 2 triangles
+    static final int numVertices = 6 * 2 * 3;
+
+    // vertex (3 floats) + normal (3 floats) + texcood (2 floats) + color (1 uint32)
+    static final int numBytes = ((3+3+2) * 4 + 4) * numVertices;
+
+    CharPtr data = new CharPtr(numBytes);
+
+    void GLRenderVertexArray(SoGLRenderAction action,
                                  boolean sendNormals, boolean doTextures)
 {
   SoState state = action.getState();
-  final SbVec3f scale = new SbVec3f();
+  final SbVec3fSingle scale = new SbVec3fSingle();
   getSize(scale);
 
   boolean              materialPerFace;
@@ -663,14 +675,8 @@ void GLRenderVertexArray(SoGLRenderAction action,
   _cache.useNormals = sendNormals;
   _cache.useTexCoords = doTextures;
 
-  // 6 faces with 2 triangles
-  int numVertices = 6 * 2 * 3;
-  
   _cache.numVertices = numVertices;
 
-  // vertex (3 floats) + normal (3 floats) + texcood (2 floats) + color (1 uint32)
-  int numBytes = ((3+3+2) * 4 + 4) * numVertices; 
-  CharPtr data = new CharPtr(numBytes);
   FloatPtr verticesPtr = new FloatPtr(data);
   FloatPtr normalsPtr = verticesPtr.operator_add(numVertices*3);
   FloatPtr texCoordsPtr = normalsPtr.operator_add(numVertices*3);
@@ -707,9 +713,9 @@ void GLRenderVertexArray(SoGLRenderAction action,
         normalsPtr.asterisk(tmp[1]); normalsPtr.plusPlus();
         normalsPtr.asterisk(tmp[2]); normalsPtr.plusPlus();
       }
-      verticesPtr.asterisk( (verts[face][vert]).getValueRead()[0]*scale.getValueRead()[0]); verticesPtr.plusPlus();
-      verticesPtr.asterisk( (verts[face][vert]).getValueRead()[1]*scale.getValueRead()[1]); verticesPtr.plusPlus();
-      verticesPtr.asterisk( (verts[face][vert]).getValueRead()[2]*scale.getValueRead()[2]); verticesPtr.plusPlus();
+      verticesPtr.asterisk( (verts[face][vert]).getValueRead()[0]*scale.getValue()[0]); verticesPtr.plusPlus();
+      verticesPtr.asterisk( (verts[face][vert]).getValueRead()[1]*scale.getValue()[1]); verticesPtr.plusPlus();
+      verticesPtr.asterisk( (verts[face][vert]).getValueRead()[2]*scale.getValue()[2]); verticesPtr.plusPlus();
     }
   }
   

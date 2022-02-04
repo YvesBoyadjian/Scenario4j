@@ -24,6 +24,8 @@
 
 package jscenegraph.coin3d.shaders;
 
+import java.nio.FloatBuffer;
+
 /**
  * @author Yves Boyadjian
  *
@@ -40,7 +42,7 @@ public interface SoGLShaderParameter {
    void set3fv( SoGLShaderObject  shader,  int num,  float[] value,  String name,  int id);
    void set4fv( SoGLShaderObject  shader,  int num,  float[] value,  String name,  int id);
 
-   void setMatrix( SoGLShaderObject  shader,  float[] value,  String name,  int id);
+   void setMatrix(SoGLShaderObject  shader, FloatBuffer value, String name, int id);
    void setMatrix3( SoGLShaderObject  shader,  float[] value,  String name,  int id);
    void setMatrixArray( SoGLShaderObject  shader,  int num,  float[] value,  String name,  int id);
 

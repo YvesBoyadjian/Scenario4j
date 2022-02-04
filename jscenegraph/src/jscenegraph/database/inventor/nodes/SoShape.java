@@ -642,7 +642,10 @@ SoShape_shouldGLRender(SoGLRenderAction action) // YB FIXME : use COIN3D version
     if ((shapestyleflags & SoShapeStyleElement.Flags.SHADOWMAP.getValue())!=0) {
         if (transparent) return false;
         int style = SoShadowStyleElement.get(state);
-        if ((style & SoShadowStyleElement.StyleFlags.CASTS_SHADOW.getValue())!=0) return true;
+        if ((style & SoShadowStyleElement.StyleFlags.CASTS_SHADOW.getValue())!=0){
+            updateStateParameters(state);
+            return true;
+        }
         return false;
       }
 
@@ -659,8 +662,21 @@ SoShape_shouldGLRender(SoGLRenderAction action) // YB FIXME : use COIN3D version
         return false;
     }
 
+    updateStateParameters(state);
+
     // Otherwise, go ahead and render the object
     return true;
+}
+private void updateStateParameters(SoState state) {
+
+    SoGLShaderProgram sp = SoGLShaderProgramElement.get(state);
+
+    if(null!=sp &&sp.isEnabled())
+    {
+        // Dependent of SoModelMatrixElement
+        sp.updateStateParameters(state);
+    }
+
 }
 
 ///*!
