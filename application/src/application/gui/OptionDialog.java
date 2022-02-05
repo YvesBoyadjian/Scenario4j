@@ -30,11 +30,14 @@ public class OptionDialog extends JDialog {
     SoQtWalkViewer viewer;
     SceneGraphIndexedFaceSetShader sg;
 
-    public static final double DEFAULT_SHADOW_PRECISION = 0.075;
-    public static final double DEFAULT_LOD_FACTOR = 0.5;
-    public static final double DEFAULT_LOD_FACTOR_SHADOW = 0.5;
-    public static final double DEFAULT_TREE_DISTANCE = 3000;
-    public static final double DEFAULT_TREE_SHADOW_DISTANCE = 1500;
+    /**
+     * low by default
+     */
+    public static final double DEFAULT_SHADOW_PRECISION = 0.02;//0.075;
+    public static final double DEFAULT_LOD_FACTOR = 0.25;//0.5;
+    public static final double DEFAULT_LOD_FACTOR_SHADOW = 0.25;//0.5;
+    public static final double DEFAULT_TREE_DISTANCE = 1500;//3000;
+    public static final double DEFAULT_TREE_SHADOW_DISTANCE = 500;//1500;
     public static final int DEFAULT_ISLAND_DEPTH = 7000;
     public static final boolean DEFAULT_VOLUMETRIC_SKY = false;
 
@@ -153,13 +156,13 @@ public class OptionDialog extends JDialog {
     }
 
     private void onMedium() {
-        setShadowPrecision(DEFAULT_SHADOW_PRECISION);
-        setLODFactor(DEFAULT_LOD_FACTOR);
-        setLODFactorShadow(DEFAULT_LOD_FACTOR_SHADOW);
-        setTreeDistance(DEFAULT_TREE_DISTANCE);
-        setTreeShadowDistance(DEFAULT_TREE_SHADOW_DISTANCE);
-        setIslandDepth(DEFAULT_ISLAND_DEPTH);
-        setVolumetricSky(DEFAULT_VOLUMETRIC_SKY);
+        setShadowPrecision(0.075/*DEFAULT_SHADOW_PRECISION*/);
+        setLODFactor(0.5/*DEFAULT_LOD_FACTOR*/);
+        setLODFactorShadow(0.5/*DEFAULT_LOD_FACTOR_SHADOW*/);
+        setTreeDistance(3000/*DEFAULT_TREE_DISTANCE*/);
+        setTreeShadowDistance(1500/*DEFAULT_TREE_SHADOW_DISTANCE*/);
+        setIslandDepth(7000/*DEFAULT_ISLAND_DEPTH*/);
+        setVolumetricSky(false/*DEFAULT_VOLUMETRIC_SKY*/);
     }
 
     private void onHigh() {
