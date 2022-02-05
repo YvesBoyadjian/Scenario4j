@@ -44,7 +44,7 @@ public class RecursiveChunk {
 	
 	final private boolean KEEP_IN_MEMORY = false;
 	
-	final int MIN_CHUNK_SIZE = 80;
+	final int MIN_CHUNK_SIZE = 120;
 	
 	RecursiveChunk parent;
 	int rank;
