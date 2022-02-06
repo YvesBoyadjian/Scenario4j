@@ -400,7 +400,7 @@ createVSMProgram()
 
   vgen.addDeclaration("layout (location = 0) in vec3 s4j_Vertex;",false);
 
-  vgen.addDeclaration("varying vec3 light_vec;", false);
+  vgen.addDeclaration("out vec3 light_vec;", false);
   vgen.addMainStatement("light_vec = (s4j_ModelViewMatrix * vec4(s4j_Vertex,1.0)).xyz;\n"+
                         "gl_Position = s4j_ProjectionMatrix * s4j_ModelViewMatrix * vec4(s4j_Vertex,1.0);//ftransform();");
 
@@ -437,7 +437,7 @@ createVSMProgram()
   str = "const float DISTRIBUTE_FACTOR = "+SoShadowGroupP.DISTRIBUTE_FACTOR+";\n";
   fgen.addDeclaration(str, false);
 //#endif
-  fgen.addDeclaration("varying vec3 light_vec;", false);
+  fgen.addDeclaration("in vec3 light_vec;", false);
   fgen.addDeclaration("uniform float farval;", false);
   fgen.addDeclaration("uniform float nearval;", false);
   fgen.addDeclaration("uniform float farvalnear;", false);

@@ -565,14 +565,14 @@ setVertexShader(SoState state)
 
   for (i = 0; i < numshadowlights; i++) {
     String str;
-    str = "varying vec4 shadowCoord"+i+";";
+    str = "out vec4 shadowCoord"+i+";";
     gen.addDeclaration(str, false);
 
-	  str = "varying vec4 nearShadowCoord"+i+";";
+	  str = "out vec4 nearShadowCoord"+i+";";
 	  gen.addDeclaration(str, false);
 
 	  if (!perpixelspot[0]) {
-      str = "varying vec3 spotVertexColor"+i+";";
+      str = "out vec3 spotVertexColor"+i+";";
       gen.addDeclaration(str, false);
     }
 
@@ -584,13 +584,13 @@ setVertexShader(SoState state)
     gen.addDeclaration("uniform mat4 cameraTransform;", false);
   }
 
-  gen.addDeclaration("varying vec3 ecPosition3;", false);
-  gen.addDeclaration("varying vec3 fragmentNormal;", false);
-  gen.addDeclaration("varying vec3 perVertexColor;", false);
+  gen.addDeclaration("out vec3 ecPosition3;", false);
+  gen.addDeclaration("out vec3 fragmentNormal;", false);
+  gen.addDeclaration("out vec3 perVertexColor;", false);
 
-  gen.addDeclaration("varying vec2 texCoord;",false);
+  gen.addDeclaration("out vec2 texCoord;",false);
 
-  gen.addDeclaration("varying vec4 frontColor;",false);
+  gen.addDeclaration("out vec4 frontColor;",false);
 
   boolean dirlight = false;
   boolean pointlight = false;
@@ -877,14 +877,14 @@ setFragmentShader(SoState state)
 	  str = "uniform float nearvalnear"+i+";";
 	  gen.addDeclaration(str, false);
 
-	  str = "varying vec4 shadowCoord"+i+";";
+	  str = "in vec4 shadowCoord"+i+";";
     gen.addDeclaration(str, false);
 
-	  str = "varying vec4 nearShadowCoord"+i+";";
+	  str = "in vec4 nearShadowCoord"+i+";";
 	  gen.addDeclaration(str, false);
 
 	  if (!perpixelspot[0]) {
-      str = "varying vec3 spotVertexColor"+i+";";
+      str = "in vec3 spotVertexColor"+i+";";
       gen.addDeclaration(str, false);
     }
     if (this.shadowlights.operator_square_bracket(i).light.isOfType(SoDirectionalLight.getClassTypeId())) {
@@ -903,13 +903,13 @@ setFragmentShader(SoState state)
     gen.addDeclaration(str, false);
 //#endif
   }
-  gen.addDeclaration("varying vec3 ecPosition3;", false);
-  gen.addDeclaration("varying vec3 fragmentNormal;", false);
-  gen.addDeclaration("varying vec3 perVertexColor;", false);
+  gen.addDeclaration("in vec3 ecPosition3;", false);
+  gen.addDeclaration("in vec3 fragmentNormal;", false);
+  gen.addDeclaration("in vec3 perVertexColor;", false);
 
-	gen.addDeclaration("varying vec2 texCoord;",false);
+	gen.addDeclaration("in vec2 texCoord;",false);
 
-	gen.addDeclaration("varying vec4 frontColor;",false);
+	gen.addDeclaration("in vec4 frontColor;",false);
 
   //final SoNodeList lights = SoLightElement.getLights(state); already called
 
