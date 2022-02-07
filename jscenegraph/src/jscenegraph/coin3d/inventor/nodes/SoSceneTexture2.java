@@ -450,7 +450,7 @@ public class SoSceneTexture2 extends SoNode {
 
 	  private SoSceneTexture2P pimpl;
 		  
-		
+		public SoState destructorState;
 	  
 	  static SoGLImage.Wrap
 	  translateWrap( SoSceneTexture2.Wrap wrap)

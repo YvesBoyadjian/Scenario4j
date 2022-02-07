@@ -166,7 +166,7 @@ public class SoShadowGroupP implements Destroyable {
 		    if (vertexshader != null) vertexshader.unref();
 		    if (fragmentshader != null) fragmentshader.unref();
 		    if (shaderprogram != null) shaderprogram.unref();
-		    deleteShadowLights();
+		    deleteShadowLights(null);
 		    searchaction.destructor();
 		    lightpaths.destructor();
 		    bboxaction.destructor();
@@ -202,9 +202,11 @@ public class SoShadowGroupP implements Destroyable {
 		  }
 	  
 	  
-	  public void deleteShadowLights() {
+	  public void deleteShadowLights(SoState state) {
 		    for (int i = 0; i < this.shadowlights.getLength(); i++) {
-		      Destroyable.delete(this.shadowlights.operator_square_bracket(i));
+		    	SoShadowLightCache cache = this.shadowlights.operator_square_bracket(i);
+		    	cache.destructorState = state;
+		      Destroyable.delete(cache);
 		    }
 		    this.shadowlights.truncate(0);
 		  }
@@ -423,7 +425,7 @@ public class SoShadowGroupP implements Destroyable {
 	      }
 	      if (numlights != this.shadowlights.getLength() || containsInvalidShadowLights() ) {
 	        // just delete and recreate all if the number of spot lights have changed
-	        this.deleteShadowLights();
+	        this.deleteShadowLights(state);
 	        int id = lightidoffset;
 	        for (i = 0; i < pl.getLength(); i++) {
 	          SoLight light = (SoLight)(SoFullPath.cast(pl.operator_square_bracket(i))).getTail();

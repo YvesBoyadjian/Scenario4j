@@ -315,7 +315,7 @@ GLRender(SoGLRenderAction action)
       this.pimpl.glimage.setData(bytes, size, nc[0],srgb[0],
                              translateWrap(Wrap.fromValue(this.wrapS.getValue())),
                              translateWrap(Wrap.fromValue(this.wrapT.getValue())),
-                             quality);
+                             quality,0,state);
       this.pimpl.glimagevalid = true;
       // don't cache while creating a texture object
       SoCacheElement.setInvalid(true);

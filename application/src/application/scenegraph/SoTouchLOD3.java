@@ -42,36 +42,36 @@ public abstract class SoTouchLOD3 extends SoCameraLOD implements SoTouchLODMaste
 	public void
 	GLRenderBelowPath(SoGLRenderAction action)
 	{
-		  int idx = this.whichToTraverse(action);
+		  int wantedIdx = this.whichToTraverse(action);
 		  
-//		  int wanted_idx = idx;
-		  
-	    SoRecursiveIndexedFaceSet least_detailed = (SoRecursiveIndexedFaceSet) this.children.get(LEAST_DETAILED);
+	    SoRecursiveIndexedFaceSet leastDetailedIndexedFaceSet = (SoRecursiveIndexedFaceSet) this.children.get(LEAST_DETAILED);
 	    
-		  boolean leastDetailedWasCleared = false;
-		  if(idx == MOST_DETAILED) {
-			    if(least_detailed.cleared) {
-			    	idx = LEAST_DETAILED;
-			    	leastDetailedWasCleared = true;
+		  boolean mostDetailedAskedButLeastDetailedWasCleared = false;
+		  int drawnIdx = wantedIdx;
+		  if(wantedIdx == MOST_DETAILED) {
+			    if(leastDetailedIndexedFaceSet.cleared) {
+			    	drawnIdx = LEAST_DETAILED;
+			    	mostDetailedAskedButLeastDetailedWasCleared = true;
 			    }
 		  }
 		  
-		  if (idx >= 0) {
-		    SoNode child = (SoNode) this.children.get(idx);
-		    action.pushCurPath(idx, child);
+		  if (drawnIdx >= 0) {
+		    SoNode renderedChild = (SoNode) this.children.get(drawnIdx);
+		    action.pushCurPath(drawnIdx, renderedChild);
 		    if (!action.abortNow()) {
 		      //SoNodeProfiling profiling; TODO
 		      //profiling.preTraversal(action);
-		      child.GLRenderBelowPath(action);
+		      renderedChild.GLRenderBelowPath(action);
 		      //profiling.postTraversal(action);
 		    }
 		    action.popCurPath();
 		    
-		    currentVisible = idx;
+		    currentVisible = drawnIdx;
 		  
-			  if(/*idx == MOST_DETAILED*/!least_detailed.cleared) {
-			  int other_idx = 1 -idx;
-				  if(leastDetailedWasCleared || !all_children_have_been_loaded(child,action,0)) {
+			  if(/*idx == MOST_DETAILED*/!leastDetailedIndexedFaceSet.cleared) {
+			  	int other_idx = 1 - drawnIdx;
+			  	boolean all_children_loaded = all_children_have_been_loaded(renderedChild,action,0);
+				  if(mostDetailedAskedButLeastDetailedWasCleared || !all_children_loaded) {
 					    SoNode otherChild = (SoNode) this.children.get(other_idx);	
 					    action.pushCurPath(other_idx, otherChild);
 					    if (!action.abortNow()) {
@@ -102,7 +102,7 @@ public abstract class SoTouchLOD3 extends SoCameraLOD implements SoTouchLODMaste
 			  }
 		  }
 		  
-		    if(!least_detailed.cleared) {
+		    if(!leastDetailedIndexedFaceSet.cleared) {
 		    	cleared = false;
 		    }
 		    else if( currentVisible == LEAST_DETAILED) {

@@ -123,10 +123,16 @@ public class SoSceneTexture2P implements Destroyable {
 
 		  public void destructor()
 		  {
-		    this.deleteFrameBufferObjects(null, null);
+			  cc_glglue glue = null;
+			if(null != api.destructorState) {
+				int ctx = SoGLCacheContextElement.get(api.destructorState);
+				glue = SoGL.cc_glglue_instance(ctx);
+			}
+
+		    this.deleteFrameBufferObjects(glue, api.destructorState);
 		    Destroyable.delete(this.fbodata);
 
-		    if (this.glimage != null) this.glimage.unref(null);
+		    if (this.glimage != null) this.glimage.unref(api.destructorState);
 		    if (this.glcontext != null) {
 		      SoGL.cc_glglue_context_destruct(this.glcontext);
 		    }

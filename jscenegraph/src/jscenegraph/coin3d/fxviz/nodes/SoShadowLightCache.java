@@ -117,6 +117,8 @@ public class SoShadowLightCache implements Destroyable {
 
 	  final SoColorPacker colorpacker = new SoColorPacker();
 	  final SbColor color = new SbColor();
+
+	  SoState destructorState;
 	  
   public SoShadowLightCache(SoState state,
                      SoPath path,
@@ -363,9 +365,15 @@ public class SoShadowLightCache implements Destroyable {
 		    if (this.light != null) this.light.unref();
 		    if (this.path != null) this.path.unref();
 		    if (this.gaussmap != null) this.gaussmap.unref();
-		    if (this.depthmap != null) this.depthmap.unref();
+		    if (this.depthmap != null) {
+              this.depthmap.destructorState = destructorState;
+		      this.depthmap.unref();
+            }
 
-		    if (this.neardepthmap != null) this.neardepthmap.unref();
+		    if (this.neardepthmap != null) {
+              this.neardepthmap.destructorState = destructorState;
+		      this.neardepthmap.unref();
+            }
 
 		    if (this.camera != null) this.camera.unref();
 		  }
