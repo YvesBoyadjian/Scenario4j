@@ -4,6 +4,7 @@
 package application;
 
 import java.awt.*;
+import java.awt.event.InputEvent;
 import java.awt.image.Raster;
 import java.io.*;
 import java.net.MalformedURLException;
@@ -1431,6 +1432,15 @@ public class MainGLFW {
 			window.setVisible(false);
 
 			boolean success = viewer.setFocus();
+
+			Robot bot = null;
+			try {
+				bot = new Robot();
+				bot.mousePress(InputEvent.BUTTON2_DOWN_MASK);
+				bot.mouseRelease(InputEvent.BUTTON2_DOWN_MASK);
+			} catch (AWTException e) {
+				e.printStackTrace();
+			}
 		});
 	}
 
