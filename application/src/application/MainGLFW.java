@@ -1419,10 +1419,6 @@ public class MainGLFW {
 			});
 		} // end GOD
 
-		window.setVisible(false);
-
-		boolean success = viewer.setFocus();
-
 		scenario.start(loadingQuestIndex,viewer);
 
 		viewer.addIdleListener((viewer1)->{
@@ -1431,6 +1427,10 @@ public class MainGLFW {
 
 		SwingUtilities.invokeLater(() -> {
 			loop();
+
+			window.setVisible(false);
+
+			boolean success = viewer.setFocus();
 		});
 	}
 

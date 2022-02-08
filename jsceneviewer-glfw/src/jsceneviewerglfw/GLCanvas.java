@@ -76,6 +76,8 @@ public class GLCanvas extends Composite {
 		glfwWindowHint(GLFW_DECORATED, GLFW_FALSE); //makes flashing the screen in windows, but necessary for linux
 		
 		//glfwWindowHint(GLFW_SRGB_CAPABLE, GLFW_TRUE); this does not seem to have effect
+
+		glfwWindowHint(GLFW_FLOATING, GLFW_TRUE);
 			
 		// Create the window
 		window = glfwCreateWindow(width, height, format.name, /*glfwGetPrimaryMonitor()*/NULL, NULL);
