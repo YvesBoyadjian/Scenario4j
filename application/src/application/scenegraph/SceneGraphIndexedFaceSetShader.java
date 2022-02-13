@@ -1410,7 +1410,7 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 
 		SoFont font = new SoFont();
 
-		font.size.setValue(0.1f);
+		font.size.setValue(0.2f);
 
 		speechGroup.addChild(font);
 
