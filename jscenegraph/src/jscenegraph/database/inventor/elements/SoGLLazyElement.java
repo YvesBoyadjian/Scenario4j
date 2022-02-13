@@ -2429,6 +2429,28 @@ sendAlphaTest(int func, float value)
      send_gl_material(GL2.GL_EMISSION, color,gl2);
      this.glState.emissive.copyFrom(color);
      this.cachebitmask |= SoLazyElement.masks.EMISSIVE_MASK.getValue();
+
+
+       if(!state.isElementEnabled(classStackIndexMap.get(SoGLShaderProgramElement.class))) {
+           return;
+       }
+
+       SoGLShaderProgram program = SoGLShaderProgramElement.get(state);
+       if( null != program && program.isEnabled()) {
+           SoGLSLShaderProgram.Handle pHandle = program.getGLSLShaderProgramHandleClass(state);
+           if( SoGLSLShaderProgram.Handle.isValid(pHandle) ) {
+               SoGLSLShaderProgram.Handle.Uniform colorLocation = pHandle.glGetUniformLocation(state.getGL2(), "s4j_FrontLightModelProduct_sceneColor");
+               if ( SoGLSLShaderProgram.Handle.Uniform.isValid(colorLocation) ) {
+                   SbColor col = this.glState.emissive;
+                   rgba[0] = col.getX();
+                   rgba[1] = col.getY();
+                   rgba[2] = col.getZ();
+                   rgba[3] = 1.0f;
+                   colorLocation.glUniform4fv(state.getGL2(),1,rgba);
+               }
+           }
+       }
+
    }
 
    public void

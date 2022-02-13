@@ -545,6 +545,8 @@ setVertexShader(SoState state)
 	gen.addDeclaration("uniform vec3 s4j_NormalUniform;",false);
 	gen.addDeclaration("uniform bool s4j_PerVertexNormal;",false);
 
+	gen.addDeclaration("uniform vec4 s4j_FrontLightModelProduct_sceneColor;",false);
+
   boolean storedinvalid = SoCacheElement.setInvalid(false);
 
   state.push();
@@ -649,14 +651,14 @@ setVertexShader(SoState state)
     if (dirlight) gen.addNamedFunction(new SbName("lights/DirectionalLight"), false);
     if (pointlight) gen.addNamedFunction(new SbName("lights/PointLight"), false);
 
-    gen.addMainStatement("color = vec4(0,0,0,0);//gl_FrontLightModelProduct.sceneColor + "+
+    gen.addMainStatement("color = s4j_FrontLightModelProduct_sceneColor + "+
                          "  accambient * s4j_FrontMaterial.ambient + "+
                          "  accdiffuse * diffuCol +"+
                          "  accspecular * s4j_FrontMaterial.specular;\n"
                          );
   }
   else {
-    gen.addMainStatement("color = vec4(0,0,0,0);//gl_FrontLightModelProduct.sceneColor;\n");
+    gen.addMainStatement("color = s4j_FrontLightModelProduct_sceneColor;\n");
   }
 
   if (numshadowlights != 0) {
