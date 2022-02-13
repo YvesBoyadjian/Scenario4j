@@ -69,4 +69,7 @@ public interface GLUtessellator {
 
 	void gluEndPolygon();
 
+	void gluSetUserObject(Object userObject);
+
+	Object gluGetUserObject();
 }

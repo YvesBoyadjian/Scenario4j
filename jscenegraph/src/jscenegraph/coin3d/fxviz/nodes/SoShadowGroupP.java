@@ -542,6 +542,9 @@ setVertexShader(SoState state)
 	gen.addDeclaration("uniform vec4 s4j_ColorUniform;",false);
 	gen.addDeclaration("uniform bool s4j_PerVertexColor;",false);
 
+	gen.addDeclaration("uniform vec3 s4j_NormalUniform;",false);
+	gen.addDeclaration("uniform bool s4j_PerVertexNormal;",false);
+
   boolean storedinvalid = SoCacheElement.setInvalid(false);
 
   state.push();
@@ -602,7 +605,9 @@ setVertexShader(SoState state)
   gen.addMainStatement("vec4 ecPosition = s4j_ModelViewMatrix * vec4(s4j_Vertex, 1.0);\n"+
                        "ecPosition3 = ecPosition.xyz / ecPosition.w;");
 
-  gen.addMainStatement("vec3 normal = normalize(s4j_NormalMatrix * s4j_Normal);\n"+
+  gen.addMainStatement("vec3 normal3 = s4j_NormalUniform; if(s4j_PerVertexNormal) normal3 = s4j_Normal;");
+
+  gen.addMainStatement("vec3 normal = normalize(s4j_NormalMatrix * normal3);\n"+
                        "vec3 eye = -normalize(ecPosition3);\n"+
                        "vec4 ambient;\n"+
                        "vec4 diffuse;\n"+

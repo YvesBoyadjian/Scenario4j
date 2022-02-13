@@ -56,6 +56,9 @@ package jscenegraph.database.inventor.elements;
 
 import com.jogamp.opengl.GL2;
 
+import jscenegraph.coin3d.shaders.SoGLSLShaderProgram;
+import jscenegraph.coin3d.shaders.SoGLShaderProgram;
+import jscenegraph.coin3d.shaders.inventor.elements.SoGLShaderProgramElement;
 import jscenegraph.database.inventor.errors.SoDebugError;
 import jscenegraph.database.inventor.misc.SoState;
 import jscenegraph.port.Ctx;
@@ -106,6 +109,14 @@ init(SoState state)
     //gl2.glEnable(GL2.GL_NORMALIZE); CORE
 }
 
+    public void push(SoState state) {
+        this.state = state;
+    }
+
+//    public void pop(SoState state, SoElement prevTopElement) {
+//        this.state = state;
+//    }
+
 ////////////////////////////////////////////////////////////////////////
 //
 // Description:
@@ -113,7 +124,7 @@ init(SoState state)
 //
 // Use: public
 
-public void send(int index)
+public void send(GL2 gl2, int index)
 //
 ////////////////////////////////////////////////////////////////////////
 {
@@ -123,8 +134,21 @@ public void send(int index)
                            "Index ("+index+") is out of range 0 - "+( numNormals - 1));
 //#endif /* DEBUG */
 
-    GL2 gl2 = Ctx.get(SoGLCacheContextElement.get(state));
+    //gl2.glNormal3fv(normals.getFast(index).getValueRead(),0);
 
-    gl2.glNormal3fv(normals.getFast(index).getValueRead(),0);
+    if(!state.isElementEnabled(classStackIndexMap.get(SoGLShaderProgramElement.class))) {
+        return;
+    }
+
+    SoGLShaderProgram program = SoGLShaderProgramElement.get(state);
+    if( null != program && program.isEnabled()) {
+        SoGLSLShaderProgram.Handle pHandle = program.getGLSLShaderProgramHandleClass(state);
+        if (SoGLSLShaderProgram.Handle.isValid(pHandle)) {
+            SoGLSLShaderProgram.Handle.Uniform normalLocation = pHandle.glGetUniformLocation(state.getGL2(), "s4j_NormalUniform");
+            if (SoGLSLShaderProgram.Handle.Uniform.isValid(normalLocation)) {
+                normalLocation.glUniform3fv(state.getGL2(),normals.getFast(index).getValueRead());
+            }
+        }
+    }
 }
 }

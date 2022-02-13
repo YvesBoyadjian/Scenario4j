@@ -30,6 +30,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import jscenegraph.coin3d.inventor.nodes.SoShaderObject;
+import jscenegraph.database.inventor.SbVec3f;
 import jscenegraph.database.inventor.errors.SoDebugError;
 import jscenegraph.database.inventor.nodes.SoNode;
 import org.lwjgl.BufferUtils;
@@ -91,6 +92,10 @@ protected
           this.value4[3] = values4[3];
           gl2.glUniform4fv(location, num, values4);
         }
+      }
+
+      public void glUniform3fv(GL2 gl2, float[] values3) {
+        gl2.glUniform3fv(location,values3);
       }
 
       public void glUniform1f(GL2 gl2, float value) {

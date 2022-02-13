@@ -3734,6 +3734,10 @@ ByteBuffer data ) {
 		return org.lwjgl.opengl.GL20C.glGetProgramInfoLog(programHandle);
 	}
 
+	default void glUniform3fv(int location, float[] value) {
+		org.lwjgl.opengl.GL40C.glUniform3fv(location,value);
+	}
+
 	default void glUniform4fv(int location, int num, float[] value) {
 		assert(num == value.length/4);
 		org.lwjgl.opengl.GL40C.glUniform4fv(location,value);

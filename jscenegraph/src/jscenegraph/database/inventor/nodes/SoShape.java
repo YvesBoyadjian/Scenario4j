@@ -2412,6 +2412,14 @@ startVertexArray(SoGLRenderAction action,
     SoGL.cc_glglue_glEnableClientState(glue, GL_NORMAL_ARRAY);
 
     glue.glEnableVertexAttribArrayARB(1);
+
+      int pHandle = SoGLShaderProgramElement.get(state).getGLSLShaderProgramHandle(state);
+      if(pHandle >0 ) {
+          int perVertexLocation = state.getGL2().glGetUniformLocation(pHandle, "s4j_PerVertexNormal");
+          if (perVertexLocation >= 0) {
+              state.getGL2().glUniform1i(perVertexLocation, 1);
+          }
+      }
   }
 
   /*GLvoid*/FloatBufferAble dataptr = null;
@@ -2472,6 +2480,14 @@ finishVertexArray(SoGLRenderAction action,
     SoGL.cc_glglue_glDisableClientState(glue, GL_NORMAL_ARRAY);
 
       glue.glDisableVertexAttribArrayARB(1);
+
+        int pHandle = SoGLShaderProgramElement.get(state).getGLSLShaderProgramHandle(state);
+        if(pHandle >0 ) {
+            int perVertexLocation = state.getGL2().glGetUniformLocation(pHandle, "s4j_PerVertexNormal");
+            if (perVertexLocation >= 0) {
+                state.getGL2().glUniform1i(perVertexLocation, 0);
+            }
+        }
 
   }
   if (texpervertex) {

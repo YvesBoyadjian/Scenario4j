@@ -1359,7 +1359,7 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 		oracleSeparator.addChild(oracleRot);
 
 		SoComplexity complexity = new SoComplexity();
-		complexity.value.setValue(10);
+		complexity.value.setValue(1); // Complexity must not exceed one
 
 		oracleSeparator.addChild(complexity);
 

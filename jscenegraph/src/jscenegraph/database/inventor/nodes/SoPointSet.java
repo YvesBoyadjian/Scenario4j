@@ -287,7 +287,7 @@ GLRender(SoGLRenderAction action)
     if (mb.isColorOnly())
       normalPerPoint = false;
     if (! mb.isColorOnly() && ! normalPerPoint && ne.getNum() > 0)
-      ne.send(curCoord);
+      ne.send(state.getGL2(),curCoord);
 
     /*SoState*/ state = action.getState();
     SoGLLazyElement lazyElt = null;
@@ -334,7 +334,7 @@ GLRender(SoGLRenderAction action)
         if (materialPerPoint && i > 0)
           mb.send(curCoord, true);
         if (normalPerPoint)
-          ne.send(curCoord);
+          ne.send(gl2,curCoord);
         if (tcb.needCoordinates())
           tcb.send(curCoord);
 

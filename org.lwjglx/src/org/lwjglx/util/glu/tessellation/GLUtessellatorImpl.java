@@ -153,6 +153,8 @@ public class GLUtessellatorImpl implements GLUtessellator {
 //    private static final int GLU_TESS_MESH = 100112;	/* void (*)(GLUmesh *mesh)	    */
     private static GLUtessellatorCallback NULL_CB = new GLUtessellatorCallbackAdapter();
 
+    private Object userObject;
+
 //    #define MAX_FAST_ALLOC	(MAX(sizeof(EdgePair), \
 //                 MAX(sizeof(GLUvertex),sizeof(GLUface))))
 
@@ -622,6 +624,16 @@ public class GLUtessellatorImpl implements GLUtessellator {
     public void gluEndPolygon() {
         gluTessEndContour();
         gluTessEndPolygon();
+    }
+
+    @Override
+    public void gluSetUserObject(Object userObject) {
+        this.userObject = userObject;
+    }
+
+    @Override
+    public Object gluGetUserObject() {
+        return userObject;
     }
 
     void callBeginOrBeginData(int a) {

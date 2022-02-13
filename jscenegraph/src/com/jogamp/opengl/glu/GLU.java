@@ -279,4 +279,8 @@ public class GLU {
 	public static void gluTessNormal(GLUtessellator tobj, double x, double y, double z) {
 		tobj.gluTessNormal(x, y, z);
 	}
+
+	public static void gluSetUserObject(GLUtessellator tobj, Object userObject) {
+	  	tobj.gluSetUserObject(userObject);
+	}
 }

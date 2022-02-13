@@ -54,6 +54,7 @@
 
 package jscenegraph.database.inventor.bundles;
 
+import com.jogamp.opengl.GL2;
 import jscenegraph.database.inventor.SbVec3f;
 import jscenegraph.database.inventor.actions.SoAction;
 import jscenegraph.database.inventor.elements.SoCreaseAngleElement;
@@ -152,7 +153,7 @@ public void destructor()
     public SbVec3f      get(int index)     { return normElt.get(index); }
 
     //! Sends indexed normal to the GL, for use only during GL rendering
-    public void                send(int index)    { GLNormElt.send(index); }
+    public void                send(GL2 gl2, int index)    { GLNormElt.send(gl2,index); }
 
 
 ////////////////////////////////////////////////////////////////////////

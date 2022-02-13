@@ -58,6 +58,13 @@ import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.nio.ShortBuffer;
 
+import jscenegraph.coin3d.shaders.SoGLShaderProgram;
+import jscenegraph.coin3d.shaders.inventor.elements.SoGLShaderProgramElement;
+import jscenegraph.database.inventor.*;
+import jscenegraph.database.inventor.elements.*;
+import jscenegraph.port.*;
+import jscenegraph.port.core.VertexAttribBuilder;
+import jscenegraph.port.core.VertexAttribList;
 import org.lwjglx.BufferUtils;
 import org.lwjglx.util.glu.GLUtessellator;
 import org.lwjglx.util.glu.GLUtessellatorCallback;
@@ -69,41 +76,11 @@ import com.jogamp.opengl.glu.gl2.GLUgl2;
 
 import jscenegraph.coin3d.inventor.elements.SoGLMultiTextureEnabledElement;
 import jscenegraph.coin3d.inventor.elements.SoMultiTextureCoordinateElement;
-import jscenegraph.database.inventor.SbBox2f;
-import jscenegraph.database.inventor.SbBox3f;
-import jscenegraph.database.inventor.SbDict;
-import jscenegraph.database.inventor.SbName;
-import jscenegraph.database.inventor.SbPList;
-import jscenegraph.database.inventor.SbVec2f;
-import jscenegraph.database.inventor.SbVec2fSingle;
-import jscenegraph.database.inventor.SbVec2s;
-import jscenegraph.database.inventor.SbVec3f;
-import jscenegraph.database.inventor.SbVec3fSingle;
-import jscenegraph.database.inventor.SbVec4f;
-import jscenegraph.database.inventor.SbVec4fSingle;
-import jscenegraph.database.inventor.SoNodeList;
-import jscenegraph.database.inventor.SoPrimitiveVertex;
-import jscenegraph.database.inventor.SoType;
 import jscenegraph.database.inventor.actions.SoAction;
 import jscenegraph.database.inventor.actions.SoGLRenderAction;
 import jscenegraph.database.inventor.bundles.SoMaterialBundle;
 import jscenegraph.database.inventor.caches.SoCache;
 import jscenegraph.database.inventor.details.SoTextDetail;
-import jscenegraph.database.inventor.elements.SoCacheElement;
-import jscenegraph.database.inventor.elements.SoComplexityElement;
-import jscenegraph.database.inventor.elements.SoComplexityTypeElement;
-import jscenegraph.database.inventor.elements.SoCreaseAngleElement;
-import jscenegraph.database.inventor.elements.SoFontNameElement;
-import jscenegraph.database.inventor.elements.SoFontSizeElement;
-import jscenegraph.database.inventor.elements.SoGLCacheContextElement;
-import jscenegraph.database.inventor.elements.SoGLDisplayList;
-import jscenegraph.database.inventor.elements.SoMaterialBindingElement;
-import jscenegraph.database.inventor.elements.SoModelMatrixElement;
-import jscenegraph.database.inventor.elements.SoProfileCoordinateElement;
-import jscenegraph.database.inventor.elements.SoProfileElement;
-import jscenegraph.database.inventor.elements.SoProjectionMatrixElement;
-import jscenegraph.database.inventor.elements.SoViewingMatrixElement;
-import jscenegraph.database.inventor.elements.SoViewportRegionElement;
 import jscenegraph.database.inventor.errors.SoDebugError;
 import jscenegraph.database.inventor.fields.SoFieldData;
 import jscenegraph.database.inventor.fields.SoMFString;
@@ -113,10 +90,6 @@ import jscenegraph.database.inventor.fields.SoSFFloat;
 import jscenegraph.database.inventor.libFL.FLcontext;
 import jscenegraph.database.inventor.misc.SoState;
 import jscenegraph.mevis.inventor.system.SbSystem;
-import jscenegraph.port.Ctx;
-import jscenegraph.port.FLoutline;
-import jscenegraph.port.fl;
-import jscenegraph.port.iconv_t;
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -367,7 +340,7 @@ public class SoText3 extends SoShape {
     int         numChars;
 
     // Display lists for fronts, sides:
-    SoGLDisplayList frontList;
+    VertexAttribList frontList;
     SoGLDisplayList sideList;
 
     // Profile information:
@@ -429,7 +402,8 @@ public class SoText3 extends SoShape {
 		super(state);
     ref();
 
-    frontList = sideList = null;
+    frontList = null;
+    sideList = null;
 
     // Add element dependencies explicitly here; making 'this' the
     // CacheElement doesn't work if we are being constructed in an
@@ -1033,16 +1007,16 @@ public void setupToRenderFront(SoState state)
 {
     otherOpen = SoCacheElement.anyOpen(state);
     if (!otherOpen && frontList == null) {
-        frontList = new SoGLDisplayList(state,
-                                        SoGLDisplayList.Type.DISPLAY_LIST,
+        frontList = new VertexAttribList(state,
+                                        //SoGLDisplayList.Type.DISPLAY_LIST,
                                         numChars);
         frontList.ref();
     }
     if (frontList != null) {
     	GL2 gl2 = state.getGL2();
         // Set correct list base
-        gl2.glListBase(frontList.getFirstIndex());
-        frontList.addDependency(state);
+//        gl2.glListBase(frontList.getFirstIndex());
+//        frontList.addDependency(state);
     }
 }
 
@@ -1087,7 +1061,7 @@ public void renderSide(GL2 gl2, int line, SideCB callbackFunc)
 //
 // Use: internal
 
-void renderFront(GL2 gl2, int line,
+void renderFront(SoState state, SoNode node, int line,
                                 GLUtessellator tobj)
 //
 ////////////////////////////////////////////////////////////////////////
@@ -1099,12 +1073,17 @@ void renderFront(GL2 gl2, int line,
     for (int i = 0; i < getNumUCSChars(line); i++) {
         int key = Character.reverseBytes((char)ustr.get(i));//ustr[2*i]<<8 | ustr[2*i+1];  
         if (frontDict.find(key, value)) {
-            gl2.glCallList(frontList.getFirstIndex()+key);
+            frontList.callList(key,node);//gl2.glCallList(frontList.getFirstIndex()+key);
         }
         else {
+            GL2 gl2 = state.getGL2();
+            VertexAttribList vertexAttribList = new VertexAttribList(state,1);
+            VertexAttribList.List list = vertexAttribList.glNewList(1);
+            GLU.gluSetUserObject(tobj,new VertexAttribBuilder(list));
             generateFrontChar(gl2, (char)str.get(i), tobj);
             SbVec2f t = getOutline((char)str.get(i)).getCharAdvance();
             gl2.glTranslatef(t.getValueRead()[0], t.getValueRead()[1], 0.0f);
+            vertexAttribList.destructor();
         }
     }
 }
@@ -1171,11 +1150,12 @@ public boolean hasFrontDisplayList(GL2 gl2, char c,
     if (otherOpen) return false;
     
     // Build one:
-    gl2.glNewList(frontList.getFirstIndex()+key, GL2.GL_COMPILE);
+    VertexAttribList.List list = frontList.glNewList(key);//gl2.glNewList(frontList.getFirstIndex()+key, GL2.GL_COMPILE);
+    GLU.gluSetUserObject(tobj,new VertexAttribBuilder(list));
     generateFrontChar(gl2,c, tobj);
     SbVec2f t = getOutline(c).getCharAdvance();
-    gl2.glTranslatef(t.getValueRead()[0], t.getValueRead()[1], 0.0f);
-    gl2.glEndList();
+    frontList.glTranslatef(key,t.getValueRead()[0], t.getValueRead()[1], 0.0f);
+    frontList.glEndList(key);
     
     frontDict.enter(key, value);
 
@@ -1545,8 +1525,8 @@ public void generateFrontChar(GL2 gl2, char c,
 
         for (int j = 0; j < outline.getNumVerts(i); j++) {
             SbVec2f t = outline.getVertex(i,j);
-            v[0] = t.getValueRead()[0];
-            v[1] = t.getValueRead()[1];
+            v[0] = t.getX();
+            v[1] = t.getY();
             v[2] = 0.0;
 
             // Note: The third argument MUST NOT BE a local variable,
@@ -1768,12 +1748,14 @@ public void GLRender(SoGLRenderAction action)
 
 			@Override
 			public void begin(int arg) {
-				gl2.glBegin(arg);
+                VertexAttribBuilder builder = (VertexAttribBuilder)tobj.gluGetUserObject();
+				builder.glBegin(arg);
 			}
 
 			@Override
 			public void end() {
-				gl2.glEnd();
+                VertexAttribBuilder builder = (VertexAttribBuilder)tobj.gluGetUserObject();
+				builder.glEnd();
 			}
 
 			@Override
@@ -1783,15 +1765,16 @@ public void GLRender(SoGLRenderAction action)
 
 			@Override
 			public void vertex(Object object) {
+                VertexAttribBuilder builder = (VertexAttribBuilder)tobj.gluGetUserObject();
 				if(object instanceof FloatBuffer) {
-					gl2.glVertex2fv((FloatBuffer)object);
+					builder.glVertex2fv((FloatBuffer)object);
 				}
 				else if(object instanceof SbVec2f) {
 					SbVec2f vec = (SbVec2f)object;
-					gl2.glVertex2fv(vec.getValueRead(), 0);
+					builder.glVertex2fv(vec.getValueRead(), 0);
 				}
 				else {
-					gl2.glVertex2fv((float[])object, 0);
+					builder.glVertex2fv((float[])object, 0);
 				}
 			}
 
@@ -1823,6 +1806,11 @@ public void GLRender(SoGLRenderAction action)
             gl2.glPopMatrix();
         }
     }
+
+    state.push();
+
+    SbVec3fArray normals = SbVec3fArray.allocate(1);
+
     if ((parts.getValue() & Part.BACK.getValue())!=0) {
         if (materialPerPart) mb.send(2, false);
 
@@ -1830,10 +1818,15 @@ public void GLRender(SoGLRenderAction action)
             gl2.glTranslatef(0, 0, lastZ[0]);
         }
         gl2.glNormal3f(0, 0, -1);
+        normals.setValueXYZ(0,0,0,-1);
+        SoNormalElement.set(state,this,1,normals);
+        SoGLNormalElement normalElement = (SoGLNormalElement) SoNormalElement.getInstance(state);
+        normalElement.send(gl2,0);
+
         gl2.glFrontFace(GL2.GL_CW);
 
         myFont.setupToRenderFront(state);
-        
+
         if (genTexCoord) {
             gl2.glPushAttrib(GL2.GL_TEXTURE_BIT);
             gl2.glTexGeni(GL2.GL_S, GL2.GL_TEXTURE_GEN_MODE, GL2.GL_OBJECT_LINEAR);
@@ -1845,22 +1838,28 @@ public void GLRender(SoGLRenderAction action)
             params[1] = -params[0];
             params[0] = 0.0f;
             gl2.glTexGenfv(GL2.GL_T, GL2.GL_OBJECT_PLANE, params,0);
-            
+
             gl2.glEnable(GL2.GL_TEXTURE_GEN_S);
             gl2.glEnable(GL2.GL_TEXTURE_GEN_T);
         }
-        
+
         for (int line = 0; line < string.getNum(); line++) {
             if (string.operator_square_bracket(line).length() <= 0) continue;
-            
+
+            SbMatrix pushed = new SbMatrix(SoModelMatrixElement.get(state));
             gl2.glPushMatrix();
             final SbVec2f p = new SbVec2f(getStringOffset(line));
-            if (p.getValueRead()[0] != 0.0 || p.getValueRead()[1] != 0.0)
+            if (p.getValueRead()[0] != 0.0 || p.getValueRead()[1] != 0.0) {
                 gl2.glTranslatef(p.getValueRead()[0], p.getValueRead()[1], 0.0f);
+                SoModelMatrixElement.translateBy(state,this,new SbVec3f(p.getValueRead()[0], p.getValueRead()[1], 0.0f));
+                sendToUniforms(state);
+            }
             renderFront(action, line, tobj);
             gl2.glPopMatrix();
+            SoModelMatrixElement.set(state,this,pushed);
+            sendToUniforms(state);
         }
-        
+
         if (genTexCoord) {
             gl2.glPopAttrib();
         }
@@ -1869,7 +1868,7 @@ public void GLRender(SoGLRenderAction action)
 
         if (lastZ[0] != 0)
             gl2.glTranslatef(0, 0, -lastZ[0]);
-    }   
+    }
     if ((parts.getValue() & Part.FRONT.getValue())!=0) {
         if (materialPerPart) mb.sendFirst();
 
@@ -1878,7 +1877,11 @@ public void GLRender(SoGLRenderAction action)
         }
 
         gl2.glNormal3f(0, 0, 1);
-        
+        normals.setValueXYZ(0,0,0,1);
+        SoNormalElement.set(state,this,1,normals);
+        SoGLNormalElement normalElement = (SoGLNormalElement) SoNormalElement.getInstance(state);
+        normalElement.send(gl2,0);
+
         myFont.setupToRenderFront(state);
 
         if (genTexCoord) {
@@ -1898,12 +1901,18 @@ public void GLRender(SoGLRenderAction action)
         }
         
         for (int line = 0; line < string.getNum(); line++) {
+            SbMatrix pushed = new SbMatrix(SoModelMatrixElement.get(state));
         	gl2.glPushMatrix();
             SbVec2f p = new SbVec2f(getStringOffset(line));
-            if (p.getValueRead()[0] != 0.0 || p.getValueRead()[1] != 0.0)
+            if (p.getValueRead()[0] != 0.0 || p.getValueRead()[1] != 0.0) {
                 gl2.glTranslatef(p.getValueRead()[0], p.getValueRead()[1], 0.0f);
+                SoModelMatrixElement.translateBy(state,this,new SbVec3f(p.getValueRead()[0], p.getValueRead()[1], 0.0f));
+                sendToUniforms(state);
+            }
             renderFront(action, line, tobj);
             gl2.glPopMatrix();
+            SoModelMatrixElement.set(state,this,pushed);
+            sendToUniforms(state);
         }
         
         if (genTexCoord) {
@@ -1914,9 +1923,22 @@ public void GLRender(SoGLRenderAction action)
             gl2.glTranslatef(0, 0, -firstZ[0]);
         }
     }
+    state.pop();
+
+    Destroyable.delete(normals);
     mb.destructor();
+
 }
 
+private void sendToUniforms(SoState state) {
+
+    SoGLShaderProgram sp = SoGLShaderProgramElement.get(state);
+    if(null!=sp &&sp.isEnabled())
+    {
+        // Dependent of SoModelMatrixElement
+        sp.updateStateParameters(state);
+    }
+}
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -1937,7 +1959,7 @@ private void renderFront(SoGLRenderAction action, int line,
     ShortBuffer chars = myFont.getUCSString(line).asShortBuffer();
 
     // First, try to figure out if we can use glCallLists:
-    boolean useCallLists = true;
+    boolean useCallLists = false;//true; CORE we cannot use CallLists
 
     for (int i = 0; i < myFont.getNumUCSChars(line); i++) {
         // See if the font cache already has (or can build) a display
@@ -1955,7 +1977,7 @@ private void renderFront(SoGLRenderAction action, int line,
     // if we don't, draw the string character-by-character, using the
     // display lists we do have:
     else {
-        myFont.renderFront(gl2, line, tobj);
+        myFont.renderFront(action.getState(),this, line, tobj);
     }
 }    
 

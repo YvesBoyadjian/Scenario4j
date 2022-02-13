@@ -8,6 +8,7 @@ import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.Map;
 
+import jscenegraph.coin3d.shaders.inventor.elements.SoGLShaderProgramElement;
 import jscenegraph.port.*;
 import jscenegraph.port.memorybuffer.MemoryBuffer;
 import org.lwjgl.opengl.GL;
@@ -2201,7 +2202,23 @@ sogl_render_cylinder( float radius,
     gl2.glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,side_vertex_ebo[0]);
     gl2.glBufferData(GL_ELEMENT_ARRAY_BUFFER,sideVertexEboArray.sizeof(),sideVertexEboArray.toIntBuffer(),GL_STATIC_DRAW);
 
+      int pHandle = SoGLShaderProgramElement.get(state).getGLSLShaderProgramHandle(state);
+      if(pHandle >0 ) {
+          int perVertexLocation = state.getGL2().glGetUniformLocation(pHandle, "s4j_PerVertexNormal");
+          if (perVertexLocation >= 0) {
+              state.getGL2().glUniform1i(perVertexLocation, 1);
+          }
+      }
+
     gl2.glDrawElements(GL_TRIANGLES,sideVertexEboArray.length(),GL_UNSIGNED_INT,0);
+
+     pHandle = SoGLShaderProgramElement.get(state).getGLSLShaderProgramHandle(state);
+      if(pHandle >0 ) {
+          int perVertexLocation = state.getGL2().glGetUniformLocation(pHandle, "s4j_PerVertexNormal");
+          if (perVertexLocation >= 0) {
+              state.getGL2().glUniform1i(perVertexLocation, 0);
+          }
+      }
 
       gl2.glDisableVertexAttribArray(0);
       gl2.glDisableVertexAttribArray(1);

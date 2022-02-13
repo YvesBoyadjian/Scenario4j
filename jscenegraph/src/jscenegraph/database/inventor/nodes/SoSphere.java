@@ -61,6 +61,7 @@ import com.jogamp.opengl.GL2;
 
 import jscenegraph.coin3d.inventor.elements.SoGLMultiTextureEnabledElement;
 import jscenegraph.coin3d.inventor.elements.SoMultiTextureCoordinateElement;
+import jscenegraph.coin3d.shaders.inventor.elements.SoGLShaderProgramElement;
 import jscenegraph.database.inventor.SbBox3f;
 import jscenegraph.database.inventor.SbSphere;
 import jscenegraph.database.inventor.SbVec2f;
@@ -625,8 +626,32 @@ public void GLRenderVertexArray(SoGLRenderAction action, boolean sendNormals, bo
   }
   
   _cache.vbo.bind(state);
+
+    if(sendNormals) {
+
+        int pHandle = SoGLShaderProgramElement.get(state).getGLSLShaderProgramHandle(state);
+        if(pHandle >0 ) {
+            int perVertexLocation = state.getGL2().glGetUniformLocation(pHandle, "s4j_PerVertexNormal");
+            if (perVertexLocation >= 0) {
+                state.getGL2().glUniform1i(perVertexLocation, 1);
+            }
+        }
+
+    }
   _cache.drawArrays(this, action, GL2.GL_TRIANGLES);
   _cache.vbo.unbind(gl2);
+
+    if(sendNormals) {
+
+        int pHandle = SoGLShaderProgramElement.get(state).getGLSLShaderProgramHandle(state);
+        if(pHandle >0 ) {
+            int perVertexLocation = state.getGL2().glGetUniformLocation(pHandle, "s4j_PerVertexNormal");
+            if (perVertexLocation >= 0) {
+                state.getGL2().glUniform1i(perVertexLocation, 0);
+            }
+        }
+
+    }
 }
 
 

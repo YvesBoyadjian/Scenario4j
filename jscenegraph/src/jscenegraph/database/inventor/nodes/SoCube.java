@@ -62,6 +62,7 @@ import jscenegraph.coin3d.inventor.elements.SoMultiTextureEnabledElement;
 import jscenegraph.coin3d.inventor.misc.SoGenerate;
 import jscenegraph.coin3d.misc.SoGL;
 import jscenegraph.coin3d.misc.SoPick;
+import jscenegraph.coin3d.shaders.inventor.elements.SoGLShaderProgramElement;
 import jscenegraph.database.inventor.SbBox3f;
 import jscenegraph.database.inventor.SbVec2f;
 import jscenegraph.database.inventor.SbVec2s;
@@ -730,8 +731,33 @@ rayPickBoundingBox(SoRayPickAction action, final SbBox3f bbox)
   _cache.normalOffset = (normalOffset.minus(data));
   _cache.texCoordOffset = (texCoordOffset.minus(data));
 
+  if(sendNormals) {
+
+      int pHandle = SoGLShaderProgramElement.get(state).getGLSLShaderProgramHandle(state);
+      if(pHandle >0 ) {
+          int perVertexLocation = state.getGL2().glGetUniformLocation(pHandle, "s4j_PerVertexNormal");
+          if (perVertexLocation >= 0) {
+              state.getGL2().glUniform1i(perVertexLocation, 1);
+          }
+      }
+
+  }
+
   _cache.drawArrays(this, action, GL2.GL_TRIANGLES);
   _cache.vbo.unbind(gl2);
+
+    if(sendNormals) {
+
+        int pHandle = SoGLShaderProgramElement.get(state).getGLSLShaderProgramHandle(state);
+        if(pHandle >0 ) {
+            int perVertexLocation = state.getGL2().glGetUniformLocation(pHandle, "s4j_PerVertexNormal");
+            if (perVertexLocation >= 0) {
+                state.getGL2().glUniform1i(perVertexLocation, 0);
+            }
+        }
+
+    }
+
   mb.destructor(); // java port
 }
 
