@@ -65,9 +65,14 @@ protected
     private final Map<String,Uniform> uniformLocations = new HashMap<>();
 
     public static class Uniform {
-      public int location;
+      public int location = -1;
       final float[] value4 = new float[4];
       final FloatBuffer value16 = BufferUtils.createFloatBuffer(16);
+
+      public Uniform() {
+        value4[0] = Float.NaN;
+        value16.put(0,Float.NaN);
+      }
 
       public static boolean isValid(Uniform uniform) {
         if(null == uniform) {
