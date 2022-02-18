@@ -775,7 +775,7 @@ public class MainGLFW {
 		}
 		viewer.getCameraController().changeCameraValues(camera);
 
-		viewer.getSceneHandler().setClearBeforeRender(/*false*/true);
+		viewer.getSceneHandler().setClearBeforeRender(false/*true*/);
 		viewer.getSceneHandler().setBackgroundColor(/*new SbColor(0,0,1)*/SceneGraphIndexedFaceSetShader.SKY_COLOR.darker());
 
 		viewer.getSceneHandler().setTransparencyType(TransparencyType.BLEND/*SORTED_LAYERS_BLEND*/);

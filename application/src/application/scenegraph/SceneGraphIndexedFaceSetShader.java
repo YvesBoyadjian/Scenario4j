@@ -16,7 +16,6 @@ import java.util.stream.Stream;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 
-import application.MainGLFW;
 import application.nodes.SoTarget;
 import application.nodes.SoTargets;
 import application.objects.Target;
@@ -34,8 +33,8 @@ import jscenegraph.coin3d.inventor.VRMLnodes.SoVRMLBillboard;
 import jscenegraph.coin3d.inventor.lists.SbListInt;
 import jscenegraph.coin3d.inventor.nodes.*;
 import jscenegraph.coin3d.shaders.inventor.nodes.SoShaderProgram;
+import jscenegraph.coin3d.shaders.inventor.nodes.SoShaderStateMatrixParameter;
 import jscenegraph.database.inventor.*;
-import jscenegraph.database.inventor.actions.SoAction;
 import jscenegraph.database.inventor.actions.SoGLRenderAction;
 import jscenegraph.database.inventor.actions.SoGetMatrixAction;
 import jscenegraph.database.inventor.actions.SoSearchAction;
@@ -44,7 +43,6 @@ import jscenegraph.database.inventor.nodes.*;
 import jscenegraph.port.Ctx;
 import jscenegraph.port.memorybuffer.MemoryBuffer;
 import jsceneviewerglfw.inventor.qt.viewers.SoQtConstrainedViewer;
-import org.lwjgl.system.CallbackI;
 import org.ode4j.math.DMatrix3;
 import org.ode4j.math.DMatrix3C;
 import org.ode4j.ode.*;
@@ -62,9 +60,9 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 	private static final boolean SAVE_CHUNK_MRI = false;
 
 	public static final boolean AIM = false;
-	
-	private static final float ZMAX = 4392.473f;
-	
+
+	public static final float ZMAX = 4392.473f;
+
 	private static final float ZMIN = 523.63275f;
 	
 	private static final int I_START = 2500;
@@ -157,7 +155,7 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 	
 	private float centerY;
 	
-	private SoShadowDirectionalLight[] sun = new SoShadowDirectionalLight[4];
+	private SoShadowDirectionalLight[] sunLight = new SoShadowDirectionalLight[4];
 	//private SoDirectionalLight sun;
 	
 	private SoDirectionalLight[] sky;
@@ -622,26 +620,52 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 	    SoShaderProgram programSun = new SoShaderProgram();
 	    
 	    SoVertexShader vertexShaderSun = new SoVertexShader();
+	    SoFragmentShader fragmentShaderSun = new SoFragmentShader();
 	    
 	    //vertexShader.sourceProgram.setValue("../../MountRainierIsland/application/src/shaders/phongShading.vert");
 
 		String behindVertexPath = "../../MountRainierIsland/application/src/shaders/behind_vertex.glsl";
+		String behindFragmentPath = "../../MountRainierIsland/application/src/shaders/behind_fragment.glsl";
 
 		File behindVertexFile = new File(behindVertexPath);
+		File behindFragmentFile = new File(behindFragmentPath);
 
 		if(!behindVertexFile.exists()) {
 			behindVertexPath = "../MountRainierIsland/application/src/shaders/behind_vertex.glsl";
+			behindFragmentPath = "../MountRainierIsland/application/src/shaders/behind_fragment.glsl";
 		}
 
 		behindVertexFile = new File(behindVertexPath);
+		behindFragmentFile = new File(behindFragmentPath);
 
 		if(!behindVertexFile.exists()) {
 			behindVertexPath = "application/src/shaders/behind_vertex.glsl";
+			behindFragmentPath = "application/src/shaders/behind_fragment.glsl";
 		}
 
 	    vertexShaderSun.sourceProgram.setValue(behindVertexPath);
-	    
+		fragmentShaderSun.sourceProgram.setValue(behindFragmentPath);
+
+		final SoShaderStateMatrixParameter mvs = new SoShaderStateMatrixParameter();
+		mvs.name.setValue("s4j_ModelViewMatrix");
+		mvs.matrixType.setValue(SoShaderStateMatrixParameter.MatrixType.MODELVIEW);
+
+		final SoShaderStateMatrixParameter prs = new SoShaderStateMatrixParameter();
+		prs.name.setValue("s4j_ProjectionMatrix");
+		prs.matrixType.setValue(SoShaderStateMatrixParameter.MatrixType.PROJECTION);
+
+		final SoShaderStateMatrixParameter ns = new SoShaderStateMatrixParameter();
+		ns.name.setValue("s4j_NormalMatrix");
+		ns.matrixType.setValue(SoShaderStateMatrixParameter.MatrixType.MODELVIEW);
+		ns.matrixTransform.setValue(SoShaderStateMatrixParameter.MatrixTransform.INVERSE_TRANSPOSE_3);
+
+		vertexShaderSun.parameter.set1Value(vertexShaderSun.parameter.getNum(), mvs);
+		vertexShaderSun.parameter.set1Value(vertexShaderSun.parameter.getNum(), prs);
+		vertexShaderSun.parameter.set1Value(vertexShaderSun.parameter.getNum(), ns);
+
 	    programSun.shaderObject.set1Value(0, vertexShaderSun);
+		programSun.shaderObject.set1Value(1, fragmentShaderSun);
+
 	    sunSep.addChild(programSun);
 	    
 	    sunSep.addChild(sunView);
@@ -694,18 +718,18 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 	    shadowGroup.smoothBorder.setValue(1.0f);
 	    
 	for(int is=0;is<4;is++) {
-	    sun[is] = new SoShadowDirectionalLight();
+	    sunLight[is] = new SoShadowDirectionalLight();
 	    //sun = new SoDirectionalLight();
-	    sun[is].color.setValue(new SbColor(SUN_COLOR.operator_mul(SUN_INTENSITY)));
+	    sunLight[is].color.setValue(new SbColor(SUN_COLOR.operator_mul(SUN_INTENSITY)));
 	    
-	    sun[is].maxShadowDistance.setValue(2e4f);
+	    sunLight[is].maxShadowDistance.setValue(2e4f);
 	    //sun[is].bboxCenter.setValue(10000, 0, 0);
-	    sun[is].bboxSize.setValue(5000+is*3000, 5000+is*3000, 1000);
+	    sunLight[is].bboxSize.setValue(5000+is*3000, 5000+is*3000, 1000);
 	    
-	    sun[is].intensity.setValue(1.0F/4.0f);
+	    sunLight[is].intensity.setValue(1.0F/4.0f);
 	    
-	    shadowGroup.addChild(sun[is]);
-	    sun[is].enableNotify(false); // In order not to recompute shaders
+	    shadowGroup.addChild(sunLight[is]);
+	    sunLight[is].enableNotify(false); // In order not to recompute shaders
 	}
 
 	skySep.addChild(transl);
@@ -718,6 +742,7 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 	    //landSep.renderCulling.setValue(SoSeparator.CacheEnabled.ON);
 	    
 	    SoShapeHints shapeHints = new SoShapeHints();
+	    		
 	    shapeHints.shapeType.setValue(SoShapeHints.ShapeType.SOLID);
 	    shapeHints.vertexOrdering.setValue(SoShapeHints.VertexOrdering.CLOCKWISE);
 	    landSep.addChild(shapeHints);
@@ -1178,10 +1203,10 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 		// slowdown too much the rendering
 		//castingShadowScene.addChild(targetsGroup);
 		
-		sun[0].shadowMapScene.setValue(castingShadowScene);
-		sun[1].shadowMapScene.setValue(castingShadowScene);
-		sun[2].shadowMapScene.setValue(castingShadowScene);
-		sun[3].shadowMapScene.setValue(castingShadowScene);
+		sunLight[0].shadowMapScene.setValue(castingShadowScene);
+		sunLight[1].shadowMapScene.setValue(castingShadowScene);
+		sunLight[2].shadowMapScene.setValue(castingShadowScene);
+		sunLight[3].shadowMapScene.setValue(castingShadowScene);
 		
 		//sep.ref();
 		//forest = null; // for garbage collection : no, we need forest
@@ -1624,10 +1649,10 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 	    r4.setValue(p4, -angle);
 	    
 		
-		sun[1].direction.setValue(r1.multVec(dir));
-		sun[2].direction.setValue(r2.multVec(dir));
-		sun[0].direction.setValue(r3.multVec(dir));
-		sun[3].direction.setValue(r4.multVec(dir));
+		sunLight[1].direction.setValue(r1.multVec(dir));
+		sunLight[2].direction.setValue(r2.multVec(dir));
+		sunLight[0].direction.setValue(r3.multVec(dir));
+		sunLight[3].direction.setValue(r4.multVec(dir));
 		
 		boolean wasEnabled = sunTransl.translation.enableNotify(false); // In order not to invalidate shaders
 		sunTransl.translation.setValue(sunPosition.operator_mul(SUN_FAKE_DISTANCE));
@@ -1637,9 +1662,9 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 		float sunElevationAngle = (float)Math.atan2(sunPosition.getZ(), Math.sqrt(Math.pow(sunPosition.getX(),2.0f)+Math.pow(sunPosition.getY(),2.0f)));
 		float sinus = (float)Math.sin(sunElevationAngle);
 		for(int is=0;is<4;is++) {	    		    
-		    sun[is].maxShadowDistance.setValue(1e4f + (1 - sinus)*1e5f);
-		    sun[is].bboxSize.setValue(5000+is*3000 + (1 - sinus)*10000, 5000+is*3000 + (1 - sinus)*10000, 2000);
-		    sun[is].nearBboxSize.setValue(80+is*10 + (1-sinus)*100,80+is*10+(1-sinus)*100,300);
+		    sunLight[is].maxShadowDistance.setValue(1e4f + (1 - sinus)*1e5f);
+		    sunLight[is].bboxSize.setValue(5000+is*3000 + (1 - sinus)*10000, 5000+is*3000 + (1 - sinus)*10000, 2000);
+		    sunLight[is].nearBboxSize.setValue(80+is*10 + (1-sinus)*100,80+is*10+(1-sinus)*100,300);
 		}
 	}
 
@@ -1734,10 +1759,10 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 		  world_camera_direction.normalize();
 		  
 		for(int is=0;is<4;is++) {
-		    sun[is].bboxCenter.setValue(
+		    sunLight[is].bboxCenter.setValue(
 		    		current_x+2000*world_camera_direction.getX(),
 		    		current_y+2000*world_camera_direction.getY(), /*current_z*/getGroundZ());
-		    sun[is].nearBboxCenter.setValue(
+		    sunLight[is].nearBboxCenter.setValue(
 		    		current_x+40*world_camera_direction.getX(),
 					current_y+40*world_camera_direction.getY(),
 					getGroundZ()
@@ -2043,7 +2068,7 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 		shadowGroup.removeAllChildren();
 		
 		for(int i=0; i<4; i++) {
-			sun[i].on.setValue(false);
+			sunLight[i].on.setValue(false);
 		}
 		
 		SbViewportRegion region = new SbViewportRegion();
@@ -2127,13 +2152,13 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 
 	public void enableNotifySun() {
 		for( int i=0;i<4;i++) {
-			sun[i].enableNotify(true);
+			sunLight[i].enableNotify(true);
 		}
 	}
 
 	public void disableNotifySun() {
 		for( int i=0;i<4;i++) {
-			sun[i].enableNotify(false);
+			sunLight[i].enableNotify(false);
 		}
 	}
 
