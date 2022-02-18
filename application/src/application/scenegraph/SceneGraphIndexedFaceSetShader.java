@@ -661,7 +661,7 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 
 		vertexShaderSun.parameter.set1Value(vertexShaderSun.parameter.getNum(), mvs);
 		vertexShaderSun.parameter.set1Value(vertexShaderSun.parameter.getNum(), prs);
-		vertexShaderSun.parameter.set1Value(vertexShaderSun.parameter.getNum(), ns);
+		//vertexShaderSun.parameter.set1Value(vertexShaderSun.parameter.getNum(), ns);
 
 	    programSun.shaderObject.set1Value(0, vertexShaderSun);
 		programSun.shaderObject.set1Value(1, fragmentShaderSun);
