@@ -166,7 +166,7 @@ public class OptionDialog extends JDialog {
     }
 
     private void onHigh() {
-        setShadowPrecision(0.3);
+        setShadowPrecision(0.2);
         setLODFactor(1.0);
         setLODFactorShadow(1.0);
         setTreeDistance(7000);
@@ -176,7 +176,7 @@ public class OptionDialog extends JDialog {
     }
 
     private void onUltra() {
-        setShadowPrecision(0.3);
+        setShadowPrecision(0.2);
         setLODFactor(1.0);
         setLODFactorShadow(1.0);
         setTreeDistance(7000);
@@ -186,7 +186,7 @@ public class OptionDialog extends JDialog {
     }
 
     private void onExtreme() {
-        setShadowPrecision(0.3);
+        setShadowPrecision(0.2);
         setLODFactor(2.0);
         setLODFactorShadow(2.0);
         setTreeDistance(15000);
