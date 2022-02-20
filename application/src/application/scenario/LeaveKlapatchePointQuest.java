@@ -28,6 +28,8 @@ public class LeaveKlapatchePointQuest implements Quest {
 
     @Override
     public void actionIfNextNotAchieved(SoQtWalkViewer viewer) {
+        String[] speech ={""};
+        sceneGraph.talk(speech);
     }
 
     double getDistanceFromKlapatche(SoQtWalkViewer viewer) {

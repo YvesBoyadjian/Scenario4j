@@ -20,13 +20,21 @@ public class TargetsKillingQuest implements Quest {
     public boolean isAchieved(SoQtWalkViewer viewer) {
         boolean achieved = getDistanceFromOracle(viewer) <= NEAR_DISTANCE;
         boolean allKilled = true;
-        allKilled &= sceneGraph.haveShot(GroundSquirrels.GROUND_SQUIRREL_NAME);
-        allKilled &= sceneGraph.haveShot(HoaryMarmots.HOARY_MARMOT_NAME);
-        allKilled &= sceneGraph.haveShot(Seals.SEAL_NAME);
-        allKilled &= sceneGraph.haveShot(MountainGoats.MOUNTAIN_GOAT_NAME);
-        allKilled &= sceneGraph.haveShot(Owls.SPOTTED_OWL_NAME);
-        allKilled &= sceneGraph.haveShot(Owls.BARRED_OWL_NAME);
-        allKilled &= sceneGraph.haveShot(BigFoots.BIGFOOT_NAME);
+        int speciesToHunt = 0;
+        boolean gs = sceneGraph.haveShot(GroundSquirrels.GROUND_SQUIRREL_NAME);
+        allKilled &= gs; if( !gs) speciesToHunt++;
+        boolean hm = sceneGraph.haveShot(HoaryMarmots.HOARY_MARMOT_NAME);
+        allKilled &= hm; if( !hm) speciesToHunt++;
+        boolean s = sceneGraph.haveShot(Seals.SEAL_NAME);
+        allKilled &= s; if( !s) speciesToHunt++;
+        boolean mg = sceneGraph.haveShot(MountainGoats.MOUNTAIN_GOAT_NAME);
+        allKilled &= mg; if( !mg) speciesToHunt++;
+        boolean so = sceneGraph.haveShot(Owls.SPOTTED_OWL_NAME);
+        allKilled &= so; if( !so) speciesToHunt++;
+        boolean bo = sceneGraph.haveShot(Owls.BARRED_OWL_NAME);
+        allKilled &= bo; if( !bo) speciesToHunt++;
+        boolean bf = sceneGraph.haveShot(BigFoots.BIGFOOT_NAME);
+        allKilled &= bf; if( !bf) speciesToHunt++;
 
         achieved &= allKilled;
 
@@ -47,9 +55,11 @@ public class TargetsKillingQuest implements Quest {
             else {
                 if(allKilled) {
                     sceneGraph.setMessage("Go back to the oracle by taking the trail, he has a present for you");
+                    String[] speech ={""};
+                    sceneGraph.talk(speech);
                 }
                 else {
-                    sceneGraph.setMessage("");
+                    sceneGraph.setMessage(speciesToHunt + " species left to hunt");
                 }
             }
             sceneGraph.setSearchForSea(onlyMissingSeal);
