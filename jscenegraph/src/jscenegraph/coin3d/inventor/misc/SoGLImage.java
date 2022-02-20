@@ -59,6 +59,10 @@ import jscenegraph.port.Destroyable;
 import jscenegraph.port.Mutable;
 import jscenegraph.port.memorybuffer.MemoryBuffer;
 
+import static org.lwjgl.opengl.GL11C.*;
+import static org.lwjgl.opengl.GL30C.GL_RG;
+import static org.lwjgl.opengl.GL33C.*;
+
 /**
  * @author Yves Boyadjian
  *
@@ -216,7 +220,7 @@ import jscenegraph.port.memorybuffer.MemoryBuffer;
 
 // *************************************************************************
 
-public class SoGLImage implements Destroyable {
+public class SoGLImage /*implements Destroyable*/ {
 	
   public enum Wrap {
     REPEAT /*= 0*/,
@@ -409,7 +413,7 @@ unref(SoState state)
 /*!
   Destructor.
 */
-public void destructor()
+private void destructor()
 {
   SoContextHandler.removeContextDestructionCallback(SoGLImage::contextCleanup, this);
   if (this.isregistered) SoGLImage.unregisterImage(this);
@@ -985,6 +989,22 @@ public void
     }
   }
   else { // 2D textures
+
+    switch (dataFormat) {
+      case GL_RED:
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_R, GL_RED);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_G, GL_RED);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_B, GL_RED);
+        break;
+      case GL_RG:
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_R, GL_RED);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_G, GL_RED);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_B, GL_RED);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_A, GL_GREEN);
+        break;
+      default:
+    }
+
     boolean mipmapimage = mipmap;
     boolean mipmapfilter = mipmap;
     boolean generatemipmap = false;

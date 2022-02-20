@@ -1211,6 +1211,93 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 		//sep.ref();
 		//forest = null; // for garbage collection : no, we need forest
 
+		// ____________________________________________________________ Shader for screen display
+		SoShaderProgram onScreenShaderProgram = new SoShaderProgram();
+
+		SoVertexShader vertexShaderScreen = new SoVertexShader();
+
+		vertexShaderScreen.sourceType.setValue(SoShaderObject.SourceType.GLSL_PROGRAM);
+		vertexShaderScreen.sourceProgram.setValue(
+				"#version 400 core\n" +
+						"layout (location = 0) in vec3 s4j_Vertex;\n" +
+						"layout (location = 1) in vec3 s4j_Normal;\n" +
+						"layout (location = 2) in vec2 s4j_MultiTexCoord0;\n"+
+						"layout (location = 3) in vec4 s4j_Color;\n" +
+						"\n" +
+						"uniform mat4 s4j_ModelViewMatrix;\n" +
+						"uniform mat4 s4j_ProjectionMatrix;\n" +
+						"uniform mat3 s4j_NormalMatrix;\n" +
+						"uniform vec4 s4j_ColorUniform;\n" +
+						"uniform bool s4j_PerVertexColor;\n" +
+						"uniform vec4 s4j_FrontLightModelProduct_sceneColor;\n" +
+						"\n" +
+						"out vec2 texCoord;\n" +
+						"out vec4 frontColor;\n" +
+						"\n" +
+						"void main(void)\n" +
+						"{\n" +
+						"    gl_Position = s4j_ProjectionMatrix * s4j_ModelViewMatrix * vec4(s4j_Vertex, 1.0);\n" +
+						"    vec4 diffuCol;\n" +
+						"    //diffuCol = s4j_FrontLightModelProduct_sceneColor;\n" +
+						"    diffuCol = s4j_ColorUniform; if(s4j_PerVertexColor) diffuCol = s4j_Color;\n" +
+						"\n" +
+						"texCoord = s4j_MultiTexCoord0;\n"+
+						"    frontColor = diffuCol;\n" +
+						"}\n"
+);
+
+		SoFragmentShader fragmentShaderScreen = new SoFragmentShader();
+
+		fragmentShaderScreen.sourceType.setValue(SoShaderObject.SourceType.GLSL_PROGRAM);
+		fragmentShaderScreen.sourceProgram.setValue("#version 400 core\n"+
+				"struct FrontMaterial {\n" +
+				"    vec4 specular;\n" +
+				"    vec4 ambient;\n" +
+				"    float shininess;\n" +
+				"};\n" +
+				"uniform FrontMaterial s4j_FrontMaterial;\n" +
+				"layout(location = 0) out vec4 s4j_FragColor;\n"+
+				"in vec3 perVertexColor;\n" +
+				"in vec2 texCoord;\n" +
+				"in vec4 frontColor;\n" +
+				"uniform sampler2D textureMap0;\n" +
+				"\n" +
+				"uniform int coin_texunit0_model;\n"+
+				"uniform int coin_light_model;\n"+
+				"\n" +
+				"void main(void) {\n"+
+				"vec4 mydiffuse = frontColor;\n" +
+				"vec4 texcolor = (coin_texunit0_model != 0) ? texture2D(textureMap0, texCoord) : vec4(1.0);\n" +
+				"if ( texcolor.r == 0.0 ) { mydiffuse.a = 0; discard;}\n" +
+				"\n" +
+				"  vec3 color = perVertexColor;\n"+
+				"color = mydiffuse.rgb * texcolor.rgb;\n"+
+				"s4j_FragColor = vec4(color, mydiffuse.a);\n"+
+				"}\n"
+		);
+
+		final SoShaderStateMatrixParameter smvs = new SoShaderStateMatrixParameter();
+		smvs.name.setValue("s4j_ModelViewMatrix");
+		smvs.matrixType.setValue(SoShaderStateMatrixParameter.MatrixType.MODELVIEW);
+
+		final SoShaderStateMatrixParameter sprs = new SoShaderStateMatrixParameter();
+		sprs.name.setValue("s4j_ProjectionMatrix");
+		sprs.matrixType.setValue(SoShaderStateMatrixParameter.MatrixType.PROJECTION);
+
+//		final SoShaderStateMatrixParameter ns = new SoShaderStateMatrixParameter();
+//		ns.name.setValue("s4j_NormalMatrix");
+//		ns.matrixType.setValue(SoShaderStateMatrixParameter.MatrixType.MODELVIEW);
+//		ns.matrixTransform.setValue(SoShaderStateMatrixParameter.MatrixTransform.INVERSE_TRANSPOSE_3);
+
+		vertexShaderScreen.parameter.set1Value(vertexShaderScreen.parameter.getNum(), smvs);
+		vertexShaderScreen.parameter.set1Value(vertexShaderScreen.parameter.getNum(), sprs);
+		//vertexShaderSun.parameter.set1Value(vertexShaderSun.parameter.getNum(), ns);
+
+		onScreenShaderProgram.shaderObject.set1Value(0, vertexShaderScreen);
+		onScreenShaderProgram.shaderObject.set1Value(1, fragmentShaderScreen);
+
+		sep.addChild(onScreenShaderProgram);
+
 		SoDepthBuffer db = new SoDepthBuffer();
 
 		db.test.setValue(false);

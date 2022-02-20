@@ -58,10 +58,10 @@ public static /*GLenum*/int coin_glglue_get_texture_format(final cc_glglue glw, 
   /*GLenum*/int format;
   switch (numcomponents) {
   case 1:
-    format = GL2.GL_LUMINANCE;
+    format = GL2.GL_RED; // CORE
     break;
   case 2:
-    format = GL2.GL_LUMINANCE_ALPHA;
+    format = GL2.GL_RG; // CORE
     break;
   case 3:
     format = GL2.GL_RGB;
@@ -181,10 +181,10 @@ public static int coin_glglue_get_internal_texture_format(final cc_glglue glw,
     boolean usenewenums = true;//glglue_allow_newer_opengl(glw) && cc_glglue_glversion_matches_at_least(glw,1,1,0); java port
     switch (numcomponents) {
     case 1:
-      format = usenewenums ? GL2.GL_LUMINANCE8 : GL2.GL_LUMINANCE;
+      format = usenewenums ? GL2.GL_R8 : GL2.GL_LUMINANCE;
       break;
     case 2:
-      format = usenewenums ? GL2.GL_LUMINANCE8_ALPHA8 : GL2.GL_LUMINANCE_ALPHA;
+      format = usenewenums ? GL2.GL_RG8 : GL2.GL_LUMINANCE_ALPHA;
       break;
     case 3:
       format = usenewenums ? (srgb ? GL2.GL_SRGB8 :GL2.GL_RGB8) : GL2.GL_RGB;

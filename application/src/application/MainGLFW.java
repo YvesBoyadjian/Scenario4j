@@ -549,7 +549,8 @@ public class MainGLFW {
 //				glDebugMessageCallback(new GLDebugMessageCallback() {
 //					@Override
 //					public void invoke(int i, int i1, int i2, int i3, int length, long message, long l1) {
-//						System.err.println("OpenGL Error : "+ getMessage(length,message));
+//						String messageStr = getMessage(length,message);
+//						System.err.println("OpenGL Error : "+ messageStr);
 //					}
 //				}, 0);
 //				error = glGetError();
@@ -803,7 +804,7 @@ public class MainGLFW {
 		glf.minorVersion = 0;//1;
 		glf.api = GLData.API.GL;
 		glf.profile = GLData.Profile.CORE;
-		glf.debug = false;//true; has no effect
+		glf.debug = false;//true;
 		glf.grabCursor = true;
 		viewer.setFormat(glf, style);
 

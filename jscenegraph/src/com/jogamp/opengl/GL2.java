@@ -3395,8 +3395,8 @@ ByteBuffer data ) {
 		// org.lwjgl.opengl.GL11.glDeleteLists(i,num); CORE
 	}
 
-	default void glDrawArrays(int arg1, int arg2, int arg3) {
-		org.lwjgl.opengl.GL11.glDrawArrays(arg1,arg2,arg3);
+	default void glDrawArrays(int mode, int first, int count) {
+		org.lwjgl.opengl.GL11.glDrawArrays(mode,first,count);
 	}
 
 	default void glActiveTexture(int texture) {

@@ -191,7 +191,10 @@ public class SoText2 extends SoShape {
     //! Internal class that allows Text2 nodes to share font
     //! information, GL display lists, etc.
     private SoBitmapFontCache   myFont;
-	 
+
+    interface Transformer {
+        SbVec3f transform(SbVec3f in);
+    }
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -350,33 +353,53 @@ GLRender(SoGLRenderAction action)
     mb.sendFirst();
     
     GL2 gl2 = state.getGL2();
-    
+
+    final SbMatrix objToScreen = new SbMatrix();
+    objToScreen.copyFrom( SoProjectionMatrixElement.get(state));
+    objToScreen.copyFrom(
+            objToScreen.multLeft(SoViewingMatrixElement.get(state)));
+    objToScreen.copyFrom(
+            objToScreen.multLeft(SoModelMatrixElement.get(state)));
+
+    SbMatrix screenToObj = objToScreen.inverse();
+
+    SbViewportRegion vpr = SoViewportRegionElement.get(state);
+
+    Transformer transformer = new Transformer() {
+        @Override
+        public SbVec3f transform(SbVec3f in) {
+            return toObjectSpace(in, screenToObj,
+                    vpr);
+        }
+    };
+
+    // The origin of the text on the screen is the object-space point
+    // 0,0,0:
+    SbVec3f screenOrigin =
+            fromObjectSpace(new SbVec3f(0,0,0), objToScreen, vpr);
+
     // Special-case left-justified, single-line text, which we know
     // starts at (0,0,0) in object space, so we can help caching by
     // avoiding getting the projection/view/model matrices:
     if (string.getNum() == 1 && justification.getValue() == Justification.LEFT.getValue()) {
-        gl2.glRasterPos3f(0,0,0);       
 
-        myFont.drawString(0,gl2);
+        // Starting position of string, based on justification:
+        SbVec3f charPosition = getPixelStringOffset(0).operator_add(
+                screenOrigin);
+
+        // Transform the screen-space starting position into object
+        // space, and feed that back to the glRasterPos command (which
+        // will turn around and transform it back into screen-space,
+        // but oh well).
+        SbVec3f lineOrigin = transformer.transform(charPosition);
+
+        gl2.glRasterPos3f(0,0,0);
+
+        myFont.drawString(0,state,this,charPosition,transformer);
     }
     // General case:
     else {
-        final SbMatrix objToScreen = new SbMatrix();
-        objToScreen.copyFrom( SoProjectionMatrixElement.get(state));
-        objToScreen.copyFrom(
-            objToScreen.multLeft(SoViewingMatrixElement.get(state)));
-        objToScreen.copyFrom(
-            objToScreen.multLeft(SoModelMatrixElement.get(state)));
 
-        SbMatrix screenToObj = objToScreen.inverse();
-        
-        SbViewportRegion vpr = SoViewportRegionElement.get(state);
-
-        // The origin of the text on the screen is the object-space point
-        // 0,0,0:
-        SbVec3f screenOrigin =
-            fromObjectSpace(new SbVec3f(0,0,0), objToScreen, vpr);
-    
         for (int line = 0; line < string.getNum(); line++) {
         
             // Starting position of string, based on justification:
@@ -387,11 +410,11 @@ GLRender(SoGLRenderAction action)
             // space, and feed that back to the glRasterPos command (which
             // will turn around and transform it back into screen-space,
             // but oh well).
-            SbVec3f lineOrigin = toObjectSpace(charPosition, screenToObj,
-                                               vpr);
+            SbVec3f lineOrigin = transformer.transform(charPosition);
+            //toObjectSpace(charPosition, screenToObj, vpr);
             gl2.glRasterPos3fv(lineOrigin.getValueRead(),0);
-            
-            myFont.drawString(line,gl2);
+
+            myFont.drawString(line,state,this,charPosition,transformer);
         }
         // Don't auto-cache above, since dependent on camera:
         SoGLCacheContextElement.shouldAutoCache(state,

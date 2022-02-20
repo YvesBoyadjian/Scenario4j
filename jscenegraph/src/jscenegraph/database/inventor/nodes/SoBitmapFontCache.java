@@ -53,28 +53,32 @@
 
 package jscenegraph.database.inventor.nodes;
 
+import static com.jogamp.opengl.GL.*;
+import static com.jogamp.opengl.GL.GL_FLOAT;
 import static jscenegraph.database.inventor.libFL.FLcontext.FL_FONTNAME;
 import static jscenegraph.database.inventor.libFL.FLcontext.FL_HINT_MINOUTLINESIZE;
 import static org.lwjgl.opengl.GL11.glBitmap;
 import static org.lwjgl.opengl.GL11.glCallLists;
 import static org.lwjgl.opengl.GL11.glListBase;
 
-import java.nio.ByteBuffer;
-import java.nio.CharBuffer;
-import java.nio.ShortBuffer;
+import java.nio.*;
+import java.util.BitSet;
 
+import jscenegraph.coin3d.inventor.elements.SoGLMultiTextureEnabledElement;
+import jscenegraph.coin3d.inventor.elements.SoMultiTextureImageElement;
+import jscenegraph.coin3d.inventor.elements.gl.SoGLMultiTextureImageElement;
+import jscenegraph.coin3d.inventor.misc.SoGLImage;
+import jscenegraph.database.inventor.*;
 import jscenegraph.port.Destroyable;
+import jscenegraph.port.SbVec2fArray;
+import jscenegraph.port.SbVec3fArray;
+import jscenegraph.port.memorybuffer.FloatMemoryBuffer;
+import jscenegraph.port.memorybuffer.MemoryBuffer;
 import org.lwjglx.BufferUtils;
 
 import com.jogamp.common.nio.Buffers;
 import com.jogamp.opengl.GL2;
 
-import jscenegraph.database.inventor.SbBox3f;
-import jscenegraph.database.inventor.SbDict;
-import jscenegraph.database.inventor.SbName;
-import jscenegraph.database.inventor.SbPList;
-import jscenegraph.database.inventor.SbVec3f;
-import jscenegraph.database.inventor.SbViewportRegion;
 import jscenegraph.database.inventor.caches.SoCache;
 import jscenegraph.database.inventor.elements.SoCacheElement;
 import jscenegraph.database.inventor.elements.SoFontNameElement;
@@ -120,6 +124,9 @@ public class SoBitmapFontCache extends SoCache {
         
     // Dictionary to point to bitmap; keyed by unicode value.
     private SbDict      bitmapDict;
+
+    // Dictionary to point to SoGLImage; keyed by unicode value.
+    private SbDict  imageDict;
 
     // This flag will be true if there is another cache open (if
     // building GL display lists for render caching, that means we
@@ -202,6 +209,7 @@ public SoBitmapFontCache(SoState state) { super(state);
     currentNodeId = 0;
     displayListDict = new SbDict();
     bitmapDict = new SbDict();
+    imageDict = new SbDict();
     
     fonts.append(this);
 }
@@ -289,6 +297,8 @@ private String createUniFontList(String fontNameList, float size)
 
             bitmapDict.applyToAll(SoBitmapFontCache::freeBitmap);
 
+            imageDict.applyToAll(SoBitmapFontCache::freeImage);
+
             // Only destroy the font library font if no other font caches
             // are using the same font identifier:
             // Must go through fontlist and destroy every font that isn't used
@@ -319,6 +329,7 @@ private String createUniFontList(String fontNameList, float size)
             if (otherFonts) Destroyable.delete(otherFontDict);
             Destroyable.delete(displayListDict);
             Destroyable.delete(bitmapDict);
+            Destroyable.delete(imageDict);
 
             if (fontNumList != null) ;//       delete [] fontNumList;
             if (fontNums != null)           Destroyable.delete(fontNums);
@@ -607,22 +618,153 @@ getHeight()
 // Use: internal public
 
 public void
-drawCharacter(char c, GL2 gl2)
+drawCharacter(char c, SoState state, SoNode node, SbVec3f charPosition, SoText2.Transformer transformer)
 //
 ////////////////////////////////////////////////////////////////////////
 {
     char uc = (char)c;
     final FLbitmap bmap = getBitmap(uc);
     
-    if (bmap != null)
-        gl2.glBitmap(bmap.width, bmap.height, bmap.xorig, bmap.yorig,
-             bmap.xmove, bmap.ymove, Buffers.newDirectByteBuffer(bmap.bitmap));
+    if (bmap != null) {
+
+        SoGLImage image = getImage(uc);
+
+        if( image != null) {
+
+            glBitmap(state, node, charPosition, transformer, bmap.width, bmap.height, bmap.xorig, bmap.yorig,
+                    bmap.xmove, bmap.ymove, image);
+        }
+    }
 //#ifdef DEBUG
     else SoDebugError.post("SoBitmapFontCache::drawCharacter", 
         "no bitmap for character "+uc+" "/*, uc[0]*256+uc[1]*/);
 //#endif  
 }
 
+
+    private void glBitmap(
+            SoState state,
+            SoNode node,
+            SbVec3f charPosition,
+            SoText2.Transformer transformer,
+            int width,
+            int height,
+            float xorig,
+            float yorig,
+            float xmove,
+            float ymove,
+            SoGLImage image
+    ) {
+
+//        SoGLImage image = new SoGLImage();
+//
+//        SbVec2s size = new SbVec2s((short)width,(short)height);
+//
+//        image.setData(
+//                bitmap,
+//                size,
+//                1,
+//                false,
+//                SoGLImage.Wrap.CLAMP,
+//                SoGLImage.Wrap.CLAMP,
+//                1.0f,
+//                0,
+//                /*state*/null);
+
+        SoGLMultiTextureImageElement.set(
+                state,
+                node,
+                0,
+                image,
+                SoMultiTextureImageElement.Model.MODULATE,
+                new SbColor(0.0f, 0.0f, 0.0f)
+        );
+
+        SoGLMultiTextureEnabledElement.set(state,node,0,true);
+
+        SbVec3fArray vboArray = new SbVec3fArray(FloatMemoryBuffer.allocateFloats(3 * 6));
+
+        float xScreenStart = charPosition.getX();
+        float yScreenStart = charPosition.getY();
+        float xScreenEnd = xScreenStart + width;
+        float yScreenEnd = yScreenStart + height;
+
+        SbVec3f a = new SbVec3fSingle(xScreenStart,yScreenStart,-1);
+        SbVec3f b = new SbVec3fSingle(xScreenEnd,yScreenStart,-1);
+        SbVec3f c = new SbVec3fSingle(xScreenStart,yScreenEnd,-1);
+        SbVec3f d = new SbVec3fSingle(xScreenEnd,yScreenEnd,-1);
+
+        a = transformer.transform(a);
+        b = transformer.transform(b);
+        c = transformer.transform(c);
+        d = transformer.transform(d);
+
+        vboArray.setO(0,a);
+        vboArray.setO(1,b);
+        vboArray.setO(2,c);
+        vboArray.setO(3,b);
+        vboArray.setO(4,d);
+        vboArray.setO(5,c);
+
+        SbVec2fArray tcArray = new SbVec2fArray(FloatMemoryBuffer.allocateFloats(2 * 6));
+
+        SbVec2f at = new SbVec2fSingle(0,0);
+        SbVec2f bt = new SbVec2fSingle(1,0);
+        SbVec2f ct = new SbVec2fSingle(0,1);
+        SbVec2f dt = new SbVec2fSingle(1,1);
+
+        tcArray.setO(0,at);
+        tcArray.setO(1,bt);
+        tcArray.setO(2,ct);
+        tcArray.setO(3,bt);
+        tcArray.setO(4,dt);
+        tcArray.setO(5,ct);
+
+        // ________________________________________________ Vertex coords
+        final int[] vertex_bo = new int[1];
+
+        GL2 gl2 = state.getGL2();
+
+        gl2.glGenBuffers(1,vertex_bo);
+        gl2.glBindBuffer(GL_ARRAY_BUFFER,vertex_bo[0]);
+        gl2.glBufferData(GL_ARRAY_BUFFER,vboArray.sizeof(),vboArray.toFloatBuffer(),GL_STATIC_DRAW);
+
+        gl2.glVertexAttribPointer(0,3,GL_FLOAT,false,/*3*Float.BYTES*/0,0);
+
+        gl2.glEnableVertexAttribArray(0);
+
+// __________________________________________________ Texture coords
+        final int[] texture_coordinate_bo = new int[1];
+
+        gl2.glGenBuffers(1, texture_coordinate_bo);
+        gl2.glBindBuffer(GL_ARRAY_BUFFER,texture_coordinate_bo[0]);
+        gl2.glBufferData(GL_ARRAY_BUFFER,tcArray.sizeof(),tcArray.toFloatBuffer(),GL_STATIC_DRAW);
+
+        gl2.glVertexAttribPointer(2,2,GL_FLOAT,false,0,0);
+
+        gl2.glEnableVertexAttribArray(2);
+
+    int mode = GL_TRIANGLES;
+    int first = 0;
+    int count = vboArray.length();
+
+        gl2.glDrawArrays(mode,first,count);
+
+
+        gl2.glBindBuffer(GL_ARRAY_BUFFER,0);
+
+        gl2.glDisableVertexAttribArray(0);
+        gl2.glDisableVertexAttribArray(2);
+
+//    gl2.glDeleteBuffers(1,ebo);
+        gl2.glDeleteBuffers(1,vertex_bo);
+        gl2.glDeleteBuffers(1,texture_coordinate_bo);
+
+        //image.unref(state);
+
+        charPosition.setX(charPosition.getX()+xmove);
+        charPosition.setY(charPosition.getY()+ymove);
+    }
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -633,7 +775,7 @@ drawCharacter(char c, GL2 gl2)
 // Use: internal public
 
 public void
-drawString(int line, GL2 gl2)
+drawString(int line, SoState state, SoNode node, SbVec3f linePosition,  SoText2.Transformer transformer)
 //
 ////////////////////////////////////////////////////////////////////////
 {
@@ -645,10 +787,13 @@ drawString(int line, GL2 gl2)
 
     // If there aren't any other caches open, build display lists for
     // the characters we can:
+
+    // Well be changed in loop
+    SbVec3f charPosition = new SbVec3fSingle(linePosition);
     for (int i = 0; i < getNumUCSChars(line); i++) {
         // See if the font cache already has (or can build) a display
         // list for this character:
-        if (!hasDisplayList((char)str.get(/*2**/i),gl2)) {// java port
+        if (!hasDisplayList((char)str.get(/*2**/i),state, node, charPosition,transformer)) {// java port
             useCallLists = false;
             break;
         }
@@ -657,15 +802,18 @@ drawString(int line, GL2 gl2)
     // if we have display lists for all of the characters, use
     // glCallLists:
     if (useCallLists) {
-        callLists(strb, getNumUCSChars(line),gl2);
+        callLists(strb, getNumUCSChars(line),state.getGL2());
     } else {
         // if we don't, draw the string character-by-character, using the
         // display lists we do have:
+
+        // CharPosition will changed by drawCharacter method
+        charPosition = new SbVec3fSingle(linePosition);
         for (int i = 0; i < getNumUCSChars(line); i++) {
-            if (!hasDisplayList((char)str.get(/* 2**/i),gl2)) {
-                drawCharacter((char)str.get(/*2**/i),gl2);
+            if (!hasDisplayList((char)str.get(/* 2**/i),state, node, charPosition,transformer)) {
+                drawCharacter((char)str.get(/*2**/i),state,node,charPosition,transformer);
             }
-            else gl2.glCallList(list.getFirstIndex()+ str.get(i)/*ustr.charAt(i)*//*((ustr[2*i]<<8) | ustr[2*i+1])*/); // java port
+            else state.getGL2().glCallList(list.getFirstIndex()+ str.get(i)/*ustr.charAt(i)*//*((ustr[2*i]<<8) | ustr[2*i+1])*/); // java port
         }
     }
 }
@@ -702,7 +850,49 @@ private FLbitmap getBitmap(char c)
     return (FLbitmap)value[0];
 }
 
+private SoGLImage getImage(char c) {
+    int key = c;
+    final Object[] value = new Object[1];
 
+    if(!imageDict.find(key,value)) {
+        SoGLImage image = new SoGLImage();
+
+        final FLbitmap bmap = getBitmap(c);
+
+        if (bmap != null) {
+
+            MemoryBuffer mb = MemoryBuffer.allocateBytes(bmap.width*bmap.height);
+            ByteBuffer bb = ByteBuffer.wrap(bmap.bitmap).order(ByteOrder.BIG_ENDIAN);
+            IntBuffer sb = bb.asIntBuffer();
+            int index = 0;
+            for (int j=0;j<bmap.height;j++) {
+                for( int i=0; i<bmap.width;i++) {
+                    int white = (sb.get(index/32) >>> (31 - (index%32)) ) & 1;
+                    mb.setByte(index, (byte)(white * 255));
+                    index++;
+                }
+            }
+
+            SbVec2s size = new SbVec2s((short)bmap.width,(short)bmap.height);
+
+            image.setData(
+                    mb,
+                    size,
+                    1,
+                    false,
+                    SoGLImage.Wrap.CLAMP,
+                    SoGLImage.Wrap.CLAMP,
+                    1.0f,
+                    0,
+                    null);
+            value[0] = image;
+        }
+
+        imageDict.enter(key,value[0]);
+    }
+
+    return (SoGLImage)value[0];
+}
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -713,7 +903,7 @@ private FLbitmap getBitmap(char c)
 // Use: internal
 
 private boolean
-hasDisplayList(char c, GL2 gl2)
+hasDisplayList(char c, SoState state, SoNode node, SbVec3f charPosition, SoText2.Transformer transformer)
 //
 ////////////////////////////////////////////////////////////////////////
 {
@@ -725,10 +915,12 @@ hasDisplayList(char c, GL2 gl2)
 
     // If we don't and we can't build one, return FALSE.
     if (otherOpen || null == list) return false; // CORE
-    
+
+    GL2 gl2 = state.getGL2();
+
     // Build one:
     gl2.glNewList(list.getFirstIndex()+key, GL2.GL_COMPILE);
-    drawCharacter(c,gl2);
+    drawCharacter(c,state, node, charPosition, transformer);
     gl2.glEndList();
     
     displayListDict.enter(key, value[0]);
@@ -767,5 +959,8 @@ callLists(ByteBuffer string, int len, GL2 gl2)
         fl.flFreeBitmap((FLbitmap)value);
     }
 
-
+    public static void freeImage(Object obj, Object value) {
+        SoGLImage image = (SoGLImage)value;
+        image.unref(null);
+    }
 }
