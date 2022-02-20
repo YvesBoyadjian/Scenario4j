@@ -1257,7 +1257,6 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 				"};\n" +
 				"uniform FrontMaterial s4j_FrontMaterial;\n" +
 				"layout(location = 0) out vec4 s4j_FragColor;\n"+
-				"in vec3 perVertexColor;\n" +
 				"in vec2 texCoord;\n" +
 				"in vec4 frontColor;\n" +
 				"uniform sampler2D textureMap0;\n" +
@@ -1270,7 +1269,7 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 				"vec4 texcolor = (coin_texunit0_model != 0) ? texture2D(textureMap0, texCoord) : vec4(1.0);\n" +
 				"if ( texcolor.r == 0.0 ) { mydiffuse.a = 0; discard;}\n" +
 				"\n" +
-				"  vec3 color = perVertexColor;\n"+
+				"  vec3 color;\n"+
 				"color = mydiffuse.rgb * texcolor.rgb;\n"+
 				"s4j_FragColor = vec4(color, mydiffuse.a);\n"+
 				"}\n"
