@@ -135,7 +135,8 @@ public class SoTargets extends SoSeparator {
 		return target;
 	}
 
-	public SoTarget getTargetChild(int index) {
+	public SoTarget getTargetChildFromInstance(int instance) {
+		int index = target.indexOfInstance(instance);
 		return targets.get(index);
 	}
 }

@@ -1071,13 +1071,14 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 		
 			final SbVec3f targetPosition = new SbVec3f();
 
-			for (int instance = 0; instance < target.getNbTargets(); instance++) {
+			for (int index = 0; index < target.getNbTargets(); index++) {
+				int instance = target.getInstance(index);
 				SoTarget targetSeparator = new SoTarget(instance);
 				//sealSeparator.renderCaching.setValue(SoSeparator.CacheEnabled.OFF);
 
 				SoTranslation targetTranslation = new SoTranslation();
 
-				targetPosition.setValue(target.getTarget(instance, vector));
+				targetPosition.setValue(target.getTarget(index, vector));
 				targetPosition.setZ(targetPosition.getZ() + 0.3f);
 
 				targetTranslation.translation.setValue(targetPosition);
@@ -2365,7 +2366,7 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 
 			SoTargets targetsNode = (SoTargets) targetsGroup.getChild(index);
 
-			SoTarget target = targetsNode.getTargetChild(instance);
+			SoTarget target = targetsNode.getTargetChildFromInstance(instance);
 
 			SoVRMLBillboard billboard = (SoVRMLBillboard) target.getChild(1);
 

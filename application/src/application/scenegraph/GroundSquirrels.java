@@ -116,6 +116,7 @@ public class GroundSquirrels extends TargetBase implements Target {
                 squirrelCoords.append( xyz[1]);
                 squirrelCoords.append( xyz[2]);
 
+                addInstance(i);
                 nbSquirrels++;
             }
         }

@@ -110,6 +110,7 @@ public class HoaryMarmots extends TargetBase implements Target {
                 marmotCoords.append(y);
                 marmotCoords.append(z);
 
+                addInstance(i);
                 nbMarmots++;
             }
         }

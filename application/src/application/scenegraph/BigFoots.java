@@ -131,6 +131,7 @@ public class BigFoots extends TargetBase implements Target {
                 start = bigFootCoords.getNum();
                 bigFootCoords.setValues(start, xyz);
 
+                addInstance(i);
                 nbBigFoots++;
             }
         }

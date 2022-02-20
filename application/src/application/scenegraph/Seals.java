@@ -92,7 +92,8 @@ public class Seals extends TargetBase implements Target {
 				xyz[2] = z + 0.3f;
 				start = sealCoords.getNum();
 				sealCoords.setValues(start, xyz);
-				
+
+				addInstance(i);
 				nbSeals++;
 			}
 		}

@@ -21,4 +21,8 @@ public interface Target {
     void setGroup(SoGroup group, int instance);
 
     void resurrect(int instance);
+
+    int getInstance( int index);
+
+    int indexOfInstance(int instance);
 }

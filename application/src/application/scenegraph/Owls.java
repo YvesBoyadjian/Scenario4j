@@ -107,6 +107,7 @@ public abstract class Owls extends TargetBase implements Target {
                 owlCoords.append(y);
                 owlCoords.append(z+altitude);
 
+                addInstance(i);
                 nbOwls++;
             }
         }

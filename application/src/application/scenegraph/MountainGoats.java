@@ -115,6 +115,7 @@ public class MountainGoats extends TargetBase implements Target {
                 goatCoords.append(xyz[1]);
                 goatCoords.append(xyz[2]);
 
+                addInstance(i);
                 nbGoats++;
             }
         }
