@@ -219,7 +219,7 @@ public class MainGLFW {
 
 		southPanel.add(progressBar);
 
-		JLabel keys = new JLabel("[WASD] or [ZQSD] to walk, [left mouse button] to shoot"+ (SceneGraphIndexedFaceSetShader.AIM ? ", [right mouse button] to aim":""),null,SwingConstants.CENTER);
+		JLabel keys = new JLabel("[WASD] or [ZQSD] to walk, [left mouse button] to shoot"+ ((SceneGraphIndexedFaceSetShader.AIM ? ", [right mouse button] to aim":"")+", [Esc] for menu"),null,SwingConstants.CENTER);
 		keys.setForeground(Color.yellow);
 		//keys.setFont(intro.getFont().deriveFont((float) height / 100f));
 		keys.setBackground(Color.black);
