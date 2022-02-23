@@ -810,6 +810,14 @@ public class MainGLFW {
 
 		viewer.buildWidget(style);
 
+		GL2 gl2 = new GL2() {
+		};
+		gl2.glClearColor(0,0,0,1);
+		gl2.glClear(GL2.GL_COLOR_BUFFER_BIT);
+		viewer.swapBuffers();
+
+		window.setVisible(false);
+
 		final double computerStartTimeCorrected = COMPUTER_START_TIME_SEC - (double) System.nanoTime() / 1e9;//60*60*4.5 / TimeConstants./*JMEMBA_TIME_ACCELERATION*/GTA_SA_TIME_ACCELERATION;
 
 		if (previousTimeSec == 0) {
@@ -882,9 +890,6 @@ public class MainGLFW {
 //		}
 		System.gc();
 		System.runFinalization();
-
-		GL2 gl2 = new GL2() {
-		};
 
 		int[] depthBits = new int[1];
 		gl2.glGetIntegerv(GL2.GL_DEPTH_BITS, depthBits);
@@ -1442,7 +1447,6 @@ public class MainGLFW {
 				System.exit(-1); // Necessary, because of Linux
 			}
 
-			window.setVisible(false);
 
 			boolean success = viewer.setFocus();
 

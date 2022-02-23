@@ -177,7 +177,7 @@ public class GLCanvas extends Composite {
 //        if ( format.grabCursor && glfwRawMouseMotionSupported()) does not work
 //            glfwSetInputMode(window, GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);	
         
-        swapBuffers();
+        //swapBuffers();
         }
 	
 	public void setCurrent() {
