@@ -160,7 +160,7 @@ public class OptionDialog extends JDialog {
         setShadowPrecision(0.075/*DEFAULT_SHADOW_PRECISION*/);
         setLODFactor(0.5/*DEFAULT_LOD_FACTOR*/);
         setLODFactorShadow(0.5/*DEFAULT_LOD_FACTOR_SHADOW*/);
-        setTreeDistance(3000/*DEFAULT_TREE_DISTANCE*/);
+        setTreeDistance(4500/*DEFAULT_TREE_DISTANCE*/);
         setTreeShadowDistance(1500/*DEFAULT_TREE_SHADOW_DISTANCE*/);
         setIslandDepth(7000/*DEFAULT_ISLAND_DEPTH*/);
         setVolumetricSky(false/*DEFAULT_VOLUMETRIC_SKY*/);
