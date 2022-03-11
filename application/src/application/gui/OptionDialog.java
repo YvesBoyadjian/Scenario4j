@@ -94,6 +94,7 @@ public class OptionDialog extends JDialog {
     private void onOK() {
         // add your code here
         //dispose();
+        setAlwaysOnTop(false);
         setVisible(false);
         apply();
         if(viewer.isTimeStop()) {
