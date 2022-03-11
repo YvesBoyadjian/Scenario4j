@@ -86,6 +86,7 @@ import jsceneviewerglfw.Display;
 import jsceneviewerglfw.GLData;
 import jsceneviewerglfw.SWT;
 import loader.TerrainLoader;
+import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GLDebugMessageCallback;
 import org.ode4j.math.DQuaternion;
 import org.ode4j.math.DVector3;
@@ -895,6 +896,18 @@ public class MainGLFW {
 		gl2.glGetIntegerv(GL2.GL_DEPTH_BITS, depthBits);
 
 		System.out.println("Depth Buffer : " + depthBits[0]);
+
+		String glVersion = (String) GL11.glGetString(GL2.GL_VERSION);
+
+		System.out.println("GL Version : " + glVersion);
+
+		String glVendor = (String)GL11.glGetString(GL2.GL_VENDOR);
+
+		System.out.println("GL Vendor : " + glVendor);
+
+		String glRenderer = (String)GL11.glGetString(GL2.GL_RENDERER);
+
+		System.out.println("GL Renderer : "+ glRenderer);
 
 		// ______________________________________________________________________________________________________ planks
 		File planksFile = new File("planks.mri");
