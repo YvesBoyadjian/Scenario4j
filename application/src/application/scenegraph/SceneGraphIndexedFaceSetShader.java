@@ -260,7 +260,7 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 
 	final SoGroup targetsGroup = new SoGroup();
 
-	final List<Target> targets = new ArrayList<>();
+	final List<Target> targetFamilies = new ArrayList<>();
 
 	private final Set<String> shotTargets = new HashSet<>();
 	private final List<Integer> shotTargetsIndices = new ArrayList<>();
@@ -939,19 +939,19 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 		// _______________________________________________________________________ Targets
 
 		Seals seals_ = new Seals(this);
-		addTarget(seals_);
+		addTargetFamily(seals_);
 
 		BigFoots bigfoots_ = new BigFoots(this);
-		addTarget(bigfoots_);
+		addTargetFamily(bigfoots_);
 
 		MountainGoats goats_ = new MountainGoats(this);
-		addTarget(goats_);
+		addTargetFamily(goats_);
 
 		HoaryMarmots marmots_ = new HoaryMarmots(this);
-		addTarget(marmots_);
+		addTargetFamily(marmots_);
 
 		GroundSquirrels squirrels_ = new GroundSquirrels(this);
-		addTarget(squirrels_);
+		addTargetFamily(squirrels_);
 
 		Owls spottedOwlFront_ = new Owls(this,53) {
 
@@ -970,7 +970,7 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 				return 218.0f/292.0f;
 			}
 		};
-		addTarget(spottedOwlFront_);
+		addTargetFamily(spottedOwlFront_);
 
 		Owls spottedOwlBack_ = new Owls(this,54) {
 
@@ -989,7 +989,7 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 				return 209.0f/329.0f;
 			}
 		};
-		addTarget(spottedOwlBack_);
+		addTargetFamily(spottedOwlBack_);
 
 		Owls barredOwlFront_ = new Owls(this,55) {
 
@@ -1008,7 +1008,7 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 				return 217.0f/289.0f;
 			}
 		};
-		addTarget(barredOwlFront_);
+		addTargetFamily(barredOwlFront_);
 
 		Owls barredOwlBack_ = new Owls(this,56) {
 
@@ -1027,11 +1027,11 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 				return 222.0f/330.0f;
 			}
 		};
-		addTarget(barredOwlBack_);
+		addTargetFamily(barredOwlBack_);
 
-		for( Target target : targets) {
+		for( Target targetFamily : targetFamilies) {
 
-			SoTargets targetsSeparator = new SoTargets(target) {
+			SoTargets targetsSeparator = new SoTargets(targetFamily) {
 				public void notify(SoNotList list) {
 					super.notify(list);
 				}
@@ -1055,7 +1055,7 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 		
 			SoTexture2 targetTexture = new SoTexture2();
 
-			String texturePath = target.getTexturePath();
+			String texturePath = targetFamily.getTexturePath();
 
 			File textureFile = new File(texturePath);
 
@@ -1071,14 +1071,16 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 		
 			final SbVec3f targetPosition = new SbVec3f();
 
-			for (int index = 0; index < target.getNbTargets(); index++) {
-				int instance = target.getInstance(index);
+			final int nbTargets = targetFamily.getNbTargets();
+
+			for (int index = 0; index < nbTargets; index++) {
+				int instance = targetFamily.getInstance(index);
 				SoTarget targetSeparator = new SoTarget(instance);
 				//sealSeparator.renderCaching.setValue(SoSeparator.CacheEnabled.OFF);
 
 				SoTranslation targetTranslation = new SoTranslation();
 
-				targetPosition.setValue(target.getTarget(index, vector));
+				targetPosition.setValue(targetFamily.getTarget(index, vector));
 				targetPosition.setZ(targetPosition.getZ() + 0.3f);
 
 				targetTranslation.translation.setValue(targetPosition);
@@ -1089,8 +1091,8 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 				//billboard.axisOfRotation.setValue(0, 1, 0);
 
 				SoCube targetCube = new SoCube();
-				targetCube.height.setValue(target.getSize());
-				targetCube.width.setValue(target.getRatio() * targetCube.height.getValue());
+				targetCube.height.setValue(targetFamily.getSize());
+				targetCube.width.setValue(targetFamily.getRatio() * targetCube.height.getValue());
 				targetCube.depth.setValue(0.1f);
 
 				billboard.addChild(targetCube);
@@ -2316,12 +2318,12 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 		this.space = space;
 	}
 
-	public void addTarget(Target target) {
-		targets.add(target);
+	public void addTargetFamily(Target target) {
+		targetFamilies.add(target);
 	}
 
 	public void shootTarget(Target t, int instance) {
-		registerShot(targets.indexOf(t),instance);
+		registerShot(targetFamilies.indexOf(t),instance);
 		doShootTarget(t,instance);
 	}
 
@@ -2331,7 +2333,7 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 	}
 
 	public boolean isShot(Target t, int instance) {
-		int index = targets.indexOf(t);
+		int index = targetFamilies.indexOf(t);
 		int nbShots = shotTargetsIndices.size();
 		for(int i=0; i<nbShots; i++) {
 			if(shotTargetsIndices.get(i) == index) {
@@ -2376,8 +2378,8 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 			billboard.insertChild(c, 0);
 			//billboard.enableNotify(true);
 
-			targets.get(index).setGroup(billboard,instance);
-			shootTarget(targets.get(index),instance);
+			targetFamilies.get(index).setGroup(billboard,instance);
+			shootTarget(targetFamilies.get(index),instance);
 			i++;
 		}
 	}
@@ -2683,7 +2685,7 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 		for( int i = 0; i< nb; i++) {
 			int indice = shotTargetsIndices.get(i);
 			int instance = shotTargetsInstances.get(i);
-			Target t = targets.get(indice);
+			Target t = targetFamilies.get(indice);
 			t.resurrect(instance);
 		}
 
