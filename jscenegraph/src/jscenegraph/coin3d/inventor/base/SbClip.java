@@ -14,21 +14,28 @@ import jscenegraph.database.inventor.SbVec3f;
 public class SbClip {
 	
 	private static class SbClipData {
-		public final SbVec3f vertex = new SbVec3f();
-		public Object data;
+		private float x,y,z;
+		private Object data;
 		
 		public SbClipData(final SbVec3f v, Object data) {
-			vertex.copyFrom(v);
+			x = v.getX();
+			y = v.getY();
+			z = v.getZ();
+			//vertex.copyFrom(v);
 			this.data = data;
 		}
 
 		public SbClipData(SbClipData other) {
-			vertex.copyFrom(other.vertex);
+			x = other.x;
+			y = other.y;
+			z = other.z;
+			//vertex.copyFrom(other.vertex);
 			this.data = other.data;
 		}
 
 		public void get(SbVec3f v, Object[] data) {
-			v.copyFrom(vertex);
+			//v.copyFrom(vertex);
+			v.setValue(x,y,z);
 			data[0] = this.data;
 		}
 	}
@@ -140,7 +147,8 @@ public class SbClip {
 	public void
 	getVertex(int idx, SbVec3f v, final Object [] vdata)
 	{
-	  v.copyFrom( this.array(this.curr).operator_square_bracket(idx).vertex);
+		SbClipData cd = this.array(this.curr).operator_square_bracket(idx);
+	  v.setValue( cd.x,cd.y,cd.z);
 	  if (vdata != null) vdata[0] = this.array(this.curr).operator_square_bracket(idx).data;
 	}
 

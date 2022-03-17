@@ -30,6 +30,15 @@ public abstract class Indexable<T extends Object> {
 
 	public abstract T getO(int index);
 
+	/**
+	 * Can be redefined for optimization
+	 * @param index
+	 * @return
+	 */
+	public T getOFast(int index) {
+		return getO(index);
+	}
+
 	public abstract int length();
 
 	public abstract void setO(int i, T object);

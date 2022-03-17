@@ -1,5 +1,6 @@
 package application.objects;
 
+import application.nodes.SoTargets;
 import jscenegraph.database.inventor.nodes.SoGroup;
 
 public interface Target {
@@ -25,4 +26,8 @@ public interface Target {
     int getInstance( int index);
 
     int indexOfInstance(int instance);
+
+    SoTargets getGraphicObject();
+
+    void setGraphicObject(SoTargets graphicObject);
 }

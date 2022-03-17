@@ -232,10 +232,21 @@ isInHalfSpace(final SbVec3f point)
 public float
 getDistance(SbVec3f point)
 {
-  // convert to double before doing the dot product to increase precision of the result
-  final SbVec3d dp = new SbVec3d(point);
-  final SbVec3d dn = new SbVec3d(this.normalVec);
-  return (float) (dp.dot(dn)) - this.distance;
+  	// convert to double before doing the dot product to increase precision of the result
+  	//final SbVec3d dp = new SbVec3d(point);
+  	//final SbVec3d dn = new SbVec3d(this.normalVec);
+
+  	final double dpx = point.getX();
+	final double dpy = point.getY();
+	final double dpz = point.getZ();
+
+	final double dnx = this.normalVec.getX();
+	final double dny = this.normalVec.getY();
+	final double dnz = this.normalVec.getZ();
+
+	final double dp_dot_dn = dpx*dnx+dpy*dny+dpz*dnz;
+
+  return (float) (/*dp.dot(dn)*/dp_dot_dn) - this.distance;
 }
 
 

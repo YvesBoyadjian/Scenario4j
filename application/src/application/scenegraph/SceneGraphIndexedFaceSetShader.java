@@ -1079,6 +1079,7 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 				//sealSeparator.renderCaching.setValue(SoSeparator.CacheEnabled.OFF);
 
 				SoTranslation targetTranslation = new SoTranslation();
+				targetTranslation.enableNotify(false); // Will change often
 
 				targetPosition.setValue(targetFamily.getTarget(index, vector));
 				targetPosition.setZ(targetPosition.getZ() + 0.3f);
@@ -2822,5 +2823,39 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 
 	public void setSearchForSea(boolean searchForSea) {
 		this.searchForSea = searchForSea;
+	}
+
+	private double currentPos = 0;
+	private double currentSpeed = 1;
+	private double currentTargetTime = 0;
+	private double lastRandom = 0;
+	private Random targetSpeedRandom = new Random();
+
+	public void updateTargetPositions(double dt) {
+//		currentTargetTime += dt;
+//		if(currentTargetTime - lastRandom > 1) {
+//			lastRandom = currentTargetTime;
+//			currentSpeed = targetSpeedRandom.nextDouble();
+//		}
+//
+//		currentPos += currentSpeed * dt;
+//		final float[] vector = new float[3];
+//
+//		float sinus = (float)Math.sin(/*currentPos*/currentTargetTime);
+//		float cosinus = (float)Math.cos(/*currentPos*/currentTargetTime);
+//
+//		for(Target targetFamily : targetFamilies) {
+//			SoTargets graphicObject = targetFamily.getGraphicObject();
+//			for(SoTarget child : graphicObject.getNearChildren()) {
+//				int instance = child.getInstance();
+//				int index = targetFamily.indexOfInstance(instance);
+//				targetFamily.getTarget(index, vector);
+//				vector[0]+=sinus;
+//				vector[1]+=cosinus;
+//				vector[2]+=0.3;
+//				SoTranslation transl = (SoTranslation)child.getChild(0);
+//				transl.translation.setValue(vector);
+//			}
+//		}
 	}
 }

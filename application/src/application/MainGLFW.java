@@ -1233,6 +1233,7 @@ public class MainGLFW {
 						body.getPosition().get1()/*cameraPositionValue.getY()*/,
 						body.getPosition().get2() /*cameraPositionValue.getZ() - 0.4f + 0.13f + above_ground*/ - 1.75f+ 2*0.4f);
 			}
+			sg.updateTargetPositions(dt);
 		});
 
 		ErrorHandler.dMessageFunction function = new ErrorHandler.dMessageFunction() {

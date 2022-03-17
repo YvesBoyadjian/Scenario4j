@@ -182,13 +182,18 @@ public class SbVec3fArray extends Indexable<SbVec3f> implements ByteBufferAble, 
 	}
 
 	@Override
+	public SbVec3f getOFast(int index) {
+		return getFast(index);
+	}
+
+	@Override
 	public int length() {
 		return valuesArray.numFloats()/3 - delta;
 	}
 
 	@Override
 	public void setO(int index, SbVec3f object) {
-		getO(index).copyFrom(object);
+		/*getO*/getFast(index).copyFrom(object);
 		
 	}
 

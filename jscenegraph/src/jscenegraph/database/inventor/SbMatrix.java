@@ -1327,12 +1327,13 @@ multLeft(final SbMatrix m)
   float[] t2 = (this).matrix[2];
   float[] t3 = (this).matrix[3];
 
-		final SbVec4f s = new SbVec4f(src);
+		final SbVec4f s = /*new SbVec4f(*/src/*)*/;
 
-		dst.s(0, (s.getX()*t0[0] + s.getY()*t1[0] + s.getZ()*t2[0] + s.getW()*t3[0]));
-		dst.s(1, (s.getX()*t0[1] + s.getY()*t1[1] + s.getZ()*t2[1] + s.getW()*t3[1]));
-		dst.s(2, (s.getX()*t0[2] + s.getY()*t1[2] + s.getZ()*t2[2] + s.getW()*t3[2]));
-		dst.s(3, (s.getX()*t0[3] + s.getY()*t1[3] + s.getZ()*t2[3] + s.getW()*t3[3]));
+		float x = s.getX()*t0[0] + s.getY()*t1[0] + s.getZ()*t2[0] + s.getW()*t3[0];
+		float y = s.getX()*t0[1] + s.getY()*t1[1] + s.getZ()*t2[1] + s.getW()*t3[1];
+		float z = s.getX()*t0[2] + s.getY()*t1[2] + s.getZ()*t2[2] + s.getW()*t3[2];
+		float w = s.getX()*t0[3] + s.getY()*t1[3] + s.getZ()*t2[3] + s.getW()*t3[3];
+		dst.setValue(x,y,z,w);
 	}
 
     //

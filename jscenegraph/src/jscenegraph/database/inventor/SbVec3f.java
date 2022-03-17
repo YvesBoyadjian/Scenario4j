@@ -459,6 +459,15 @@ operator_minus_equal(SbVec3f v)
 	    		                     v.g(2) * d);
 	    		  	}
 
+	// Component-wise binary scalar multiplication operator.
+	public SbVec3f operator_mul(float d, final SbVec3f dummy) {
+		SbVec3f v = this;
+		dummy.setValue(v.g(0) * d,
+				v.g(1) * d,
+				v.g(2) * d);
+		return dummy;
+	}
+
 	 //
 	   // Component-wise binary vector addition operator
 	   //

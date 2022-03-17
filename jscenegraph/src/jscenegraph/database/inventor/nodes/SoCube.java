@@ -192,14 +192,14 @@ public		    final SoSFFloat           depth = new SoSFFloat();
   private
     static final SbVec3f[]      coords = new SbVec3f[8];      //!< Corner coordinates
   private    static final SbVec2f[]      texCoords = new SbVec2f[4];   //!< Face corner texture coordinates
-  private    static final SbVec3f[]      normals = new SbVec3f[6];     //!< Face normals
+  private    static final SbVec3fSingle[]      normals = new SbVec3fSingle[6];     //!< Face normals
   private    static final SbVec3f[]      edgeNormals = new SbVec3f[12];//!< Edge normals (for wire-frame)
   private    static final SbVec3f[][] verts = new SbVec3f[6][4];  //!< Vertex references to coords
   
   static {
 	  for(int i=0; i<8; i++) coords[i] = new SbVec3f();
 	  for(int i=0; i<4; i++) texCoords[i] = new SbVec2f();
-	  for(int i=0; i<6; i++) normals[i] = new SbVec3f();
+	  for(int i=0; i<6; i++) normals[i] = new SbVec3fSingle();
 	  for(int i=0; i<12; i++) edgeNormals[i] = new SbVec3f();
   }
 
@@ -653,15 +653,18 @@ rayPickBoundingBox(SoRayPickAction action, final SbBox3f bbox)
 
     CharPtr data = new CharPtr(numBytes);
 
+    final static int indices[] = {0,1,2, 0,2,3};
+
+    final SbVec3fSingle scale = new SbVec3fSingle(); // SINGLE_THREAD
+
     void GLRenderVertexArray(SoGLRenderAction action,
                                  boolean sendNormals, boolean doTextures)
 {
   SoState state = action.getState();
-  final SbVec3fSingle scale = new SbVec3fSingle();
   getSize(scale);
 
   boolean              materialPerFace;
-  final SbVec3f             pt = new SbVec3f(), norm = new SbVec3f();
+  //final SbVec3f             pt = new SbVec3f(), norm = new SbVec3f();
   final SoMaterialBundle    mb = new SoMaterialBundle(action);
 
   materialPerFace = isMaterialPerFace(action);
@@ -689,7 +692,7 @@ rayPickBoundingBox(SoRayPickAction action, final SbBox3f bbox)
 
   IntArrayPtr colors =  SoLazyElement.getPackedColors(state);
   int color = colors.get(0);
-  final SbVec3f normal = new SbVec3f();
+  final SbVec3fSingle normal = new SbVec3fSingle();
   for (int face = 0; face < 6; face++) {
     if (materialPerFace && face > 0) {
       color = colors.get(face);
@@ -697,10 +700,9 @@ rayPickBoundingBox(SoRayPickAction action, final SbBox3f bbox)
     if (sendNormals) {
       normal.copyFrom(normals[face]);
     }
-    int indices[] = {0,1,2, 0,2,3};
+    final int[] swappedColor = new int[1];
     for (int tri = 0; tri < 6; tri++) {
       int vert = indices[tri];
-      final int[] swappedColor = new int[1];
       SoMachine.DGL_HTON_INT32(swappedColor, color);
       colorsPtr.asterisk(swappedColor[0]); colorsPtr.plusPlus();
       if (doTextures) {
@@ -709,14 +711,14 @@ rayPickBoundingBox(SoRayPickAction action, final SbBox3f bbox)
         texCoordsPtr.asterisk(tmp[1]); texCoordsPtr.plusPlus(); 
       }
       if (sendNormals) {
-        final float[] tmp = normal.getValueRead();
+        final float[] tmp = normal.getValue();
         normalsPtr.asterisk(tmp[0]); normalsPtr.plusPlus();
         normalsPtr.asterisk(tmp[1]); normalsPtr.plusPlus();
         normalsPtr.asterisk(tmp[2]); normalsPtr.plusPlus();
       }
-      verticesPtr.asterisk( (verts[face][vert]).getValueRead()[0]*scale.getValue()[0]); verticesPtr.plusPlus();
-      verticesPtr.asterisk( (verts[face][vert]).getValueRead()[1]*scale.getValue()[1]); verticesPtr.plusPlus();
-      verticesPtr.asterisk( (verts[face][vert]).getValueRead()[2]*scale.getValue()[2]); verticesPtr.plusPlus();
+      verticesPtr.asterisk( (verts[face][vert]).getX()*scale.getValue()[0]); verticesPtr.plusPlus();
+      verticesPtr.asterisk( (verts[face][vert]).getY()*scale.getValue()[1]); verticesPtr.plusPlus();
+      verticesPtr.asterisk( (verts[face][vert]).getZ()*scale.getValue()[2]); verticesPtr.plusPlus();
     }
   }
   
@@ -1122,7 +1124,7 @@ GLRenderGeneric(SoGLRenderAction action,
 	if (materialPerFace && face > 0)
 	    mb.send(face, numDivisions == 1);
 	if (sendNormals)
-	    gl2.glNormal3fv(normals[face].getValueRead(),0);
+	    gl2.glNormal3fv(normals[face].getValue(),0);
 
 	// Simple case of one polygon per face 
 	if (numDivisions == 1) {

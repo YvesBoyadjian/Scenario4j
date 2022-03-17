@@ -52,22 +52,23 @@ public class TargetSearchRunnable implements Runnable {
 					return;
 				}
 				SwingUtilities.invokeLater(()-> {
-					SoPath p = pp.getPath();
-					if( p != null) {
-						SoNode n = p.getTail();
+					SoPath pat = pp.getPath();
+					if( pat != null) {
+						SoNode n = pat.getTail();
 						if( n.isOfType(SoCube.getClassTypeId())) {
-							int len = p.getLength();
+							int len = pat.getLength();
 							if( len > 3) {
-								SoNode parent = p.getNode(len-2);
-								SoNode maybe_targets = p.getNode(len-4);
-								if(parent.isOfType(SoGroup.getClassTypeId()) &&
+								SoNode cube_parent = pat.getNode(len-2);
+								SoNode maybe_targets = pat.getNode(len-4);
+								if(cube_parent.isOfType(SoGroup.getClassTypeId()) &&
 								maybe_targets instanceof SoTargets) {
+									// hit one
 									v.addOneShotIdleListener((viewer1)->{
-										SoGroup g = (SoGroup)parent;
+										SoGroup g = (SoGroup)cube_parent;
 
 										SoTargets targets = (SoTargets) maybe_targets;
 										Target t = targets.getTarget();
-										SoTarget targetNode = (SoTarget) p.getNode(len-3);
+										SoTarget targetNode = (SoTarget) pat.getNode(len-3);
 
 										if(!main.isShot(t,targetNode.getInstance())) {
 

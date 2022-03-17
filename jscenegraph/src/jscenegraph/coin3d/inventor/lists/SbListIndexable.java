@@ -43,6 +43,10 @@ public class SbListIndexable<T extends Object, I extends Indexable<T>> implement
         return array.getO(indice);
     }
 
+    public T operator_square_bracket_fast(int indice) {
+        return array.getOFast(indice);
+    }
+
     public int getLength() {
         return size;
     }

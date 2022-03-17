@@ -235,7 +235,7 @@ findPoints(final SbSphere sphere, final SbListInt array)
   else {
     int i, n = this.indices.getLength();
     for (i = 0; i < n; i++) {
-      SbVec3f pt = (pointsArray).operator_square_bracket(this.indices.operator_square_bracket(i));
+      SbVec3f pt = (pointsArray).operator_square_bracket_fast(this.indices.operator_square_bracket(i));
       if (sphere.pointInside(pt))
       	array.append(this.indices.operator_square_bracket(i));
     }

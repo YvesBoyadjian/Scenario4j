@@ -16,10 +16,7 @@ import jscenegraph.database.inventor.nodes.SoNode;
 import jscenegraph.database.inventor.nodes.SoSeparator;
 import org.lwjgl.system.CallbackI;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * @author Yves Boyadjian
@@ -51,6 +48,7 @@ public class SoTargets extends SoSeparator {
 		super();
 		renderCaching.setValue(SoSeparator.CacheEnabled.OFF);
 		this.target = target;
+		this.target.setGraphicObject(this);
 	}
 
 	public void
@@ -138,5 +136,14 @@ public class SoTargets extends SoSeparator {
 	public SoTarget getTargetChildFromInstance(int instance) {
 		int index = target.indexOfInstance(instance);
 		return targets.get(index);
+	}
+
+	public Collection<SoTarget> getNearChildren() {
+		Collection<SoTarget> nearChildren = new ArrayList<>();
+		for(int id : actualChildren) {
+			SoTarget child = (SoTarget)bspTree.getUserData(id);
+			nearChildren.add(child);
+		}
+		return nearChildren;
 	}
 }

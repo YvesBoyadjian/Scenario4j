@@ -26,11 +26,11 @@ package jscenegraph.coin3d.inventor.nodes;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Map;
 
 import com.jogamp.opengl.GL2;
 
 import jscenegraph.coin3d.glue.cc_glglue;
-import jscenegraph.coin3d.inventor.elements.SoDepthBufferElement;
 import jscenegraph.coin3d.inventor.elements.SoEnvironmentElement;
 import jscenegraph.coin3d.inventor.elements.SoLightElement;
 import jscenegraph.coin3d.inventor.elements.SoMultiTextureImageElement;
@@ -50,7 +50,6 @@ import jscenegraph.database.inventor.elements.*;
 import jscenegraph.database.inventor.errors.SoDebugError;
 import jscenegraph.database.inventor.fields.SoField;
 import jscenegraph.database.inventor.fields.SoFieldData;
-import jscenegraph.database.inventor.fields.SoMFNode;
 import jscenegraph.database.inventor.fields.SoSFBool;
 import jscenegraph.database.inventor.fields.SoSFEnum;
 import jscenegraph.database.inventor.fields.SoSFString;
@@ -431,6 +430,12 @@ public void updateColor(SoState state) {
     SoGLLazyElement lazyElement = SoGLLazyElement.getInstance(state);
     lazyElement.sendDiffuseToGL(state);
 }
+    final SbVec3fSingle v3 = new SbVec3fSingle(); // SINGLE_THREAD
+    final SbVec4fSingle v4 = new SbVec4fSingle(); // SINGLE_THREAD
+
+    final Map<Integer,String> s4j_LightSourcePos = new HashMap<>();
+    final Map<Integer,String> s4j_LightSourceDif = new HashMap<>();
+    final Map<Integer,String> s4j_LightSourceSpec = new HashMap<>();
 
 public void updateLights(final int cachecontext, SoState state) {
 
@@ -452,25 +457,32 @@ public void updateLights(final int cachecontext, SoState state) {
         if(light instanceof SoDirectionalLight) {
             SoDirectionalLight dirLight = (SoDirectionalLight) light;
             {
-                String positionName = "s4j_LightSource[" + SoLightElement.getIndex(state, i) + "].position";
+                int index = SoLightElement.getIndex(state, i);
+                String positionName;
+                if(!s4j_LightSourcePos.containsKey(index)) {
+                    positionName = "s4j_LightSource[" + index + "].position";
+                    s4j_LightSourcePos.put(index,positionName);
+                }
+                else {
+                    positionName = s4j_LightSourcePos.get(index);
+                }
                 SoGLSLShaderProgram.Handle.Uniform positionLocation = pHandle.glGetUniformLocation(gl2,
                         ( /*COIN_GLchar **/String) positionName);
 
                 if (SoGLSLShaderProgram.Handle.Uniform.isValid( positionLocation)) {
                     SbVec3f lightDir = dirLight.direction.getValue();
 
-                    SbVec4f value4 = new SbVec4f();
-                    value4.setValue(-lightDir.getX(),
+                    v4.setValue(-lightDir.getX(),
                             -lightDir.getY(),
                             -lightDir.getZ(),
                             0);
 
                     final SbMatrix lighttoworld = SoLightElement.getMatrix(state, i);
 
-                    lighttoworld.multVecMatrix(value4, value4);
-                    value4.setValue(3, 0);
+                    lighttoworld.multVecMatrix(v4, v4);
+                    v4.setValue(3, 0);
 
-                    positionLocation.glUniform4fv(gl2, 1, value4.getValueRead());
+                    positionLocation.glUniform4fv(gl2, 1, v4.getValue());
 
 //                if( 5 == i ) {
 //                    System.out.println("light 5 x = "+value4.getX()+" y = "+value4.getY());
@@ -481,35 +493,47 @@ public void updateLights(final int cachecontext, SoState state) {
                 }
             }
             {
-                String diffuseName = "s4j_LightSource[" + SoLightElement.getIndex(state, i) + "].diffuse";
+                int index = SoLightElement.getIndex(state, i);
+                String diffuseName;
+                if(!s4j_LightSourceDif.containsKey(index)) {
+                    diffuseName = "s4j_LightSource[" + index + "].diffuse";
+                    s4j_LightSourceDif.put(index,diffuseName);
+                }
+                else {
+                    diffuseName = s4j_LightSourceDif.get(index);
+                }
                 SoGLSLShaderProgram.Handle.Uniform diffuseLocation = pHandle.glGetUniformLocation(gl2,
                         ( /*COIN_GLchar **/String) diffuseName);
 
                 if (SoGLSLShaderProgram.Handle.Uniform.isValid( diffuseLocation)) {
-                    final SbVec3f v3 = new SbVec3f();
-                    final SbVec4fSingle v4 = new SbVec4fSingle();
 
                     // RGBA intensities of source are the product of the color and
                     // intensity, with 1.0 alpha
-                    v3.copyFrom(dirLight.color.getValue().operator_mul(dirLight.intensity.getValue()));
-                    v4.setValue(v3.getValueRead()[0], v3.getValueRead()[1], v3.getValueRead()[2], 1.0f);
+                    v3.copyFrom(dirLight.color.getValue().operator_mul(dirLight.intensity.getValue(),v3));
+                    v4.setValue(v3.getX(), v3.getY(), v3.getZ(), 1.0f);
 
                     diffuseLocation.glUniform4fv(gl2, 1, v4.getValue());
                 }
             }
             {
-                String specularName = "s4j_LightSource[" + SoLightElement.getIndex(state, i) + "].specular";
+                int index = SoLightElement.getIndex(state, i);
+                String specularName;
+                if(!s4j_LightSourceSpec.containsKey(index)) {
+                    specularName = "s4j_LightSource[" + index + "].specular";
+                    s4j_LightSourceSpec.put(index,specularName);
+                }
+                else {
+                    specularName = s4j_LightSourceSpec.get(index);
+                }
                 SoGLSLShaderProgram.Handle.Uniform specularLocation = pHandle.glGetUniformLocation(gl2,
                         ( /*COIN_GLchar **/String) specularName);
 
                 if (SoGLSLShaderProgram.Handle.Uniform.isValid( specularLocation)) {
-                    final SbVec3f v3 = new SbVec3f();
-                    final SbVec4fSingle v4 = new SbVec4fSingle();
 
                     // RGBA intensities of source are the product of the color and
                     // intensity, with 1.0 alpha
-                    v3.copyFrom(dirLight.color.getValue().operator_mul(dirLight.intensity.getValue()));
-                    v4.setValue(v3.getValueRead()[0], v3.getValueRead()[1], v3.getValueRead()[2], 1.0f);
+                    v3.copyFrom(dirLight.color.getValue().operator_mul(dirLight.intensity.getValue(),v3));
+                    v4.setValue(v3.getValue()[0], v3.getValue()[1], v3.getValue()[2], 1.0f);
 
                     specularLocation.glUniform4fv(gl2, 1, v4.getValue());
                 }

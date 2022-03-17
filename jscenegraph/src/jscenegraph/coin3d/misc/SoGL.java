@@ -2116,12 +2116,12 @@ sogl_render_cylinder( float radius,
     	  gl2.glTexCoord2f(t, 1.0f);
       }
       else if ((flags & SOGL_NEED_3DTEXCOORDS)!=0) {
-    	  gl2.glTexCoord3f(texcoords.get(i).getValueRead()[0]+0.5f, 1.0f, 1.0f - texcoords.get(i).getValueRead()[1]-0.5f);
+    	  gl2.glTexCoord3f(texcoords.getFast(i).getX()+0.5f, 1.0f, 1.0f - texcoords.getFast(i).getY()-0.5f);
       }
       if ((flags & SOGL_NEED_NORMALS)!=0) {
-    	  gl2.glNormal3fv(normals.get(i).getValueRead());
-          sideNormalVboArray.get(sideNormalVboArrayIndex).setValue(normals.get(i));sideNormalVboArrayIndex++;
-          sideNormalVboArray.get(sideNormalVboArrayIndex).setValue(normals.get(i));sideNormalVboArrayIndex++;
+    	  gl2.glNormal3fv(normals.getFast(i).getValueRead());
+          sideNormalVboArray.getFast(sideNormalVboArrayIndex).setValue(normals.getFast(i));sideNormalVboArrayIndex++;
+          sideNormalVboArray.getFast(sideNormalVboArrayIndex).setValue(normals.getFast(i));sideNormalVboArrayIndex++;
       }
       if ((flags & SOGL_NEED_MULTITEXCOORDS)!=0) {
         for (u = 1; u <= maxunit[0]; u++) {
@@ -2146,17 +2146,17 @@ sogl_render_cylinder( float radius,
           sideVertexEboArray.set(sideVertexEboArrayIndex, sideVertexVboArrayIndex + 3);
           sideVertexEboArrayIndex++;
       }
-      SbVec3f c = coords.get(i);
+      SbVec3f c = coords.getFast(i);
 
-      gl2.glVertex3f(c.getValueRead()[0], h2, c.getValueRead()[2]);
+      gl2.glVertex3f(c.getX(), h2, c.getZ());
 
-      sideVertexVboArray.get(sideVertexVboArrayIndex).setValue(c.getValueRead()[0], h2, c.getValueRead()[2]); sideVertexVboArrayIndex++;
+      sideVertexVboArray.getFast(sideVertexVboArrayIndex).setValue(c.getX(), h2, c.getZ()); sideVertexVboArrayIndex++;
 
       if ((flags & SOGL_NEED_TEXCOORDS)!=0) {
     	  gl2.glTexCoord2f(t, 0.0f);
       }
       else if ((flags & SOGL_NEED_3DTEXCOORDS)!=0) {
-    	  gl2.glTexCoord3f(texcoords.get(i).getValueRead()[0]+0.5f, 0.0f, 1.0f - texcoords.get(i).getValueRead()[1]-0.5f);
+    	  gl2.glTexCoord3f(texcoords.getFast(i).getX()+0.5f, 0.0f, 1.0f - texcoords.getFast(i).getY()-0.5f);
       }
       if ((flags & SOGL_NEED_MULTITEXCOORDS)!=0) {
         for (u = 1; u <= maxunit[0]; u++) {
@@ -2167,9 +2167,9 @@ sogl_render_cylinder( float radius,
         }
       }
 
-      gl2.glVertex3f(c.getValueRead()[0], c.getValueRead()[1], c.getValueRead()[2]);
+      gl2.glVertex3f(c.getX(), c.getY(), c.getZ());
 
-      sideVertexVboArray.get(sideVertexVboArrayIndex).setValue(c.getValueRead()[0], -h2, c.getValueRead()[2]); sideVertexVboArrayIndex++;
+      sideVertexVboArray.get(sideVertexVboArrayIndex).setValue(c.getX(), -h2, c.getZ()); sideVertexVboArrayIndex++;
 
       i++;
       t += inc;

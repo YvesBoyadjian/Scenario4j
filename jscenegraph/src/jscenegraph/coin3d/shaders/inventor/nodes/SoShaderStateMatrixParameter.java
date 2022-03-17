@@ -204,10 +204,11 @@ public void updateParameter(SoGLShaderObject shader)
 /*!
  * Updates matrix value from state
  */
+final SbMatrix matrix = SbMatrix.identity(); // SINGLE_THREAD
+
 public void
 updateValue(SoState state)
 {
-  final SbMatrix matrix = SbMatrix.identity();
   switch (MatrixType.fromValue(this.matrixType.getValue())) {
     case MODELVIEW: {
       matrix.copyFrom(SoModelMatrixElement.get(state));
