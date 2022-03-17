@@ -129,6 +129,7 @@ public class SoSubNode {
 
 	protected Class thisClass;
 	protected SoNode thisParent;
+	private SoType thisClassTypeId;
 	
 	  private static final Map<Class,SoType> classTypeId = new HashMap<Class,SoType>();            /* Type id              */    
 	  private  static final Set<Class>      firstInstance = new HashSet<Class>(); /* true until 2nd c'tor call */        
@@ -144,6 +145,8 @@ public class SoSubNode {
 		  if( !fieldData.containsKey(class1)) {
 			  throw new IllegalStateException("Class "+ class1 + " not initialized");
 		  }
+
+		  thisClassTypeId = classTypeId.get(thisClass);
 	  }
 	  
 	public                                                                     
@@ -159,7 +162,7 @@ public class SoSubNode {
 	
 	// java port
 	public SoType getClassTypeId() {
-		return classTypeId.get(thisClass);
+		return thisClassTypeId;//classTypeId.get(thisClass);
 	}
 	
   public                                                                  
