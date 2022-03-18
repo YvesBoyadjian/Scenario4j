@@ -1177,7 +1177,8 @@ public class MainGLFW {
 		final double[] data = new double[1];
 		data[0] = 100.0;//0.8;
 
-		int nb_step = 50;
+		final int nb_step = 50;
+		final double max_physics_frequency = 500;
 
 		final boolean firstDT[] = new boolean[1];
 		firstDT[0] = true;
@@ -1206,9 +1207,13 @@ public class MainGLFW {
 			}
 
 			double nbSteps = firstDT[0] ? 999 : nb_step;
-			firstDT[0] = false;
 
 			double dt = Math.min(0.5, viewer1.dt());
+			if(!firstDT[0] && max_physics_frequency < nbSteps/dt) {
+				nbSteps = Math.ceil(max_physics_frequency*dt);
+			}
+			firstDT[0] = false;
+
 			for (int i = 0; i < nbSteps; i++) {
 				physics_error = false;
 				saved_pos.set(body.getPosition());
