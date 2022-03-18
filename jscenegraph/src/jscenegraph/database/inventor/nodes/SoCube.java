@@ -657,6 +657,8 @@ rayPickBoundingBox(SoRayPickAction action, final SbBox3f bbox)
 
     final SbVec3fSingle scale = new SbVec3fSingle(); // SINGLE_THREAD
 
+    final int[] swappedColor = new int[1]; // SINGLE_THREAD
+
     void GLRenderVertexArray(SoGLRenderAction action,
                                  boolean sendNormals, boolean doTextures)
 {
@@ -700,7 +702,6 @@ rayPickBoundingBox(SoRayPickAction action, final SbBox3f bbox)
     if (sendNormals) {
       normal.copyFrom(normals[face]);
     }
-    final int[] swappedColor = new int[1];
     for (int tri = 0; tri < 6; tri++) {
       int vert = indices[tri];
       SoMachine.DGL_HTON_INT32(swappedColor, color);
