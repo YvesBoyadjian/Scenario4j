@@ -2,6 +2,11 @@ package vrmlviewer;
 
 import com.jogamp.opengl.GL2;
 import jscenegraph.coin3d.inventor.VRMLnodes.SoVRMLImageTexture;
+import jscenegraph.coin3d.inventor.nodes.SoFragmentShader;
+import jscenegraph.coin3d.inventor.nodes.SoShaderObject;
+import jscenegraph.coin3d.inventor.nodes.SoVertexShader;
+import jscenegraph.coin3d.shaders.inventor.nodes.SoShaderProgram;
+import jscenegraph.coin3d.shaders.inventor.nodes.SoShaderStateMatrixParameter;
 import jscenegraph.database.inventor.SbColor;
 import jscenegraph.database.inventor.SbViewportRegion;
 import jscenegraph.database.inventor.SoInput;
@@ -13,6 +18,7 @@ import jsceneviewerawt.inventor.qt.SoQt;
 import jsceneviewerawt.inventor.qt.SoQtCameraController;
 import jsceneviewerawt.inventor.qt.viewers.SoQtExaminerViewer;
 import jsceneviewerawt.inventor.qt.viewers.SoQtFullViewer;
+import org.lwjgl.opengl.GLDebugMessageCallback;
 
 import javax.swing.*;
 import java.awt.*;
@@ -22,6 +28,7 @@ import java.awt.dnd.DropTarget;
 import java.awt.dnd.DropTargetDropEvent;
 import java.io.File;
 import java.util.List;
+import static org.lwjgl.opengl.GL43C.*;
 
 public class VRMLViewer {
 
@@ -48,25 +55,100 @@ public static void main(String[] args) {
 
     SoVRMLImageTexture.setDelayFetchURL(false); // Don't wait to load textures
 
+    SoSeparator upperCache = new SoSeparator();
+
+    upperCache.ref();
+
+
+    SoShaderProgram program = new SoShaderProgram();
+
+    SoVertexShader vs = new SoVertexShader();
+
+    vs.sourceType.setValue(SoShaderObject.SourceType.GLSL_PROGRAM);
+    vs.sourceProgram.setValue(
+            "#version 330 core\n"+
+                    "layout (location = 0) in vec3 aPos;\n"+
+                    "uniform mat4 s4j_ModelViewMatrix;\n"+
+                    "uniform mat4 s4j_ProjectionMatrix;\n"+
+                    "void main()\n"+
+                    "{\n"+
+                    "gl_Position = s4j_ProjectionMatrix * s4j_ModelViewMatrix * vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"+
+                    "}\n");
+
+    final SoShaderStateMatrixParameter mvs = new SoShaderStateMatrixParameter();
+    mvs.name.setValue("s4j_ModelViewMatrix");
+    mvs.matrixType.setValue(SoShaderStateMatrixParameter.MatrixType.MODELVIEW);
+
+    final SoShaderStateMatrixParameter ps = new SoShaderStateMatrixParameter();
+    ps.name.setValue("s4j_ProjectionMatrix");
+    ps.matrixType.setValue(SoShaderStateMatrixParameter.MatrixType.PROJECTION);
+
+    vs.parameter.set1Value(0, mvs);
+    vs.parameter.set1Value(1, ps);
+
+    program.shaderObject.set1Value(0, vs);
+
+    SoFragmentShader fs = new SoFragmentShader();
+
+    fs.sourceType.setValue(SoShaderObject.SourceType.GLSL_PROGRAM);
+    fs.sourceProgram.setValue(
+            "#version 330 core\n"+
+                    "out vec4 FragColor;\n"+
+                    "void main()\n"+
+                    "{\n"+
+                    "FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"+
+                    "}\n"
+    );
+
+    program.shaderObject.set1Value(1, fs);
+
+    upperCache.addChild(program);
+
+
     SoSeparator cache = new SoSeparator();
 
-    cache.ref();
+    upperCache.addChild(cache);
 
 
     SoText3 text = new SoText3();
     text.string.setValue("Drag an drop your iv/wrl/zip file here");
 
     cache.addChild(text);
+    //cache.addChild(new SoCube());
 
     SwingUtilities.invokeLater(() -> {
         SoQtExaminerViewer examinerViewer = new SoQtExaminerViewer(
                 SoQtFullViewer.BuildFlag.BUILD_ALL,
                 SoQtCameraController.Type.BROWSER,
                 /*panel*/frame.getContentPane()
-        );
+        ) {
+            public void initializeGL(GL2 gl2) {
+                super.initializeGL(gl2);
+
+                int error = glGetError();
+                glEnable(GL_DEBUG_OUTPUT);
+                error = glGetError();
+                glDebugMessageCallback(new GLDebugMessageCallback() {
+                    @Override
+                    public void invoke(int i, int i1, int i2, int i3, int length, long message, long l1) {
+                        System.err.println("OpenGL Error : "+ getMessage(length,message));
+                    }
+                }, 0);
+                error = glGetError();
+                glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
+                error = glGetError();
+
+                final int[] vao = new int[1];
+                gl2.glGenVertexArrays(1,vao);
+                gl2.glBindVertexArray(vao[0]);
+
+                System.out.println("init");
+            }
+        };
+
 
         //examinerViewer.setAntialiasing(true, 15);
-        examinerViewer.getSceneHandler().setTransparencyType(SoGLRenderAction.TransparencyType.DELAYED_BLEND);
+        //examinerViewer.getSceneHandler().setTransparencyType(SoGLRenderAction.TransparencyType.DELAYED_BLEND);
         //examinerViewer.getSceneHandler().setTransparencyType(SoGLRenderAction.TransparencyType.SORTED_LAYERS_BLEND); still bugs with villa Savoye
 
         examinerViewer.getSceneHandler().setBackgroundColor(new SbColor(0.6f,0.535f,0.28f));
@@ -77,7 +159,7 @@ public static void main(String[] args) {
         frame.setSize(800,600);
         frame.setVisible(true);
 
-        examinerViewer.setSceneGraph(cache);
+        examinerViewer.setSceneGraph(upperCache);
 
         examinerViewer.setDropTarget(new DropTarget() {
             public synchronized void drop(DropTargetDropEvent evt) {

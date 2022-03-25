@@ -1414,7 +1414,7 @@ SoSeparator createPlanet2(float radius, float distance,
 
 				texture2d.filename.setValue("C:\\Users\\boyadjian\\Pictures\\MountRainierIslandScreenShot.jpg");
 
-				mainSep.addChild(texture2d);
+				//mainSep.addChild(texture2d);
 
 				mainSep.addChild(createDemoScene());
 
