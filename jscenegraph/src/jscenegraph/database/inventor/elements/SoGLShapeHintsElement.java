@@ -217,7 +217,7 @@ private void send(GL2 gl2)
         // we know we can do successful backface culling
         if (shapeType == ShapeType.SOLID) {
             gl2.glEnable(GL2.GL_CULL_FACE);
-            gl2.glLightModeli(GL2.GL_LIGHT_MODEL_TWO_SIDE, GL2.GL_FALSE);
+            gl2.glLightModeli(GL2.GL_LIGHT_MODEL_TWO_SIDE, GL2.GL_FALSE); // FIXME CORE PROFILE
         }
 
         // If the shapes are not solid, but the vertices are ordered,

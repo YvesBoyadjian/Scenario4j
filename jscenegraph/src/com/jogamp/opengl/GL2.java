@@ -2901,7 +2901,7 @@ public interface GL2 extends GL2ES1, GL2GL3 {
 	}
 
 	default void glVertex3fv(FloatBuffer arg) {
-		org.lwjgl.opengl.GL11.glVertex3fv( arg);
+		// org.lwjgl.opengl.GL11.glVertex3fv( arg); CORE
 	}
 
 	default void glMatrixMode(int arg) {
@@ -2976,7 +2976,7 @@ public interface GL2 extends GL2ES1, GL2GL3 {
 		if(arg2 != 0) {
 			throw new IllegalArgumentException();
 		}
-		org.lwjgl.opengl.GL11.glNormal3fv( arg1);
+		// org.lwjgl.opengl.GL11.glNormal3fv( arg1);
 	}
 	
 	default void glNormal3fv(float[] arg1) {
@@ -2988,7 +2988,7 @@ public interface GL2 extends GL2ES1, GL2GL3 {
 	}
 
 	default void glNormal3fv(FloatBuffer arg) {
-		org.lwjgl.opengl.GL11.glNormal3fv(arg);
+		// org.lwjgl.opengl.GL11.glNormal3fv(arg); CORE
 	}
 
 	default void glLightf(int arg1, int arg2, float arg3) {

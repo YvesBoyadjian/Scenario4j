@@ -251,7 +251,7 @@ public class SoGLModelMatrixElement extends SoModelMatrixElement {
 
         updateStateParameters(); // CORE
 
-        glMultMatrixf((float[]) matrix.toGL());
+        //glMultMatrixf((float[]) matrix.toGL()); CORE
     }
 
 ////////////////////////////////////////////////////////////////////////
