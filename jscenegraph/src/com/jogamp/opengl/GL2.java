@@ -3425,7 +3425,7 @@ ByteBuffer data ) {
 	}
 
 	default void glMultiTexCoord2fv(int target, float[] v) {
-		org.lwjgl.opengl.GL13.glMultiTexCoord2fv(target, v);
+		// org.lwjgl.opengl.GL13.glMultiTexCoord2fv(target, v); CORE PROFILE
 	}
 
 	default void glMultiTexCoord3fv(int target, float[] v) {

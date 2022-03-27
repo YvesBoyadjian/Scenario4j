@@ -75,7 +75,9 @@ public class VertexAttribList implements Destroyable {
 
             gl2.glBindBuffer(GL_ARRAY_BUFFER,0);
 
-            SoModelMatrixElement.translateBy(state,node,translation);
+            if(!translation.isNull()) {
+                SoModelMatrixElement.translateBy(state, node, translation);
+            }
 
             SoGLShaderProgram sp = SoGLShaderProgramElement.get(state);
 

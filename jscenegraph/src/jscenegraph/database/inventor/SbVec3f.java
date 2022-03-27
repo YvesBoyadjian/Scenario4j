@@ -685,4 +685,7 @@ public void setValue(SbVec3f other) {
 	s(2, other.g(2));
 }
 
+    public boolean isNull() {
+		return g(0) == 0.0f && g(1) == 0 && g(2) == 0;
+    }
 }

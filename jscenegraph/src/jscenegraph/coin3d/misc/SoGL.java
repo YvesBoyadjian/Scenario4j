@@ -10,6 +10,7 @@ import java.util.Map;
 
 import jscenegraph.coin3d.shaders.inventor.elements.SoGLShaderProgramElement;
 import jscenegraph.port.*;
+import jscenegraph.port.core.GLCore;
 import jscenegraph.port.memorybuffer.MemoryBuffer;
 import org.lwjgl.opengl.GL;
 import org.lwjgl.opengl.GLCapabilities;
@@ -892,7 +893,7 @@ sogl_render_faceset( final SoGLCoordinateElement vertexlist,
                     final int mbind,
                     final int attribbind,
                     final int dotexture,
-                    final int doattribs)
+                    final int doattribs,final SoState state)
 {
   SOGL_FACESET_GLRENDER(nbind, mbind, attribbind, 
 		  											vertexlist,
@@ -906,7 +907,7 @@ sogl_render_faceset( final SoGLCoordinateElement vertexlist,
                                                    texindices,
                                                    attribs,
                                                    dotexture,
-                                                   doattribs
+                                                   doattribs,state
                                                    );
 }
 
@@ -922,7 +923,7 @@ public static void SOGL_FACESET_GLRENDER(final int normalbinding, final int mate
 		IntArrayPtr    texindices,
 		SoVertexAttributeBundle    attribs,
 		int    dotexture,
-		int    doattribs
+		int    doattribs,SoState state
 		)  {
 	SOGL_FACESET_GLRENDER_RESOLVE_ARG1(normalbinding, materialbinding, vertexattributebinding, 
 				vertexlist,
@@ -936,7 +937,7 @@ public static void SOGL_FACESET_GLRENDER(final int normalbinding, final int mate
                 texindices,
                 attribs,
                 dotexture,
-                doattribs
+                doattribs,state
 			);
 }
 
@@ -984,7 +985,7 @@ private static final void SOGL_FACESET_GLRENDER_RESOLVE_ARG1(int normalbinding, 
 		IntArrayPtr    texindices,
 		SoVertexAttributeBundle    attribs,
 		int    dotexture,
-		int    doattribs
+		int    doattribs,SoState state
 		)  {
 switch (SoGL.AttributeBinding.fromValue(normalbinding)) { 
 case OVERALL: 
@@ -1000,7 +1001,7 @@ case OVERALL:
             texindices,
             attribs,
             dotexture,
-            doattribs
+            doattribs,state
 		  ); 
   break; 
 case PER_FACE: 
@@ -1016,7 +1017,7 @@ case PER_FACE:
             texindices,
             attribs,
             dotexture,
-            doattribs
+            doattribs,state
 		  ); 
   break; 
 case PER_FACE_INDEXED: 
@@ -1032,7 +1033,7 @@ case PER_FACE_INDEXED:
             texindices,
             attribs,
             dotexture,
-            doattribs
+            doattribs,state
 		  ); 
   break; 
 case PER_VERTEX: 
@@ -1048,7 +1049,7 @@ case PER_VERTEX:
             texindices,
             attribs,
             dotexture,
-            doattribs
+            doattribs,state
 		  ); 
   break; 
 case PER_VERTEX_INDEXED: 
@@ -1064,7 +1065,7 @@ case PER_VERTEX_INDEXED:
             texindices,
             attribs,
             dotexture,
-            doattribs
+            doattribs,state
 		  ); 
   break; 
 default: 
@@ -1084,7 +1085,7 @@ private static final void  SOGL_FACESET_GLRENDER_RESOLVE_ARG2(SoGL.AttributeBind
 		IntArrayPtr    texindices,
 		SoVertexAttributeBundle    attribs,
 		int    dotexture,
-		int    doattribs
+		int    doattribs,SoState state
 		)  {
 switch (SoGL.AttributeBinding.fromValue(materialbinding)) { 
 case OVERALL: 
@@ -1100,7 +1101,7 @@ case OVERALL:
             texindices,
             attribs,
             dotexture,
-            doattribs
+            doattribs,state
 		  ); 
   break; 
 case PER_FACE: 
@@ -1116,7 +1117,7 @@ case PER_FACE:
             texindices,
             attribs,
             dotexture,
-            doattribs
+            doattribs,state
 		  ); 
   break; 
 case PER_FACE_INDEXED: 
@@ -1132,7 +1133,7 @@ case PER_FACE_INDEXED:
             texindices,
             attribs,
             dotexture,
-            doattribs
+            doattribs,state
 		  ); 
   break; 
 case PER_VERTEX: 
@@ -1148,7 +1149,7 @@ case PER_VERTEX:
             texindices,
             attribs,
             dotexture,
-            doattribs
+            doattribs,state
 		  ); 
   break; 
 case PER_VERTEX_INDEXED: 
@@ -1164,7 +1165,7 @@ case PER_VERTEX_INDEXED:
             texindices,
             attribs,
             dotexture,
-            doattribs
+            doattribs,state
 		  ); 
   break; 
 default: 
@@ -1184,7 +1185,7 @@ private static final void SOGL_FACESET_GLRENDER_RESOLVE_ARG3(SoGL.AttributeBindi
 		IntArrayPtr    texindices,
 		SoVertexAttributeBundle    attribs,
 		int    dotexture,
-		int    doattribs
+		int    doattribs,SoState state
 		)  {
 switch (SoGL.AttributeBinding.fromValue(vertexattributebinding)) { 
 case OVERALL: 
@@ -1200,7 +1201,7 @@ case OVERALL:
             texindices,
             attribs,
             dotexture,
-            doattribs
+            doattribs,state
 		  ); 
   break; 
 case PER_FACE: 
@@ -1216,7 +1217,7 @@ case PER_FACE:
             texindices,
             attribs,
             dotexture,
-            doattribs
+            doattribs,state
 		  ); 
   break; 
 case PER_FACE_INDEXED: 
@@ -1232,7 +1233,7 @@ case PER_FACE_INDEXED:
             texindices,
             attribs,
             dotexture,
-            doattribs
+            doattribs,state
 		  ); 
   break; 
 case PER_VERTEX: 
@@ -1248,7 +1249,7 @@ case PER_VERTEX:
             texindices,
             attribs,
             dotexture,
-            doattribs
+            doattribs,state
 		  ); 
   break; 
 case PER_VERTEX_INDEXED: 
@@ -1264,7 +1265,7 @@ case PER_VERTEX_INDEXED:
             texindices,
             attribs,
             dotexture,
-            doattribs
+            doattribs,state
 		  ); 
   break; 
 default: 
@@ -1284,7 +1285,7 @@ private static void SOGL_FACESET_GLRENDER_CALL_FUNC(SoGL.AttributeBinding normal
 		IntArrayPtr    texindices,
 		SoVertexAttributeBundle    attribs,
 		int    dotexture,
-		int    doattribs
+		int    doattribs,SoState state
 		) {
 	FaceSet_GLRender(normalbinding, materialbinding, vertexattributebinding, 
 			vertexlist,
@@ -1298,7 +1299,7 @@ private static void SOGL_FACESET_GLRENDER_CALL_FUNC(SoGL.AttributeBinding normal
             texindices,
             attribs,
             dotexture,
-            doattribs
+            doattribs,state
 			);
 }
 
@@ -1308,6 +1309,13 @@ private static void SEND_VERTEX(int _idx_, boolean is3d, SbVec3fArray coords3d, 
 	if (is3d) gl2.glVertex3fv(coords3d.toFloatBuffer(_idx_)/*.getValueRead(),0*/);             
 	else gl2.glVertex4fv(coords4d.get(_idx_).getValueRead(),0);
 }
+
+    // This is the same code as in SoGLCoordinateElement.send().
+// It is inlined here for speed (~15% speed increase).
+    private static void SEND_VERTEX(int _idx_, boolean is3d, SbVec3fArray coords3d, SbVec4fArray coords4d, GLCore gl2) {
+        if (is3d) gl2.glVertex3fv(coords3d.toFloatBuffer(_idx_)/*.getValueRead(),0*/);
+        else gl2.glVertex4fv(coords4d.get(_idx_).getValueRead(),0);
+    }
 
 // Variable used for counting errors and make sure not a
 // bunch of errormessages flood the screen.
@@ -1329,7 +1337,8 @@ private static int current_errors = 0;
                      IntArrayPtr texindices_,
                        SoVertexAttributeBundle attribs,
                        int dotexture,
-                       int doattribs)
+                       int doattribs,
+          SoState state)
   {
 	    // just in case someone forgot
 	    if (matindices_ == null) matindices_ = vertexindices_;
@@ -1378,7 +1387,7 @@ private static int current_errors = 0;
       attribs.send(0);
     }
 
-    GL2 gl2 = new GL2() {};
+    GLCore gl2 = new GLCore(state);
     
     while (viendptr != null && viptr.plusLessThan(2, viendptr)) {
       v1 = viptr.get(); viptr.plusPlus();

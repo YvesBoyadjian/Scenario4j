@@ -814,7 +814,7 @@ public void GLRender(SoGLRenderAction action)
 	                        (int)mbind.getValue(),
 	                        (int)attribbind.getValue(),
 	                        doTextures ? 1 : 0,
-	                        doattribs ? 1 : 0);
+	                        doattribs ? 1 : 0,state);
 	    
 	    Destroyable.delete(vab); // java port
 	  }

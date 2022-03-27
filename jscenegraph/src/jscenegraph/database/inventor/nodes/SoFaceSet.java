@@ -1577,7 +1577,7 @@ useConvexCache(SoAction action)
                       realmbind,
                       attribbind.getValue(),
                       doTextures ? 1 : 0,
-                      doattribs ? 1 : 0);
+                      doattribs ? 1 : 0,state);
 
 
   if (nc != null) {
