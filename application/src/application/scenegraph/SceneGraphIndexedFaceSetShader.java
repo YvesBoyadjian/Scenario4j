@@ -59,7 +59,7 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 	// Put it to false, if you do not want to save mri files
 	private static final boolean SAVE_CHUNK_MRI = false;
 
-	public static final boolean AIM = false;
+	public static final boolean AIM = true;
 
 	public static final float ZMAX = 4392.473f;
 

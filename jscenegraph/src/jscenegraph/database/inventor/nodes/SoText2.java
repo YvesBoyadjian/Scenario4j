@@ -85,6 +85,7 @@ import jscenegraph.database.inventor.fields.SoMFString;
 import jscenegraph.database.inventor.fields.SoSFEnum;
 import jscenegraph.database.inventor.fields.SoSFFloat;
 import jscenegraph.database.inventor.misc.SoState;
+import jscenegraph.port.core.GLBitmap;
 
 // TODO YB : The code of this class is different from Coin3D 
 
@@ -192,10 +193,6 @@ public class SoText2 extends SoShape {
     //! information, GL display lists, etc.
     private SoBitmapFontCache   myFont;
 
-    interface Transformer {
-        SbVec3f transform(SbVec3f in);
-    }
-
 ////////////////////////////////////////////////////////////////////////
 //
 // Description:
@@ -284,7 +281,7 @@ fromObjectSpace(final SbVec3f vector, final SbMatrix matrix,
 //
 // Use: internal, static
 
-private SbVec3f
+public static SbVec3f
 toObjectSpace(final SbVec3f pixel, final SbMatrix matrix,
               final SbViewportRegion vpr)
 //
@@ -365,7 +362,7 @@ GLRender(SoGLRenderAction action)
 
     SbViewportRegion vpr = SoViewportRegionElement.get(state);
 
-    Transformer transformer = new Transformer() {
+    GLBitmap.Transformer transformer = new GLBitmap.Transformer() {
         @Override
         public SbVec3f transform(SbVec3f in) {
             return toObjectSpace(in, screenToObj,

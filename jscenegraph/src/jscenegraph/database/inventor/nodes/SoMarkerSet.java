@@ -28,6 +28,9 @@ import com.jogamp.opengl.GL2;
 import jscenegraph.coin3d.inventor.elements.SoGLMultiTextureEnabledElement;
 import jscenegraph.coin3d.inventor.elements.gl.SoGLTexture3EnabledElement;
 import jscenegraph.coin3d.inventor.lists.SbList;
+import jscenegraph.coin3d.inventor.misc.SoGLImage;
+import jscenegraph.coin3d.shaders.SoGLShaderProgram;
+import jscenegraph.coin3d.shaders.inventor.elements.SoGLShaderProgramElement;
 import jscenegraph.database.inventor.SbBox3f;
 import jscenegraph.database.inventor.SbMatrix;
 import jscenegraph.database.inventor.SbVec2s;
@@ -56,6 +59,13 @@ import jscenegraph.database.inventor.fields.SoMFInt32;
 import jscenegraph.database.inventor.misc.SoState;
 import jscenegraph.port.SbVec3fArray;
 import jscenegraph.port.Util;
+import jscenegraph.port.core.GLBitmap;
+import jscenegraph.port.memorybuffer.MemoryBuffer;
+import org.joml.Matrix4f;
+
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.nio.IntBuffer;
 
 /*!
   \class SoMarkerSet SoMarkerSet.h Inventor/nodes/SoMarkerSet.h
@@ -1203,14 +1213,32 @@ GLRender(SoGLRenderAction action)
   SbVec2s vpsize = new SbVec2s(vp.getViewportSizePixels());
   
   GL2 gl2 = state.getGL2();
+	{
+//		gl2.glMatrixMode(GL2.GL_MODELVIEW);
+//		gl2.glPushMatrix();
+//		gl2.glLoadIdentity();
 
-  gl2.glMatrixMode(GL2.GL_MODELVIEW);
-  gl2.glPushMatrix();
-  gl2.glLoadIdentity();
-  gl2.glMatrixMode(GL2.GL_PROJECTION);
-  gl2.glPushMatrix();
-  gl2.glLoadIdentity();
-  gl2.glOrtho(0, vpsize.getValue()[0], 0, vpsize.getValue()[1], -1.0f, 1.0f);
+		SbMatrix identity = SbMatrix.identity();
+		SoModelMatrixElement.set(state, this, identity);
+		SoViewingMatrixElement.set(state,this,identity);
+	}
+
+	{
+//		gl2.glMatrixMode(GL2.GL_PROJECTION);
+//		gl2.glPushMatrix();
+//		gl2.glLoadIdentity();
+
+		SbMatrix proj = new SbMatrix();
+
+		Matrix4f mat4 = new Matrix4f();
+		mat4 = mat4.setOrtho(0, vpsize.getValue()[0], 0, vpsize.getValue()[1], -1.0f, 1.0f);
+		proj.setValue(mat4);
+		SoProjectionMatrixElement.set(state,this,proj);
+
+		//gl2.glOrtho(0, vpsize.getValue()[0], 0, vpsize.getValue()[1], -1.0f, 1.0f);
+	}
+
+	updateStateParameters(state);
 
   for (int i = 0; i < numpts; i++) {
     int midx = Math.min(i, this.markerIndex.getNum() - 1);
@@ -1266,21 +1294,73 @@ GLRender(SoGLRenderAction action)
 
     gl2.glPixelStorei(GL2.GL_UNPACK_ALIGNMENT, tmp.align);
     gl2.glRasterPos3f(point.getValueRead()[0], point.getValueRead()[1], -point.getValueRead()[2]);
-    gl2.glBitmap(tmp.width, tmp.height, 0, 0, 0, 0, tmp.data, tmp.dataOffset);
+    //gl2.glBitmap(tmp.width, tmp.height, 0, 0, 0, 0, tmp.data, tmp.dataOffset);
+	  SoGLImage image = new SoGLImage();
+
+	  MemoryBuffer mbu = MemoryBuffer.allocateBytes(tmp.width*tmp.height);
+	  ByteBuffer bb = ByteBuffer.wrap(tmp.data).order(ByteOrder.BIG_ENDIAN);
+	  bb.position(tmp.dataOffset);
+	  IntBuffer sb = bb.asIntBuffer();
+	  ByteBuffer bb2 = bb.slice();
+	  int index = 0;
+	  int index2 = 0;
+	  for (int j=0;j<tmp.height;j++) {
+	  	int indexSave = index2;
+		  for( int ii=0; ii<tmp.width;ii++) {
+			  int white = (bb2.get(index2/8) >>> (7 - (index2%8)) ) & 1;
+			  mbu.setByte(index, (byte)(white * 255));
+			  index++;index2++;
+		  }
+		  index2 = indexSave+tmp.align*Byte.SIZE;
+	  }
+	  SbVec2s size = new SbVec2s((short)tmp.width, (short)tmp.height);
+	  image.setData(mbu,size,1,true, SoGLImage.Wrap.CLAMP, SoGLImage.Wrap.CLAMP,1.0f);
+
+
+	  final SbMatrix objToScreen = new SbMatrix();
+	  objToScreen.copyFrom( SoProjectionMatrixElement.get(state));
+	  objToScreen.copyFrom(
+			  objToScreen.multLeft(SoViewingMatrixElement.get(state)));
+	  objToScreen.copyFrom(
+			  objToScreen.multLeft(SoModelMatrixElement.get(state)));
+
+	  SbMatrix screenToObj = objToScreen.inverse();
+
+	  SbViewportRegion vpr = SoViewportRegionElement.get(state);
+
+	  GLBitmap.Transformer transformer = new GLBitmap.Transformer() {
+		  @Override
+		  public SbVec3f transform(SbVec3f in) {
+			  return SoText2.toObjectSpace(in, screenToObj, vpr);
+		  }
+	  };
+
+	  GLBitmap.glBitmap(state, this, new SbVec3fSingle(point.getValueRead()[0], point.getValueRead()[1], -point.getValueRead()[2]), transformer,tmp.width, tmp.height, 0, 0, 0, 0, image);
   }
 
   // FIXME: this looks wrong, shouldn't we rather reset the alignment
   // value to what it was previously?  20010824 mortene.
   gl2.glPixelStorei(GL2.GL_UNPACK_ALIGNMENT, 4); // restore default value
-  gl2.glMatrixMode(GL2.GL_PROJECTION);
-  gl2.glPopMatrix();
-  gl2.glMatrixMode(GL2.GL_MODELVIEW);
-  gl2.glPopMatrix();
+//  gl2.glMatrixMode(GL2.GL_PROJECTION);
+//  gl2.glPopMatrix();
+//  gl2.glMatrixMode(GL2.GL_MODELVIEW);
+//  gl2.glPopMatrix();
 
   state.pop(); // we pushed, remember
   
   mb.destructor();
 }
+	private void updateStateParameters(SoState state) {
+
+		SoGLShaderProgram sp = SoGLShaderProgramElement.get(state);
+
+		if(null!=sp &&sp.isEnabled())
+		{
+			// Dependent of SoModelMatrixElement
+			sp.updateStateParameters(state);
+		}
+
+	}
 
 // ----------------------------------------------------------------------------------------------------
 

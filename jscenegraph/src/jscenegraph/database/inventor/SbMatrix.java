@@ -184,6 +184,7 @@ import java.nio.FloatBuffer;
 import java.util.function.DoubleConsumer;
 
 import jscenegraph.port.Mutable;
+import org.joml.Matrix4f;
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -2006,4 +2007,12 @@ public void jacobi3(final float[] evalues,
 
 			  return true;
 	}
+
+    public void setValue(Matrix4f mat4) {
+		for (int i=0; i < 4; i++) {
+			for (int j = 0; j < 4; j++) {
+				matrix[i][j] = mat4.get(i,j);
+			}
+		}
+    }
 }
