@@ -463,7 +463,7 @@ boolean removeSceneCallback (SoCallback callbackNode)
         }
         // restore button state because some mouse events may not have reached us:
         if (isMouseEvent) {
-            synthesizeCurrentButtonState ((MouseEvent)anyEvent, type);
+            //synthesizeCurrentButtonState ((MouseEvent)anyEvent, type); not necessary with lwjgl
         }
         // pass event to inventor scene:
         translateAndSendEvent(anyEvent, type);
