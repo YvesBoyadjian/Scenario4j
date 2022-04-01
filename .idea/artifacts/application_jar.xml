@@ -1,51 +1,66 @@
 <component name="ArtifactManager">
-  <artifact name="application:jar">
+  <artifact type="jar" name="application:jar">
     <output-path>$PROJECT_DIR$/out/artifacts/application_jar</output-path>
-    <root id="root">
-      <element id="archive" name="application.jar">
-        <element id="module-output" name="geotools" />
-        <element id="module-output" name="loader" />
-        <element id="module-output" name="application" />
-        <element id="module-output" name="jscenegraph" />
-        <element id="module-output" name="lwjgl" />
-        <element id="module-output" name="org.lwjglx" />
-        <element id="module-output" name="lwjgl-glfw" />
-        <element id="module-output" name="jsceneviewer-glfw" />
-        <element id="module-output" name="lwjgl-utils" />
-        <element id="module-output" name="gdx" />
-        <element id="module-output" name="ode4j" />
-        <element id="module-output" name="sl4j" />
-        <element id="dir-copy" path="$PROJECT_DIR$/geotools/lib" />
-      </element>
-      <element id="library" level="module" name="lwjgl.jar" module-name="lwjgl" />
-      <element id="file-copy" path="$PROJECT_DIR$/gdx/lib/gdx-platform-1.9.11-natives-desktop.jar" />
-      <element id="library" level="module" name="lwjgl-glfw-natives-linux-arm64.jar" module-name="lwjgl-glfw" />
-      <element id="library" level="module" name="lwjgl-opengles-natives-linux.jar" module-name="lwjgl" />
-      <element id="library" level="module" name="lwjgl-opengl-natives-linux.jar" module-name="lwjgl" />
-      <element id="file-copy" path="$PROJECT_DIR$/gdx/lib/gdx-bullet-1.9.11.jar" />
-      <element id="library" level="module" name="lwjgl-opengles-sources.jar" module-name="lwjgl" />
-      <element id="file-copy" path="$PROJECT_DIR$/gdx/lib/gdx-1.9.11.jar" />
-      <element id="library" level="module" name="lwjgl-glfw-natives-windows.jar" module-name="lwjgl-glfw" />
-      <element id="library" level="module" name="lwjgl-glfw-javadoc.jar" module-name="lwjgl-glfw" />
-      <element id="library" level="module" name="lwjgl-opengl-natives-linux-arm64.jar" module-name="lwjgl" />
-      <element id="library" level="module" name="lwjgl-glfw-sources.jar" module-name="lwjgl-glfw" />
-      <element id="library" level="module" name="lwjgl-opengles.jar" module-name="lwjgl" />
-      <element id="library" level="module" name="lwjgl-natives-linux-arm64.jar" module-name="lwjgl" />
-      <element id="library" level="module" name="lwjgl-natives-linux.jar" module-name="lwjgl" />
-      <element id="library" level="module" name="lwjgl-opengl-javadoc.jar" module-name="lwjgl" />
-      <element id="library" level="module" name="lwjgl-opengles-natives-windows.jar" module-name="lwjgl" />
-      <element id="library" level="module" name="lwjgl-javadoc.jar" module-name="lwjgl" />
-      <element id="library" level="module" name="lwjgl-opengl.jar" module-name="lwjgl" />
-      <element id="library" level="module" name="lwjgl-sources.jar" module-name="lwjgl" />
-      <element id="library" level="module" name="lwjgl-opengl-sources.jar" module-name="lwjgl" />
-      <element id="file-copy" path="$PROJECT_DIR$/gdx/lib/gdx-bullet-platform-1.9.11-natives-desktop.jar" />
-      <element id="library" level="module" name="lwjgl-opengles-natives-linux-arm64.jar" module-name="lwjgl" />
-      <element id="library" level="module" name="lwjgl-opengles-javadoc.jar" module-name="lwjgl" />
-      <element id="library" level="module" name="lwjgl-natives-windows.jar" module-name="lwjgl" />
-      <element id="library" level="module" name="lwjgl-glfw.jar" module-name="lwjgl-glfw" />
-      <element id="library" level="module" name="all_libs" module-name="geotools" />
-      <element id="library" level="module" name="lwjgl-opengl-natives-windows.jar" module-name="lwjgl" />
-      <element id="library" level="module" name="lwjgl-glfw-natives-linux.jar" module-name="lwjgl-glfw" />
+    <root id="archive" name="application.jar">
+      <element id="module-output" name="geotools" />
+      <element id="module-output" name="loader" />
+      <element id="module-output" name="application" />
+      <element id="module-output" name="jscenegraph" />
+      <element id="module-output" name="org.lwjglx" />
+      <element id="module-output" name="vk-bootstrap" />
+      <element id="module-output" name="lwjgl-opengl" />
+      <element id="module-output" name="jsceneviewer-glfw" />
+      <element id="module-output" name="lwjgl-utils" />
+      <element id="module-output" name="gdx" />
+      <element id="module-output" name="ode4j" />
+      <element id="module-output" name="sl4j" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/lwjgl/lwjgl/3.3.0-SNAPSHOT/lwjgl-3.3.0-20211020.190020-13-natives-windows.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/lwjgl/lwjgl-stb/3.3.0-SNAPSHOT/lwjgl-stb-3.3.0-20210325.222416-6.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/lwjgl/lwjgl-vma/3.3.0-SNAPSHOT/lwjgl-vma-3.3.0-20210325.222416-6.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/geotools/lib/commons-lang3-3.8.1.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/geotools/lib/ejml-core-0.34.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/geotools/lib/ejml-ddense-0.34.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/geotools/lib/gt-coverage-21.5.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/geotools/lib/gt-geotiff-21.5.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/geotools/lib/gt-main-21.5.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/geotools/lib/gt-metadata-21.5.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/geotools/lib/gt-opengis-21.5.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/geotools/lib/gt-referencing-21.5.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/geotools/lib/gt-render-21.5.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/geotools/lib/gt-swing-21.5.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/geotools/lib/imageio-ext-geocore-1.2.3.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/geotools/lib/imageio-ext-streams-1.2.3.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/geotools/lib/imageio-ext-tiff-1.2.3.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/geotools/lib/imageio-ext-utilities-1.2.3.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/geotools/lib/jai_codec-1.1.3.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/geotools/lib/jai_core-1.1.3.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/geotools/lib/jai_imageio-1.1.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/geotools/lib/jaxb-api-2.4.0-b180830.0359.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/geotools/lib/jt-utilities-1.1.11.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/geotools/lib/si-quantity-0.7.1.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/geotools/lib/si-units-java8-0.7.1.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/geotools/lib/systems-common-java8-0.7.2.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/geotools/lib/unit-api-1.0.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/geotools/lib/uom-lib-common-1.0.2.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/geotools/lib/uom-se-1.0.8.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/gdx/lib/gdx-platform-1.9.11-natives-desktop.jar" path-in-jar="/" />
+      <element id="library" level="module" name="lib" module-name="geotools" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/gdx/lib/gdx-bullet-platform-1.9.11-natives-desktop.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/lwjgl/lwjgl-openal/3.3.0-SNAPSHOT/lwjgl-openal-3.3.0-20210325.222416-6.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/lwjgl/lwjgl-openal/3.3.0-SNAPSHOT/lwjgl-openal-3.3.0-20210325.222416-6-natives-windows.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/lwjgl/lwjgl-glfw/3.3.0-SNAPSHOT/lwjgl-glfw-3.3.0-20210325.222416-6.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/lwjgl/lwjgl-assimp/3.3.0-SNAPSHOT/lwjgl-assimp-3.3.0-20210325.222416-6.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/lwjgl/lwjgl-assimp/3.3.0-SNAPSHOT/lwjgl-assimp-3.3.0-20210325.222416-6-natives-windows.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/lwjgl/lwjgl-glfw/3.3.0-SNAPSHOT/lwjgl-glfw-3.3.0-20210325.222416-6-natives-windows.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/lwjgl/lwjgl/3.3.0-SNAPSHOT/lwjgl-3.3.0-20211020.190020-13.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/lwjgl/lwjgl-vma/3.3.0-SNAPSHOT/lwjgl-vma-3.3.0-20210325.222416-6-natives-windows.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/gdx/lib/gdx-bullet-1.9.11.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/lwjgl/lwjgl-stb/3.3.0-SNAPSHOT/lwjgl-stb-3.3.0-20210325.222416-6-natives-windows.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/lwjgl/lwjgl-opengl/3.3.0-SNAPSHOT/lwjgl-opengl-3.3.0-20211020.190020-13-natives-windows.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/joml/joml/1.10.1/joml-1.10.1.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/lwjgl/lwjgl-opengl/3.3.0-SNAPSHOT/lwjgl-opengl-3.3.0-20211020.190020-13.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/lwjgl/lwjgl-vulkan/3.3.0-SNAPSHOT/lwjgl-vulkan-3.3.0-20210325.222416-6.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/gdx/lib/gdx-1.9.11.jar" path-in-jar="/" />
     </root>
   </artifact>
 </component>
