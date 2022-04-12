@@ -71,12 +71,7 @@ import jscenegraph.database.inventor.events.SoKeyboardEvent;
 import jscenegraph.database.inventor.events.SoMouseButtonEvent;
 import jscenegraph.database.inventor.actions.SoAction;
 import jscenegraph.database.inventor.actions.SoRayPickAction;
-import jscenegraph.database.inventor.nodes.SoCamera;
-import jscenegraph.database.inventor.nodes.SoCube;
-import jscenegraph.database.inventor.nodes.SoGroup;
-import jscenegraph.database.inventor.nodes.SoMaterial;
-import jscenegraph.database.inventor.nodes.SoNode;
-import jscenegraph.database.inventor.nodes.SoSeparator;
+import jscenegraph.database.inventor.nodes.*;
 import jscenegraph.port.KDebug;
 import jsceneviewerglfw.inventor.qt.SoQt;
 import jsceneviewerglfw.inventor.qt.SoQtCameraController;
@@ -590,6 +585,11 @@ public class MainGLFW {
 
 		camera.position.setValue(0, 0, 0);
 		camera.orientation.setValue(new SbVec3f(0, 1, 0), -(float) Math.PI / 2.0f);
+
+		if(camera instanceof SoPerspectiveCamera) {
+			SoPerspectiveCamera perspCamera = (SoPerspectiveCamera) camera;
+			perspCamera.heightAngle.setValue(35.0f*(float)Math.PI/180.0f);
+		}
 
 		// _____________________________________________________ Physics with bullet physics
 
