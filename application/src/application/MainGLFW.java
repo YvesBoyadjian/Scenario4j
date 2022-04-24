@@ -588,7 +588,7 @@ public class MainGLFW {
 
 		if(camera instanceof SoPerspectiveCamera) {
 			SoPerspectiveCamera perspCamera = (SoPerspectiveCamera) camera;
-			perspCamera.heightAngle.setValue(35.0f*(float)Math.PI/180.0f);
+			perspCamera.heightAngle.setValue(40.0f*(float)Math.PI/180.0f);
 		}
 
 		// _____________________________________________________ Physics with bullet physics
