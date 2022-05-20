@@ -34,7 +34,7 @@ Credits :
 
 - sl4j : https://github.com/qos-ch/slf4j
 
--Lightweight Java Game Library : https://github.com/LWJGL/lwjgl3
+- Lightweight Java Game Library : https://github.com/LWJGL/lwjgl3
 
 - GeoTools : https://www.geotools.org/
 
