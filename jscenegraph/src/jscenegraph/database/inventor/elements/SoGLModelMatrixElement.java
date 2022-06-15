@@ -333,7 +333,7 @@ public class SoGLModelMatrixElement extends SoModelMatrixElement {
 
         GL2 gl2 = state.getGL2();
 
-        glScalef(scaleFactor.getX(), scaleFactor.getY(), scaleFactor.getZ());
+        //glScalef(scaleFactor.getX(), scaleFactor.getY(), scaleFactor.getZ());
     }
 
 ////////////////////////////////////////////////////////////////////////
