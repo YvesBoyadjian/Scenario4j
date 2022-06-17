@@ -14,7 +14,7 @@ public class OptionDialog extends JDialog {
     private JButton buttonCancel;
     private JSpinner spinnerShadowgroup;
     private JSpinner spinnerLODFactor;
-    private JSpinner spinnerLODFactorShadow;
+    //private JSpinner spinnerLODFactorShadow;
     private JSpinner spinnerTreeDistance;
     private JSpinner spinnerTreeShadowDistance;
     private JCheckBox volumetricSkyCheckBox;
@@ -200,7 +200,7 @@ public class OptionDialog extends JDialog {
         //sg.enableNotifySun();
         sg.getShadowGroup().precision.setValue((float)((double)((Double)((SpinnerNumberModel) spinnerShadowgroup.getModel()).getNumber())));
         sg.setLevelOfDetail((float)((double)((Double)((SpinnerNumberModel)spinnerLODFactor.getModel()).getNumber())));
-        sg.setLevelOfDetailShadow((float)((double)((Double)((SpinnerNumberModel)spinnerLODFactorShadow.getModel()).getNumber())));
+        //sg.setLevelOfDetailShadow((float)((double)((Double)((SpinnerNumberModel)spinnerLODFactorShadow.getModel()).getNumber())));
         sg.setTreeDistance((float)((double)((Double)((SpinnerNumberModel)spinnerTreeDistance.getModel()).getNumber())));
         sg.setTreeShadowDistance((float)((double)((Double)((SpinnerNumberModel)spinnerTreeShadowDistance.getModel()).getNumber())));
         sg.setMaxI(((int)((SpinnerNumberModel)spinnerMaxI.getModel()).getNumber()));
@@ -219,7 +219,7 @@ public class OptionDialog extends JDialog {
             // LOD_FACTOR
             spinnerLODFactor.setModel(new SpinnerNumberModel((double)sg.getLevelOfDetail(),0.05 - delta,2.0 + delta,0.05));
             // LOD_FACTOR_SHADOW
-            spinnerLODFactorShadow.setModel(new SpinnerNumberModel((double)sg.getLevelOfDetailShadow(),0.05 - delta,2.0 + delta,0.05));
+            //spinnerLODFactorShadow.setModel(new SpinnerNumberModel((double)sg.getLevelOfDetailShadow(),0.05 - delta,2.0 + delta,0.05));
             // TREE_DISTANCE
             double treeDistance = (double)sg.getTreeDistance();
             treeDistance = Math.max(500,treeDistance);
@@ -249,7 +249,7 @@ public class OptionDialog extends JDialog {
     }
 
     public void setLODFactorShadow(double lodFactorShadow) {
-        spinnerLODFactorShadow.getModel().setValue(lodFactorShadow);
+        //spinnerLODFactorShadow.getModel().setValue(lodFactorShadow);
     }
 
     public void setTreeDistance(double treeDistance) {

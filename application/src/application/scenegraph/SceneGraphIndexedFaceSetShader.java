@@ -187,7 +187,7 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 	SoEnvironment environment = new SoEnvironment();
 
 	SoVolumetricShadowGroup shadowGroup;
-	SoNode shadowTree;
+	//SoNode shadowTree;
 	SoNode chunkTree;
 	SoCamera camera;
 
@@ -210,7 +210,7 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 	final SbVec3f douglasTreesSRefPoint = new SbVec3f();
 	
 	SoTouchLODMaster master;
-	SoTouchLODMaster masterS;
+	//SoTouchLODMaster masterS;
 	
 	//final SbBSPTree sealsBSPTree = new SbBSPTree();
 	
@@ -1160,14 +1160,14 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 	    
 	    //RecursiveChunk rcS = chunks.getRecursiveChunk();
 	    
-	    masterS = new SoTouchLODMaster("shadow");
+	    //masterS = new SoTouchLODMaster("shadow");
 
-		masterS.setLodFactor(LEVEL_OF_DETAIL_SHADOW);
+		//masterS.setLodFactor(LEVEL_OF_DETAIL_SHADOW);
 	    
-	    shadowLandSep.addChild(masterS);
+	    //shadowLandSep.addChild(masterS);
 	    
-	    shadowTree = rc.getShadowGroup(masterS,false);
-	    shadowLandSep.addChild(shadowTree);
+	    //shadowTree = rc.getShadowGroup(masterS,false);
+	    shadowLandSep.addChild(/*shadowTree*/chunkTree);
 	    
 	    //shadowLandSep.addChild(chunks.getShadowGroup());
 		
@@ -2173,9 +2173,9 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 	public void setCamera(SoCamera camera) {
 		this.camera = camera;
 	    master.setCamera(camera);	
-	    masterS.setCamera(camera);
+	    //masterS.setCamera(camera);
 		RecursiveChunk.setCamera(chunkTree, camera);
-		RecursiveChunk.setCamera(shadowTree, camera);		
+		//RecursiveChunk.setCamera(shadowTree, camera);
 	}
 
 	@Override
@@ -2257,7 +2257,7 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 	}
 
 	public float getLevelOfDetailShadow() {
-		return LEVEL_OF_DETAIL_SHADOW / masterS.getLodFactor();
+		return LEVEL_OF_DETAIL_SHADOW /*/ masterS.getLodFactor()*/;
 	}
 
 	public void setLevelOfDetail(float levelOfDetail) {
@@ -2267,7 +2267,7 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 
 	public void setLevelOfDetailShadow(float levelOfDetailShadow) {
 		float lodFactor = LEVEL_OF_DETAIL_SHADOW / levelOfDetailShadow;
-		masterS.setLodFactor(lodFactor);
+		//masterS.setLodFactor(lodFactor);
 	}
 
 	public void setTreeDistance(float treeDistance) {
