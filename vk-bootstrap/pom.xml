@@ -11,7 +11,7 @@
     <properties>
         <maven.compiler.source>11</maven.compiler.source>
         <maven.compiler.target>11</maven.compiler.target>
-        <lwjgl.version>3.3.0-SNAPSHOT</lwjgl.version>
+        <lwjgl.version>3.3.1</lwjgl.version>
     </properties>
 
     <profiles>
