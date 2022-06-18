@@ -440,7 +440,10 @@ public void updateColor(SoState state) {
 
     SoGLSLShaderProgram.Handle lastHandle;
 
-public void updateLights(final int cachecontext, SoState state) {
+    final static String fogColorName = "s4j_Fog.color";
+    final static String fogDensityName = "s4j_Fog.density";
+
+    public void updateLights(final int cachecontext, SoState state) {
 
     SoGLShaderProgram shaderprogram =
             (SoGLShaderProgram)(SoGLShaderProgramElement.get(state));
@@ -563,20 +566,18 @@ public void updateLights(final int cachecontext, SoState state) {
 
     SbColor fogColor = SoEnvironmentElement.getFogColor(state);
 
-    String fogColorName = "s4j_Fog.color";
     SoGLSLShaderProgram.Handle.Uniform fogColorLocation = pHandle.glGetUniformLocation(gl2,fogColorName);
     if(SoGLSLShaderProgram.Handle.Uniform.isValid( fogColorLocation)) {
-        SbVec4fSingle fogColor4 = new SbVec4fSingle();
-        fogColor4.setValue(fogColor.getX(),fogColor.getY(),fogColor.getZ(),1.0f);
+        //SbVec4fSingle fogColor4 = new SbVec4fSingle();
+        v4.setValue(fogColor.getX(),fogColor.getY(),fogColor.getZ(),1.0f);
 
-        fogColorLocation.glUniform4fv(gl2,1,fogColor4.getValue());
+        fogColorLocation.glUniform4fv(gl2,1,v4.getValue());
     }
 
     float visibility = SoEnvironmentElement.getFogVisibility(state);
 
     float density = 4.0f / visibility;
 
-    String fogDensityName = "s4j_Fog.density";
     SoGLSLShaderProgram.Handle.Uniform fogDensityLocation = pHandle.glGetUniformLocation(gl2,fogDensityName);
     if(SoGLSLShaderProgram.Handle.Uniform.isValid( fogDensityLocation)) {
         fogDensityLocation.glUniform1f(gl2,density);
