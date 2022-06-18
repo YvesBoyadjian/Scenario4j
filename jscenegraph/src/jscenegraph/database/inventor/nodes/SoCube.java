@@ -217,7 +217,8 @@ public		    final SoSFFloat           depth = new SoSFFloat();
 	
   private final CacheState _cache = new CacheState();
 
-  
+  private boolean cacheDirty = true;
+
 ////////////////////////////////////////////////////////////////////////
 //
 // Description:
@@ -677,63 +678,82 @@ rayPickBoundingBox(SoRayPickAction action, final SbBox3f bbox)
   }
   mb.sendFirst();
 
-  _cache.useColors = true;
-  _cache.useNormals = sendNormals;
-  _cache.useTexCoords = doTextures;
+    CharPtr vertexOffset = null;
+    CharPtr normalOffset = null;
+    CharPtr texCoordOffset = null;
+    CharPtr colorOffset = null;
 
-  _cache.numVertices = numVertices;
+    if (cacheDirty) {
 
-  FloatPtr verticesPtr = new FloatPtr(data);
-  FloatPtr normalsPtr = verticesPtr.operator_add(numVertices*3);
-  FloatPtr texCoordsPtr = normalsPtr.operator_add(numVertices*3);
-  IntPtr colorsPtr = new IntPtr(texCoordsPtr.operator_add(numVertices*2));
-  CharPtr vertexOffset = new CharPtr(verticesPtr); 
-  CharPtr normalOffset = new CharPtr(normalsPtr); 
-  CharPtr texCoordOffset = new CharPtr(texCoordsPtr); 
-  CharPtr colorOffset = new CharPtr(colorsPtr);
+      _cache.useColors = true;
+      _cache.useNormals = sendNormals;
+      _cache.useTexCoords = doTextures;
 
-  IntArrayPtr colors =  SoLazyElement.getPackedColors(state);
-  int color = colors.get(0);
-  final SbVec3fSingle normal = new SbVec3fSingle();
-  for (int face = 0; face < 6; face++) {
-    if (materialPerFace && face > 0) {
-      color = colors.get(face);
-    }
-    if (sendNormals) {
-      normal.copyFrom(normals[face]);
-    }
-    for (int tri = 0; tri < 6; tri++) {
-      int vert = indices[tri];
-      SoMachine.DGL_HTON_INT32(swappedColor, color);
-      colorsPtr.asterisk(swappedColor[0]); colorsPtr.plusPlus();
-      if (doTextures) {
-        float[] tmp = texCoords[vert].getValueRead();
-        texCoordsPtr.asterisk(tmp[0]); texCoordsPtr.plusPlus(); 
-        texCoordsPtr.asterisk(tmp[1]); texCoordsPtr.plusPlus(); 
+      _cache.numVertices = numVertices;
+
+      FloatPtr verticesPtr = new FloatPtr(data);
+      FloatPtr normalsPtr = verticesPtr.operator_add(numVertices * 3);
+      FloatPtr texCoordsPtr = normalsPtr.operator_add(numVertices * 3);
+      IntPtr colorsPtr = new IntPtr(texCoordsPtr.operator_add(numVertices * 2));
+      vertexOffset = new CharPtr(verticesPtr);
+      normalOffset = new CharPtr(normalsPtr);
+      texCoordOffset = new CharPtr(texCoordsPtr);
+      colorOffset = new CharPtr(colorsPtr);
+
+      IntArrayPtr colors = SoLazyElement.getPackedColors(state);
+      int color = colors.get(0);
+      final SbVec3fSingle normal = new SbVec3fSingle();
+      for (int face = 0; face < 6; face++) {
+          if (materialPerFace && face > 0) {
+              color = colors.get(face);
+          }
+          if (sendNormals) {
+              normal.copyFrom(normals[face]);
+          }
+          for (int tri = 0; tri < 6; tri++) {
+              int vert = indices[tri];
+              SoMachine.DGL_HTON_INT32(swappedColor, color);
+              colorsPtr.asterisk(swappedColor[0]);
+              colorsPtr.plusPlus();
+              if (doTextures) {
+                  float[] tmp = texCoords[vert].getValueRead();
+                  texCoordsPtr.asterisk(tmp[0]);
+                  texCoordsPtr.plusPlus();
+                  texCoordsPtr.asterisk(tmp[1]);
+                  texCoordsPtr.plusPlus();
+              }
+              if (sendNormals) {
+                  final float[] tmp = normal.getValue();
+                  normalsPtr.asterisk(tmp[0]);
+                  normalsPtr.plusPlus();
+                  normalsPtr.asterisk(tmp[1]);
+                  normalsPtr.plusPlus();
+                  normalsPtr.asterisk(tmp[2]);
+                  normalsPtr.plusPlus();
+              }
+              verticesPtr.asterisk((verts[face][vert]).getX() * scale.getValue()[0]);
+              verticesPtr.plusPlus();
+              verticesPtr.asterisk((verts[face][vert]).getY() * scale.getValue()[1]);
+              verticesPtr.plusPlus();
+              verticesPtr.asterisk((verts[face][vert]).getZ() * scale.getValue()[2]);
+              verticesPtr.plusPlus();
+          }
       }
-      if (sendNormals) {
-        final float[] tmp = normal.getValue();
-        normalsPtr.asterisk(tmp[0]); normalsPtr.plusPlus();
-        normalsPtr.asterisk(tmp[1]); normalsPtr.plusPlus();
-        normalsPtr.asterisk(tmp[2]); normalsPtr.plusPlus();
-      }
-      verticesPtr.asterisk( (verts[face][vert]).getX()*scale.getValue()[0]); verticesPtr.plusPlus();
-      verticesPtr.asterisk( (verts[face][vert]).getY()*scale.getValue()[1]); verticesPtr.plusPlus();
-      verticesPtr.asterisk( (verts[face][vert]).getZ()*scale.getValue()[2]); verticesPtr.plusPlus();
-    }
+
+
+      _cache.vbo.setData(numBytes, null, 0, state);
   }
-  
-  GL2 gl2 = Ctx.get(action.getCacheContext());
-
-  _cache.vbo.setData(numBytes, null, 0, state);
+    GL2 gl2 = Ctx.get(action.getCacheContext());
   _cache.vbo.bind(state);
-  _cache.vbo.updateData(gl2,data);
-  
-  _cache.vertexOffset = (vertexOffset.minus(data));
-  _cache.colorOffset = (colorOffset.minus(data));
-  _cache.normalOffset = (normalOffset.minus(data));
-  _cache.texCoordOffset = (texCoordOffset.minus(data));
+  if (cacheDirty) {
+      _cache.vbo.updateData(gl2, data);
 
+      _cache.vertexOffset = (vertexOffset.minus(data));
+      _cache.colorOffset = (colorOffset.minus(data));
+      _cache.normalOffset = (normalOffset.minus(data));
+      _cache.texCoordOffset = (texCoordOffset.minus(data));
+      cacheDirty = false;
+  }
   if(sendNormals) {
 
       int pHandle = SoGLShaderProgramElement.get(state).getGLSLShaderProgramHandle(state);
