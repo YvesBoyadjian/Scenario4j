@@ -218,6 +218,8 @@ public		    final SoSFFloat           depth = new SoSFFloat();
   private final CacheState _cache = new CacheState();
 
   private boolean cacheDirty = true;
+  private int lastColor;
+  private boolean lastNormal;
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -683,7 +685,15 @@ rayPickBoundingBox(SoRayPickAction action, final SbBox3f bbox)
     CharPtr texCoordOffset = null;
     CharPtr colorOffset = null;
 
+    final IntArrayPtr colors = SoLazyElement.getPackedColors(state);
+    int color = colors.get(0);
+
+    if(lastColor != color || lastNormal != sendNormals) {
+        cacheDirty = true;
+    }
+
     if (cacheDirty) {
+        lastNormal = sendNormals;
 
       _cache.useColors = true;
       _cache.useNormals = sendNormals;
@@ -700,8 +710,6 @@ rayPickBoundingBox(SoRayPickAction action, final SbBox3f bbox)
       texCoordOffset = new CharPtr(texCoordsPtr);
       colorOffset = new CharPtr(colorsPtr);
 
-      IntArrayPtr colors = SoLazyElement.getPackedColors(state);
-      int color = colors.get(0);
       final SbVec3fSingle normal = new SbVec3fSingle();
       for (int face = 0; face < 6; face++) {
           if (materialPerFace && face > 0) {
@@ -740,7 +748,6 @@ rayPickBoundingBox(SoRayPickAction action, final SbBox3f bbox)
           }
       }
 
-
       _cache.vbo.setData(numBytes, null, 0, state);
   }
     GL2 gl2 = Ctx.get(action.getCacheContext());
@@ -752,7 +759,11 @@ rayPickBoundingBox(SoRayPickAction action, final SbBox3f bbox)
       _cache.colorOffset = (colorOffset.minus(data));
       _cache.normalOffset = (normalOffset.minus(data));
       _cache.texCoordOffset = (texCoordOffset.minus(data));
-      cacheDirty = false;
+
+      if (!materialPerFace) {
+          lastColor = color;
+          cacheDirty = false;
+      }
   }
   if(sendNormals) {
 
