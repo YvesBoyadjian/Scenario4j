@@ -68,10 +68,12 @@ protected
       public int location = -1;
       final float[] value4 = new float[4];
       final FloatBuffer value16 = BufferUtils.createFloatBuffer(16);
+      final float[] value9 = new float[9];
 
       public Uniform() {
         value4[0] = Float.NaN;
         value16.put(0,Float.NaN);
+        value9[0] = Float.NaN;
       }
 
       public static boolean isValid(Uniform uniform) {
@@ -115,6 +117,15 @@ protected
           value.flip();
           value16.flip();
           gl2.glUniformMatrix4fvARB(location, num, transpose, value);
+        }
+      }
+
+      public void glUniformMatrix3fvARB(GL2 gl2, int num, boolean transpose, float[] values9) {
+        if(!Arrays.equals(value9,values9)) {
+          for (int i = 0; i < 9; i++) {
+            value9[i] = values9[i];
+          }
+          gl2.glUniformMatrix3fvARB(location, num, transpose, value9);
         }
       }
     }

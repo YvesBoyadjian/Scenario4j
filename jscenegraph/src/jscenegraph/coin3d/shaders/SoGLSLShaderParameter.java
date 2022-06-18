@@ -161,7 +161,7 @@ setMatrix(SoGLShaderObject shader,
              int id)
   {
     if (this.isValid(shader, name, GL2.GL_FLOAT_MAT3_ARB))
-      shader.GLContext().glUniformMatrix3fvARB(this.location.location,1,false,value);
+      location.glUniformMatrix3fvARB(shader.GLContext().getGL2(),1,false,value);
   }
   
 public void

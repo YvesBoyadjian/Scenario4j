@@ -436,6 +436,9 @@ public void updateColor(SoState state) {
     final Map<Integer,String> s4j_LightSourcePos = new HashMap<>();
     final Map<Integer,String> s4j_LightSourceDif = new HashMap<>();
     final Map<Integer,String> s4j_LightSourceSpec = new HashMap<>();
+    final Map<Long,Long> addressToNodeId = new HashMap<>();
+
+    SoGLSLShaderProgram.Handle lastHandle;
 
 public void updateLights(final int cachecontext, SoState state) {
 
@@ -446,6 +449,14 @@ public void updateLights(final int cachecontext, SoState state) {
 
     if(!SoGLSLShaderProgram.Handle.isValid(pHandle)) return;
 
+    if (lastHandle != pHandle) {
+        s4j_LightSourcePos.clear();
+        s4j_LightSourceDif.clear();
+        s4j_LightSourceSpec.clear();
+        addressToNodeId.clear();
+        lastHandle = pHandle;
+    }
+
     final SoNodeList lights = SoLightElement.getLights(state);
 
     int numLights = lights.getLength();
@@ -454,10 +465,25 @@ public void updateLights(final int cachecontext, SoState state) {
 
     for(int i=0; i < numLights; i++) {
         SoLight light = (SoLight) lights.operator_square_bracket(i);
+
+        final long lightNodeAddress = light.getAddress();
+        final long lightNodeId = light.getNodeId();
+
+        Long lastNodeId = addressToNodeId.get(lightNodeAddress);
+        if(lastNodeId != null && (long)lastNodeId == lightNodeId) {
+            continue;
+        }
+        addressToNodeId.put(lightNodeAddress,lightNodeId);
+
+        //System.out.print(lightId);
+
         if(light instanceof SoDirectionalLight) {
+
+            final int index = SoLightElement.getIndex(state, i);
+
+            // ________________________________________________________________________________________ light direction
             SoDirectionalLight dirLight = (SoDirectionalLight) light;
             {
-                int index = SoLightElement.getIndex(state, i);
                 String positionName;
                 if(!s4j_LightSourcePos.containsKey(index)) {
                     positionName = "s4j_LightSource[" + index + "].position";
@@ -483,17 +509,10 @@ public void updateLights(final int cachecontext, SoState state) {
                     v4.setValue(3, 0);
 
                     positionLocation.glUniform4fv(gl2, 1, v4.getValue());
-
-//                if( 5 == i ) {
-//                    System.out.println("light 5 x = "+value4.getX()+" y = "+value4.getY());
-//                    SbMatrix modelMat = SoModelMatrixElement.get(state);
-//                    SbMatrix viewingMat = SoViewingMatrixElement.get(state);
-//                    //System.out.println("modelMat x = "+viewingMat.toGL()[0]);
-//                }
                 }
             }
+            // ______________________________________________________________________________ light color and intensity
             {
-                int index = SoLightElement.getIndex(state, i);
                 String diffuseName;
                 if(!s4j_LightSourceDif.containsKey(index)) {
                     diffuseName = "s4j_LightSource[" + index + "].diffuse";
@@ -516,7 +535,6 @@ public void updateLights(final int cachecontext, SoState state) {
                 }
             }
             {
-                int index = SoLightElement.getIndex(state, i);
                 String specularName;
                 if(!s4j_LightSourceSpec.containsKey(index)) {
                     specularName = "s4j_LightSource[" + index + "].specular";
@@ -540,6 +558,8 @@ public void updateLights(final int cachecontext, SoState state) {
             }
         }
     }
+
+    //System.out.println();
 
     SbColor fogColor = SoEnvironmentElement.getFogColor(state);
 

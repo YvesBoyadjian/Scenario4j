@@ -3759,4 +3759,9 @@ ByteBuffer data ) {
 		assert ( 1 == num);
 		ARBShaderObjects.glUniformMatrix4fvARB(location,b,value);
 	}
+
+	default void glUniformMatrix3fvARB(int location, int num, boolean b, float[] value) {
+		assert ( 1 == num);
+		ARBShaderObjects.glUniformMatrix3fvARB(location,b,value);
+	}
 }

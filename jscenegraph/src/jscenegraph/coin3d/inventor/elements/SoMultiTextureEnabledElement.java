@@ -204,12 +204,8 @@ getEnabledUnits(SoState state,
   }
   if (i >= 0) {
     lastenabled[0] = i;
-    Boolean[] retVal =  elem.enabled.getArrayPtr(new Boolean[elem.enabled.getLength()]);
-    boolean[] retValn = new boolean[elem.enabled.getLength()];
-    for ( i=0;i<elem.enabled.getLength();i++) {
-    	retValn[i] = retVal[i];
-    }
-    return retValn;
+    boolean[] retVal =  elem.enabled.getArrayPtr(new boolean[elem.enabled.getLength()]);
+    return retVal;
   }
   lastenabled[0] = -1;
   return null;

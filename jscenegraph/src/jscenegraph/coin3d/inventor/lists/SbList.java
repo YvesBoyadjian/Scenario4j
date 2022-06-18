@@ -270,5 +270,11 @@ public void truncate( int length, int dofit /*= 0*/) {
     return (T)this.itembuffer[this.numitems];
   }
 
-  
+	public boolean[] getArrayPtr(boolean[] arrayWithGoodSize) {
+
+		for(int i=0;i<getLength();i++) {
+			arrayWithGoodSize[i] = (boolean)operator_square_bracket(i);
+		}
+		return arrayWithGoodSize;
+	}
 }
