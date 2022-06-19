@@ -238,6 +238,10 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 
 	final SoText2 offscreenTargetDisplay = new SoText2();
 
+	final SoText2 temporaryMessageDisplay = new SoText2();
+
+	long temporaryMessageStopNanoTime;
+
 	final SoSwitch oracleSwitch = new SoSwitch();
 
 	final SoSwitch oracleSwitchShadow = new SoSwitch();
@@ -1394,6 +1398,28 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 
 		sep.addChild(messageSeparator);
 
+		SoSeparator temporaryMessageSeparator = new SoSeparator();
+
+		temporaryMessageSeparator.addChild(billboardMessageCamera);
+
+		SoFont bigFont = new SoFont();
+		bigFont.size.setValue(80.0f);
+
+		temporaryMessageSeparator.addChild(bigFont);
+
+		temporaryMessageSeparator.addChild(color);
+
+		SoTranslation centerTextTransl = new SoTranslation();
+		centerTextTransl.translation.setValue(0, -0.06f, 0);
+
+		temporaryMessageSeparator.addChild(centerTextTransl);
+
+		temporaryMessageDisplay.justification.setValue(SoText2.Justification.CENTER);
+
+		temporaryMessageSeparator.addChild(temporaryMessageDisplay);
+
+		sep.addChild(temporaryMessageSeparator);
+
 		// _____________________________________________________ ViewFinder
 		SoSeparator viewFinderSeparator = new SoSeparator();
 
@@ -2210,6 +2236,13 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 			};
 			t.start();
 		}
+
+		if(temporaryMessageStopNanoTime != 0) {
+			if(System.nanoTime() > temporaryMessageStopNanoTime) {
+				temporaryMessageStopNanoTime = 0;
+				temporaryMessageDisplay.string.setNum(0);
+			}
+		}
 	}
 
 	synchronized void addIdleCB(Runnable r) {
@@ -2823,6 +2856,11 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 
 	public void setSearchForSea(boolean searchForSea) {
 		this.searchForSea = searchForSea;
+	}
+
+	public void displayTemporaryMessage(String message, float durationSeconds) {
+		temporaryMessageDisplay.string.setValue(message);
+		temporaryMessageStopNanoTime = (long)(System.nanoTime() + durationSeconds*1.0e9);
 	}
 
 	private double currentPos = 0;

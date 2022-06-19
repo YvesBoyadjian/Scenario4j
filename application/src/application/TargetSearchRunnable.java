@@ -8,6 +8,7 @@ import application.nodes.SoTargets;
 import application.objects.Target;
 import application.scenegraph.SceneGraphIndexedFaceSetShader;
 import application.viewer.glfw.SoQtWalkViewer;
+import jscenegraph.database.inventor.SbVec3f;
 import jscenegraph.database.inventor.SbViewportRegion;
 import jscenegraph.database.inventor.SoPath;
 import jscenegraph.database.inventor.SoPickedPoint;
@@ -81,6 +82,12 @@ public class TargetSearchRunnable implements Runnable {
 
 											main.shootTarget(t, targetNode.getInstance());
 
+											SbVec3f pickedPoint = pp.getPoint();
+											SbVec3f hero = main.getPosition();
+											float distance = hero.operator_minus(pickedPoint).length();
+											if(distance > 150) {
+												main.displayTemporaryMessage("NICE SHOT!", 3);
+											}
 										}
 									});
 								}
