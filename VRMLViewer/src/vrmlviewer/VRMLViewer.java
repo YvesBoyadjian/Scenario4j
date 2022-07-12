@@ -24,10 +24,12 @@ import org.lwjgl.opengl.GLDebugMessageCallback;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.dnd.DnDConstants;
 import java.awt.dnd.DropTarget;
 import java.awt.dnd.DropTargetDropEvent;
 import java.io.File;
+import java.io.IOException;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -172,6 +174,7 @@ public static void main(String[] args) {
             public synchronized void drop(DropTargetDropEvent evt) {
 
                 Consumer<List<File>> doDrop = (droppedFiles) -> {
+                    try {
                     cache.removeAllChildren();
 
 //                    SoCallback callback = new SoCallback();
@@ -204,18 +207,23 @@ public static void main(String[] args) {
                         title += file.getName() + " ";
                     }
                     frame.setTitle(title);
+
+                    } catch(Exception ex){
+                        ex.printStackTrace();
+                    }
                 };
 
+                evt.acceptDrop(DnDConstants.ACTION_COPY);
                 try {
-                    evt.acceptDrop(DnDConstants.ACTION_COPY);
                     List<File> droppedFiles = (List<File>)
                             evt.getTransferable().getTransferData(DataFlavor.javaFileListFlavor);
-
                     SwingUtilities.invokeLater(()->doDrop.accept(droppedFiles));
-
-                } catch(Exception ex){
-                    ex.printStackTrace();
+                } catch (UnsupportedFlavorException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
+
             }
 
         });
