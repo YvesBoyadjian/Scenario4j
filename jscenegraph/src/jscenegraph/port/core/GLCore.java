@@ -41,10 +41,19 @@ public class GLCore {
     }
 
     public void glNormal3fv(FloatBuffer toFloatBuffer) {
+        //TODO
+    }
+
+    public void glNormal3fv(float[] valueRead) {
+        //TODO
     }
 
     public void glVertex3fv(FloatBuffer floatBuffer) {
         vab.glVertex3fv(floatBuffer);
+    }
+
+    public void glVertex3fv(float[] floatBuffer) {
+        //TODO
     }
 
     public void glVertex4fv(float[] valueRead, int i) {

@@ -29,6 +29,8 @@ import java.awt.dnd.DropTarget;
 import java.awt.dnd.DropTargetDropEvent;
 import java.io.File;
 import java.util.List;
+import java.util.function.Consumer;
+
 import static org.lwjgl.opengl.GL43C.*;
 
 public class VRMLViewer {
@@ -168,10 +170,8 @@ public static void main(String[] args) {
 
         examinerViewer.setDropTarget(new DropTarget() {
             public synchronized void drop(DropTargetDropEvent evt) {
-                try {
-                    evt.acceptDrop(DnDConstants.ACTION_COPY);
-                    List<File> droppedFiles = (List<File>)
-                            evt.getTransferable().getTransferData(DataFlavor.javaFileListFlavor);
+
+                Consumer<List<File>> doDrop = (droppedFiles) -> {
                     cache.removeAllChildren();
 
 //                    SoCallback callback = new SoCallback();
@@ -192,21 +192,28 @@ public static void main(String[] args) {
                         SoFile input = new SoFile();
                         input.name.setValue(file.toString());
 
-                        if(file.toString().endsWith(".iv")) {
+                        if (file.toString().endsWith(".iv")) {
                             cache.renderCaching.setValue(SoSeparator.CacheEnabled.AUTO);
-                        }
-                        else {
+                        } else {
                             cache.renderCaching.setValue(SoSeparator.CacheEnabled.ON);
                         }
 
                         cache.addChild(input);
                         examinerViewer.viewAll();
 
-                        title += file.getName()+" ";
+                        title += file.getName() + " ";
                     }
                     frame.setTitle(title);
+                };
 
-                } catch (Exception ex) {
+                try {
+                    evt.acceptDrop(DnDConstants.ACTION_COPY);
+                    List<File> droppedFiles = (List<File>)
+                            evt.getTransferable().getTransferData(DataFlavor.javaFileListFlavor);
+
+                    SwingUtilities.invokeLater(()->doDrop.accept(droppedFiles));
+
+                } catch(Exception ex){
                     ex.printStackTrace();
                 }
             }

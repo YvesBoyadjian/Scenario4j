@@ -13,6 +13,7 @@ import jscenegraph.database.inventor.fields.SoMFInt32;
 import jscenegraph.database.inventor.misc.SoState;
 import jscenegraph.database.inventor.nodes.*;
 import jscenegraph.port.*;
+import jscenegraph.port.core.GLCore;
 
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
@@ -772,7 +773,8 @@ public class SoBrepFaceSet extends SoIndexedFaceSet {
                 matindices.plusPlus();
         }
 
-        GL2 gl2 = action.getState().getGL2();
+        //GL2 gl2 = action.getState().getGL2();
+        GLCore gl2 = new GLCore(action.getState());
 
         gl2.glBegin(GL2.GL_TRIANGLES);
         while (viptr.plusLessThan(2, viendptr)) {
