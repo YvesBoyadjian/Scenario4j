@@ -1,6 +1,7 @@
 package vrmlviewer;
 
 import com.jogamp.opengl.GL2;
+import jscenegraph.coin3d.fxviz.nodes.SoShadowGroup;
 import jscenegraph.coin3d.inventor.VRMLnodes.SoVRMLImageTexture;
 import jscenegraph.coin3d.inventor.nodes.SoFragmentShader;
 import jscenegraph.coin3d.inventor.nodes.SoShaderObject;
@@ -102,12 +103,15 @@ public static void main(String[] args) {
 
     program.shaderObject.set1Value(1, fs);
 
-    upperCache.addChild(program);
+    SoShadowGroup shadowGroup = new SoShadowGroup();
+    shadowGroup.quality.setValue(1.0f);
 
+    //upperCache.addChild(program);
+    upperCache.addChild(shadowGroup);
 
     SoSeparator cache = new SoSeparator();
 
-    upperCache.addChild(cache);
+    /*upperCache*/shadowGroup.addChild(cache);
 
 
     SoText3 text = new SoText3();
@@ -131,7 +135,8 @@ public static void main(String[] args) {
                 glDebugMessageCallback(new GLDebugMessageCallback() {
                     @Override
                     public void invoke(int i, int i1, int i2, int i3, int length, long message, long l1) {
-                        System.err.println("OpenGL Error : "+ getMessage(length,message));
+                        String messageStr = getMessage(length,message);
+                        System.err.println("OpenGL Error : "+ messageStr);
                     }
                 }, 0);
                 error = glGetError();

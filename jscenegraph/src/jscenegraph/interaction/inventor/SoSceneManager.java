@@ -183,10 +183,10 @@ public void getAntialiasing(final boolean[] smoothing, final int[] numPasses)
 	           do {
 	           	err = glGetError();
 			   } while(err != GL_NO_ERROR && err != GL_INVALID_OPERATION);
-	           gl.glGetIntegerv(GL_DEPTH_BITS, numBits,0);
-	           if(glGetError()!=GL_NO_ERROR) {
+	           //gl.glGetIntegerv(GL_DEPTH_BITS, numBits,0);
+	           //if(glGetError()!=GL_NO_ERROR) {
 				   numBits[0] = gl.glGetFramebufferAttachmentParameteriv(GL_DRAW_FRAMEBUFFER, GL_DEPTH, GL_FRAMEBUFFER_ATTACHMENT_DEPTH_SIZE);
-			   }
+			   //}
 	           needZbuffer = (numBits[0] != 0); // FALSE for overlay windows !
 	           if (needZbuffer)
 	               gl.glDepthFunc(GL_LEQUAL); // needed for hidden line rendering

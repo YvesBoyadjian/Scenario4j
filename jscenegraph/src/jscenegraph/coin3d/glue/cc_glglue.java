@@ -106,7 +106,7 @@ public class cc_glglue {
 
     int dummyError = GL11.glGetError();
 
-    extensionsstr = (String)GL11.glGetString(GL2.GL_EXTENSIONS);
+    //extensionsstr = (String)GL11.glGetString(GL2.GL_EXTENSIONS); does not work in core profile
 
     int extensionStrError = GL11.glGetError();
     /* Randall O'Reilly reports that the above call is deprecated from OpenGL 3.0

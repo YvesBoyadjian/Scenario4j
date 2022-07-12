@@ -209,7 +209,7 @@ printInfoLog( cc_glglue g, /*COIN_GLhandle*/int handle, int objType)
     default: ;// do nothing
     }
     SoDebugError.postInfo("SoGLSLShaderObject::printInfoLog",
-                           s+" log: '"+Util.toString(infoLog)+"'");
+                           s+" log: '\n"+Util.toString(infoLog)+"'");
     //delete [] infoLog; java port
     return true;
   }
