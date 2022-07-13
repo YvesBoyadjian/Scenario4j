@@ -54,6 +54,10 @@
 
 package jscenegraph.database.inventor.nodes;
 
+import de.javagl.jgltf.model.GltfModel;
+import de.javagl.jgltf.model.MeshModel;
+import de.javagl.jgltf.model.TextureModel;
+import de.javagl.jgltf.model.io.GltfModelReader;
 import jscenegraph.database.inventor.SbVec3f;
 import jscenegraph.database.inventor.SoDB;
 import jscenegraph.database.inventor.SoInput;
@@ -73,15 +77,17 @@ import jscenegraph.database.inventor.misc.SoChildList;
 import jscenegraph.database.inventor.sensors.SoFieldSensor;
 import jscenegraph.database.inventor.sensors.SoSensor;
 import jscenegraph.database.inventor.sensors.SoSensorCB;
+import org.lwjgl.assimp.AIFileIO;
+import org.lwjgl.assimp.AIScene;
+import org.lwjgl.assimp.Assimp;
+import org.lwjglx.BufferUtils;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
+import java.nio.ByteBuffer;
 import java.nio.file.*;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.*;
 import java.util.zip.ZipError;
 
 /**
@@ -259,18 +265,18 @@ public boolean readInstance(SoInput in, short flags)
     return readOK;
 }
 
-private static Path findIVOrWRL(Path parentPath) {
+private static Path findFileWithExtension(Path parentPath, String extension, boolean anyParent) {
         Path fileName = parentPath.getFileName();
         if(
         fileName != null
-        && (fileName.toString().endsWith(".iv")||fileName.toString().endsWith(".wrl"))
+        && (fileName.toString().endsWith(extension))
         && ( parentPath.getParent().getFileName() == null
-        || fileName.toString().startsWith(parentPath.getParent().getFileName().toString()))) {
+        || fileName.toString().startsWith(parentPath.getParent().getFileName().toString()) || anyParent)) {
             return parentPath;
         }
         try (DirectoryStream<Path> stream = Files.newDirectoryStream(parentPath)) {
             for (Path file: stream) {
-                Path found = findIVOrWRL(file);
+                Path found = findFileWithExtension(file, extension, anyParent);
                 if( found != null ) {
                     return found;
                 }
@@ -295,15 +301,23 @@ private static Path findIVOrWRL(Path parentPath) {
 
     f.children.truncate(0);
 
-    final SoInput in = new SoInput();
     String filename = f.name.getValue();
+
+    Path filePath = null;
+
+    try {
+        filePath = Paths.get(filename);
+    } catch( InvalidPathException e) {
+        f.readOK = false;
+        return;
+    }
 
     // _______________________________________ Test if it is a zip file
     boolean zip = true;
         FileSystem fs = null;
 
     try {
-        Path zipfile = Paths.get(filename);
+        Path zipfile = filePath;
         //ZipFileSystemProvider provider = new ZipFileSystemProvider();
         //Map<String,?> env = Collections.emptyMap();
         //fs = provider.newFileSystem(zipfile,env);
@@ -328,7 +342,11 @@ private static Path findIVOrWRL(Path parentPath) {
     Path ivOrwrl = null;
     if ( fs != null) {
         for (Path root : fs.getRootDirectories()) {
-            ivOrwrl = findIVOrWRL(root);
+            ivOrwrl = findFileWithExtension(root,".iv",false);
+            if (ivOrwrl != null) {
+                break;
+            }
+            ivOrwrl = findFileWithExtension(root,".wrl",false);
             if (ivOrwrl != null) {
                 break;
             }
@@ -337,6 +355,8 @@ private static Path findIVOrWRL(Path parentPath) {
 
     // Open file
     f.readOK = true;
+
+    final SoInput in = new SoInput();
 
     boolean found = (ivOrwrl != null) ? in.openFile(ivOrwrl,true) : in.openFile(filename, true);
 
@@ -367,10 +387,64 @@ private static Path findIVOrWRL(Path parentPath) {
     // Note: if there is an error reading one of the children, the
     // other children will still be added properly...    	
     in.destructor(); //java port
+
+        if (!f.readOK && f.children.getLength() == 0) {
+            // try another format
+            Path gltf = null;
+            if(zip) {
+                if ( fs != null) {
+                    for (Path root : fs.getRootDirectories()) {
+                        gltf = findFileWithExtension(root,".gltf",true);
+                        if (gltf != null) {
+                            readGLTF(f, gltf);
+                            return;
+                        }
+                    }
+                }
+            }
+            else {
+                gltf = findFileWithExtension(filePath,".gltf",true);
+            }
+            if (gltf != null) {
+                readGLTF(f, gltf);
+            }
+        }
     }
 
     private boolean                readOK;         //!< FALSE on read error.
 	  
+
+    private static void readGLTF(SoFile f, Path gltf) {
+        URI gltfURI = gltf.toUri();
+        GltfModelReader reader = new GltfModelReader();
+        try {
+            //GltfModel gltfModel = reader.read(gltfURI);
+            GltfModel gltfModel = reader.read(gltf);
+            List<MeshModel> meshModels = gltfModel.getMeshModels();
+            List<TextureModel> textureModels = gltfModel.getTextureModels();
+            System.out.println(meshModels);
+            System.out.println(textureModels);
+        } catch (IOException e) {
+            e.printStackTrace();
+            f.readOK = false;
+        }
+    }
+
+    private static ByteBuffer pathToByteBuffer(Path path) {
+        long fileLength = path.toFile().length();
+        ByteBuffer byteBuffer = BufferUtils.createByteBuffer((int)fileLength);
+
+        try {
+            byte[] data = Files.readAllBytes(path);
+            byteBuffer.put(ByteBuffer.wrap(data));
+            byteBuffer.flip();
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+
+        return byteBuffer;
+    }
 
 ////////////////////////////////////////////////////////////////////////
 //

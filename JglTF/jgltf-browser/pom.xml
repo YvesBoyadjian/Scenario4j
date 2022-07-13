@@ -1,0 +1,113 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>de.javagl</groupId>
+    <artifactId>jgltf-parent</artifactId>
+    <version>2.0.2-SNAPSHOT</version>
+  </parent>
+
+  <artifactId>jgltf-browser</artifactId>
+  <packaging>jar</packaging>
+
+  <repositories>
+    <repository>
+      <id>localMocalMepository</id>
+      <url>file://${basedir}/localMavenRepository</url>
+    </repository>
+  </repositories>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-source-plugin</artifactId>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <version>2.6</version>
+        <configuration>
+          <archive>
+            <manifest>
+              <mainClass>de.javagl.jgltf.browser.GltfBrowser</mainClass>
+            </manifest>
+          </archive>
+          <descriptorRefs>
+            <descriptorRef>jar-with-dependencies</descriptorRef>
+          </descriptorRefs>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+
+  <dependencies>
+    <dependency>
+      <groupId>de.javagl</groupId>
+      <artifactId>jgltf-impl-v1</artifactId>
+      <version>2.0.2-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>de.javagl</groupId>
+      <artifactId>jgltf-model</artifactId>
+      <version>2.0.2-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>de.javagl</groupId>
+      <artifactId>jgltf-obj</artifactId>
+      <version>2.0.2-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>de.javagl</groupId>
+      <artifactId>jgltf-viewer</artifactId>
+      <version>2.0.2-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>de.javagl</groupId>
+      <artifactId>jgltf-viewer-jogl</artifactId>
+      <version>2.0.2-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>de.javagl</groupId>
+      <artifactId>jgltf-viewer-lwjgl</artifactId>
+      <version>2.0.2-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>de.javagl</groupId>
+      <artifactId>swing-tasks</artifactId>
+      <version>0.0.3</version>
+    </dependency>
+    <dependency>
+      <groupId>de.javagl</groupId>
+      <artifactId>common-ui</artifactId>
+      <version>0.0.4</version>
+    </dependency>
+    <dependency>
+      <groupId>javax.vecmath</groupId>
+      <artifactId>vecmath</artifactId>
+      <version>1.5.2</version>
+    </dependency>
+    <dependency>
+      <groupId>de.javagl</groupId>
+      <artifactId>rendering-core</artifactId>
+      <version>0.0.0-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>de.javagl</groupId>
+      <artifactId>rendering-interaction</artifactId>
+      <version>0.0.0-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-databind</artifactId>
+      <version>2.13.1</version>
+    </dependency>
+  </dependencies>
+
+</project>

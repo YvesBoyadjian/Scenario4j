@@ -1,0 +1,177 @@
+{
+  "accessors" : {
+    "accessor_0" : {
+      "bufferView" : "bufferView_0",
+      "byteOffset" : 0,
+      "byteStride" : 0,
+      "componentType" : 5123,
+      "count" : 36,
+      "type" : "SCALAR",
+      "max" : [ 23 ],
+      "min" : [ 0 ]
+    },
+    "accessor_1" : {
+      "bufferView" : "bufferView_1",
+      "byteOffset" : 0,
+      "byteStride" : 12,
+      "componentType" : 5126,
+      "count" : 24,
+      "type" : "VEC3",
+      "max" : [ 0.5, 0.5, 0.5 ],
+      "min" : [ -0.5, -0.5, -0.5 ]
+    },
+    "accessor_2" : {
+      "bufferView" : "bufferView_1",
+      "byteOffset" : 288,
+      "byteStride" : 12,
+      "componentType" : 5126,
+      "count" : 24,
+      "type" : "VEC3",
+      "max" : [ 1.0, 1.0, 1.0 ],
+      "min" : [ -1.0, -1.0, -1.0 ]
+    }
+  },
+  "asset" : {
+    "generator" : "JglTF from https://github.com/javagl/JglTF",
+    "version" : "1.0"
+  },
+  "buffers" : {
+    "buffer_0" : {
+      "uri" : "Box.bin",
+      "byteLength" : 648
+    }
+  },
+  "bufferViews" : {
+    "bufferView_0" : {
+      "buffer" : "buffer_0",
+      "byteOffset" : 0,
+      "byteLength" : 72,
+      "target" : 34963
+    },
+    "bufferView_1" : {
+      "buffer" : "buffer_0",
+      "byteOffset" : 72,
+      "byteLength" : 576,
+      "target" : 34962
+    }
+  },
+  "materials" : {
+    "material_0" : {
+      "name" : "Red",
+      "technique" : "technique_0",
+      "values" : {
+        "diffuse" : [ 0.8, 0, 0, 1 ],
+        "shininess" : 256,
+        "specular" : [ 0.2, 0.2, 0.2, 1 ]
+      }
+    }
+  },
+  "meshes" : {
+    "mesh_0" : {
+      "name" : "Mesh",
+      "primitives" : [ {
+        "attributes" : {
+          "NORMAL" : "accessor_2",
+          "POSITION" : "accessor_1"
+        },
+        "indices" : "accessor_0",
+        "material" : "material_0",
+        "mode" : 4
+      } ]
+    }
+  },
+  "nodes" : {
+    "node_0" : {
+      "name" : "Mesh",
+      "matrix" : [ 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0 ],
+      "meshes" : [ "mesh_0" ]
+    },
+    "node_1" : {
+      "name" : "Y_UP_Transform",
+      "children" : [ "node_0" ],
+      "matrix" : [ 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, -1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0 ]
+    }
+  },
+  "programs" : {
+    "program_0" : {
+      "attributes" : [ "a_normal", "a_position" ],
+      "fragmentShader" : "shader_0",
+      "vertexShader" : "shader_1"
+    }
+  },
+  "scene" : "scene_0",
+  "scenes" : {
+    "scene_0" : {
+      "nodes" : [ "node_1" ]
+    }
+  },
+  "shaders" : {
+    "shader_0" : {
+      "uri" : "Box0FS.glsl",
+      "type" : 35632
+    },
+    "shader_1" : {
+      "uri" : "Box0VS.glsl",
+      "type" : 35633
+    }
+  },
+  "techniques" : {
+    "technique_0" : {
+      "parameters" : {
+        "diffuse" : {
+          "count" : 1,
+          "type" : 35666
+        },
+        "modelViewMatrix" : {
+          "count" : 1,
+          "type" : 35676,
+          "semantic" : "MODELVIEW"
+        },
+        "normal" : {
+          "count" : 1,
+          "type" : 35665,
+          "semantic" : "NORMAL"
+        },
+        "normalMatrix" : {
+          "count" : 1,
+          "type" : 35675,
+          "semantic" : "MODELVIEWINVERSETRANSPOSE"
+        },
+        "position" : {
+          "count" : 1,
+          "type" : 35665,
+          "semantic" : "POSITION"
+        },
+        "projectionMatrix" : {
+          "count" : 1,
+          "type" : 35676,
+          "semantic" : "PROJECTION"
+        },
+        "shininess" : {
+          "count" : 1,
+          "type" : 5126
+        },
+        "specular" : {
+          "count" : 1,
+          "type" : 35666
+        }
+      },
+      "attributes" : {
+        "a_normal" : "normal",
+        "a_position" : "position"
+      },
+      "program" : "program_0",
+      "uniforms" : {
+        "u_diffuse" : "diffuse",
+        "u_modelViewMatrix" : "modelViewMatrix",
+        "u_normalMatrix" : "normalMatrix",
+        "u_projectionMatrix" : "projectionMatrix",
+        "u_shininess" : "shininess",
+        "u_specular" : "specular"
+      },
+      "states" : {
+        "enable" : [ 2929, 2884 ]
+      }
+    }
+  }
+}
