@@ -427,6 +427,9 @@ private static Path findFileWithExtension(Path parentPath, String extension, boo
         } catch (IOException e) {
             e.printStackTrace();
             f.readOK = false;
+        } catch (NullPointerException e) {
+            e.printStackTrace();
+            f.readOK = false;
         }
     }
 

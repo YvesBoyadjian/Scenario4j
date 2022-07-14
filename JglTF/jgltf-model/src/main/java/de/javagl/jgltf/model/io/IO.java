@@ -82,9 +82,9 @@ public class IO
             URI uri = new URI(escapedUriString);
             if (uri.isAbsolute())
             {
-                return Path.of(uri);
+                return Path.of(uri).toAbsolutePath();
             }
-            return baseUri.resolve(escapedUriString);
+            return baseUri.resolve(escapedUriString).toAbsolutePath();
         }
         catch (URISyntaxException e)
         {
