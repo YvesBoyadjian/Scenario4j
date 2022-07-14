@@ -56,6 +56,10 @@ package jscenegraph.database.inventor.nodes;
 
 import de.javagl.jgltf.model.*;
 import de.javagl.jgltf.model.io.GltfModelReader;
+import de.javagl.jgltf.model.v2.MaterialModelV2;
+import jscenegraph.coin3d.inventor.misc.SoGLImage;
+import jscenegraph.coin3d.inventor.nodes.SoTexture;
+import jscenegraph.coin3d.inventor.nodes.SoTexture2;
 import jscenegraph.coin3d.inventor.nodes.SoVertexProperty;
 import jscenegraph.database.inventor.*;
 import jscenegraph.database.inventor.actions.SoAction;
@@ -73,11 +77,14 @@ import jscenegraph.database.inventor.misc.SoChildList;
 import jscenegraph.database.inventor.sensors.SoFieldSensor;
 import jscenegraph.database.inventor.sensors.SoSensor;
 import jscenegraph.database.inventor.sensors.SoSensorCB;
+import jscenegraph.port.memorybuffer.MemoryBuffer;
 import org.lwjgl.assimp.AIFileIO;
 import org.lwjgl.assimp.AIScene;
 import org.lwjgl.assimp.Assimp;
 import org.lwjglx.BufferUtils;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
@@ -418,6 +425,42 @@ private static Path findFileWithExtension(Path parentPath, String extension, boo
         try {
             //GltfModel gltfModel = reader.read(gltfURI);
             GltfModel gltfModel = reader.read(gltf);
+            List<MaterialModel> materialModels = gltfModel.getMaterialModels();
+            for(MaterialModel materialModel : materialModels) {
+                if (materialModel instanceof MaterialModelV2) {
+                    MaterialModelV2 materialModelV2 = (MaterialModelV2) materialModel;
+                    TextureModel baseColorTexture = materialModelV2.getBaseColorTexture();
+                    ImageModel imageModel = baseColorTexture.getImageModel();
+                    String imageURI = imageModel.getUri();
+
+                    Path rootDir = gltf.getParent();
+                    Path imagePath = rootDir.resolve(imageURI);
+                    BufferedImage textureBufferedImage = ImageIO.read(imagePath.toUri().toURL());
+                    SoTexture2 texture = new SoTexture2();
+                    //texture.filename.setValue(imagePath.toString());
+                    int w = textureBufferedImage.getWidth();
+                    int h = textureBufferedImage.getHeight();
+                    SbVec2s s = new SbVec2s((short)w,(short)h);
+                    int nc = 3;
+                    int numPixels = (int)s.getX()*s.getY();
+                    int numBytes = numPixels*3;
+                    MemoryBuffer b = MemoryBuffer.allocateBytes(numBytes);
+                    int j=0;
+                    for(int i=0; i< numPixels;i++) {
+                        int x = i%w;
+                        int y = i/w;//h - i/w -1;
+                        int rgb = textureBufferedImage.getRGB(x, y);
+                        b.setByte(j, (byte)((rgb & 0x00FF0000) >>> 16)) ; j++;
+                        b.setByte(j, (byte)((rgb & 0x0000FF00) >>> 8)); j++;
+                        b.setByte(j, (byte)((rgb & 0x000000FF) >>> 0)); j++;
+                    }
+
+                    texture.image.setValue(s,nc,true,b);
+
+                    f.children.append(texture);
+                    System.out.println("");
+                }
+            }
             List<SceneModel> sceneModels = gltfModel.getSceneModels();
             for (SceneModel sceneModel : sceneModels) {
                 List<NodeModel> nodeModels = sceneModel.getNodeModels();
@@ -461,30 +504,37 @@ private static Path findFileWithExtension(Path parentPath, String extension, boo
                 Map<String, AccessorModel> attributes = primitiveModel.getAttributes();
                 AccessorModel positionsModel = attributes.get("POSITION");
                 AccessorModel normalsModel = attributes.get("NORMAL");
+                AccessorModel texCoordsModel = attributes.get("TEXCOORD_0");
 
-                if (indicesModel != null && positionsModel != null && normalsModel != null) {
+                if (indicesModel != null && positionsModel != null && normalsModel != null && texCoordsModel != null) {
                     Class indiceDataType =  indicesModel.getComponentDataType();
                     Class positionDataType = positionsModel.getComponentDataType();
                     Class normalDataType = normalsModel.getComponentDataType();
+                    Class texCoordDataType = texCoordsModel.getComponentDataType();
 
                     AccessorData indicesData = indicesModel.getAccessorData();
                     AccessorData positionsData = positionsModel.getAccessorData();
                     AccessorData normalsData = normalsModel.getAccessorData();
+                    AccessorData texCoordsData = texCoordsModel.getAccessorData();
 
                     if (
                             indicesData != null &&
                                     positionsData != null &&
                                     normalsData != null &&
+                                    texCoordsData != null &&
                                     Objects.equals(indiceDataType, int.class) &&
                                     Objects.equals(positionDataType, float.class) &&
-                                    Objects.equals(normalDataType, float.class)) {
+                                    Objects.equals(normalDataType, float.class) &&
+                                    Objects.equals(texCoordDataType, float.class)) {
                         ByteBuffer indicesBuffer = indicesData.createByteBuffer();
                         ByteBuffer positionsBuffer = positionsData.createByteBuffer();
                         ByteBuffer normalsBuffer = normalsData.createByteBuffer();
-                        if (indicesBuffer != null && positionsBuffer != null && normalsBuffer != null) {
+                        ByteBuffer texCoordsBuffer = texCoordsData.createByteBuffer();
+                        if (indicesBuffer != null && positionsBuffer != null && normalsBuffer != null && texCoordsBuffer != null) {
                             IntBuffer indicesIntBuffer = indicesBuffer.asIntBuffer();
                             FloatBuffer positionsFloatBuffer = positionsBuffer.asFloatBuffer();
                             FloatBuffer normalsFloatBuffer = normalsBuffer.asFloatBuffer();
+                            FloatBuffer texCoordsFloatBuffer = texCoordsBuffer.asFloatBuffer();
 
                             int numIndices = indicesIntBuffer.remaining();
                             int numTriangles = numIndices/3;
@@ -498,12 +548,17 @@ private static Path findFileWithExtension(Path parentPath, String extension, boo
 
                             float[] positionsArray = new float[positionsFloatBuffer.remaining()];
                             positionsFloatBuffer.get(positionsArray);
+
                             float[] normalsArray = new float[normalsFloatBuffer.remaining()];
                             normalsFloatBuffer.get(normalsArray);
+
+                            float[] texCoordsArray = new float[texCoordsFloatBuffer.remaining()];
+                            texCoordsFloatBuffer.get(texCoordsArray);
 
                             SoVertexProperty vertexProperty = new SoVertexProperty();
                             vertexProperty.vertex.setValuesPointer(positionsArray);
                             vertexProperty.normal.setValuesPointer(normalsArray);
+                            vertexProperty.texCoord.setValues(0,texCoordsArray);
 
                             SoIndexedFaceSet indexedFaceSet = new SoIndexedFaceSet();
                             indexedFaceSet.vertexProperty.setValue(vertexProperty);
