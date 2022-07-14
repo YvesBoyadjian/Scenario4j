@@ -57,10 +57,7 @@ package jscenegraph.database.inventor.nodes;
 import de.javagl.jgltf.model.*;
 import de.javagl.jgltf.model.io.GltfModelReader;
 import jscenegraph.coin3d.inventor.nodes.SoVertexProperty;
-import jscenegraph.database.inventor.SbVec3f;
-import jscenegraph.database.inventor.SoDB;
-import jscenegraph.database.inventor.SoInput;
-import jscenegraph.database.inventor.SoType;
+import jscenegraph.database.inventor.*;
 import jscenegraph.database.inventor.actions.SoAction;
 import jscenegraph.database.inventor.actions.SoCallbackAction;
 import jscenegraph.database.inventor.actions.SoGLRenderAction;
@@ -444,9 +441,17 @@ private static Path findFileWithExtension(Path parentPath, String extension, boo
     }
 
     private static SoGroup recursiveAddNode(SoFile f, NodeModel nodeModel) {
-        SoGroup group = new SoGroup();
+        SoGroup group = new SoSeparator();
 
-        float[] matrix = nodeModel.getMatrix();
+        float[] matrixArray = nodeModel.getMatrix();
+        if (matrixArray != null) {
+            SbMatrix matrix = new SbMatrix();
+            matrix.setValue(matrixArray);
+            //matrix.setIdentity();
+            SoMatrixTransform matrixTransform = new SoMatrixTransform();
+            matrixTransform.matrix.setValue(matrix);
+            group.addChild(matrixTransform);
+        }
 
         List<MeshModel> meshModels = nodeModel.getMeshModels();
         for (MeshModel meshModel : meshModels) {

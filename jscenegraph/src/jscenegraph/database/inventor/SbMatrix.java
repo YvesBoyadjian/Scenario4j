@@ -294,7 +294,25 @@ public class SbMatrix implements Mutable {
 	  	        matrix[3][2] = m[3][2];
 	  	        matrix[3][3] = m[3][3];	  	   	  		
 	  	}
-	
+	public void setValue(float[] m) {
+		matrix[0][0] = m[0];
+		matrix[0][1] = m[1];
+		matrix[0][2] = m[2];
+		matrix[0][3] = m[3];
+		matrix[1][0] = m[4];
+		matrix[1][1] = m[5];
+		matrix[1][2] = m[6];
+		matrix[1][3] = m[7];
+		matrix[2][0] = m[8];
+		matrix[2][1] = m[9];
+		matrix[2][2] = m[10];
+		matrix[2][3] = m[11];
+		matrix[3][0] = m[12];
+		matrix[3][1] = m[13];
+		matrix[3][2] = m[14];
+		matrix[3][3] = m[15];
+	}
+
 	// Sets matrix to be identity. 
 	public void makeIdentity() {
 	     matrix[0][0] = 1.0f;
