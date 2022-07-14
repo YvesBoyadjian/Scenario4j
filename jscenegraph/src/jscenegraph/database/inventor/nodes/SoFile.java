@@ -54,10 +54,9 @@
 
 package jscenegraph.database.inventor.nodes;
 
-import de.javagl.jgltf.model.GltfModel;
-import de.javagl.jgltf.model.MeshModel;
-import de.javagl.jgltf.model.TextureModel;
+import de.javagl.jgltf.model.*;
 import de.javagl.jgltf.model.io.GltfModelReader;
+import jscenegraph.coin3d.inventor.nodes.SoVertexProperty;
 import jscenegraph.database.inventor.SbVec3f;
 import jscenegraph.database.inventor.SoDB;
 import jscenegraph.database.inventor.SoInput;
@@ -86,6 +85,8 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.ByteBuffer;
+import java.nio.FloatBuffer;
+import java.nio.IntBuffer;
 import java.nio.file.*;
 import java.util.*;
 import java.util.zip.ZipError;
@@ -420,10 +421,19 @@ private static Path findFileWithExtension(Path parentPath, String extension, boo
         try {
             //GltfModel gltfModel = reader.read(gltfURI);
             GltfModel gltfModel = reader.read(gltf);
+            List<SceneModel> sceneModels = gltfModel.getSceneModels();
+            for (SceneModel sceneModel : sceneModels) {
+                List<NodeModel> nodeModels = sceneModel.getNodeModels();
+                for (NodeModel nodeModel : nodeModels) {
+                    f.children.append(recursiveAddNode(f,nodeModel));
+                }
+            }
+
             List<MeshModel> meshModels = gltfModel.getMeshModels();
             List<TextureModel> textureModels = gltfModel.getTextureModels();
             System.out.println(meshModels);
             System.out.println(textureModels);
+            f.readOK = true;
         } catch (IOException e) {
             e.printStackTrace();
             f.readOK = false;
@@ -431,6 +441,80 @@ private static Path findFileWithExtension(Path parentPath, String extension, boo
             e.printStackTrace();
             f.readOK = false;
         }
+    }
+
+    private static SoGroup recursiveAddNode(SoFile f, NodeModel nodeModel) {
+        SoGroup group = new SoGroup();
+
+        float[] matrix = nodeModel.getMatrix();
+
+        List<MeshModel> meshModels = nodeModel.getMeshModels();
+        for (MeshModel meshModel : meshModels) {
+            List<MeshPrimitiveModel> primitiveModels = meshModel.getMeshPrimitiveModels();
+            for (MeshPrimitiveModel primitiveModel : primitiveModels) {
+                AccessorModel indicesModel = primitiveModel.getIndices();
+                Map<String, AccessorModel> attributes = primitiveModel.getAttributes();
+                AccessorModel positionsModel = attributes.get("POSITION");
+                AccessorModel normalsModel = attributes.get("NORMAL");
+
+                if (indicesModel != null && positionsModel != null && normalsModel != null) {
+                    Class indiceDataType =  indicesModel.getComponentDataType();
+                    Class positionDataType = positionsModel.getComponentDataType();
+                    Class normalDataType = normalsModel.getComponentDataType();
+
+                    AccessorData indicesData = indicesModel.getAccessorData();
+                    AccessorData positionsData = positionsModel.getAccessorData();
+                    AccessorData normalsData = normalsModel.getAccessorData();
+
+                    if (
+                            indicesData != null &&
+                                    positionsData != null &&
+                                    normalsData != null &&
+                                    Objects.equals(indiceDataType, int.class) &&
+                                    Objects.equals(positionDataType, float.class) &&
+                                    Objects.equals(normalDataType, float.class)) {
+                        ByteBuffer indicesBuffer = indicesData.createByteBuffer();
+                        ByteBuffer positionsBuffer = positionsData.createByteBuffer();
+                        ByteBuffer normalsBuffer = normalsData.createByteBuffer();
+                        if (indicesBuffer != null && positionsBuffer != null && normalsBuffer != null) {
+                            IntBuffer indicesIntBuffer = indicesBuffer.asIntBuffer();
+                            FloatBuffer positionsFloatBuffer = positionsBuffer.asFloatBuffer();
+                            FloatBuffer normalsFloatBuffer = normalsBuffer.asFloatBuffer();
+
+                            int numIndices = indicesIntBuffer.remaining();
+                            int numTriangles = numIndices/3;
+                            int[] indicesArray = new int[numTriangles*4];
+                            for(int triangle = 0 ; triangle < numTriangles; triangle++) {
+                                indicesArray[triangle*4] = indicesIntBuffer.get(triangle*3);
+                                indicesArray[triangle*4+1] = indicesIntBuffer.get(triangle*3+1);
+                                indicesArray[triangle*4+2] = indicesIntBuffer.get(triangle*3+2);
+                                indicesArray[triangle*4+3] = -1;
+                            }
+
+                            float[] positionsArray = new float[positionsFloatBuffer.remaining()];
+                            positionsFloatBuffer.get(positionsArray);
+                            float[] normalsArray = new float[normalsFloatBuffer.remaining()];
+                            normalsFloatBuffer.get(normalsArray);
+
+                            SoVertexProperty vertexProperty = new SoVertexProperty();
+                            vertexProperty.vertex.setValuesPointer(positionsArray);
+                            vertexProperty.normal.setValuesPointer(normalsArray);
+
+                            SoIndexedFaceSet indexedFaceSet = new SoIndexedFaceSet();
+                            indexedFaceSet.vertexProperty.setValue(vertexProperty);
+                            indexedFaceSet.coordIndex.setValuesPointer(indicesArray);
+                            group.addChild(indexedFaceSet);
+                        }
+                    }
+                }
+            }
+        }
+
+        List<NodeModel> childrens = nodeModel.getChildren();
+        for (NodeModel child : childrens) {
+            group.addChild(recursiveAddNode(f, child));
+        }
+        return group;
     }
 
     private static ByteBuffer pathToByteBuffer(Path path) {
