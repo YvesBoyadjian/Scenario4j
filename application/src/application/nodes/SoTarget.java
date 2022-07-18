@@ -31,8 +31,6 @@ public class SoTarget extends SoSeparator {
 
 	public static final float MAX_SQUARE_SHOOT_DISTANCE = MAX_SHOOT_DISTANCE * MAX_SHOOT_DISTANCE;
 
-	//private int sealIndex;
-	private SbVec3f referencePoint;
 	private final SbVec3fSingle dummyRender = new SbVec3fSingle();
 	//private final SbVec3fSingle dummyPick = new SbVec3fSingle();
 
@@ -48,11 +46,7 @@ public class SoTarget extends SoSeparator {
 //	public void setSealIndex( int sealIndex) {
 //		this.sealIndex = sealIndex;
 //	}
-	
-	public void setReferencePoint(SbVec3f referencePoint) {
-		this.referencePoint = referencePoint;
-	}
-	
+
 	public SbVec3f getCoordinates() {
 		return ((SoTranslation)getChild(0)).translation.getValue();
 	}

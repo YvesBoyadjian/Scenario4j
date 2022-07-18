@@ -16,14 +16,14 @@ import java.util.stream.Stream;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 
-import application.nodes.SoTarget;
-import application.nodes.SoTargets;
+import application.nodes.*;
 import application.objects.Target;
+import application.objects.collectible.BootsFamily;
+import application.objects.collectible.Collectible;
 import application.scenario.Scenario;
 import application.viewer.glfw.SoQtWalkViewer;
 import com.jogamp.opengl.GL2;
 
-import application.nodes.SoNoSpecularDirectionalLight;
 import application.objects.DouglasFir;
 import jscenegraph.coin3d.fxviz.nodes.SoShadowDirectionalLight;
 import jscenegraph.coin3d.fxviz.nodes.SoShadowGroup;
@@ -47,8 +47,7 @@ import org.ode4j.math.DMatrix3;
 import org.ode4j.math.DMatrix3C;
 import org.ode4j.ode.*;
 
-import static application.MainGLFW.MAX_PROGRESS;
-import static application.MainGLFW.SCENE_POSITION;
+import static application.MainGLFW.*;
 
 /**
  * @author Yves Boyadjian
@@ -99,7 +98,7 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 	
 	public static boolean FLY = false;
 	
-	static final float CUBE_DEPTH = 2000;
+	static public final float CUBE_DEPTH = 2000;
 	
 	static final int LEVEL_OF_DETAIL = 600;
 	
@@ -269,6 +268,10 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 	private final Set<String> shotTargets = new HashSet<>();
 	private final List<Integer> shotTargetsIndices = new ArrayList<>();
 	private final List<Integer> shotTargetsInstances = new ArrayList<>();
+
+	final SoGroup collectibleGroup = new SoGroup();
+
+	final List<Collectible> collectibleFamilies = new ArrayList<>();
 
 	final SoSeparator planksSeparator = new SoSeparator();
 
@@ -940,24 +943,24 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 		if(WITH_DOUGLAS)
 			shadowGroup.addChild(douglasSep);
 
-		// _______________________________________________________________________ Targets
+		// ____________________________________________________________ Targets
 
-		Seals seals_ = new Seals(this);
+		Target seals_ = new Seals(this);
 		addTargetFamily(seals_);
 
-		BigFoots bigfoots_ = new BigFoots(this);
+		Target bigfoots_ = new BigFoots(this);
 		addTargetFamily(bigfoots_);
 
-		MountainGoats goats_ = new MountainGoats(this);
+		Target goats_ = new MountainGoats(this);
 		addTargetFamily(goats_);
 
-		HoaryMarmots marmots_ = new HoaryMarmots(this);
+		Target marmots_ = new HoaryMarmots(this);
 		addTargetFamily(marmots_);
 
-		GroundSquirrels squirrels_ = new GroundSquirrels(this);
+		Target squirrels_ = new GroundSquirrels(this);
 		addTargetFamily(squirrels_);
 
-		Owls spottedOwlFront_ = new Owls(this,53) {
+		Target spottedOwlFront_ = new Owls(this,53) {
 
 			@Override
 			public String targetName() {
@@ -976,7 +979,7 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 		};
 		addTargetFamily(spottedOwlFront_);
 
-		Owls spottedOwlBack_ = new Owls(this,54) {
+		Target spottedOwlBack_ = new Owls(this,54) {
 
 			@Override
 			public String targetName() {
@@ -995,7 +998,7 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 		};
 		addTargetFamily(spottedOwlBack_);
 
-		Owls barredOwlFront_ = new Owls(this,55) {
+		Target barredOwlFront_ = new Owls(this,55) {
 
 			@Override
 			public String targetName() {
@@ -1014,7 +1017,7 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 		};
 		addTargetFamily(barredOwlFront_);
 
-		Owls barredOwlBack_ = new Owls(this,56) {
+		Target barredOwlBack_ = new Owls(this,56) {
 
 			@Override
 			public String targetName() {
@@ -1047,16 +1050,8 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 			targetsColor.rgb.setValue(1,1,1);
 			targetsSeparator.addChild(targetsColor);
 
-		//sealsSeparator.renderCaching.setValue(SoSeparator.CacheEnabled.ON);
-		
-		//SoTranslation sealsTranslation = new SoTranslation();
-		
-		//sealsTranslation.translation.setValue(0, 0, - getzTranslation());
-
 			targetsSeparator.addChild(transl);
 	    
-		//sealsSeparator.addChild(sealsTranslation);
-		
 			SoTexture2 targetTexture = new SoTexture2();
 
 			String texturePath = targetFamily.getTexturePath();
@@ -1104,14 +1099,58 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 
 				targetSeparator.addChild(billboard);
 
-				targetSeparator.setReferencePoint(targetsRefPoint);
 				targetsSeparator.addChild(targetSeparator);
 			}
-
 			targetsGroup.addChild(targetsSeparator);
-
 		}
 		shadowGroup.addChild(targetsGroup);
+
+		// End targets
+
+		// ___________________________________________________ Collectibles
+
+		Collectible boots = new BootsFamily(this, 57);
+		collectibleFamilies.add(boots);
+
+		for( Collectible collectibleFamily : collectibleFamilies) {
+
+			SoCollectibles collectiblesSeparator = new SoCollectibles(collectibleFamily);
+
+			collectiblesSeparator.setReferencePoint(targetsRefPoint);
+			collectiblesSeparator.setCameraDirection(cameraDirection);
+
+			collectiblesSeparator.addChild(transl);
+
+			SoNode collectibleNode = collectibleFamily.getNode();
+
+			final float[] vector = new float[3];
+
+			final SbVec3f collectiblePosition = new SbVec3f();
+
+			final int nbCollectibles = collectibleFamily.getNbCollectibles();
+
+			for (int index = 0; index < nbCollectibles; index++) {
+				int instance = collectibleFamily.getInstance(index);
+				SoCollectible collectibleSeparator = new SoCollectible(instance);
+
+				SoTranslation collectibleTranslation = new SoTranslation();
+				collectibleTranslation.enableNotify(false); // Will change often
+
+				collectiblePosition.setValue(collectibleFamily.getCollectible(index, vector));
+
+				collectibleTranslation.translation.setValue(collectiblePosition);
+
+				collectibleSeparator.addChild(collectibleTranslation);
+
+				collectibleSeparator.addChild(collectibleNode);
+
+				collectibleSeparator.setReferencePoint(targetsRefPoint);
+				collectiblesSeparator.addChild(collectibleSeparator);
+			}
+
+			collectibleGroup.addChild(collectiblesSeparator);
+		}
+		shadowGroup.addChild(collectibleGroup);
 
 		addWater(shadowGroup,185 + zTranslation, 0.0f, true,false);
 		addWater(shadowGroup,175 + zTranslation, 0.2f, true,false);
@@ -1210,7 +1249,9 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 
 		// slowdown too much the rendering
 		//castingShadowScene.addChild(targetsGroup);
-		
+
+		castingShadowScene.addChild(collectibleGroup);
+
 		sunLight[0].shadowMapScene.setValue(castingShadowScene);
 		sunLight[1].shadowMapScene.setValue(castingShadowScene);
 		sunLight[2].shadowMapScene.setValue(castingShadowScene);
@@ -1252,7 +1293,7 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 						"texCoord = s4j_MultiTexCoord0;\n"+
 						"    frontColor = diffuCol;\n" +
 						"}\n"
-);
+		);
 
 		SoFragmentShader fragmentShaderScreen = new SoFragmentShader();
 
@@ -1885,11 +1926,9 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 			);
 		}		
 		
-		float xTransl = - transl.translation.getValue().getX();
-		
-		float yTransl = - transl.translation.getValue().getY();
-		
-		float zTransl = - transl.translation.getValue().getZ();
+		final float xTransl = - transl.translation.getValue().getX();
+		final float yTransl = - transl.translation.getValue().getY();
+		final float zTransl = - transl.translation.getValue().getZ();
 		
 		float trees_x = current_x + xTransl+douglas_distance_foliage[0]*0.4f/*3000*/*world_camera_direction.getX();
 		float trees_y = current_y + yTransl+douglas_distance_foliage[0]*0.4f/*3000*/*world_camera_direction.getY();
@@ -2208,6 +2247,7 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 	public void idle() {
 		setBBoxCenter();
 		hideOracleIfTooFar();
+		setNearDistance();
 
 		runIdleCB();
 
@@ -2861,6 +2901,22 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 	public void displayTemporaryMessage(String message, float durationSeconds) {
 		temporaryMessageDisplay.string.setValue(message);
 		temporaryMessageStopNanoTime = (long)(System.nanoTime() + durationSeconds*1.0e9);
+	}
+
+	public float getNearestCollectibleDistance() {
+		float nearestCollectibleDistance = 99;
+		for( Collectible collectible : collectibleFamilies) {
+			nearestCollectibleDistance = Math.min(nearestCollectibleDistance,collectible.getGraphicObject().getNearestCollectibleDistance());
+		}
+		return nearestCollectibleDistance;
+	}
+
+	private void setNearDistance() {
+		float nearest = getNearestCollectibleDistance();
+		float minViewDistance = Math.min(nearest/1.5f, MINIMUM_VIEW_DISTANCE);
+		minViewDistance = Math.max(0.5f, minViewDistance);
+		camera.nearDistance.setValue(minViewDistance);
+		//System.out.println(minViewDistance);
 	}
 
 	private double currentPos = 0;
