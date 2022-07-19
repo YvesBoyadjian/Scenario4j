@@ -39,6 +39,8 @@ public class BootsFamily extends CollectibleBase implements Collectible {
             texturePath = "application/"+texturePath;
         }
 
+        node.ref(); // To avoid destruction
+
         SoRotation rot = new SoRotation();
 
         rot.rotation.setValue(new SbVec3f(1,0,0), (float)Math.PI/2.0f);
