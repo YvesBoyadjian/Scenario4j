@@ -1121,31 +1121,32 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 
 			collectiblesSeparator.addChild(transl);
 
-			SoNode collectibleNode = collectibleFamily.getNode();
+//			SoNode collectibleNode = collectibleFamily.getNode();
 
 			final float[] vector = new float[3];
-
-			final SbVec3f collectiblePosition = new SbVec3f();
 
 			final int nbCollectibles = collectibleFamily.getNbCollectibles();
 
 			for (int index = 0; index < nbCollectibles; index++) {
 				int instance = collectibleFamily.getInstance(index);
-				SoCollectible collectibleSeparator = new SoCollectible(instance);
 
-				SoTranslation collectibleTranslation = new SoTranslation();
-				collectibleTranslation.enableNotify(false); // Will change often
-
+				final SbVec3f collectiblePosition = new SbVec3f();
 				collectiblePosition.setValue(collectibleFamily.getCollectible(index, vector));
 
-				collectibleTranslation.translation.setValue(collectiblePosition);
+				collectiblesSeparator.addMember(collectiblePosition,instance);
 
-				collectibleSeparator.addChild(collectibleTranslation);
+//				SoCollectible collectibleSeparator = new SoCollectible(instance);
 
-				collectibleSeparator.addChild(collectibleNode);
+//				SoTranslation collectibleTranslation = new SoTranslation();
+//				collectibleTranslation.enableNotify(false); // Will change often
 
-				collectibleSeparator.setReferencePoint(targetsRefPoint);
-				collectiblesSeparator.addChild(collectibleSeparator);
+//				collectibleTranslation.translation.setValue(collectiblePosition);
+
+//				collectibleSeparator.addChild(collectibleTranslation);
+
+//				collectibleSeparator.addChild(collectibleNode);
+
+//				collectiblesSeparator.addChild(collectibleSeparator);
 			}
 
 			collectibleGroup.addChild(collectiblesSeparator);

@@ -368,11 +368,13 @@ public class SoShadowLightCache implements Destroyable {
 		    if (this.depthmap != null) {
               this.depthmap.destructorState = destructorState;
 		      this.depthmap.unref();
+              this.depthmap = null;
             }
 
 		    if (this.neardepthmap != null) {
               this.neardepthmap.destructorState = destructorState;
 		      this.neardepthmap.unref();
+              this.neardepthmap = null;
             }
 
 		    if (this.camera != null) this.camera.unref();

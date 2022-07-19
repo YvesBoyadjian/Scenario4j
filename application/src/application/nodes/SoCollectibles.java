@@ -13,6 +13,7 @@ import jscenegraph.database.inventor.elements.SoCacheElement;
 import jscenegraph.database.inventor.misc.SoState;
 import jscenegraph.database.inventor.nodes.SoNode;
 import jscenegraph.database.inventor.nodes.SoSeparator;
+import jscenegraph.database.inventor.nodes.SoTranslation;
 
 import java.util.*;
 
@@ -32,7 +33,7 @@ public class SoCollectibles extends SoSeparator {
 
     private final Set<Integer> nearChildren = new HashSet<>();
 
-    private final List<SoCollectible> collectibles = new ArrayList<>();
+    private final Map<Integer,SoCollectible> idxToCollectibles = new HashMap<>();
 
     private float nearestCollectibleDistance = 99;
 
@@ -66,17 +67,11 @@ public class SoCollectibles extends SoSeparator {
         this.cameraDirection = cameraDirection;
     }
 
-    // Adds a child as last one in group.
-    public void addChild(SoNode child) {
-
-        if ( child instanceof SoCollectible) {
-            child.ref();
-            bspTree.addPoint(((SoCollectible)child).getCoordinates(),child);
-            collectibles.add((SoCollectible)child);
-        }
-        else {
-            super.addChild(child);
-        }
+    /*
+    register the member
+     */
+    public void addMember(SbVec3f collectiblePosition, int instance) {
+        bspTree.addPoint(collectiblePosition,instance);
     }
 
     void update_children_list() {
@@ -94,8 +89,28 @@ public class SoCollectibles extends SoSeparator {
         for( int i=0;i<nbIDS;i++) {
             int id = nearIDS.get(i);
             if( !actualChildren.contains(id)) {
-                SoCollectible child = (SoCollectible)bspTree.getUserData(id);
-                addCollectible(child, id);
+                int instance = (Integer)bspTree.getUserData(id);
+
+                SoCollectible collectibleSeparator = new SoCollectible(instance);
+                collectibleSeparator.ref();
+
+                SoTranslation collectibleTranslation = new SoTranslation();
+                collectibleTranslation.enableNotify(false); // Will change often
+
+                final SbVec3f collectiblePosition = new SbVec3f();
+                int index = collectible.indexOfInstance(instance);
+                final float[] vector = new float[3];
+                collectiblePosition.setValue(collectible.getCollectible(index, vector));
+                collectibleTranslation.translation.setValue(collectiblePosition);
+
+                collectibleSeparator.addChild(collectibleTranslation);
+
+                SoNode collectibleNode = collectible.getNode();
+
+                collectibleSeparator.addChild(collectibleNode);
+
+                addCollectible(collectibleSeparator, id);
+                collectibleSeparator.unref();
             }
             nearChildren.add(id);
         }
@@ -104,12 +119,12 @@ public class SoCollectibles extends SoSeparator {
         actualChildrenSaved.addAll(actualChildren);
         for( int id : actualChildrenSaved) {
             if(actualChildren.contains(id) && !nearChildren.contains(id)) {
-                SoCollectible child = (SoCollectible)bspTree.getUserData(id);
+                SoCollectible child = idxToCollectibles.get(id);
                 removeCollectible(child,id);
             }
         }
         for(int id : actualChildren) {
-            SoCollectible child = (SoCollectible)bspTree.getUserData(id);
+            SoCollectible child = idxToCollectibles.get(id);
             float distance = referencePoint.operator_minus(child.getCoordinates()).length();
             nearestCollectibleDistance = Math.min(nearestCollectibleDistance,distance);
         }
@@ -119,12 +134,14 @@ public class SoCollectibles extends SoSeparator {
     void addCollectible(SoCollectible target, int id) {
         actualChildren.add(id);
         super.addChild(target);
-        target.unref();
+        idxToCollectibles.put(id,target);
+//        target.unref();
     }
 
     void removeCollectible(SoCollectible target, int id) {
         actualChildren.remove(id);
-        target.ref();
+        idxToCollectibles.remove(id);
+//        target.ref();
         super.removeChild(target);
     }
 
@@ -132,15 +149,10 @@ public class SoCollectibles extends SoSeparator {
         return collectible;
     }
 
-    public SoCollectible getCollectibleChildFromInstance(int instance) {
-        int index = collectible.indexOfInstance(instance);
-        return collectibles.get(index);
-    }
-
     public Collection<SoCollectible> getNearChildren() {
         Collection<SoCollectible> nearChildren = new ArrayList<>();
         for(int id : actualChildren) {
-            SoCollectible child = (SoCollectible)bspTree.getUserData(id);
+            SoCollectible child = idxToCollectibles.get(id);
             nearChildren.add(child);
         }
         return nearChildren;

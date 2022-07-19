@@ -12,8 +12,8 @@ import java.util.Random;
 
 public class BootsFamily extends CollectibleBase implements Collectible {
 
-    final int THIRTY_THOUSAND = 30000;
-    int NB_BOOTS_BIRTHS = THIRTY_THOUSAND;
+    final int FIFTY_THOUSAND = 50000;
+    int NB_BOOTS_BIRTHS = FIFTY_THOUSAND;
 
     final int SEED_BOOTS_PLACEMENT;
 
@@ -117,7 +117,7 @@ public class BootsFamily extends CollectibleBase implements Collectible {
 
     @Override
     public float getViewDistance() {
-        return 150;
+        return 100;
     }
 
     float getRandomX(Random randomPlacementTrees) {
