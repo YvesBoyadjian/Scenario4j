@@ -2914,7 +2914,7 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 
 	private void setNearDistance() {
 		float nearest = getNearestCollectibleDistance();
-		float minViewDistance = Math.min(nearest/1.5f, MINIMUM_VIEW_DISTANCE);
+		float minViewDistance = Math.min(nearest/2.0f, MINIMUM_VIEW_DISTANCE);
 		minViewDistance = Math.max(0.5f, minViewDistance);
 		camera.nearDistance.setValue(minViewDistance);
 		//System.out.println(minViewDistance);
