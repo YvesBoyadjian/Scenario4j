@@ -534,7 +534,8 @@ protected SoBase()
 		    if (myName.operator_not_equal(""))
 		    	removeName(this, myName.getString());
 		    auditors.destructor(); // java port
-		auditors = null;
+		auditors = null; // java port
+		refCount = -999999; // java port
 	}
 	
 	// Internal methods used to maintain the global name dictionary. 

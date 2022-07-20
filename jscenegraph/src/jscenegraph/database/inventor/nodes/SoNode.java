@@ -120,7 +120,7 @@ public abstract class SoNode extends SoFieldContainer {
 	private static long nextAddress;
 
 
-	private final long address;
+	private long address;
 
 	//! Unique id for this node.
 	protected long uniqueId;
@@ -128,84 +128,90 @@ public abstract class SoNode extends SoFieldContainer {
 	//! Next available unique id
 	protected static long nextUniqueId;
 
-    //! Next index into the action method table
-    protected  static int          nextActionMethodIndex;
+	//! Next index into the action method table
+	protected static int nextActionMethodIndex;
 
- 	   private
-		        static SoType       classTypeId;    //!< Type identifier
+	private
+	static SoType classTypeId;    //!< Type identifier
 
-		   	private boolean override; //!< TRUE if node overrides others
+	private boolean override; //!< TRUE if node overrides others
 
-		    public enum NodeType {
-		        INVENTOR     ( 0x0000),
-		        VRML1        ( 0x0001),
-		        VRML2        ( 0x0002),
-		        INVENTOR_1   ( 0x0004),
-		        INVENTOR_2_0 ( 0x0008),
-		        INVENTOR_2_1 ( 0x0010),
-		        INVENTOR_2_5 ( 0x0020),
-		        INVENTOR_2_6 ( 0x0040),
-		        COIN_1_0     ( 0x0080),
-		        COIN_2_0     ( 0x0100),
-		        EXTENSION    ( 0x0200),
-		        COIN_2_2     ( 0x0400),
-		        COIN_2_3     ( 0x0800),
-		        COIN_2_4     ( 0x1000),
-		        INVENTOR_5_0 ( 0x2000),
-		        COIN_2_5     ( 0x4000),
-		        COIN_3_0     ( 0x8000),
-		        INVENTOR_6_0 ( 0x10000),
-		        COIN_4_0     ( 0x20000);
-		        
-		        private int value;
-		        
-		        NodeType(int value) {
-		        	this.value = value;
-		        }
-		        
-		        public int getValue() {
-		        	return value;
-		        }
-		        
-		        public static NodeType fromValue( int value) {
-		        	for(NodeType nt : NodeType.values()) {
-		        		if(nt.getValue() == value) {
-		        			return nt;
-		        		}		        		
-		        	}
-		        	return null;
-		        }
-		      };
+	public enum NodeType {
+		INVENTOR(0x0000),
+		VRML1(0x0001),
+		VRML2(0x0002),
+		INVENTOR_1(0x0004),
+		INVENTOR_2_0(0x0008),
+		INVENTOR_2_1(0x0010),
+		INVENTOR_2_5(0x0020),
+		INVENTOR_2_6(0x0040),
+		COIN_1_0(0x0080),
+		COIN_2_0(0x0100),
+		EXTENSION(0x0200),
+		COIN_2_2(0x0400),
+		COIN_2_3(0x0800),
+		COIN_2_4(0x1000),
+		INVENTOR_5_0(0x2000),
+		COIN_2_5(0x4000),
+		COIN_3_0(0x8000),
+		INVENTOR_6_0(0x10000),
+		COIN_4_0(0x20000);
+
+		private int value;
+
+		NodeType(int value) {
+			this.value = value;
+		}
+
+		public int getValue() {
+			return value;
+		}
+
+		public static NodeType fromValue(int value) {
+			for (NodeType nt : NodeType.values()) {
+				if (nt.getValue() == value) {
+					return nt;
+				}
+			}
+			return null;
+		}
+	}
+
+	;
 
 // defines for node state flags
 
-// we can currently have 31 node types. The last bit is used to store
+	// we can currently have 31 node types. The last bit is used to store
 // the override flag.
-public static final int FLAG_TYPEMASK = 0x7fffffff;
-public static final int FLAG_OVERRIDE = 0x80000000;
+	public static final int FLAG_TYPEMASK = 0x7fffffff;
+	public static final int FLAG_OVERRIDE = 0x80000000;
 
-private int stateflags;		   	
-		   	
+	private int stateflags;
+
 	protected SoNode() {
 
 //		 #ifdef DEBUG
-		   if (! SoDB.isInitialized()) {
-		   SoDebugError.post("SoNode.SoNode",
-		   "Cannot construct nodes before "+
-		   "calling SoDB.init()");
-		   }
+		if (!SoDB.isInitialized()) {
+			SoDebugError.post("SoNode.SoNode",
+					"Cannot construct nodes before " +
+							"calling SoDB.init()");
+		}
 //		  #endif /* DEBUG */
 
-		   override = false;
-		   uniqueId = nextUniqueId++;
+		override = false;
+		uniqueId = nextUniqueId++;
 
-		   address = nextAddress++;
-		 }
+		address = nextAddress++;
+	}
 
-	public long getAddress() { return address;}
+	public long getAddress() {
+		return address;
+	}
 
-    //! Returns type identifier for the SoNode class.
-    public  static SoType       getClassTypeId()        { return new SoType(classTypeId); }
+	//! Returns type identifier for the SoNode class.
+	public static SoType getClassTypeId() {
+		return new SoType(classTypeId);
+	}
 
 
 	@Override
@@ -214,24 +220,26 @@ private int stateflags;
 	}
 
 	// Turns override flag on or off.
-	 ////////////////////////////////////////////////////////////////////////
-	   //
-	   // Description:
-	   //    Turns override flag on or off. Causes notification.
-	   //
-	   // Use: public
+	////////////////////////////////////////////////////////////////////////
+	//
+	// Description:
+	//    Turns override flag on or off. Causes notification.
+	//
+	// Use: public
 
-	  public void
-	   setOverride(boolean state)
-	   //
-	   ////////////////////////////////////////////////////////////////////////
-	   {
-	       override = state;
-	       startNotify();
-	   }
+	public void
+	setOverride(boolean state)
+	//
+	////////////////////////////////////////////////////////////////////////
+	{
+		override = state;
+		startNotify();
+	}
 
-	     //! Returns the state of the override flag.
-	  public     boolean              isOverride()              { return override; }
+	//! Returns the state of the override flag.
+	public boolean isOverride() {
+		return override;
+	}
 
 	/**
 	 * Creates and returns an exact copy of the node.
@@ -245,7 +253,7 @@ private int stateflags;
 	 *
 	 * @return
 	 */
-	  // java port
+	// java port
 	public SoNode copy() {
 		return copy(false);
 	}
@@ -303,37 +311,36 @@ private int stateflags;
 
 // *************************************************************************
 
-/*!
-  Make a duplicate of this node and return a pointer to the duplicate.
+	/*!
+	  Make a duplicate of this node and return a pointer to the duplicate.
 
-  If this node is a group node, children are also copied and we return
-  a pointer to the root of a full copy of the subgraph rooted here.
+	  If this node is a group node, children are also copied and we return
+	  a pointer to the root of a full copy of the subgraph rooted here.
 
-  If \a copyconnections is \c TRUE, we also copy the connections to
-  fields within this node (and ditto for any children and children's
-  children etc.).
+	  If \a copyconnections is \c TRUE, we also copy the connections to
+	  fields within this node (and ditto for any children and children's
+	  children etc.).
 
 
-  Note that this function has been made virtual in Coin, which is not
-  the case in the original Open Inventor API. We may change this
-  method back into being non-virtual again for major Coin versions
-  after this, as it was made virtual more or less by mistake. So
-  please don't write application code that depends on SoNode::copy()
-  being virtual.
+	  Note that this function has been made virtual in Coin, which is not
+	  the case in the original Open Inventor API. We may change this
+	  method back into being non-virtual again for major Coin versions
+	  after this, as it was made virtual more or less by mistake. So
+	  please don't write application code that depends on SoNode::copy()
+	  being virtual.
 
-  The reason this method should not be virtual is because this is \e
-  not the function the application programmer should override in
-  extension nodes if she needs some special behavior during a copy
-  operation (like copying the value of internal data not exposed as
-  fields).
+	  The reason this method should not be virtual is because this is \e
+	  not the function the application programmer should override in
+	  extension nodes if she needs some special behavior during a copy
+	  operation (like copying the value of internal data not exposed as
+	  fields).
 
-  For that purpose, override the copyContents() method. Your
-  overridden copyContents() method should then \e both copy internal
-  data as well as calling the parent superclass' copyContents() method
-  for automatically handling of fields and other common data.
-*/
-	public SoNode copy(boolean copyconnections)
-	{
+	  For that purpose, override the copyContents() method. Your
+	  overridden copyContents() method should then \e both copy internal
+	  data as well as calling the parent superclass' copyContents() method
+	  for automatically handling of fields and other common data.
+	*/
+	public SoNode copy(boolean copyconnections) {
 		// FIXME: "de-virtualize" this method for next major Coin release?
 		// See method documentation above. 20011220 mortene.
 
@@ -343,8 +350,8 @@ private int stateflags;
 		cp.ref();
 		// Call findCopy() to have copyContents() run only once.
 //#if COIN_DEBUG
-		SoNode cp2 = (SoNode )SoFieldContainer.findCopy(this, copyconnections);
-		assert(cp == cp2);
+		SoNode cp2 = (SoNode) SoFieldContainer.findCopy(this, copyconnections);
+		assert (cp == cp2);
 //#else // COIN_DEBUG
 //		(void) SoFieldContainer::findCopy(this, copyconnections);
 //#endif
@@ -357,12 +364,12 @@ private int stateflags;
 	// Initiates notification from an instance.
 	@Override
 	public void startNotify() {
-		  // Update our unique id to indicate that we are a different node.
-		  uniqueId = nextUniqueId;
-		  nextUniqueId++;
+		// Update our unique id to indicate that we are a different node.
+		uniqueId = nextUniqueId;
+		nextUniqueId++;
 
-		  // Let FieldContainer pass notification on to auditors...
-		  super.startNotify();
+		// Let FieldContainer pass notification on to auditors...
+		super.startNotify();
 
 	}
 
@@ -374,34 +381,33 @@ private int stateflags;
 //
 // Use: internal
 
-@Override
-public void
-notify(SoNotList list)
+	@Override
+	public void
+	notify(SoNotList list)
 //
 ////////////////////////////////////////////////////////////////////////
-{
+	{
 //#ifdef DEBUG
-    if (list == null) {
-        SoDebugError.post("SoNode::notify",
-                           "notification list pointer is NULL");
-        return;
-    }
+		if (list == null) {
+			SoDebugError.post("SoNode::notify",
+					"notification list pointer is NULL");
+			return;
+		}
 //#endif /* DEBUG */
 
-    // Do nothing if this node has already been notified by this
-    // current notification. We can tell this by comparing the
-    // notification list's time stamp with the node id.
-    if (list.getTimeStamp() <= uniqueId) {
-		return;
+		// Do nothing if this node has already been notified by this
+		// current notification. We can tell this by comparing the
+		// notification list's time stamp with the node id.
+		if (list.getTimeStamp() <= uniqueId) {
+			return;
+		}
+
+		// Update our unique id to indicate that we are a different node
+		uniqueId = nextUniqueId++;
+
+		// Let FieldContainer do most of the work.
+		super.notify(list);
 	}
-
-    // Update our unique id to indicate that we are a different node
-    uniqueId = nextUniqueId++;
-
-    // Let FieldContainer do most of the work.
-    super.notify(list);
-}
-
 
 
 	// Returns pointer to children, or NULL if none.
@@ -447,14 +453,13 @@ notify(SoNotList list)
   Used internally during copy operations.
 */
 	public SoNode
-	addToCopyDict()
-	{
+	addToCopyDict() {
 //#if COIN_DEBUG && 0 // debug
 //		SoDebugError::postInfo("SoNode::addToCopyDict",
 //			"%s node", this->getTypeId().getName().getString());
 //#endif // debug
 
-		SoNode cp = (SoNode )SoFieldContainer.checkCopy(this);
+		SoNode cp = (SoNode) SoFieldContainer.checkCopy(this);
 		if (cp == null) {
 			// We need to do some extra work when copying nodes that are
 			// ProtoInstance root nodes. We create a new ProtoInstance node,
@@ -463,30 +468,30 @@ notify(SoNotList list)
 			if (inst != null) {
 				SoProto proto = inst.getProtoDefinition();
 				SoProtoInstance newinst = proto.createProtoInstance();
-				if (inst.getName().getLength()!=0) newinst.setName(inst.getName());
+				if (inst.getName().getLength() != 0) newinst.setName(inst.getName());
 				cp = newinst.getRootNode();
-				assert(cp!=null);
+				assert (cp != null);
 				// We have to call addCopy() before calling copyContents() since
 				// the proto instance might have a field that has a pointer to
 				// the root node. pederb, 2002-09-04
-				/*SoFieldContainer::*/super.addCopy(this, cp);
+				/*SoFieldContainer::*/
+				super.addCopy(this, cp);
 				newinst.copyContents(inst, false);
-			}
-			else {
+			} else {
 				if (this.isOfType(SoProto.getClassTypeId())) {
 					// just copy the pointer. A PROTO definition is
 					// read-only. It's not possible to change it after it has been
 					// created so this should be safe.
 					cp = (SoNode) this;
+				} else {
+					cp = (SoNode) this.getTypeId().createInstance();
 				}
-      else {
-					cp = (SoNode)this.getTypeId().createInstance();
-				}
-				assert(cp!=null);
-				/*SoFieldContainer::*/super.addCopy(this, cp);
+				assert (cp != null);
+				/*SoFieldContainer::*/
+				super.addCopy(this, cp);
 
 				SoChildList l = this.getChildren();
-				for (int i=0; l!=null && (i < l.getLength()); i++)
+				for (int i = 0; l != null && (i < l.getLength()); i++)
 					(l).operator_square_bracket(i).addToCopyDict();
 			}
 		}
@@ -504,11 +509,12 @@ notify(SoNotList list)
 	public void copyContents(SoFieldContainer fromFC, boolean copyConnections) {
 		SoNode_copyContents(fromFC, copyConnections);
 	}
+
 	public void SoNode_copyContents(SoFieldContainer fromFC, boolean copyConnections) {
 		// workaround when copying PROTO definitions. A PROTO definition is
 		// read-only, and we just copy the pointer (in
 		// SoNode::addToCopyDict(), not the contents.
-		if (!this.isOfType(SoProto.getClassTypeId())){
+		if (!this.isOfType(SoProto.getClassTypeId())) {
 			// Copy the regular stuff
 			super.copyContents(fromFC, copyConnections);
 
@@ -525,21 +531,21 @@ notify(SoNotList list)
 //
 // Use: internal, virtual
 
-@Override
-public SoFieldContainer
-copyThroughConnection()
+	@Override
+	public SoFieldContainer
+	copyThroughConnection()
 //
 ////////////////////////////////////////////////////////////////////////
-{
-    // If there is already a copy of this node (created during the
-    // first pass of a copy() operation), use it. Otherwise, just use
-    // this node.
-    SoFieldContainer copy = findCopy(this, true);
-    if (copy != null) {
-		return copy;
+	{
+		// If there is already a copy of this node (created during the
+		// first pass of a copy() operation), use it. Otherwise, just use
+		// this node.
+		SoFieldContainer copy = findCopy(this, true);
+		if (copy != null) {
+			return copy;
+		}
+		return this;
 	}
-    return this;
-}
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -550,13 +556,13 @@ copyThroughConnection()
 //
 // Use: public
 
-public static SoNode
-getByName( SbName name)
+	public static SoNode
+	getByName(SbName name)
 //
 ////////////////////////////////////////////////////////////////////////
-{
-    return (SoNode )getNamedBase(name, SoNode.getClassTypeId());
-}
+	{
+		return (SoNode) getNamedBase(name, SoNode.getClassTypeId());
+	}
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -566,290 +572,288 @@ getByName( SbName name)
 //
 // Use: public
 
-public int
-getByName( SbName name, SoNodeList list)
+	public int
+	getByName(SbName name, SoNodeList list)
 //
 ////////////////////////////////////////////////////////////////////////
-{
-    return getNamedBases(name, list, SoNode.getClassTypeId());
-}
-
+	{
+		return getNamedBases(name, list, SoNode.getClassTypeId());
+	}
 
 
 	// Returns the next available unique id.
 	public static long getNextNodeId() {
-		 return nextUniqueId;
+		return nextUniqueId;
 	}
 
-	public static int getActionMethodIndex(SoType t)
-	               { return t.getData(); }
+	public static int getActionMethodIndex(SoType t) {
+		return t.getData();
+	}
 
 
-/*!
-  This function performs the typical operation of a node for any
-  action.
-*/
-public void
-doAction(SoAction action)
-{
-}
+	/*!
+	  This function performs the typical operation of a node for any
+	  action.
+	*/
+	public void
+	doAction(SoAction action) {
+	}
 
-	
-	
-	 ////////////////////////////////////////////////////////////////////////
-	   //
-	   // Description:
-	   //    Returns TRUE if a node has an affect on the state during
-	   //    traversal. The default method returns TRUE. Node classes (such
-	   //    as SoSeparator) that isolate their effects from the rest of the
-	   //    graph override this method to return FALSE.
-	   //
-	   // Use: public
 
-	  public boolean
-	   affectsState()
-	   //
-	   ////////////////////////////////////////////////////////////////////////
-	   {
-	       return true;
-	   }
+	////////////////////////////////////////////////////////////////////////
+	//
+	// Description:
+	//    Returns TRUE if a node has an affect on the state during
+	//    traversal. The default method returns TRUE. Node classes (such
+	//    as SoSeparator) that isolate their effects from the rest of the
+	//    graph override this method to return FALSE.
+	//
+	// Use: public
+
+	public boolean
+	affectsState()
+	//
+	////////////////////////////////////////////////////////////////////////
+	{
+		return true;
+	}
 
 
 	// Initialize ALL Inventor node classes.
 	public static void initClasses() {
 		//TODO
 
-	     // Base class must be initialized first
-		        SoNode.initClass();
+		// Base class must be initialized first
+		SoNode.initClass();
 
-		        // Parent classes must always be initialized before their subclasses
-		        SoCamera.initClass();
-		        SoGroup.initClass();
-		        SoLight.initClass();
-		        SoProfile.initClass();
-		        SoSeparator.initClass();
-		        SoShape.initClass();
-		        SoTransformation.initClass();
-		        SoVertexShape.initClass();
-		        SoIndexedShape.initClass();
-		        SoNonIndexedShape.initClass();
+		// Parent classes must always be initialized before their subclasses
+		SoCamera.initClass();
+		SoGroup.initClass();
+		SoLight.initClass();
+		SoProfile.initClass();
+		SoSeparator.initClass();
+		SoShape.initClass();
+		SoTransformation.initClass();
+		SoVertexShape.initClass();
+		SoIndexedShape.initClass();
+		SoNonIndexedShape.initClass();
 
-		        SoAnnotation.initClass();
-		        SoArray.initClass();
-		        SoAsciiText.initClass();
-		        SoBaseColor.initClass();
-		        SoCallback.initClass();
-		        SoClipPlane.initClass();
+		SoAnnotation.initClass();
+		SoArray.initClass();
+		SoAsciiText.initClass();
+		SoBaseColor.initClass();
+		SoCallback.initClass();
+		SoClipPlane.initClass();
 //		        SoColorIndex.initClass(); doesnt exist anymore
-		        SoComplexity.initClass();
-		        SoCone.initClass();
-		        SoCoordinate3.initClass();
-		        SoCoordinate4.initClass();
-		        SoCube.initClass();
-		       SoCylinder.initClass();
-		       SoDirectionalLight.initClass();
-		       SoDrawStyle.initClass();
-		       SoEnvironment.initClass();
-		       SoEventCallback.initClass();
-		       SoFaceSet.initClass();
-		       SoFile.initClass();
-		       SoFont.initClass();
-		       SoFontStyle.initClass();
-		       SoIndexedFaceSet.initClass();
-		       SoIndexedTriangleSet.initClass();
-		       SoIndexedLineSet.initClass();
+		SoComplexity.initClass();
+		SoCone.initClass();
+		SoCoordinate3.initClass();
+		SoCoordinate4.initClass();
+		SoCube.initClass();
+		SoCylinder.initClass();
+		SoDirectionalLight.initClass();
+		SoDrawStyle.initClass();
+		SoEnvironment.initClass();
+		SoEventCallback.initClass();
+		SoFaceSet.initClass();
+		SoFile.initClass();
+		SoFont.initClass();
+		SoFontStyle.initClass();
+		SoIndexedFaceSet.initClass();
+		SoIndexedTriangleSet.initClass();
+		SoIndexedLineSet.initClass();
 //		       SoIndexedNurbsCurve.initClass();
 //		       SoIndexedNurbsSurface.initClass();
-		       SoIndexedTriangleStripSet.initClass();
-		       SoInfo.initClass();
-		       SoLabel.initClass();
-		       SoLevelOfDetail.initClass();
-		       SoLOD.initClass();
-		       SoLocateHighlight.initClass();
-		       SoLightModel.initClass();
-		       SoLineSet.initClass();
-		       SoLinearProfile.initClass();
-		       SoMaterial.initClass();
-		       SoMaterialBinding.initClass();
-		       SoVertexAttributeBinding.initClass(); // COIN 3D
-		       SoMatrixTransform.initClass();
+		SoIndexedTriangleStripSet.initClass();
+		SoInfo.initClass();
+		SoLabel.initClass();
+		SoLevelOfDetail.initClass();
+		SoLOD.initClass();
+		SoLocateHighlight.initClass();
+		SoLightModel.initClass();
+		SoLineSet.initClass();
+		SoLinearProfile.initClass();
+		SoMaterial.initClass();
+		SoMaterialBinding.initClass();
+		SoVertexAttributeBinding.initClass(); // COIN 3D
+		SoMatrixTransform.initClass();
 //		       SoMultipleCopy.initClass();
-		       SoNormal.initClass();
-		       SoNormalBinding.initClass();
+		SoNormal.initClass();
+		SoNormalBinding.initClass();
 //		       SoNurbsCurve.initClass();
 //		       SoNurbsProfile.initClass();
 //		       SoNurbsSurface.initClass();
-		       SoOrthographicCamera.initClass();
-		       SoPackedColor.initClass();
+		SoOrthographicCamera.initClass();
+		SoPackedColor.initClass();
 //		       SoPathSwitch.initClass();
-		       SoPerspectiveCamera.initClass();
-		       SoPickStyle.initClass();
-		       SoPointLight.initClass();
-		       SoPointSet.initClass();
-		       SoMarkerSet.initClass();
-		       SoProfileCoordinate2.initClass();
-		       SoProfileCoordinate3.initClass();
-		       SoQuadMesh.initClass();
-		       SoResetTransform.initClass();
-		       SoRotation.initClass();
-		       SoRotationXYZ.initClass();
-		       SoScale.initClass();
-		       SoShapeHints.initClass();
-		       SoSphere.initClass();
-		       SoSpotLight.initClass();
-		       SoSwitch.initClass();
-		       SoText2.initClass();
-		       SoText3.initClass();
-		       SoTextureCoordinate2.initClass();
-		       SoTextureCoordinateBinding.initClass();
-		       SoTextureCoordinateFunction.initClass();
-		       SoTextureCoordinateDefault.initClass();
-		       SoTextureCoordinateEnvironment.initClass();
-		       SoTextureCoordinatePlane.initClass();
-		       SoTexture.initClass(); // COIN 3D
-		       SoTexture2.initClass();
-		       SoTexture3.initClass(); // COIN 3D
-		       SoTexture2Transform.initClass();
-		       SoTransform.initClass();
-		       SoTransformSeparator.initClass();
-		       SoTranslation.initClass();
-		       SoTriangleStripSet.initClass();
-		       SoUnits.initClass();
-		       SoUnknownNode.initClass();
-		       SoVertexProperty.initClass();
-		       SoWWWAnchor.initClass();
-		       SoWWWInline.initClass();
+		SoPerspectiveCamera.initClass();
+		SoPickStyle.initClass();
+		SoPointLight.initClass();
+		SoPointSet.initClass();
+		SoMarkerSet.initClass();
+		SoProfileCoordinate2.initClass();
+		SoProfileCoordinate3.initClass();
+		SoQuadMesh.initClass();
+		SoResetTransform.initClass();
+		SoRotation.initClass();
+		SoRotationXYZ.initClass();
+		SoScale.initClass();
+		SoShapeHints.initClass();
+		SoSphere.initClass();
+		SoSpotLight.initClass();
+		SoSwitch.initClass();
+		SoText2.initClass();
+		SoText3.initClass();
+		SoTextureCoordinate2.initClass();
+		SoTextureCoordinateBinding.initClass();
+		SoTextureCoordinateFunction.initClass();
+		SoTextureCoordinateDefault.initClass();
+		SoTextureCoordinateEnvironment.initClass();
+		SoTextureCoordinatePlane.initClass();
+		SoTexture.initClass(); // COIN 3D
+		SoTexture2.initClass();
+		SoTexture3.initClass(); // COIN 3D
+		SoTexture2Transform.initClass();
+		SoTransform.initClass();
+		SoTransformSeparator.initClass();
+		SoTranslation.initClass();
+		SoTriangleStripSet.initClass();
+		SoUnits.initClass();
+		SoUnknownNode.initClass();
+		SoVertexProperty.initClass();
+		SoWWWAnchor.initClass();
+		SoWWWInline.initClass();
 
-		       // Four self-animating nodes. These are subclassed from
-		       // SoSwitch, SoRotation, and SoTranslation
-		       SoBlinker.initClass();
+		// Four self-animating nodes. These are subclassed from
+		// SoSwitch, SoRotation, and SoTranslation
+		SoBlinker.initClass();
 //		       SoPendulum.initClass();
-		       SoRotor.initClass();
-		       SoShuttle.initClass();
+		SoRotor.initClass();
+		SoShuttle.initClass();
 
-		       SoTextureCombine.initClass(); // COIN 3D
-		       
+		SoTextureCombine.initClass(); // COIN 3D
+
 		SoDepthBuffer.initClass(); // COIN 3D
-		
+
 		SoTextureUnit.initClass(); // COIN 3D
-       
-       SoSceneTexture2.initClass(); // COIN 3D
-       
-       SoTransparencyType.initClass(); // COIN 3D
-       
-       SoTextureScalePolicy.initClass(); // COIN 3D
-       
-       SoVertexAttribute.initClass(); // COIN 3D
+
+		SoSceneTexture2.initClass(); // COIN 3D
+
+		SoTransparencyType.initClass(); // COIN 3D
+
+		SoTextureScalePolicy.initClass(); // COIN 3D
+
+		SoVertexAttribute.initClass(); // COIN 3D
 	}
 
-	 ////////////////////////////////////////////////////////////////////////
-	   //
-	   // Description:
-	   //    This initializes the base SoNode class.
-	   //
-	   // Use: internal
+	////////////////////////////////////////////////////////////////////////
+	//
+	// Description:
+	//    This initializes the base SoNode class.
+	//
+	// Use: internal
 
-	  public static void
-	   initClass()
-	   //
-	   ////////////////////////////////////////////////////////////////////////
-	   {
-	       nextActionMethodIndex = 0;
-	       // Allocate a new node type id
-	       // No real parent id
-	       classTypeId = SoType.createType(SoFieldContainer.getClassTypeId(),
-	                                        new SbName("Node"),
-	                                        null,      // Cannot create, abstract
-	                                        (short)nextActionMethodIndex++);
+	public static void
+	initClass()
+	//
+	////////////////////////////////////////////////////////////////////////
+	{
+		nextActionMethodIndex = 0;
+		// Allocate a new node type id
+		// No real parent id
+		classTypeId = SoType.createType(SoFieldContainer.getClassTypeId(),
+				new SbName("Node"),
+				null,      // Cannot create, abstract
+				(short) nextActionMethodIndex++);
 
-	       // Start nodeIds at 10--that way values of 0 through 9 can be used
-	       // for special meanings to attach to nonexistent nodes,
-	       // like "default" or "invalid"
-	       nextUniqueId = 10;
+		// Start nodeIds at 10--that way values of 0 through 9 can be used
+		// for special meanings to attach to nonexistent nodes,
+		// like "default" or "invalid"
+		nextUniqueId = 10;
 
-	       // Add action methods
-	       SoCallbackAction.addMethod(classTypeId, new SoActionMethod() {
-	    	   @Override
+		// Add action methods
+		SoCallbackAction.addMethod(classTypeId, new SoActionMethod() {
+			@Override
 			public void run(SoAction soAction, SoNode soNode) {
-	    		   callbackS(soAction, soNode);
-	    	   }
-	       });
-	       SoGLRenderAction.addMethod(classTypeId, new SoActionMethod() {
-	    	   @Override
+				callbackS(soAction, soNode);
+			}
+		});
+		SoGLRenderAction.addMethod(classTypeId, new SoActionMethod() {
+			@Override
 			public void run(SoAction soAction, SoNode soNode) {
-	    		   GLRenderS(soAction, soNode);
-	    	   }
-	       }            );
-	       SoGetBoundingBoxAction.addMethod(classTypeId, new SoActionMethod() {
-	    	   @Override
+				GLRenderS(soAction, soNode);
+			}
+		});
+		SoGetBoundingBoxAction.addMethod(classTypeId, new SoActionMethod() {
+			@Override
 			public void run(SoAction soAction, SoNode soNode) {
-	    		   getBoundingBoxS(soAction, soNode);
-	    	   }
-	       }      );
-	       SoGetMatrixAction.addMethod(classTypeId, new SoActionMethod() {
-	    	   @Override
+				getBoundingBoxS(soAction, soNode);
+			}
+		});
+		SoGetMatrixAction.addMethod(classTypeId, new SoActionMethod() {
+			@Override
 			public void run(SoAction soAction, SoNode soNode) {
-	    		   getMatrixS(soAction, soNode);
-	    	   }
-	       }           );
-	       SoHandleEventAction.addMethod(classTypeId, new SoActionMethod() {
-	    	   @Override
+				getMatrixS(soAction, soNode);
+			}
+		});
+		SoHandleEventAction.addMethod(classTypeId, new SoActionMethod() {
+			@Override
 			public void run(SoAction soAction, SoNode soNode) {
-	    		   handleEventS(soAction, soNode);
-	    	   }
-	       }         );
-	       SoPickAction.addMethod(classTypeId, new SoActionMethod() {
-	    	   @Override
+				handleEventS(soAction, soNode);
+			}
+		});
+		SoPickAction.addMethod(classTypeId, new SoActionMethod() {
+			@Override
 			public void run(SoAction soAction, SoNode soNode) {
-	    		   pickS(soAction, soNode);
-	    	   }
-	       }                );
-	       SoRayPickAction.addMethod(classTypeId, new SoActionMethod() {
-	    	   @Override
+				pickS(soAction, soNode);
+			}
+		});
+		SoRayPickAction.addMethod(classTypeId, new SoActionMethod() {
+			@Override
 			public void run(SoAction soAction, SoNode soNode) {
-	    		   rayPickS(soAction, soNode);
-	    	   }
-	       }             );
-	       SoSearchAction.addMethod(classTypeId, new SoActionMethod() {
-	    	   @Override
+				rayPickS(soAction, soNode);
+			}
+		});
+		SoSearchAction.addMethod(classTypeId, new SoActionMethod() {
+			@Override
 			public void run(SoAction soAction, SoNode soNode) {
-	    		   searchS(soAction, soNode);
-	    	   }
-	       }              );
-	       SoWriteAction.addMethod(classTypeId, new SoActionMethod() {
-	    	   @Override
+				searchS(soAction, soNode);
+			}
+		});
+		SoWriteAction.addMethod(classTypeId, new SoActionMethod() {
+			@Override
 			public void run(SoAction soAction, SoNode soNode) {
-	    		   writeS(soAction, soNode);
-	    	   }
-	       }               );
-	   }
+				writeS(soAction, soNode);
+			}
+		});
+	}
 
-	     //! These static methods are registered with the database - they
-	       //! simply call the appropriate virtual function
-	  private     static void         callbackS(SoAction action, SoNode node) {
-		     SoCallbackAction a = (SoCallbackAction )action;
+	//! These static methods are registered with the database - they
+	//! simply call the appropriate virtual function
+	private static void callbackS(SoAction action, SoNode node) {
+		SoCallbackAction a = (SoCallbackAction) action;
 
-		          // Pre/post callbacks are automatically handled.  If the callbacks
-		          // set the 'response' flag to stop traversal, handle that also.
+		// Pre/post callbacks are automatically handled.  If the callbacks
+		// set the 'response' flag to stop traversal, handle that also.
 
-		          if (a.hasTerminated()) {
-					return;
-				}
+		if (a.hasTerminated()) {
+			return;
+		}
 
-		          a.setCurrentNode(node);
+		a.setCurrentNode(node);
 
-		          a.invokePreCallbacks(node);
+		a.invokePreCallbacks(node);
 
-		          if (! a.hasTerminated() &&
-		              a.getCurrentResponse() != SoCallbackAction.Response.PRUNE) {
-					node.callback(a);
-				}
+		if (!a.hasTerminated() &&
+				a.getCurrentResponse() != SoCallbackAction.Response.PRUNE) {
+			node.callback(a);
+		}
 
-		          a.invokePostCallbacks(node);
+		a.invokePostCallbacks(node);
 
-	  }
-	  
-// Note that this documentation will also be used for all subclasses
+	}
+
+	// Note that this documentation will also be used for all subclasses
 // which reimplements the method, so keep the doc "generic enough".
 /*!
   Action method for the SoGetPrimitiveCountAction.
@@ -861,49 +865,54 @@ doAction(SoAction action)
   count also overrides this method to change the relevant state
   variables.
 */
-public void
-getPrimitiveCount(SoGetPrimitiveCountAction action)
-{
-}
+	public void
+	getPrimitiveCount(SoGetPrimitiveCountAction action) {
+	}
 
-	  
-	  
-	  private     static void         GLRenderS(SoAction action, SoNode node) {
 
-		     SoGLRenderAction a = (SoGLRenderAction ) action;
+	private static void GLRenderS(SoAction action, SoNode node) {
 
-		          if (! a.abortNow()) {
-					node.GLRender(a);
-				} else {
-		              SoCacheElement.invalidate(action.getState());
-		          }
-		     	  }
-	  private     static void         getBoundingBoxS(SoAction action, SoNode node) {
-		     SoGetBoundingBoxAction a = (SoGetBoundingBoxAction )action;
+		SoGLRenderAction a = (SoGLRenderAction) action;
 
-		          a.checkResetBefore();
-		          node.getBoundingBox(a);
-		          a.checkResetAfter();
+		if (!a.abortNow()) {
+			node.GLRender(a);
+		} else {
+			SoCacheElement.invalidate(action.getState());
+		}
+	}
 
-	  }
-	  private     static void         getMatrixS(SoAction action, SoNode node) {
-		  node.getMatrix((SoGetMatrixAction ) action);
-	  }
-	  private     static void         handleEventS(SoAction action, SoNode node) {
-		  node.handleEvent((SoHandleEventAction ) action);
-	  }
-	  private     static void         pickS(SoAction action, SoNode node) {
-		  node.pick((SoPickAction ) action);
-	  }
-	  public     static void         rayPickS(SoAction action, SoNode node) {
-		     node.rayPick((SoRayPickAction ) action);
-	  }
-	  private     static void         searchS(SoAction action, SoNode node) {
-		  node.search((SoSearchAction ) action);
-	  }
-	  private     static void         writeS(SoAction action, SoNode node) {
-		  // not implemented
-	  }
+	private static void getBoundingBoxS(SoAction action, SoNode node) {
+		SoGetBoundingBoxAction a = (SoGetBoundingBoxAction) action;
+
+		a.checkResetBefore();
+		node.getBoundingBox(a);
+		a.checkResetAfter();
+
+	}
+
+	private static void getMatrixS(SoAction action, SoNode node) {
+		node.getMatrix((SoGetMatrixAction) action);
+	}
+
+	private static void handleEventS(SoAction action, SoNode node) {
+		node.handleEvent((SoHandleEventAction) action);
+	}
+
+	private static void pickS(SoAction action, SoNode node) {
+		node.pick((SoPickAction) action);
+	}
+
+	public static void rayPickS(SoAction action, SoNode node) {
+		node.rayPick((SoRayPickAction) action);
+	}
+
+	private static void searchS(SoAction action, SoNode node) {
+		node.search((SoSearchAction) action);
+	}
+
+	private static void writeS(SoAction action, SoNode node) {
+		// not implemented
+	}
 
 //	  protected static SoType SO__NODE_INIT_ABSTRACT_CLASS(Class className, String classPrintName,
 //			  Class<? extends SoBase> parentClass,
@@ -911,17 +920,17 @@ getPrimitiveCount(SoGetPrimitiveCountAction action)
 //		  return SO__NODE_INIT_CLASS(className,classPrintName,parentClass,parentFieldData,false);
 //	  }
 
-	  protected static void SO__NODE_INIT_ABSTRACT_CLASS(
-			  Class className, String classPrintName,
-			  Class<? extends SoBase> parentClass) {
-		  SoSubNode.SO__NODE_INIT_ABSTRACT_CLASS(className, classPrintName, parentClass);
-	  }
+	protected static void SO__NODE_INIT_ABSTRACT_CLASS(
+			Class className, String classPrintName,
+			Class<? extends SoBase> parentClass) {
+		SoSubNode.SO__NODE_INIT_ABSTRACT_CLASS(className, classPrintName, parentClass);
+	}
 
-	  protected static void SO__NODE_INIT_CLASS(
-			  Class className, String classPrintName,
-			  Class<? extends SoBase> parentClass) {
-		  SoSubNode.SO__NODE_INIT_CLASS(className, classPrintName, parentClass);
-	  }
+	protected static void SO__NODE_INIT_CLASS(
+			Class className, String classPrintName,
+			Class<? extends SoBase> parentClass) {
+		SoSubNode.SO__NODE_INIT_CLASS(className, classPrintName, parentClass);
+	}
 
 //	  protected static SoType SO__NODE_INIT_CLASS(
 //			  Class className, String classPrintName,
@@ -1001,12 +1010,12 @@ getPrimitiveCount(SoGetPrimitiveCountAction action)
 //				}
 //	  }
 
-	  protected static void SO_ENABLE(Class<? extends SoAction> actionClass, Class<? extends SoElement> elementClass) {
+	protected static void SO_ENABLE(Class<? extends SoAction> actionClass, Class<? extends SoElement> elementClass) {
 
-		  Class<?>[] parameterTypes = new Class<?>[1];
-		  parameterTypes[0] = Class.class;
+		Class<?>[] parameterTypes = new Class<?>[1];
+		parameterTypes[0] = Class.class;
 
-		  try {
+		try {
 			Method enableElement = actionClass.getMethod("enableElement", parameterTypes);
 			enableElement.invoke(actionClass, elementClass);
 		} catch (SecurityException e) {
@@ -1020,66 +1029,68 @@ getPrimitiveCount(SoGetPrimitiveCountAction action)
 		} catch (InvocationTargetException e) {
 			throw new IllegalStateException(e);
 		}
-	  }
+	}
 
-	   public
-		        //! This is used by the field-inheritence mechanism, hidden in
-		        //! the SoSubNode macros
-		        static SoFieldData[] getFieldDataPtr() { return null; }
+	public
+	//! This is used by the field-inheritence mechanism, hidden in
+	//! the SoSubNode macros
+	static SoFieldData[] getFieldDataPtr() {
+		return null;
+	}
 
-	   ////////////////////////////////////////////////////////////////////////
-	    //
-	    // Description:
-	    //    Implements search action for most nodes.
-	    //
-	    // Use: extender
-	   public void
-	    search(SoSearchAction action) {
-		   SoNode_search(action);
-	   }
+	////////////////////////////////////////////////////////////////////////
+	//
+	// Description:
+	//    Implements search action for most nodes.
+	//
+	// Use: extender
+	public void
+	search(SoSearchAction action) {
+		SoNode_search(action);
+	}
 
-	   public final void
-	    SoNode_search(SoSearchAction action)
-	    //
-	    ////////////////////////////////////////////////////////////////////////
-	    {
-	        int         lookingFor = action.getFind();
-	        boolean      foundMe = true;
+	public final void
+	SoNode_search(SoSearchAction action)
+	//
+	////////////////////////////////////////////////////////////////////////
+	{
+		int lookingFor = action.getFind();
+		boolean foundMe = true;
 
-	        // We have to match everything set by the search action.
-	        // First, see if node doesn't match:
-	        if (((lookingFor & SoSearchAction.LookFor.NODE.getValue())!= 0) && action.getNode() != this) {
+		// We have to match everything set by the search action.
+		// First, see if node doesn't match:
+		if (((lookingFor & SoSearchAction.LookFor.NODE.getValue()) != 0) && action.getNode() != this) {
+			foundMe = false;
+		}
+
+		// Next, see if the name doesn't match:
+		if (((lookingFor & SoSearchAction.LookFor.NAME.getValue()) != 0) &&
+				action.getName().operator_not_equal(this.getName())) {
+			foundMe = false;
+		}
+
+		// Finally, figure out if types match:
+		if ((lookingFor & SoSearchAction.LookFor.TYPE.getValue()) != 0) {
+			final boolean[] derivedOk = new boolean[1];
+			SoType t = action.getType(derivedOk);
+			if (!(derivedOk[0] ? isOfType(t) : getTypeId().operator_equal_equal(t))) {
 				foundMe = false;
 			}
+		}
 
-	        // Next, see if the name doesn't match:
-	        if (((lookingFor & SoSearchAction.LookFor.NAME.getValue()) != 0) &&
-	            action.getName().operator_not_equal(this.getName())) {
-				foundMe = false;
-			}
+		if (foundMe) {
+			// We have a match! Add it to the action.
 
-	        // Finally, figure out if types match:
-	        if ((lookingFor & SoSearchAction.LookFor.TYPE.getValue()) != 0) {
-	            final boolean[]     derivedOk = new boolean[1];
-	            SoType  t = action.getType(derivedOk);
-	            if (! (derivedOk[0] ? isOfType(t) : getTypeId().operator_equal_equal(t))) {
-					foundMe = false;
+			if (action.getInterest() == SoSearchAction.Interest.ALL) {
+				action.getPaths().append(action.getCurPath().copy());
+			} else {
+				action.addPath(action.getCurPath().copy());
+				if (action.getInterest() == SoSearchAction.Interest.FIRST) {
+					action.setFound();
 				}
-	        }
-
-	        if (foundMe) {
-	            // We have a match! Add it to the action.
-
-	            if (action.getInterest() == SoSearchAction.Interest.ALL) {
-					action.getPaths().append(action.getCurPath().copy());
-				} else {
-	                action.addPath(action.getCurPath().copy());
-	                if (action.getInterest() == SoSearchAction.Interest.FIRST) {
-						action.setFound();
-					}
-	            }
-	        }
-	    }
+			}
+		}
+	}
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -1088,12 +1099,12 @@ getPrimitiveCount(SoGetPrimitiveCountAction action)
 //
 // Use: extender
 
-public void
-grabEventsSetup()
+	public void
+	grabEventsSetup()
 //
 ////////////////////////////////////////////////////////////////////////
-{
-}
+	{
+	}
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -1102,169 +1113,158 @@ grabEventsSetup()
 //
 // Use: extender
 
-public void
-grabEventsCleanup()
+	public void
+	grabEventsCleanup()
 //
 ////////////////////////////////////////////////////////////////////////
-{
-}
+	{
+	}
 
 
-
-	   public void
-	    callback(SoCallbackAction action)
-	    {
+	public void
+	callback(SoCallbackAction action) {
 //	    #ifdef DEBUG_DEFAULT_METHODS
 //	        SoDebugInfo::post("SoNode::callback",
 //	                          "Called for %s", getTypeId().getName().getString());
 //	    #endif /* DEBUG_DEFAULT_METHODS */
-	    }
+	}
 
-	   public void
-	   GLRender(SoGLRenderAction action)
-	    {
+	public void
+	GLRender(SoGLRenderAction action) {
 //	    #ifdef DEBUG_DEFAULT_METHODS
 //	        SoDebugInfo::post("SoNode::GLRender",
 //	                          "Called for %s", getTypeId().getName().getString());
 //	    #endif /* DEBUG_DEFAULT_METHODS */
-	    }
+	}
 
 
-public void
-GLRenderBelowPath(SoGLRenderAction action)
-{
-    GLRender(action);
-}
+	public void
+	GLRenderBelowPath(SoGLRenderAction action) {
+		GLRender(action);
+	}
 
-public void
-GLRenderInPath(SoGLRenderAction action)
-{
-    GLRender(action);
-}
+	public void
+	GLRenderInPath(SoGLRenderAction action) {
+		GLRender(action);
+	}
 
-public void
-GLRenderOffPath(SoGLRenderAction action)
-{
-    GLRender(action);
-}
+	public void
+	GLRenderOffPath(SoGLRenderAction action) {
+		GLRender(action);
+	}
 
 
+	//! Returns the unique id for a node
+	public long getNodeId() {
+		return uniqueId;
+	}
 
-	     //! Returns the unique id for a node
-	   public long getNodeId()        { return uniqueId; }
-
-	   public void
-	    getBoundingBox(SoGetBoundingBoxAction action)
-	    {
+	public void
+	getBoundingBox(SoGetBoundingBoxAction action) {
 //	    #ifdef DEBUG_DEFAULT_METHODS
 //	        SoDebugInfo::post("SoNode::getBoundingBox",
 //	                          "Called for %s", getTypeId().getName().getString());
 //	    #endif /* DEBUG_DEFAULT_METHODS */
-	    }
+	}
 
-	   protected void
-	    getMatrix(SoGetMatrixAction action)
-	    {
+	protected void
+	getMatrix(SoGetMatrixAction action) {
 //	    #ifdef DEBUG_DEFAULT_METHODS
 //	        SoDebugInfo::post("SoNode::getMatrix",
 //	                          "Called for %s", getTypeId().getName().getString());
 //	    #endif /* DEBUG_DEFAULT_METHODS */
-	    }
+	}
 
 
-	   protected void
-	    handleEvent(SoHandleEventAction action)
-	    {
+	protected void
+	handleEvent(SoHandleEventAction action) {
 //	    #ifdef DEBUG_DEFAULT_METHODS
 //	       SoDebugInfo::post("SoNode::handleEvent",
 //	                          "Called for %s", getTypeId().getName().getString());
 //	    #endif /* DEBUG_DEFAULT_METHODS */
-	    }
+	}
 
-	   protected void
-	    pick(SoPickAction action)
-	    {
+	protected void
+	pick(SoPickAction action) {
 //	    #ifdef DEBUG_DEFAULT_METHODS
 //	        SoDebugInfo::post("SoNode::pick",
 //	                          "Called for %s", getTypeId().getName().getString());
 //	    #endif /* DEBUG_DEFAULT_METHODS */
-	    }
+	}
 
-	    protected void
-	    rayPick(SoRayPickAction action)
-	    {
-	        // If the node doesn't have a specific rayPick() method, it may
-	        // have a more general pick() method for any pick action.
-	        pick(action);
-	    }
-	    
-// clear bits in stateflags
-private void clearStateFlags(final int bits)
-{
-  this.stateflags &= ~bits;
-}
+	protected void
+	rayPick(SoRayPickAction action) {
+		// If the node doesn't have a specific rayPick() method, it may
+		// have a more general pick() method for any pick action.
+		pick(action);
+	}
 
-// sets bits in stateflags
-private void setStateFlags(final int bits)
-{
-  this.stateflags |= bits;
-}
+	// clear bits in stateflags
+	private void clearStateFlags(final int bits) {
+		this.stateflags &= ~bits;
+	}
 
-	    
+	// sets bits in stateflags
+	private void setStateFlags(final int bits) {
+		this.stateflags |= bits;
+	}
 
-/*!
-  Sets the node type for this node to \a type. Since some nodes
-  should be handled differently in VRML1 vs. Inventor, this
-  should be used to get correct behavior for those cases.
-  The default node type is INVENTOR.
 
-  This method is an extension versus the Open Inventor API.
+	/*!
+	  Sets the node type for this node to \a type. Since some nodes
+	  should be handled differently in VRML1 vs. Inventor, this
+	  should be used to get correct behavior for those cases.
+	  The default node type is INVENTOR.
 
-  \sa getNodeType()
-*/
-public void setNodeType(final NodeType type)
-{
-  // make sure we have enogh bits to store this type
-  assert((int) type.getValue() <= FLAG_TYPEMASK);
-  // clear old type
-  this.clearStateFlags(FLAG_TYPEMASK);
-  // set new type
-  this.setStateFlags((int) type.getValue());
-}
+	  This method is an extension versus the Open Inventor API.
 
-	    
-	    /*!
-	    Returns the node type set for this node.
+	  \sa getNodeType()
+	*/
+	public void setNodeType(final NodeType type) {
+		// make sure we have enogh bits to store this type
+		assert ((int) type.getValue() <= FLAG_TYPEMASK);
+		// clear old type
+		this.clearStateFlags(FLAG_TYPEMASK);
+		// set new type
+		this.setStateFlags((int) type.getValue());
+	}
 
-	    This method is an extension versus the Open Inventor API.
 
-	    \sa setNodeType()
-	  */
-	  public SoNode.NodeType
-	  getNodeType() 
-	  {
-	    int type = this.stateflags & FLAG_TYPEMASK;
-	    return NodeType.fromValue(type);
-	  }
+	/*!
+	Returns the node type set for this node.
+
+	This method is an extension versus the Open Inventor API.
+
+	\sa setNodeType()
+  */
+	public SoNode.NodeType
+	getNodeType() {
+		int type = this.stateflags & FLAG_TYPEMASK;
+		return NodeType.fromValue(type);
+	}
 
 
 	// Doc in super.
 	public boolean
-	readInstance(SoInput in, short flags)
-	{
-		return SoNode_readInstance(in,flags);
+	readInstance(SoInput in, short flags) {
+		return SoNode_readInstance(in, flags);
 	}
-	
-	  public boolean SoNode_readInstance(SoInput in,
-              short flags)
-{
-  // Overridden to set node type.
 
-  boolean ret = super.readInstance(in, flags);
-  if (ret) {
-    if (in.isFileVRML1()) this.setNodeType(SoNode.NodeType.VRML1);
-    else if (in.isFileVRML2()) this.setNodeType(SoNode.NodeType.VRML2);
-  }
-  return ret;
-}
+	public boolean SoNode_readInstance(SoInput in,
+									   short flags) {
+		// Overridden to set node type.
+
+		boolean ret = super.readInstance(in, flags);
+		if (ret) {
+			if (in.isFileVRML1()) this.setNodeType(SoNode.NodeType.VRML1);
+			else if (in.isFileVRML2()) this.setNodeType(SoNode.NodeType.VRML2);
+		}
+		return ret;
+	}
+
+	public void destructor() {
+		address = -999999; // java port
+		uniqueId = -999999; // java port
+		super.destructor();
+	}
 }
