@@ -1067,40 +1067,44 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 			targetsSeparator.addChild(targetTexture);
 		
 			final float[] vector = new float[3];
-		
-			final SbVec3f targetPosition = new SbVec3f();
 
 			final int nbTargets = targetFamily.getNbTargets();
 
 			for (int index = 0; index < nbTargets; index++) {
 				int instance = targetFamily.getInstance(index);
-				SoTarget targetSeparator = new SoTarget(instance);
-				//sealSeparator.renderCaching.setValue(SoSeparator.CacheEnabled.OFF);
 
-				SoTranslation targetTranslation = new SoTranslation();
-				targetTranslation.enableNotify(false); // Will change often
-
+				final SbVec3f targetPosition = new SbVec3f();
 				targetPosition.setValue(targetFamily.getTarget(index, vector));
 				targetPosition.setZ(targetPosition.getZ() + 0.3f);
 
-				targetTranslation.translation.setValue(targetPosition);
+				targetsSeparator.addMember(targetPosition,instance);
 
-				targetSeparator.addChild(targetTranslation);
+				//SoTarget targetSeparator = new SoTarget(instance);
+				//sealSeparator.renderCaching.setValue(SoSeparator.CacheEnabled.OFF);
 
-				SoVRMLBillboard billboard = new SoVRMLBillboard();
+				//SoTranslation targetTranslation = new SoTranslation();
+				//targetTranslation.enableNotify(false); // Will change often
+
+
+				//targetTranslation.translation.setValue(targetPosition);
+
+				//targetSeparator.addChild(targetTranslation);
+
+				//SoVRMLBillboard billboard = new SoVRMLBillboard();
 				//billboard.axisOfRotation.setValue(0, 1, 0);
 
-				SoCube targetCube = new SoCube();
-				targetCube.height.setValue(targetFamily.getSize());
-				targetCube.width.setValue(targetFamily.getRatio() * targetCube.height.getValue());
-				targetCube.depth.setValue(0.1f);
+				//SoCube targetCube = new SoCube();
+				//targetCube.height.setValue(targetFamily.getSize());
+				//targetCube.width.setValue(targetFamily.getRatio() * targetCube.height.getValue());
+				//targetCube.depth.setValue(0.1f);
 
-				billboard.addChild(targetCube);
+				//billboard.addChild(targetCube);
 
-				targetSeparator.addChild(billboard);
+				//targetSeparator.addChild(billboard);
 
-				targetsSeparator.addChild(targetSeparator);
+				//targetsSeparator.addChild(targetSeparator);
 			}
+
 			targetsGroup.addChild(targetsSeparator);
 		}
 		shadowGroup.addChild(targetsGroup);
@@ -2435,25 +2439,30 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 
 	public void loadShots(Properties saveGameProperties) {
 		int i=0;
-		String keyIndex = "targetShotIndex";
-		String keyInstance = "targetShotInstance";
+		final String keyIndex = "targetShotIndex";
+		final String keyInstance = "targetShotInstance";
 		while(saveGameProperties.containsKey(keyIndex+i)) {
 			int index = Integer.valueOf(saveGameProperties.getProperty(keyIndex+i));
 			int instance = Integer.valueOf(saveGameProperties.getProperty(keyInstance+i));
 
 			SoTargets targetsNode = (SoTargets) targetsGroup.getChild(index);
+			Target targetFamily = targetsNode.getTarget();
+			targetFamily.setShot(instance);
 
 			SoTarget target = targetsNode.getTargetChildFromInstance(instance);
 
-			SoVRMLBillboard billboard = (SoVRMLBillboard) target.getChild(1);
+			if (target != null) {
 
-			SoMaterial c = new SoMaterial();
-			c.diffuseColor.setValue(1, 0, 0);
-			//billboard.enableNotify(false);
-			billboard.insertChild(c, 0);
-			//billboard.enableNotify(true);
+				SoVRMLBillboard billboard = (SoVRMLBillboard) target.getChild(1);
 
-			targetFamilies.get(index).setGroup(billboard,instance);
+				SoMaterial c = new SoMaterial();
+				c.diffuseColor.setValue(1, 0, 0);
+				//billboard.enableNotify(false);
+				billboard.insertChild(c, 0);
+				//billboard.enableNotify(true);
+
+				targetFamilies.get(index).setGroup(billboard, instance);
+			}
 			shootTarget(targetFamilies.get(index),instance);
 			i++;
 		}

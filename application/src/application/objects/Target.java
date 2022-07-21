@@ -30,4 +30,11 @@ public interface Target {
     SoTargets getGraphicObject();
 
     void setGraphicObject(SoTargets graphicObject);
+
+    /*
+    returns true if new shot
+     */
+    boolean setShot(int instance);
+
+    boolean isShot(int instance);
 }

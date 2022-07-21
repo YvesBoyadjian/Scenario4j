@@ -215,7 +215,7 @@ public		    final SoSFFloat           depth = new SoSFFloat();
 	  
   }
 	
-  private final CacheState _cache = new CacheState();
+  private CacheState _cache = new CacheState();
 
   private boolean cacheDirty = true;
   private int lastColor;
@@ -1245,6 +1245,12 @@ getPrimitiveCount(SoGetPrimitiveCountAction action)
   if (!this.shouldPrimitiveCount(action)) return;
 
   action.addNumTriangles(12);
+}
+
+public void destructor() {
+        _cache.destructor();
+        _cache = null;
+        super.destructor();
 }
 
 ////////////////////////////////////////////////////////////////////////

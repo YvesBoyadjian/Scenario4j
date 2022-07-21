@@ -108,6 +108,7 @@ public class BootsFamily extends CollectibleBase implements Collectible {
                 nbBootPairs++;
             }
         }
+        System.out.println("Boot pairs: "+nbBootPairs);
     }
 
     public float[] getCollectible(int sealIndex, float[] vector) {

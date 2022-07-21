@@ -257,7 +257,7 @@ public abstract class SoShape extends SoNode implements Destroyable {
     };
 
     //! Helper struct used by primitive types like cube, sphere, ...
-    public class SimpleVertexArrayCache {
+    public class SimpleVertexArrayCache implements Destroyable {
       public SimpleVertexArrayCache() {
     	  numVertices = 0;
     	  useTexCoords = false;
@@ -389,6 +389,11 @@ public abstract class SoShape extends SoNode implements Destroyable {
       public boolean useTexCoords;
       public boolean useNormals;
       public boolean useColors;
+
+        @Override
+        public void destructor() {
+            vbo.destructor();
+        }
     };
 
     

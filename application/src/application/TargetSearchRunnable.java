@@ -71,7 +71,10 @@ public class TargetSearchRunnable implements Runnable {
 										Target t = targets.getTarget();
 										SoTarget targetNode = (SoTarget) pat.getNode(len-3);
 
-										if(!main.isShot(t,targetNode.getInstance())) {
+										final int instance = targetNode.getInstance();
+										if(!main.isShot(t,instance)) {
+											Target targetFamily = targets.getTarget();
+											targetFamily.setShot(instance);
 
 											SoMaterial c = new SoMaterial();
 											c.diffuseColor.setValue(1, 0, 0);

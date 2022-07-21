@@ -24,13 +24,10 @@ public class SoCollectibles extends SoSeparator {
     private SbVec3f cameraDirection;
 
     private final SbBSPTree bspTree = new SbBSPTree();
-
     private final SbSphere nearSphere = new SbSphere();
-
     private final SbListInt nearIDS = new SbListInt();
 
     private final Set<Integer> actualChildren = new HashSet<>();
-
     private final Set<Integer> nearChildren = new HashSet<>();
 
     private final Map<Integer,SoCollectible> idxToCollectibles = new HashMap<>();
