@@ -4,6 +4,7 @@ import application.nodes.SoCollectibles;
 import application.scenegraph.SceneGraphIndexedFaceSetShader;
 import jscenegraph.database.inventor.SbBox3f;
 import jscenegraph.database.inventor.SbVec3f;
+import jscenegraph.database.inventor.engines.SoElapsedTime;
 import jscenegraph.database.inventor.fields.SoMFVec3f;
 import jscenegraph.database.inventor.nodes.*;
 
@@ -40,6 +41,16 @@ public class BootsFamily extends CollectibleBase implements Collectible {
         }
 
         node.ref(); // To avoid destruction
+
+        SoRotationXYZ rotXYZ = new SoRotationXYZ();
+
+        rotXYZ.axis.setValue(SoRotationXYZ.Axis.Z);
+
+        SoElapsedTime elapsedTime = new SoElapsedTime();
+
+        rotXYZ.angle.connectFrom(elapsedTime.timeOut);
+
+        node.addChild(rotXYZ);
 
         SoRotation rot = new SoRotation();
 
@@ -119,7 +130,7 @@ public class BootsFamily extends CollectibleBase implements Collectible {
 
     @Override
     public float getViewDistance() {
-        return 100;
+        return 75;
     }
 
     float getRandomX(Random randomPlacementTrees) {
