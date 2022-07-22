@@ -304,6 +304,8 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 
 	boolean wasDisplayingTrailDistance;
 
+	boolean haveBoots;
+
 	public SceneGraphIndexedFaceSetShader(
 			Raster rw,
 			Raster re,
@@ -2428,13 +2430,27 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 
 		shotTargets.add(t.targetName());
 
-		String[] targets = new String[shotTargets.size()];
+		updateTargetDisplay();
+	}
+
+	private void updateTargetDisplay() {
+
+		int shotTargetSize = shotTargets.size();
+		if (haveBoots) {
+			shotTargetSize++;
+		}
+
+		String[] targets = new String[shotTargetSize];
 		int i=0;
 		for(String name : shotTargets) {
 			targets[i] = name;
 			i++;
 		}
+		if(haveBoots) {
+			targets[i] = "Boots";
+		}
 		targetDisplay.string.setValues(0,targets);
+		targetDisplay.string.setNum(shotTargetSize);
 	}
 
 	public void loadShots(Properties saveGameProperties) {
@@ -2777,7 +2793,7 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 		shotTargetsInstances.clear();
 		shotTargets.clear();
 
-		targetDisplay.string.setNum(0);
+		updateTargetDisplay();
 	}
 
 	public float getDistanceFromOracle() {
@@ -2927,6 +2943,14 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 		minViewDistance = Math.max(0.5f, minViewDistance);
 		camera.nearDistance.setValue(minViewDistance);
 		//System.out.println(minViewDistance);
+
+		if (nearest < 1.3) {
+			setBoots(true);
+		}
+	}
+
+	public boolean haveBoots() {
+		return haveBoots;
 	}
 
 	private double currentPos = 0;
@@ -2961,5 +2985,11 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 //				transl.translation.setValue(vector);
 //			}
 //		}
+	}
+
+	public void setBoots(boolean boots) {
+		haveBoots = boots;
+
+		updateTargetDisplay();
 	}
 }

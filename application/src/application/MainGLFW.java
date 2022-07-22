@@ -144,6 +144,8 @@ public class MainGLFW {
 
 	public static final String DISPLAY_FPS = "display_fps";
 
+	public static final String BOOTS = "boots";
+
 	public static SbVec3f SCENE_POSITION;
 
 	public static final SbColor SKY_BLUE = new SbColor(0.53f, 0.81f, 0.92f);
@@ -430,6 +432,8 @@ public class MainGLFW {
 						saveGameProperties.setProperty(ALLOW_FLY, isAllowingFly() ? "true" : "false" );
 
 						saveGameProperties.setProperty(QUEST_INDEX, String.valueOf(scenario.getCurrentQuestIndex()));
+
+						saveGameProperties.setProperty(BOOTS, sg.haveBoots() ? "true" : "false");
 
 						sg.saveShots(saveGameProperties);
 					}
@@ -765,6 +769,8 @@ public class MainGLFW {
 				sg.loadShots(saveGameProperties);
 
 				loadingQuestIndex = Integer.valueOf(saveGameProperties.getProperty(QUEST_INDEX,"0"));
+
+				sg.setBoots("true".equals(saveGameProperties.getProperty(BOOTS,"false")));
 
 				in.close();
 			} catch (FileNotFoundException e) {

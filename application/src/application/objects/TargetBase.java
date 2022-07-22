@@ -17,7 +17,9 @@ public class TargetBase {
 
     public void resurrect(int instance) {
         SoGroup group = groups.get(instance);
-        group.removeChild(0);
+        if (group != null) {
+            group.removeChild(0);
+        }
         shotInstances.remove(instance);
     }
 
