@@ -61,6 +61,16 @@
       <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/lwjgl/lwjgl-opengl/3.3.0-SNAPSHOT/lwjgl-opengl-3.3.0-20211020.190020-13.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/lwjgl/lwjgl-vulkan/3.3.0-SNAPSHOT/lwjgl-vulkan-3.3.0-20210325.222416-6.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$PROJECT_DIR$/gdx/lib/gdx-1.9.11.jar" path-in-jar="/" />
+      <element id="module-output" name="jgltf-obj" />
+      <element id="module-output" name="jgltf-model" />
+      <element id="module-output" name="jgltf-model-builder" />
+      <element id="module-output" name="jgltf-impl-v1" />
+      <element id="module-output" name="jgltf-impl-v2" />
+      <element id="module-output" name="jgltf-impl-v2-technique-webgl" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/com/fasterxml/jackson/core/jackson-annotations/2.13.1/jackson-annotations-2.13.1.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/com/fasterxml/jackson/core/jackson-core/2.13.1/jackson-core-2.13.1.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/com/fasterxml/jackson/core/jackson-databind/2.13.1/jackson-databind-2.13.1.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/de/javagl/obj/0.3.0/obj-0.3.0.jar" path-in-jar="/" />
     </root>
   </artifact>
 </component>
