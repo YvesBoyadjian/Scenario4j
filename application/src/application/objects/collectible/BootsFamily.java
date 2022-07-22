@@ -26,7 +26,11 @@ public class BootsFamily extends CollectibleBase implements Collectible {
 
     SoSeparator node = new SoSeparator();
 
+    SoElapsedTime elapsedTime = new SoElapsedTime();
+
     public String filePath = "ressource/hi-tec_mountain_boots_high_poly.zip";
+
+    private boolean spin = true;
 
     public BootsFamily(SceneGraphIndexedFaceSetShader sg, int seed) {
         this.sg = sg;
@@ -45,8 +49,6 @@ public class BootsFamily extends CollectibleBase implements Collectible {
         SoRotationXYZ rotXYZ = new SoRotationXYZ();
 
         rotXYZ.axis.setValue(SoRotationXYZ.Axis.Z);
-
-        SoElapsedTime elapsedTime = new SoElapsedTime();
 
         rotXYZ.angle.connectFrom(elapsedTime.timeOut);
 
@@ -146,5 +148,10 @@ public class BootsFamily extends CollectibleBase implements Collectible {
         float yMin = sceneBox.getBounds()[1];
         float yMax = sceneBox.getBounds()[4];
         return yMin + (yMax - yMin) * randomPlacementTrees.nextFloat();
+    }
+
+    public void setSpin(boolean b) {
+        spin = b;
+        elapsedTime.on.setValue(spin);
     }
 }

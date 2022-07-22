@@ -16,6 +16,7 @@ import java.util.stream.Stream;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 
+import application.MainGLFW;
 import application.nodes.*;
 import application.objects.Target;
 import application.objects.collectible.BootsFamily;
@@ -306,7 +307,9 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 
 	boolean haveBoots;
 
-	public SceneGraphIndexedFaceSetShader(
+    BootsFamily boots;
+
+    public SceneGraphIndexedFaceSetShader(
 			Raster rw,
 			Raster re,
 			int overlap,
@@ -1115,7 +1118,8 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 
 		// ___________________________________________________ Collectibles
 
-		Collectible boots = new BootsFamily(this, 57);
+		boots = new BootsFamily(this, 57);
+		boots.setSpin(!haveBoots);
 		collectibleFamilies.add(boots);
 
 		for( Collectible collectibleFamily : collectibleFamilies) {
@@ -2924,8 +2928,9 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 		this.searchForSea = searchForSea;
 	}
 
-	public void displayTemporaryMessage(String message, float durationSeconds) {
-		temporaryMessageDisplay.string.setValue(message);
+	public void displayTemporaryMessage(String[] message, float durationSeconds) {
+		temporaryMessageDisplay.string.setValues(0,message);
+		temporaryMessageDisplay.string.setNum(message.length);
 		temporaryMessageStopNanoTime = (long)(System.nanoTime() + durationSeconds*1.0e9);
 	}
 
@@ -2945,13 +2950,22 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 		//System.out.println(minViewDistance);
 
 		if (nearest < 1.3) {
-			setBoots(true);
+			if (setBoots(true)) {
+				String[] message = new String[2];
+				message[0] = "Got the boots !";
+				message[1] = "Now you can climb more easily";
+                displayTemporaryMessage(message,10.0f);
+            }
 		}
 	}
 
 	public boolean haveBoots() {
 		return haveBoots;
 	}
+
+    public float getMU() {
+        return haveBoots ? CONTACT_SURFACE_MU_BOOTS : CONTACT_SURFACE_MU_BAREFOOT;
+    }
 
 	private double currentPos = 0;
 	private double currentSpeed = 1;
@@ -2987,9 +3001,18 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 //		}
 	}
 
-	public void setBoots(boolean boots) {
-		haveBoots = boots;
-
-		updateTargetDisplay();
+    /**
+     *
+     * @param boots
+     * @return true if change
+     */
+	public boolean setBoots(boolean bootsFlag) {
+        if (bootsFlag != haveBoots) {
+            haveBoots = bootsFlag;
+            updateTargetDisplay();
+            boots.setSpin(!haveBoots);
+            return true;
+        }
+        return false;
 	}
 }

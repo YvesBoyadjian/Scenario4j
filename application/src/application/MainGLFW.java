@@ -1,5 +1,5 @@
 /**
- * 
+ * Mount Rainier Island, an adventure game
  */
 package application;
 
@@ -101,6 +101,12 @@ import static org.lwjgl.opengl.GL43C.*;
  *
  */
 public class MainGLFW {
+
+	public static final float CONTACT_SURFACE_MU_DEFAULT = 0.838f; // Original value in game
+
+	public static final float CONTACT_SURFACE_MU_BAREFOOT = 0.75f;
+
+	public static final float CONTACT_SURFACE_MU_BOOTS = 0.85f;
 
 	public static final float MINIMUM_VIEW_DISTANCE = 2.5f;//1.0f;
 
@@ -1148,7 +1154,7 @@ public class MainGLFW {
 							OdeConstants.dContactSlip1 | OdeConstants.dContactSlip2;
 
 					//contact.surface.bounce = 0.1;
-					contact.surface.mu = 0.838;//((double[]) data)[0];//0.8;//50.0;
+					contact.surface.mu = sg.getMU();//0.838;//((double[]) data)[0];//0.8;//50.0;
 					contact.surface.slip1 = 0;//.1;
 					contact.surface.slip2 = 0;//.1;
 					contact.surface.soft_erp = 0.96;

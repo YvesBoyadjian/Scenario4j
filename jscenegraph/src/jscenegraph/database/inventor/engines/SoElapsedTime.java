@@ -61,11 +61,7 @@ import jscenegraph.database.inventor.SbName;
 import jscenegraph.database.inventor.SbTime;
 import jscenegraph.database.inventor.SoDB;
 import jscenegraph.database.inventor.SoType;
-import jscenegraph.database.inventor.fields.SoFieldData;
-import jscenegraph.database.inventor.fields.SoSFBool;
-import jscenegraph.database.inventor.fields.SoSFFloat;
-import jscenegraph.database.inventor.fields.SoSFTime;
-import jscenegraph.database.inventor.fields.SoSFTrigger;
+import jscenegraph.database.inventor.fields.*;
 
 /**
  * @author Yves Boyadjian
@@ -186,33 +182,17 @@ public class SoElapsedTime extends SoEngine {
     //!
     public final SoEngineOutput      timeOut = new SoEngineOutput();
 
-  private enum Todo {
-        CHECK_ON (1<<0),
-        CHECK_PAUSE (1<<1),
-        RESET (1<<2);
-	  
-	  private int value;
-	  Todo(int value) {
-		  this.value = value;
-	  }
-	  public int getValue() {
-		  return value;
-	  }
-    };
     private enum State {
         STOPPED,        //!< Clock is not running
         RUNNING,        //!< Clock is running
         PAUSED          //!< Clock is running, but output is frozen
     };
 
-    private State          state;
-    private int        todo;
-    private final SbTime              prevTimeOfDay = new SbTime();   //!< Time of day when last
-                                         //! evaluate was called.
-    private final SbTime              prevTimeOut = new SbTime();     //!< Last 'clock' time that 
-                                         //! was output.
-    private float               prevClockTime;   //!< 'Clock' time when last 
-                                         //! evaluate was called.
+
+    private final SbTime pausetime = new SbTime();
+    private final SbTime lasttime = new SbTime();
+    private final SbTime currtime = new SbTime();
+    private State status;
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -235,110 +215,70 @@ public SoElapsedTime()
     engineHeader.SO_ENGINE_ADD_INPUT(reset,"reset", (null));
     engineHeader.SO_ENGINE_ADD_OUTPUT(timeOut,"timeOut", SoSFTime.class);
 
-    state       = State.RUNNING;
-    todo        = Todo.RESET.getValue();
-    isBuiltIn   = true;
-
     // default time source connection
-    timeIn.connectFrom(SoDB.getGlobalField(new SbName("realTime")));
+    SoField realtime = SoDB.getGlobalField(new SbName("realTime"));
+    timeIn.connectFrom(realtime);
+
+    this.currtime.copyFrom(SbTime.zero());
+    this.lasttime.copyFrom(((SoSFTime)realtime).getValue());
+    status = SoElapsedTime.State.RUNNING;
+
+    isBuiltIn   = true;
 }
 
-
-	/* (non-Javadoc)
-	 * @see jscenegraph.database.inventor.engines.SoEngine#evaluate()
-	 */
-	@Override
-	protected void evaluate() {
-    final SbTime now = new SbTime(timeIn.getValue());
-    State oldState = state;
-
-    /**********
-    **
-    ** first do the things queue up in the "todo" bitmask
-    */
-
-    // reset output to 0
-    if ((todo&Todo.RESET.getValue())!=0) {
-        reset.getValue();
-        prevTimeOfDay .copyFrom( now);
-        prevTimeOut .copyFrom( SbTime.zero());
-        prevClockTime = (float)prevTimeOut.getValue();
+// Documented in superclass.
+    protected void evaluate()
+    {
+        if (this.status == SoElapsedTime.State.STOPPED) {
+            SoSubEngine.SO_ENGINE_OUTPUT(timeOut, SoSFTime.class, (Object time) -> ((SoSFTime)time).setValue(this.currtime));
+    }
+  else {
+        SbTime now = new SbTime(this.timeIn.getValue());
+        this.currtime.operator_add_equal( (now.operator_minus(this.lasttime)).operator_mul(this.speed.getValue()));
+        this.lasttime.copyFrom(now);
+        if (this.status == SoElapsedTime.State.PAUSED) {
+            SoSubEngine.SO_ENGINE_OUTPUT(timeOut, SoSFTime.class, (Object time) -> ((SoSFTime)time).setValue(this.pausetime));
+        }
+    else {
+            SoSubEngine.SO_ENGINE_OUTPUT(timeOut, SoSFTime.class, (Object time) -> ((SoSFTime)time).setValue(this.currtime));
+        }
+    }
     }
 
-    // Figure out which state we're in.  'on' takes precedence over
-    // 'pause':
-    if ((todo & Todo.CHECK_ON.getValue())!=0 || (todo & Todo.CHECK_PAUSE.getValue())!=0) {
-        if (on.getValue())
-            if (pause.getValue())
-                state = State.PAUSED;
-            else
-                state = State.RUNNING;
-        else
-            state = State.STOPPED;
+// Documented in superclass.
+    public void inputChanged(SoField which)
+    {
+        if (which == this.timeIn) return;
+
+        // Default to turn output off, only turn it back on if the engine is
+        // running.
+        this.timeOut.enable(false);
+
+        if (which == this.reset) {
+        this.currtime.copyFrom(SbTime.zero());
+        this.lasttime.copyFrom(this.timeIn.getValue());
+    }
+  else if (which == this.pause) {
+        if (this.pause.getValue() && this.status == SoElapsedTime.State.RUNNING) {
+            this.status = SoElapsedTime.State.PAUSED;
+            this.pausetime.copyFrom(this.currtime);
+        }
+    else if (!this.pause.getValue() && this.status == SoElapsedTime.State.PAUSED) {
+            this.status = SoElapsedTime.State.RUNNING;
+        }
+    }
+  else if (which == this.on) {
+        if (this.on.getValue() && this.status == SoElapsedTime.State.STOPPED) {
+            this.status = SoElapsedTime.State.RUNNING;
+            this.lasttime.copyFrom(this.timeIn.getValue());
+        }
+    else if (!this.on.getValue() && this.status != SoElapsedTime.State.STOPPED) {
+            this.status = SoElapsedTime.State.STOPPED;
+        }
     }
 
-    ////////////////////////////////////////////////////////////////////////
-    // While the engine is on, it keeps track of 'clock' time.
-    // This is the amount of real time that passes multiplied by the speed.
-    // If the speed input varies while the engine is on, then 'clock' time 
-    // advances non-uniformly.
-    //
-    // Pausing the engine will freeze the timeOut value, but internally the 
-    // 'clock' time will continue to advance.
-    // Unpause the engine and the timeOut will jump forward to display
-    // 'clock' time.
-    //
-    // Stop the engine (by setting 'on' to FALSE) to freeze both the
-    // timeOut value and the 'clock' time. Re-start (by setting 'on'
-    // to TRUE) and both timeOut and 'clock' will continue from where
-    // they were at the time the engine was stopped.
-    //
-    ////////////////////////////////////////////////////////////////////////
-
-    // Calculate clock time that has passed since last evaluation
-    // This is difference in real time multiplied by speed.
-    final SbTime deltaClockT =  (now.operator_minus(prevTimeOfDay)).operator_mul(speed.getValue());
-
-    // We'll calculate the new internal clockTime.
-    // If we're RUNNING, then we'll output clockTime.
-    // Otherwise we'll output the same value as last time.
-    final SbTime clockTime = new SbTime();
-    final SbTime tOut = new SbTime();
-
-    switch (state) {
-      case RUNNING:
-        // The first time running after a stop, we resume from the
-        // previous time that was output.
-        if (oldState == State.STOPPED)
-            clockTime .copyFrom( prevTimeOut);
-        else
-            clockTime .copyFrom( new SbTime(prevClockTime).operator_add(deltaClockT));
-        tOut .copyFrom( clockTime);
-        break;
-
-      case STOPPED:
-        clockTime .copyFrom( prevTimeOut);
-        tOut .copyFrom( prevTimeOut);
-        break;
-
-      case PAUSED:
-        clockTime .copyFrom( new SbTime(prevClockTime).operator_add( deltaClockT));
-        tOut .copyFrom( prevTimeOut);
-        break;
+        this.timeOut.enable(this.status == SoElapsedTime.State.RUNNING);
     }
-
-    // Update the state variables:
-    prevTimeOfDay .copyFrom( now);
-    prevTimeOut .copyFrom( tOut);
-    prevClockTime = (float)clockTime.getValue();
-
-    // A value is always output.  Note that if the engine is paused or
-    // stopped inputChanged() disables notification through timeOut,
-    // so evaluate() will only be called if new connections are made.
-    SoSubEngine.SO_ENGINE_OUTPUT(timeOut, SoSFTime.class, (Object time) -> ((SoSFTime)time).setValue(tOut));
-
-    todo = 0;
-	}
 
 ////////////////////////////////////////////////////////////////////////
 //
