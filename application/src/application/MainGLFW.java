@@ -1241,7 +1241,7 @@ public class MainGLFW {
 							body.getPosition().get2() /*cameraPositionValue.getZ() - 0.4f + 0.13f + above_ground*/ - 1.75f+ 2*0.4f);
 				}
 			}
-			if(body.getPosition().get2() < zref - 1.5f) {
+			if(body.getPosition().get2() < zref - 1.8f) {
 				System.err.println("Error in placement, too low");
 				saved_pos.set2(zref + 1.0f);
 				body.setPosition(saved_pos);
