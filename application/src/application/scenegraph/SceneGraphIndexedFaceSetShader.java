@@ -2954,7 +2954,7 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 				String[] message = new String[2];
 				message[0] = "Got the boots !";
 				message[1] = "Now you can climb more easily";
-                displayTemporaryMessage(message,10.0f);
+                displayTemporaryMessage(message,8.0f);
             }
 		}
 	}

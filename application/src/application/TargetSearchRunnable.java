@@ -88,7 +88,7 @@ public class TargetSearchRunnable implements Runnable {
 											SbVec3f pickedPoint = pp.getPoint();
 											SbVec3f hero = main.getPosition();
 											float distance = hero.operator_minus(pickedPoint).length();
-											if(distance > 150) {
+											if(distance > 120) {
 												String[] message = new String[1];
 												message[0] = "NICE SHOT!";
 												main.displayTemporaryMessage(message, 3);
