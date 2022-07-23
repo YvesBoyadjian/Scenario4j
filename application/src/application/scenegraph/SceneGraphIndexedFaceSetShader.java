@@ -2984,7 +2984,7 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 		camera.nearDistance.setValue(minViewDistance);
 		//System.out.println(minViewDistance);
 
-		if (nearest < 1.3) {
+		if (nearest < 1.4) {
 			if (setBoots(true)) {
 				String[] message = new String[2];
 				message[0] = "Got the boots !";

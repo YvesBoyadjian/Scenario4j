@@ -28,6 +28,8 @@ public class BootsFamily extends CollectibleBase implements Collectible {
 
     SoElapsedTime elapsedTime = new SoElapsedTime();
 
+    SoSwitch bootsSwitch = new SoSwitch();
+
     public String filePath = "ressource/hi-tec_mountain_boots_high_poly.zip";
 
     private boolean spin = true;
@@ -46,26 +48,28 @@ public class BootsFamily extends CollectibleBase implements Collectible {
 
         node.ref(); // To avoid destruction
 
+        node.addChild(bootsSwitch);
+
         SoRotationXYZ rotXYZ = new SoRotationXYZ();
 
         rotXYZ.axis.setValue(SoRotationXYZ.Axis.Z);
 
         rotXYZ.angle.connectFrom(elapsedTime.timeOut);
 
-        node.addChild(rotXYZ);
+        bootsSwitch.addChild(rotXYZ);
 
         SoRotation rot = new SoRotation();
 
         rot.rotation.setValue(new SbVec3f(1,0,0), (float)Math.PI/2.0f);
-        node.addChild(rot);
+        bootsSwitch.addChild(rot);
 
         SoScale scale = new SoScale();
         scale.scaleFactor.setValue(0.3f,0.3f,0.3f);
-        node.addChild(scale);
+        bootsSwitch.addChild(scale);
 
         SoFile file = new SoFile();
 
-        node.addChild(file);
+        bootsSwitch.addChild(file);
 
         file.name.setValue(texturePath);
     }
@@ -153,5 +157,6 @@ public class BootsFamily extends CollectibleBase implements Collectible {
     public void setSpin(boolean b) {
         spin = b;
         elapsedTime.on.setValue(spin);
+        bootsSwitch.whichChild.setValue(spin ? SoSwitch.SO_SWITCH_ALL : SoSwitch.SO_SWITCH_NONE);
     }
 }
