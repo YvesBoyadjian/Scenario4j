@@ -57,6 +57,7 @@ package jscenegraph.database.inventor.nodes;
 import de.javagl.jgltf.model.*;
 import de.javagl.jgltf.model.io.GltfModelReader;
 import de.javagl.jgltf.model.v2.MaterialModelV2;
+import de.javagl.obj.*;
 import jscenegraph.coin3d.inventor.misc.SoGLImage;
 import jscenegraph.coin3d.inventor.nodes.SoTexture;
 import jscenegraph.coin3d.inventor.nodes.SoTexture2;
@@ -85,8 +86,8 @@ import org.lwjglx.BufferUtils;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
+import java.net.MalformedURLException;
 import java.net.URI;
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
@@ -397,6 +398,7 @@ private static Path findFileWithExtension(Path parentPath, String extension, boo
         if (!f.readOK && f.children.getLength() == 0) {
             // try another format
             Path gltf = null;
+            Path obj = null;
             if(zip) {
                 if ( fs != null) {
                     for (Path root : fs.getRootDirectories()) {
@@ -410,9 +412,13 @@ private static Path findFileWithExtension(Path parentPath, String extension, boo
             }
             else {
                 gltf = findFileWithExtension(filePath,".gltf",true);
+                obj = findFileWithExtension(filePath,".obj",true);
             }
             if (gltf != null) {
                 readGLTF(f, gltf);
+            }
+            if (obj != null) {
+                readOBJ(f, obj);
             }
         }
     }
@@ -439,27 +445,7 @@ private static Path findFileWithExtension(Path parentPath, String extension, boo
 
                     Path rootDir = gltf.getParent();
                     Path imagePath = rootDir.resolve(imageURI);
-                    BufferedImage textureBufferedImage = ImageIO.read(imagePath.toUri().toURL());
-                    SoTexture2 texture = new SoTexture2();
-                    //texture.filename.setValue(imagePath.toString());
-                    int w = textureBufferedImage.getWidth();
-                    int h = textureBufferedImage.getHeight();
-                    SbVec2s s = new SbVec2s((short)w,(short)h);
-                    int nc = 3;
-                    int numPixels = (int)s.getX()*s.getY();
-                    int numBytes = numPixels*3;
-                    MemoryBuffer b = MemoryBuffer.allocateBytes(numBytes);
-                    int j=0;
-                    for(int i=0; i< numPixels;i++) {
-                        int x = i%w;
-                        int y = i/w;//h - i/w -1;
-                        int rgb = textureBufferedImage.getRGB(x, y);
-                        b.setByte(j, (byte)((rgb & 0x00FF0000) >>> 16)) ; j++;
-                        b.setByte(j, (byte)((rgb & 0x0000FF00) >>> 8)); j++;
-                        b.setByte(j, (byte)((rgb & 0x000000FF) >>> 0)); j++;
-                    }
-
-                    texture.image.setValue(s,nc,true,b);
+                    SoTexture2 texture = textureFromPath(imagePath,false);
 
                     f.children.append(texture);
                     System.out.println("");
@@ -484,6 +470,110 @@ private static Path findFileWithExtension(Path parentPath, String extension, boo
         } catch (NullPointerException e) {
             e.printStackTrace();
             f.readOK = false;
+        }
+    }
+
+    private static SoTexture2 textureFromPath(Path imagePath, boolean obj) throws IOException {
+
+        BufferedImage textureBufferedImage = ImageIO.read(imagePath.toUri().toURL());
+        SoTexture2 texture = new SoTexture2();
+        //texture.filename.setValue(imagePath.toString());
+        int w = textureBufferedImage.getWidth();
+        int h = textureBufferedImage.getHeight();
+        SbVec2s s = new SbVec2s((short)w,(short)h);
+        int nc = 3;
+        int numPixels = (int)s.getX()*s.getY();
+        int numBytes = numPixels*3;
+        MemoryBuffer b = MemoryBuffer.allocateBytes(numBytes);
+        int j=0;
+        for(int i=0; i< numPixels;i++) {
+            int x = i%w;
+            int y = obj ? h - i/w -1 : i/w;
+            int rgb = textureBufferedImage.getRGB(x, y);
+            b.setByte(j, (byte)((rgb & 0x00FF0000) >>> 16)) ; j++;
+            b.setByte(j, (byte)((rgb & 0x0000FF00) >>> 8)); j++;
+            b.setByte(j, (byte)((rgb & 0x000000FF) >>> 0)); j++;
+        }
+
+        texture.image.setValue(s,nc,true,b);
+
+        return texture;
+    }
+
+    private static void readOBJ(SoFile f, Path objPath) {
+/*
+        AIScene scene = Assimp.aiImportFile(objPath.toFile().toString(), Assimp.aiProcess_Triangulate);
+        int numMeshes = scene.mNumMeshes();
+        int numTextures = scene.mNumTextures();
+        int numMaterials = scene.mNumMaterials();
+        System.out.println(numMeshes);
+        System.out.println(numTextures);
+        System.out.println(scene.toString());
+*/
+        InputStream inputStream = null;
+        try {
+            inputStream = new FileInputStream(objPath.toFile());
+            Obj obj = ObjReader.read(inputStream);
+            Obj renderableObj = ObjUtils.convertToRenderable(obj);
+
+            IntBuffer indicesIntBuffer = ObjData.getFaceVertexIndices(renderableObj);
+            FloatBuffer positionsFloatBuffer = ObjData.getVertices(renderableObj);
+            FloatBuffer texCoordsFloatBuffer = ObjData.getTexCoords(renderableObj, 2);
+            FloatBuffer normalsFloatBuffer = ObjData.getNormals(renderableObj);
+
+            List<String> materials = renderableObj.getMtlFileNames();
+            if (!materials.isEmpty()) {
+                String materialName = materials.get(0);
+                Path materialPath = objPath.getParent().resolve(materialName);
+                List<Mtl> mtls = MtlReader.read(new FileInputStream(materialPath.toFile()));
+                if (!mtls.isEmpty()) {
+                    Mtl mtl = mtls.get(0);
+                    String imageName = mtl.getMapKd();
+                    Path imagePath = objPath.getParent().resolve(imageName);
+                    SoTexture2 texture = textureFromPath(imagePath,true);
+                    f.children.append(texture);
+                }
+            }
+
+            SoGroup group = new SoSeparator();
+
+            SoIndexedFaceSet indexedFaceSet = new SoIndexedFaceSet();
+
+            float[] positionsArray = new float[positionsFloatBuffer.remaining()];
+            positionsFloatBuffer.get(positionsArray);
+
+            float[] normalsArray = new float[normalsFloatBuffer.remaining()];
+            normalsFloatBuffer.get(normalsArray);
+
+            float[] texCoordsArray = new float[texCoordsFloatBuffer.remaining()];
+            texCoordsFloatBuffer.get(texCoordsArray);
+
+            SoVertexProperty vertexProperty = new SoVertexProperty();
+            vertexProperty.vertex.setValuesPointer(positionsArray);
+            vertexProperty.normal.setValuesPointer(normalsArray);
+            vertexProperty.texCoord.setValues(0,texCoordsArray);
+
+            indexedFaceSet.vertexProperty.setValue(vertexProperty);
+
+            int numIndices = indicesIntBuffer.remaining();
+            int numTriangles = numIndices/3;
+            int[] indicesArray = new int[numTriangles*4];
+            for(int triangle = 0 ; triangle < numTriangles; triangle++) {
+                indicesArray[triangle*4] = indicesIntBuffer.get(triangle*3);
+                indicesArray[triangle*4+1] = indicesIntBuffer.get(triangle*3+1);
+                indicesArray[triangle*4+2] = indicesIntBuffer.get(triangle*3+2);
+                indicesArray[triangle*4+3] = -1;
+            }
+
+            indexedFaceSet.coordIndex.setValuesPointer(indicesArray);
+            group.addChild(indexedFaceSet);
+
+            f.children.append(group);
+
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 

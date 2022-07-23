@@ -13,5 +13,6 @@
     <orderEntry type="module" module-name="vk-bootstrap" />
     <orderEntry type="module" module-name="lwjgl-opengl" />
     <orderEntry type="module" module-name="jgltf-model" />
+    <orderEntry type="module" module-name="obj" />
   </component>
 </module>
