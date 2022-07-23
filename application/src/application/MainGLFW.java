@@ -104,9 +104,9 @@ public class MainGLFW {
 
 	public static final float CONTACT_SURFACE_MU_DEFAULT = 0.838f; // Original value in game
 
-	public static final float CONTACT_SURFACE_MU_BAREFOOT = 0.75f;
+	public static final float CONTACT_SURFACE_MU_BAREFOOT = 0.5f;
 
-	public static final float CONTACT_SURFACE_MU_BOOTS = 0.85f;
+	public static final float CONTACT_SURFACE_MU_BOOTS = 1.0f;
 
 	public static final float MINIMUM_VIEW_DISTANCE = 2.5f;//1.0f;
 
@@ -1241,7 +1241,7 @@ public class MainGLFW {
 							body.getPosition().get2() /*cameraPositionValue.getZ() - 0.4f + 0.13f + above_ground*/ - 1.75f+ 2*0.4f);
 				}
 			}
-			if(body.getPosition().get2() < zref - 1.8f) {
+			if(body.getPosition().get2() < zref - 1.9f) {
 				System.err.println("Error in placement, too low");
 				saved_pos.set2(zref + 1.0f);
 				body.setPosition(saved_pos);
