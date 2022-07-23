@@ -91,6 +91,7 @@ import java.net.URI;
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
 import java.util.*;
 import java.util.zip.ZipError;
@@ -420,7 +421,10 @@ private static Path findFileWithExtension(Path parentPath, String extension, boo
 	  
 
     private static void readGLTF(SoFile f, Path gltf) {
-        URI gltfURI = gltf.toUri();
+
+//        AIScene scene = Assimp.aiImportFile(gltf.toFile().toString(),0);
+
+//        URI gltfURI = gltf.toUri();
         GltfModelReader reader = new GltfModelReader();
         try {
             //GltfModel gltfModel = reader.read(gltfURI);

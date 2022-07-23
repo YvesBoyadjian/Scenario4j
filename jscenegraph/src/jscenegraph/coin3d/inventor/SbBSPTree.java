@@ -57,6 +57,10 @@ public class SbBSPTree implements Destroyable {
 		DIM_NONE
 	};
 
+	public interface Filter {
+		boolean filter(SbVec3f point);
+	}
+
 	class coin_bspnode implements Destroyable {
 
 		  private coin_bspnode left; // ptr
@@ -353,6 +357,53 @@ findPoints(final SbSphere sphere, final SbListInt array)
 	}
 
 	/*!
+	  \overload
+	*/
+	public int
+	findClosest(final SbVec3f pos, Filter filter)
+	{
+		int n = this.pointsArray.getLength();
+		if (n < 32) { // points are very scattered when few are inserted
+			final SbVec3f tmp = new SbVec3f();
+			int smallidx = -1;
+			float smalldist = Float.MAX_VALUE;//FLT_MAX;
+			for (int i = 0; i < n; i++) {
+				tmp.copyFrom(this.pointsArray.operator_square_bracket(i));
+				float dist = (tmp.operator_minus(pos)).sqrLength();
+				if (dist < smalldist && filter.filter(tmp)) {
+					smalldist = dist;
+					smallidx = i;
+				}
+			}
+			return smallidx;
+		}
+		final SbVec3f center =
+				(this.boundingBox.getMin().operator_add(
+						this.boundingBox.getMax())).operator_mul(0.5f);
+		center.operator_minus_equal(pos);
+
+		float siz = center.length() * 2 +
+				(this.boundingBox.getMax().operator_minus(this.boundingBox.getMin())).length();
+
+		float currsize = siz / 65536.0f;  // max 16 iterations (too much?).
+
+		final SbSphere sphere = new SbSphere(pos, currsize);
+		final SbListInt tmparray = new SbListInt(); // use only one array to avoid reallocs
+		int idx = -1;
+
+		// double size of sphere until a vertex is found
+		while (currsize < siz) {
+			sphere.setRadius(currsize);
+			tmparray.truncate(0);
+			idx = this.findClosest(sphere, tmparray, filter);
+			if (idx >= 0) return idx;
+			currsize *= 2;
+		}
+		assert(false);
+		return -1; // this should not happen!
+	}
+
+	/*!
 	  WARNING: Please don't use this function. It can cause hard to find
 	  bugs on the Windows platform if your application is linked against a
 	  different CRT than your Coin DLL.
@@ -378,6 +429,26 @@ findPoints(final SbSphere sphere, final SbListInt array)
 	    }
 	  }
 	  return closeidx;
+	}
+	public int
+	findClosest(final SbSphere sphere,
+				final SbListInt arr, Filter filter)
+	{
+		this.findPoints(sphere, arr);
+		final SbVec3f pos = new SbVec3f(sphere.getCenter());
+		int n = arr.getLength();
+		int closeidx = -1;
+		float closedist = Float.MAX_VALUE;
+		for (int i = 0; i < n; i++) {
+			int idx = arr.operator_square_bracket(i);
+			SbVec3f pt = this.pointsArray.operator_square_bracket(idx);
+			float tmp = (pos.operator_minus(pt)).sqrLength();
+			if (tmp < closedist && filter.filter(pt)) {
+				closeidx = idx;
+				closedist = tmp;
+			}
+		}
+		return closeidx;
 	}
 
 	/*!

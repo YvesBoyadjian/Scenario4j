@@ -2808,13 +2808,48 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 		);
 	}
 
+	float getSlope(float x, float y) {
+		float height1 = getInternalZ(x+1,y,new int[4]);
+		float height2 = getInternalZ(x-1,y,new int[4]);
+		float height3 = getInternalZ(x,y-1,new int[4]);
+		float height4 = getInternalZ(x,y+1,new int[4]);
+		float heightMin = Math.min(Math.min(Math.min(height1,height2),height3),height4);
+		float heightMax = Math.max(Math.max(Math.max(height1,height2),height3),height4);
+		return (heightMax - heightMin)/2;
+	}
+
 	public float getDistanceFromTrail() {
 		SbVec3f trans = transl.translation.getValue();
 
 		SbVec3f hero = new SbVec3f(current_x - trans.getX(),current_y - trans.getY(),current_z - trans.getZ());
-		int closest = trailsBSPTree.findClosest(hero);
+		SbBSPTree.Filter filter = new SbBSPTree.Filter() {
+			@Override
+			public boolean filter(SbVec3f point) {
+				double distXY = Math.sqrt((point.getX() - hero.getX())*(point.getX() - hero.getX()) +
+						(point.getY() - hero.getY())*(point.getY() - hero.getY()));
+				double distZ = point.getZ() - hero.getZ();
+				if (distXY == 0) {
+					return true;
+				}
+				for (int i=0; i< 10; i++) {
+					float alpha = (float)i/9.0f; // 0 to 1
+					float beta = (9.0f-(float)i)/9.0f; // 1 to 0
+					float x = alpha*hero.getX() + beta*point.getX();
+					float y = alpha*hero.getY() + beta*point.getY();
+					float slope = getSlope(x + trans.getX(),y + trans.getY());
+					if (slope > 0.7) {
+						return false;
+					}
+				}
+				if(distZ / distXY > 0.7) {
+					return false;
+				}
+				return true;
+			}
+		};
+		int closest = trailsBSPTree.findClosest(hero/*,filter*/);
 
-		float distance = Float.MAX_VALUE;
+		float distance = 30000;
 
 		if( -1 != closest ) {
 			SbVec3f closestPoint = trailsBSPTree.getPoint(closest);
