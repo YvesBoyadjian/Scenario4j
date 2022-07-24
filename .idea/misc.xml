@@ -5,10 +5,12 @@
       <list>
         <option value="$PROJECT_DIR$/vk-bootstrap/pom.xml" />
         <option value="$PROJECT_DIR$/lwjgl-opengl/pom.xml" />
+        <option value="$PROJECT_DIR$/JglTF/pom.xml" />
+        <option value="$PROJECT_DIR$/Obj/pom.xml" />
       </list>
     </option>
   </component>
-  <component name="ProjectRootManager" version="2" languageLevel="JDK_11" project-jdk-name="temurin-17" project-jdk-type="JavaSDK">
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_11" project-jdk-name="17" project-jdk-type="JavaSDK">
     <output url="file://$PROJECT_DIR$/out" />
   </component>
 </project>

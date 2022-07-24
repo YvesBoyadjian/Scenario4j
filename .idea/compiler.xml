@@ -6,12 +6,35 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
+        <module name="jgltf-model" />
+        <module name="jgltf-model-builder" />
+        <module name="jgltf-viewer" />
+        <module name="jgltf-viewer-lwjgl" />
         <module name="vk-bootstrap" />
+        <module name="jgltf-impl-v2-technique-webgl" />
         <module name="lwjgl-opengl" />
+        <module name="obj" />
+        <module name="jgltf-validator" />
+        <module name="jgltf-impl-v1" />
+        <module name="jgltf-impl-v2" />
+        <module name="jgltf-viewer-jogl" />
+        <module name="jgltf-obj" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
+      <module name="jgltf-impl-v1" target="1.8" />
+      <module name="jgltf-impl-v2" target="1.8" />
+      <module name="jgltf-impl-v2-technique-webgl" target="1.8" />
+      <module name="jgltf-model" target="11" />
+      <module name="jgltf-model-builder" target="1.8" />
+      <module name="jgltf-obj" target="1.8" />
+      <module name="jgltf-parent" target="1.5" />
+      <module name="jgltf-validator" target="1.8" />
+      <module name="jgltf-viewer" target="1.8" />
+      <module name="jgltf-viewer-jogl" target="1.8" />
+      <module name="jgltf-viewer-lwjgl" target="1.8" />
       <module name="lwjgl-opengl" target="11" />
+      <module name="obj" target="1.8" />
       <module name="vk-bootstrap" target="11" />
     </bytecodeTargetLevel>
   </component>

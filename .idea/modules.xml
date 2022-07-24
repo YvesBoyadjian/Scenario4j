@@ -11,6 +11,17 @@
       <module fileurl="file://$PROJECT_DIR$/glfw/glfw.iml" filepath="$PROJECT_DIR$/glfw/glfw.iml" />
       <module fileurl="file://$PROJECT_DIR$/jExample/jExample.iml" filepath="$PROJECT_DIR$/jExample/jExample.iml" />
       <module fileurl="file://$PROJECT_DIR$/jTerrain/jTerrain.iml" filepath="$PROJECT_DIR$/jTerrain/jTerrain.iml" />
+      <module fileurl="file://$PROJECT_DIR$/JglTF/jgltf-impl-v1/jgltf-impl-v1.iml" filepath="$PROJECT_DIR$/JglTF/jgltf-impl-v1/jgltf-impl-v1.iml" />
+      <module fileurl="file://$PROJECT_DIR$/JglTF/jgltf-impl-v2/jgltf-impl-v2.iml" filepath="$PROJECT_DIR$/JglTF/jgltf-impl-v2/jgltf-impl-v2.iml" />
+      <module fileurl="file://$PROJECT_DIR$/JglTF/jgltf-impl-v2-technique-webgl/jgltf-impl-v2-technique-webgl.iml" filepath="$PROJECT_DIR$/JglTF/jgltf-impl-v2-technique-webgl/jgltf-impl-v2-technique-webgl.iml" />
+      <module fileurl="file://$PROJECT_DIR$/JglTF/jgltf-model/jgltf-model.iml" filepath="$PROJECT_DIR$/JglTF/jgltf-model/jgltf-model.iml" />
+      <module fileurl="file://$PROJECT_DIR$/JglTF/jgltf-model-builder/jgltf-model-builder.iml" filepath="$PROJECT_DIR$/JglTF/jgltf-model-builder/jgltf-model-builder.iml" />
+      <module fileurl="file://$PROJECT_DIR$/JglTF/jgltf-obj/jgltf-obj.iml" filepath="$PROJECT_DIR$/JglTF/jgltf-obj/jgltf-obj.iml" />
+      <module fileurl="file://$PROJECT_DIR$/JglTF/jgltf-parent.iml" filepath="$PROJECT_DIR$/JglTF/jgltf-parent.iml" />
+      <module fileurl="file://$PROJECT_DIR$/JglTF/jgltf-validator/jgltf-validator.iml" filepath="$PROJECT_DIR$/JglTF/jgltf-validator/jgltf-validator.iml" />
+      <module fileurl="file://$PROJECT_DIR$/JglTF/jgltf-viewer/jgltf-viewer.iml" filepath="$PROJECT_DIR$/JglTF/jgltf-viewer/jgltf-viewer.iml" />
+      <module fileurl="file://$PROJECT_DIR$/JglTF/jgltf-viewer-jogl/jgltf-viewer-jogl.iml" filepath="$PROJECT_DIR$/JglTF/jgltf-viewer-jogl/jgltf-viewer-jogl.iml" />
+      <module fileurl="file://$PROJECT_DIR$/JglTF/jgltf-viewer-lwjgl/jgltf-viewer-lwjgl.iml" filepath="$PROJECT_DIR$/JglTF/jgltf-viewer-lwjgl/jgltf-viewer-lwjgl.iml" />
       <module fileurl="file://$PROJECT_DIR$/jscenegraph/jscenegraph.iml" filepath="$PROJECT_DIR$/jscenegraph/jscenegraph.iml" />
       <module fileurl="file://$PROJECT_DIR$/jsceneviewer/jsceneviewer.iml" filepath="$PROJECT_DIR$/jsceneviewer/jsceneviewer.iml" />
       <module fileurl="file://$PROJECT_DIR$/jsceneviewer-awt/jsceneviewer-awt.iml" filepath="$PROJECT_DIR$/jsceneviewer-awt/jsceneviewer-awt.iml" />
@@ -21,6 +32,7 @@
       <module fileurl="file://$PROJECT_DIR$/lwjgl-utils/lwjgl-utils.iml" filepath="$PROJECT_DIR$/lwjgl-utils/lwjgl-utils.iml" />
       <module fileurl="file://$PROJECT_DIR$/lwjgl3-awt/lwjgl3-awt.iml" filepath="$PROJECT_DIR$/lwjgl3-awt/lwjgl3-awt.iml" />
       <module fileurl="file://$PROJECT_DIR$/lwjgl3-swt/lwjgl3-swt.iml" filepath="$PROJECT_DIR$/lwjgl3-swt/lwjgl3-swt.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Obj/obj.iml" filepath="$PROJECT_DIR$/Obj/obj.iml" />
       <module fileurl="file://$PROJECT_DIR$/ode4j/ode4j.iml" filepath="$PROJECT_DIR$/ode4j/ode4j.iml" />
       <module fileurl="file://$PROJECT_DIR$/ode4j-demo/ode4j-demo.iml" filepath="$PROJECT_DIR$/ode4j-demo/ode4j-demo.iml" />
       <module fileurl="file://$PROJECT_DIR$/org.lwjglx/org.lwjglx.iml" filepath="$PROJECT_DIR$/org.lwjglx/org.lwjglx.iml" />
