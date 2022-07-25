@@ -205,9 +205,13 @@ public SoTexture2()
 */
 public void destructor()
 {
-  if (this.pimpl.glimage != null) this.pimpl.glimage.unref(null);
-  Destroyable.delete( this.pimpl.filenamesensor);
+  if (this.pimpl.glimage != null) {
+    this.pimpl.glimage.unref(null);
+    this.pimpl.glimage = null;
+  }
+  Destroyable.delete( this.pimpl.filenamesensor); this.pimpl.filenamesensor = null;
   Destroyable.delete( this.pimpl);
+  this.pimpl = null;
   super.destructor();
 }
 
