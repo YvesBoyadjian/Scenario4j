@@ -39,7 +39,7 @@ public class DouglasForest {
 
 	final static int FOUR_MILLION = 4000000;
 	
-	int NB_DOUGLAS_SEEDS = FOUR_MILLION;
+	private final int NB_DOUGLAS_SEEDS = FOUR_MILLION;
 	
 	final static int SEED_PLACEMENT_TREES = 42;
 	final static int SEED_HEIGHT_TREES = 43;
@@ -51,7 +51,7 @@ public class DouglasForest {
 	final static int SEED_LEAN_DIRECTION_ANGLE_TREES = 49;
 	final static int SEED_BASE_TREES = 50;
 
-	private DouglasParameters[] douglasParams = new DouglasParameters[NB_DOUGLAS_SEEDS];
+	private List<DouglasParameters> douglasParams = new ArrayList<>();
 /*
 	private float[] xArray = new float[NB_DOUGLAS_SEEDS];
 	private float[] yArray = new float[NB_DOUGLAS_SEEDS];
@@ -70,14 +70,18 @@ public class DouglasForest {
 	private List<List<DouglasChunk>> douglasChunks = new ArrayList<>(); // X, then Y
 	private List<SbBox3f> xLimits = new ArrayList<>();
 	
-	int nbDouglas = 0;
+	private int nbDouglas = 0;
 	
 	public DouglasForest( SceneGraphIndexedFaceSetShader sg ) {
 		this.sg = sg;
 	}
 
+	public int getNumIndexDouglas() {
+		return nbDouglas/*NB_DOUGLAS_SEEDS*/;
+	}
+
 	public float getX(int tree_index) {
-		DouglasParameters params = douglasParams[tree_index];
+		DouglasParameters params = douglasParams.get(tree_index);
 		if(params == null) {
 			return Float.NaN;
 		}
@@ -85,43 +89,43 @@ public class DouglasForest {
 	}
 
 	public float getY(int tree_index) {
-		return douglasParams[tree_index].y;
+		return douglasParams.get(tree_index).y;
 	}
 
 	public float getZ(int tree_index) {
-		return douglasParams[tree_index].z;
+		return douglasParams.get(tree_index).z;
 	}
 
 	public float getHeight(int tree_index) {
-		return douglasParams[tree_index].height;
+		return douglasParams.get(tree_index).height;
 	}
 
 	public float getAngleDegree1(int tree_index) {
-		return douglasParams[tree_index].angleDegree1;
+		return douglasParams.get(tree_index).angleDegree1;
 	}
 
 	public float getRandomTopTree(int tree_index) {
-		return douglasParams[tree_index].topTree;
+		return douglasParams.get(tree_index).topTree;
 	}
 
 	public float getRandomBottomTree(int tree_index) {
-		return douglasParams[tree_index].bottomTree;
+		return douglasParams.get(tree_index).bottomTree;
 	}
 
 	public float getRandomBaseTree(int tree_index) {
-		return douglasParams[tree_index].baseTree;
+		return douglasParams.get(tree_index).baseTree;
 	}
 
 	public int getRandomColorMultiplierTree(int tree_index) {
-		return douglasParams[tree_index].colorMultiplier;
+		return douglasParams.get(tree_index).colorMultiplier;
 	}
 
 	public float getRandomLeanAngleTree(int tree_index) {
-		return douglasParams[tree_index].leanAngle;
+		return douglasParams.get(tree_index).leanAngle;
 	}
 
 	public float getRandomLeanDirectionAngleTree(int tree_index) {
-		return douglasParams[tree_index].leanDirectionAngle;
+		return douglasParams.get(tree_index).leanDirectionAngle;
 	}
 
 	public int compute(final JProgressBar progressBar) {
@@ -184,7 +188,7 @@ public class DouglasForest {
 				if( isAboveWater && isUnderSnowLevel && !isStone && !isNearTrails ) {
 
 					final DouglasParameters params = new DouglasParameters();
-					douglasParams[i] = params;
+					douglasParams.add(params);
 					
 					float height = randomHeight;//DouglasFir.getHeight(randomHeightTrees);
 
@@ -420,9 +424,9 @@ public class DouglasForest {
 		
 		final SbVec3f xy = new SbVec3f();
 		
-		for(int tree=0; tree</*nbDouglas*/NB_DOUGLAS_SEEDS;tree++) {
+		for(int tree=0; tree</*nbDouglas*/getNumIndexDouglas();tree++) {
 
-			DouglasParameters params = douglasParams[tree];
+			DouglasParameters params = douglasParams.get(tree);
 			if(params == null) {
 				continue;
 			}

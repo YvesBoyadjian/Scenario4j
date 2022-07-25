@@ -2190,9 +2190,9 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 
 		int progressBarInitialValue = progressBar.getValue();
 
-		for( int i=0; i< forest.NB_DOUGLAS_SEEDS; i++) {
+		for( int i=0; i< forest.getNumIndexDouglas()/*NB_DOUGLAS_SEEDS*/; i++) {
 			if( 0 == i%999 ) {
-				progressBar.setValue((int)(progressBarInitialValue + (MAX_PROGRESS - progressBarInitialValue)*(long)i/forest.NB_DOUGLAS_SEEDS));
+				progressBar.setValue((int)(progressBarInitialValue + (MAX_PROGRESS - progressBarInitialValue)*(long)i/forest.getNumIndexDouglas()));
 			}
 
 			float x = forest.getX(i);
