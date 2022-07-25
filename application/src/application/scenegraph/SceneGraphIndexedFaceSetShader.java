@@ -1886,10 +1886,10 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 			}
 			int tree_index = (int) treesBSPTree.getUserData(bsp_index);
 			if (!geoms.containsKey(tree_index)) {
-				float xd = forest.xArray[tree_index];
-				float yd = forest.yArray[tree_index];
-				float zd = forest.zArray[tree_index];
-				float height = forest.heightArray[tree_index];
+				float xd = forest.getX(tree_index);
+				float yd = forest.getY(tree_index);
+				float zd = forest.getZ(tree_index);
+				float height = forest.getHeight(tree_index);
 				float width = height * trunk_width_coef;
 
 				DGeom box = OdeHelper.createCapsule(space, width, height);
@@ -2195,13 +2195,14 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 				progressBar.setValue((int)(progressBarInitialValue + (MAX_PROGRESS - progressBarInitialValue)*(long)i/forest.NB_DOUGLAS_SEEDS));
 			}
 
-			float x = forest.xArray[i];
-			float y = forest.yArray[i];
-			float z = forest.zArray[i];
+			float x = forest.getX(i);
 
 			if(Float.isNaN(x)) {
 				continue;
 			}
+			float y = forest.getY(i);
+			float z = forest.getZ(i);
+
 			treePoint.setValue(x,y,z);
 			treesBSPTree.addPoint(treePoint,i);
 		}

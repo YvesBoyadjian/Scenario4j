@@ -18,6 +18,7 @@ import java.util.Random;
 
 import application.MainGLFW;
 import application.objects.DouglasFir;
+import application.scenegraph.douglas.DouglasParameters;
 import jscenegraph.coin3d.inventor.nodes.SoVertexProperty;
 import jscenegraph.database.inventor.SbBox3f;
 import jscenegraph.database.inventor.SbColor;
@@ -35,8 +36,10 @@ import javax.swing.*;
  *
  */
 public class DouglasForest {
+
+	final static int FOUR_MILLION = 4000000;
 	
-	int NB_DOUGLAS_SEEDS = 4000000;
+	int NB_DOUGLAS_SEEDS = FOUR_MILLION;
 	
 	final static int SEED_PLACEMENT_TREES = 42;
 	final static int SEED_HEIGHT_TREES = 43;
@@ -47,19 +50,21 @@ public class DouglasForest {
 	final static int SEED_LEAN_ANGLE_TREES = 48;
 	final static int SEED_LEAN_DIRECTION_ANGLE_TREES = 49;
 	final static int SEED_BASE_TREES = 50;
-	
-	float[] xArray = new float[NB_DOUGLAS_SEEDS]; 
-	float[] yArray = new float[NB_DOUGLAS_SEEDS]; 
-	float[] zArray = new float[NB_DOUGLAS_SEEDS]; 
-	float[] heightArray = new float[NB_DOUGLAS_SEEDS]; 
-	float[] angleDegree1 = new float[NB_DOUGLAS_SEEDS];
-	float[] randomTopTree = new float[NB_DOUGLAS_SEEDS];
-	float[] randomBottomTree = new float[NB_DOUGLAS_SEEDS];
-	float[] randomBaseTree = new float[NB_DOUGLAS_SEEDS];
-	int[] randomColorMultiplierTree = new int[NB_DOUGLAS_SEEDS];
-	float[] randomLeanAngleTree = new float[NB_DOUGLAS_SEEDS];
-	float[] randomLeanDirectionAngleTree = new float[NB_DOUGLAS_SEEDS];
-	
+
+	private DouglasParameters[] douglasParams = new DouglasParameters[NB_DOUGLAS_SEEDS];
+/*
+	private float[] xArray = new float[NB_DOUGLAS_SEEDS];
+	private float[] yArray = new float[NB_DOUGLAS_SEEDS];
+	private float[] zArray = new float[NB_DOUGLAS_SEEDS];
+	private float[] heightArray = new float[NB_DOUGLAS_SEEDS];
+	private float[] angleDegree1 = new float[NB_DOUGLAS_SEEDS];
+	private float[] randomTopTree = new float[NB_DOUGLAS_SEEDS];
+	private float[] randomBottomTree = new float[NB_DOUGLAS_SEEDS];
+	private float[] randomBaseTree = new float[NB_DOUGLAS_SEEDS];
+	private int[] randomColorMultiplierTree = new int[NB_DOUGLAS_SEEDS];
+	private float[] randomLeanAngleTree = new float[NB_DOUGLAS_SEEDS];
+	private float[] randomLeanDirectionAngleTree = new float[NB_DOUGLAS_SEEDS];
+*/
 	SceneGraphIndexedFaceSetShader sg;
 	
 	private List<List<DouglasChunk>> douglasChunks = new ArrayList<>(); // X, then Y
@@ -71,9 +76,57 @@ public class DouglasForest {
 		this.sg = sg;
 	}
 
+	public float getX(int tree_index) {
+		DouglasParameters params = douglasParams[tree_index];
+		if(params == null) {
+			return Float.NaN;
+		}
+		return params.x;
+	}
+
+	public float getY(int tree_index) {
+		return douglasParams[tree_index].y;
+	}
+
+	public float getZ(int tree_index) {
+		return douglasParams[tree_index].z;
+	}
+
+	public float getHeight(int tree_index) {
+		return douglasParams[tree_index].height;
+	}
+
+	public float getAngleDegree1(int tree_index) {
+		return douglasParams[tree_index].angleDegree1;
+	}
+
+	public float getRandomTopTree(int tree_index) {
+		return douglasParams[tree_index].topTree;
+	}
+
+	public float getRandomBottomTree(int tree_index) {
+		return douglasParams[tree_index].bottomTree;
+	}
+
+	public float getRandomBaseTree(int tree_index) {
+		return douglasParams[tree_index].baseTree;
+	}
+
+	public int getRandomColorMultiplierTree(int tree_index) {
+		return douglasParams[tree_index].colorMultiplier;
+	}
+
+	public float getRandomLeanAngleTree(int tree_index) {
+		return douglasParams[tree_index].leanAngle;
+	}
+
+	public float getRandomLeanDirectionAngleTree(int tree_index) {
+		return douglasParams[tree_index].leanDirectionAngle;
+	}
+
 	public int compute(final JProgressBar progressBar) {
 		
-		if( ! loadDouglas()) {
+		//if( ! loadDouglas()) {
 		
 			Random randomPlacementTrees = new Random(SEED_PLACEMENT_TREES);		
 			Random randomHeightTrees = new Random(SEED_HEIGHT_TREES);		
@@ -129,28 +182,31 @@ public class DouglasForest {
 				final float randomColorMultiplier3 = randomColorMultiplier.nextFloat();
 
 				if( isAboveWater && isUnderSnowLevel && !isStone && !isNearTrails ) {
+
+					final DouglasParameters params = new DouglasParameters();
+					douglasParams[i] = params;
 					
 					float height = randomHeight;//DouglasFir.getHeight(randomHeightTrees);
-					
-					xArray[i] = x;
-					yArray[i] = y;
-					zArray[i] = z;
-					heightArray[i] = height;
+
+					params.x = x;
+					params.y = y;
+					params.z = z;
+					params.height = height;
 					float angleDegree = 120.0f * randomAngle;//randomAngleTrees.nextFloat();
-					angleDegree1[i] = angleDegree;
+					params.angleDegree1 = angleDegree;
 					float width = height * 0.707f / 50.0f;
 					float widthTop = width */*2.5f*/5f * (float)Math.pow(randomTop/*randomTopTrees.nextFloat()*/,2.0f);
-					randomTopTree[i] = widthTop;
+					params.topTree = widthTop;
 					float foliageWidth = (height+ randomBottom/*randomBottomTrees.nextFloat()*/*12.0f) * 0.1f;
-					randomBottomTree[i] = foliageWidth;
+					params.bottomTree = foliageWidth;
 
-					randomBaseTree[i] = 1.5f + randomBaseTrees.nextFloat()*height/10;
+					params.baseTree = 1.5f + randomBaseTrees.nextFloat()*height/10;
 					
 					float leanAngleTree = randomLeanAngle_;//randomLeanAngle.nextFloat();
-					randomLeanAngleTree[i] = (float)(Math.pow(leanAngleTree, 5)*Math.PI/2/10);
+					params.leanAngle = (float)(Math.pow(leanAngleTree, 5)*Math.PI/2/10);
 					
 					float leanAngleDirectionTree = randomLeanDirection;//randomLeanDirectionAngle.nextFloat();
-					randomLeanDirectionAngleTree[i] = (float)(leanAngleDirectionTree * Math.PI * 2);					
+					params.leanDirectionAngle = (float)(leanAngleDirectionTree * Math.PI * 2);
 					
 					float deltaR = randomColorMultiplier1/*randomColorMultiplier.nextFloat()*/ - 0.5f;
 					float deltaG = randomColorMultiplier2/*randomColorMultiplier.nextFloat()*/ - 0.5f;
@@ -181,20 +237,21 @@ public class DouglasForest {
 					dummyColor.setY(g);
 					dummyColor.setZ(b);
 					
-					randomColorMultiplierTree[i] = dummyColor.getPackedValue();
+					params.colorMultiplier = dummyColor.getPackedValue();
 					
 					nbDouglas++;
 				}
 				else {
-					xArray[i] = nan;					
+					//xArray[i] = nan;
 				}
 			}
 			//saveDouglas(); no increase of performance
-		}
-		
+//		}
+
+		System.out.println("numDouglas = "+ nbDouglas);
 		return nbDouglas;
 	}
-
+/*
 	private void saveDouglas() {
 		File file = new File("douglas_forest.mri");
 		
@@ -249,7 +306,8 @@ public class DouglasForest {
 			e.printStackTrace();
 		}
 	}
-
+*/
+	/*
 	private boolean loadDouglas() {
 		File file = new File( "douglas_forest.mri" );
 		
@@ -300,7 +358,7 @@ public class DouglasForest {
 		
 		return true;
 	}
-
+*/
 	private long getDouglasForestFileLength() {
 		return NB_DOUGLAS_SEEDS * Float.BYTES * 8 + Integer.BYTES;
 	}
@@ -363,13 +421,15 @@ public class DouglasForest {
 		final SbVec3f xy = new SbVec3f();
 		
 		for(int tree=0; tree</*nbDouglas*/NB_DOUGLAS_SEEDS;tree++) {
-			float x = xArray[tree];
-			float y = yArray[tree];
-			
-			if(Float.isNaN(x)) {
+
+			DouglasParameters params = douglasParams[tree];
+			if(params == null) {
 				continue;
 			}
-			
+
+			float x = params.x;
+			float y = params.y;
+
 			xy.setValue(x, y, 0.0f);
 			
 			int nbChunksX = douglasChunks.size(); 

@@ -51,47 +51,47 @@ public class DouglasChunk {
 	}
 	
 	public float getX(int i) {
-		return df.xArray[insideTrees.get(i)];
+		return df.getX(insideTrees.get(i));
 	}
 	
 	public float getY(int i) {
-		return df.yArray[insideTrees.get(i)];
+		return df.getY(insideTrees.get(i));
 	}
 	
 	public float getZ(int i) {
-		return df.zArray[insideTrees.get(i)];
+		return df.getZ(insideTrees.get(i));
 	}
 	
 	public float getHeight(int i) {
-		return df.heightArray[insideTrees.get(i)];
+		return df.getHeight(insideTrees.get(i));
 	}
 	
 	public float getAngleDegree1(int i) {
-		return df.angleDegree1[insideTrees.get(i)];
+		return df.getAngleDegree1(insideTrees.get(i));
 	}
 	
 	public float getRandomTopTree(int i) {
-		return df.randomTopTree[insideTrees.get(i)];
+		return df.getRandomTopTree(insideTrees.get(i));
 	}
 	
 	public float getRandomBottomTree(int i) {
-		return df.randomBottomTree[insideTrees.get(i)];
+		return df.getRandomBottomTree(insideTrees.get(i));
 	}
 
 	public float getRandomBaseTree(int i) {
-		return df.randomBaseTree[insideTrees.get(i)];
+		return df.getRandomBaseTree(insideTrees.get(i));
 	}
 	
 	public int getRandomColorMultiplierTree(int i) {
-		return df.randomColorMultiplierTree[insideTrees.get(i)];
+		return df.getRandomColorMultiplierTree(insideTrees.get(i));
 	}
 	
 	public float getRandomLeanAngleTree(int i) {
-		return df.randomLeanAngleTree[insideTrees.get(i)];		
+		return df.getRandomLeanAngleTree(insideTrees.get(i));
 	}
 	
 	public float getRandomLeanDirectionAngleTree(int i) {
-		return df.randomLeanDirectionAngleTree[insideTrees.get(i)];		
+		return df.getRandomLeanDirectionAngleTree(insideTrees.get(i));
 	}
 
 	int[] douglasIndicesF;
