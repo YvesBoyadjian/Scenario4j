@@ -17,6 +17,7 @@ import javax.imageio.ImageIO;
 import javax.swing.*;
 
 import application.MainGLFW;
+import application.RasterProvider;
 import application.nodes.*;
 import application.objects.Target;
 import application.objects.collectible.BootsFamily;
@@ -310,30 +311,34 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
     BootsFamily boots;
 
     public SceneGraphIndexedFaceSetShader(
-			Raster rw,
-			Raster re,
+			RasterProvider rwp,
+			RasterProvider rep,
 			int overlap,
 			float zTranslation,
 			int max_i,
 			long[] trails,
 			final JProgressBar progressBar) {
 		super();
-		this.rw = rw;
-		this.re = re;
+		this.rw = rwp.provide();
 		this.overlap = overlap;
 		this.zTranslation = zTranslation;
 		this.max_i = max_i;
 		
-		int hImageW = rw.getHeight();
-		int wImageW = rw.getWidth();
-		
-		int hImageE = re.getHeight();
-		int wImageE = re.getWidth();
-		
+		int hImageW = rw.getHeight(); // 8112
+		int wImageW = rw.getWidth(); // 8112
+
 		h = Math.min(hImageW, MAX_J);// 8112
-		full_island_w = wImageW+wImageE-I_START-overlap;// 13711
+		full_island_w = 2*wImageW-I_START-overlap;// 13711
+
+		if (max_i-1+I_START >= wImageW) {
+			this.re = rep.provide();
+			int hImageE = re.getHeight(); // 8112
+			int wImageE = re.getWidth(); // 8112
+			full_island_w = wImageW+wImageE-I_START-overlap;// 13711
+		}
 		w = Math.min(full_island_w, /*MAX_I*/max_i);
-		
+
+
 		chunks = new ChunkArray(w,h,full_island_w);
 		
 		float West_Bounding_Coordinate = -122.00018518518522f;
@@ -377,16 +382,17 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 		
 		final int rgbaStone = (colorStone.getAlpha() << 0) | (redStone << 24)| (greenStone << 16)|(blueStone<<8); 
 		
-		
-		int nb = 0;
-		for(int j=hImageW/4;j<hImageW*3/4;j++) {
-			float zw = rw.getPixel(wImageW-1, j, fArray)[0];
-			float ze = re.getPixel(overlap-1, j, fArray)[0];
-		
-			delta += (ze - zw);
-			nb++;
+		if (re != null) {
+			int nb = 0;
+			for (int j = hImageW / 4; j < hImageW * 3 / 4; j++) {
+				float zw = rw.getPixel(wImageW - 1, j, fArray)[0];
+				float ze = re.getPixel(overlap - 1, j, fArray)[0];
+
+				delta += (ze - zw);
+				nb++;
+			}
+			delta /= nb;
 		}
-		delta /= nb;
 		
 		//SbBox3f sceneBox = new SbBox3f();
 		//SbVec3f sceneCenter = new SbVec3f();
@@ -498,9 +504,6 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 			need_to_save_colors = true;
 		}
 		
-		rw = null;
-		re = null;
-
 		//sceneCenter.setValue(sceneBox.getCenter());
 		
 		boolean load_normals_and_stone_was_successfull = chunks.loadNormalsAndStones(); 

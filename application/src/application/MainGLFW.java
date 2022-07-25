@@ -297,8 +297,18 @@ public class MainGLFW {
 		//shell.setLayout(new FillLayout());
 
 		TerrainLoader l = new TerrainLoader();
-		Raster rw = l.load("ned19_n47x00_w122x00_wa_mounttrainier_2008/ned19_n47x00_w122x00_wa_mounttrainier_2008.tif");
-		Raster re = l.load("ned19_n47x00_w121x75_wa_mounttrainier_2008/ned19_n47x00_w121x75_wa_mounttrainier_2008.tif");
+		RasterProvider rw = new RasterProvider() {
+			@Override
+			public Raster provide() {
+				return l.load("ned19_n47x00_w122x00_wa_mounttrainier_2008/ned19_n47x00_w122x00_wa_mounttrainier_2008.tif");
+			}
+		};
+		RasterProvider re = new RasterProvider() {
+			@Override
+			public Raster provide() {
+				return l.load("ned19_n47x00_w121x75_wa_mounttrainier_2008/ned19_n47x00_w121x75_wa_mounttrainier_2008.tif");
+			}
+		};
 
 		SoQt.init("demo");
 
