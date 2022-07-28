@@ -392,6 +392,7 @@ public class MainGLFW {
 		re = null; // for garbage collection
 
 		sg.getShadowGroup().precision.setValue(shadow_precision);
+        sg.setSoftShadows(shadow_precision > 0.05f);
 
 		sg.setLevelOfDetail(level_of_detail);
 

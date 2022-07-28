@@ -33,7 +33,7 @@ public class OptionDialog extends JDialog {
     /**
      * low by default
      */
-    public static final double DEFAULT_SHADOW_PRECISION = 0.02;//0.075;
+    public static final double DEFAULT_SHADOW_PRECISION = 0.05;//0.075;
     public static final double DEFAULT_LOD_FACTOR = 0.25;//0.5;
     public static final double DEFAULT_LOD_FACTOR_SHADOW = 0.25;//0.5;
     public static final double DEFAULT_TREE_DISTANCE = 1500;//3000;
@@ -148,7 +148,7 @@ public class OptionDialog extends JDialog {
     }
 
     private void onLow() {
-        setShadowPrecision(0.02);
+        setShadowPrecision(0.05);
         setLODFactor(0.25);
         setLODFactorShadow(0.25);
         setTreeDistance(1500);
@@ -199,7 +199,9 @@ public class OptionDialog extends JDialog {
 
     private void apply() {
         //sg.enableNotifySun();
-        sg.getShadowGroup().precision.setValue((float)((double)((Double)((SpinnerNumberModel) spinnerShadowgroup.getModel()).getNumber())));
+        float shadowPrecision = (float)((double)((Double)((SpinnerNumberModel) spinnerShadowgroup.getModel()).getNumber()));
+        sg.getShadowGroup().precision.setValue(shadowPrecision);
+        sg.setSoftShadows(shadowPrecision > 0.05f);
         sg.setLevelOfDetail((float)((double)((Double)((SpinnerNumberModel)spinnerLODFactor.getModel()).getNumber())));
         //sg.setLevelOfDetailShadow((float)((double)((Double)((SpinnerNumberModel)spinnerLODFactorShadow.getModel()).getNumber())));
         sg.setTreeDistance((float)((double)((Double)((SpinnerNumberModel)spinnerTreeDistance.getModel()).getNumber())));

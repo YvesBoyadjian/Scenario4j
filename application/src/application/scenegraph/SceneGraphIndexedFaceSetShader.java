@@ -310,6 +310,8 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 
     BootsFamily boots;
 
+	boolean softShadows = true;
+
     public SceneGraphIndexedFaceSetShader(
 			RasterProvider rwp,
 			RasterProvider rep,
@@ -3042,7 +3044,7 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 
     /**
      *
-     * @param boots
+     * @param bootsFlag
      * @return true if change
      */
 	public boolean setBoots(boolean bootsFlag) {
@@ -3053,5 +3055,26 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
             return true;
         }
         return false;
+	}
+
+	public void setSoftShadows(boolean soft) {
+		softShadows = soft;
+
+		boolean wasNotify = sunLight[0].isNotifyEnabled();
+
+		sunLight[0].enableNotify(true); // In order not to recompute shaders
+		sunLight[1].enableNotify(true); // In order not to recompute shaders
+		sunLight[2].enableNotify(true); // In order not to recompute shaders
+		sunLight[3].enableNotify(true); // In order not to recompute shaders
+
+		sunLight[0].intensity.setValue(softShadows ? 1.0f/4.0f : 1.0f);
+		sunLight[1].on.setValue(softShadows);
+		sunLight[2].on.setValue(softShadows);
+		sunLight[3].on.setValue(softShadows);
+
+		sunLight[0].enableNotify(wasNotify); // In order not to recompute shaders
+		sunLight[1].enableNotify(wasNotify); // In order not to recompute shaders
+		sunLight[2].enableNotify(wasNotify); // In order not to recompute shaders
+		sunLight[3].enableNotify(wasNotify); // In order not to recompute shaders
 	}
 }
