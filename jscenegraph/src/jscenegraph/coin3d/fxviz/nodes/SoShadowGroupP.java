@@ -665,7 +665,23 @@ setVertexShader(SoState state)
     gen.addMainStatement("vec4 pos = cameraTransform * ecPosition;\n"); // in world space
   }
 
-  if(this.texturematrix == null) {
+  if (this.texturematrix != null && this.texturematrix.length != numshadowlights) {
+	  int numMatrix = this.texturematrix.length;
+	  for (int matrix=0; matrix<numMatrix; matrix++) {
+		  SoShaderParameterMatrix tm = this.texturematrix[matrix];
+		  if (tm != null) {
+			  tm.unref();
+		  }
+		  SoShaderParameterMatrix ntm = this.neartexturematrix[matrix];
+		  if (ntm != null) {
+			  ntm.unref();
+		  }
+	  }
+	  this.texturematrix = null;
+	  this.neartexturematrix = null;
+  }
+
+  if (this.texturematrix == null) {
   	texturematrix = new SoShaderParameterMatrix[numshadowlights];
   	neartexturematrix = new SoShaderParameterMatrix[numshadowlights];
   }
