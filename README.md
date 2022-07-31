@@ -51,3 +51,11 @@ Credits :
 - vk-bootstrap : https://github.com/charles-lunarg/vk-bootstrap
 
 - Julie Boyadjian : Testing
+
+- Boots : https://sketchfab.com/3d-models/hi-tec-mountain-boots-high-poly-08ce39df87a6458ba52c06063edf281c
+
+- Mushroom : https://free3d.com/3d-model/mushroombutton--163840.html
+
+- glTF reader : https://github.com/javagl/JglTF
+
+- Obj reader : https://github.com/javagl/Obj
