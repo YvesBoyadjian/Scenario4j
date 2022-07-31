@@ -758,6 +758,7 @@ setVertexShader(SoState state)
 
     if (numshadowlights != 0) {
       this.vertexshader.parameter.set1Value(0, this.cameratransform);
+	  this.vertexshader.parameter.setNum(1);
     }
     else {
       this.vertexshader.parameter.setNum(0);
