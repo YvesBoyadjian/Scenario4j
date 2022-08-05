@@ -88,9 +88,9 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 
 	private static final float SUN_INTENSITY = 1.0f;
 	
-	public static final SbColor SKY_COLOR = new SbColor(0.3f, 0.3f, 0.5f);
+	public static final SbColor SKY_COLOR = new SbColor(0.3f, 0.3f, 0.65f);
 	
-	private static final float SKY_INTENSITY = 0.2f; 
+	private static final float SKY_INTENSITY = 0.3f;
 	
 	private static final Color STONE = new Color(139,141,122); //http://www.colourlovers.com/color/8B8D7A/stone_gray
 
