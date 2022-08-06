@@ -312,6 +312,8 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 
 	boolean softShadows = true;
 
+	float distanceFromSea = 1e6f;
+
     public SceneGraphIndexedFaceSetShader(
 			RasterProvider rwp,
 			RasterProvider rep,
@@ -471,7 +473,7 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 					//sceneBox.extendBy(ptV);
 
 					// On the beach ?
-					if( Math.abs(ptV.getZ() - zWater) < 1) {
+					if( Math.abs(ptV.getZ() - zWater) < 2.0f) {
 						beachBSPTree.addPoint(ptV,null);
 					}
 					
@@ -2300,6 +2302,7 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 				temporaryMessageDisplay.string.setNum(0);
 			}
 		}
+		distanceFromSea = computeDistanceFromBeach();
 	}
 
 	synchronized void addIdleCB(Runnable r) {
@@ -2869,6 +2872,10 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 	}
 
 	public float getDistanceFromBeach() {
+		return distanceFromSea;
+	}
+
+	private float computeDistanceFromBeach() {
 		SbVec3f trans = transl.translation.getValue();
 
 		SbVec3f hero = new SbVec3f(current_x - trans.getX(),current_y - trans.getY(),current_z - trans.getZ());
@@ -2909,7 +2916,7 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 		}
 
 		if(searchForSea) {
-			float distanceFromSea = getDistanceFromBeach();
+			//float distanceFromSea = getDistanceFromBeach();
 			if(distanceFromSea > 20) {
 				String string3 = "Beach distance: "+(int)distanceFromSea+" m";
 				offscreenTargetDisplay.string.set1Value(numStrings,string3);

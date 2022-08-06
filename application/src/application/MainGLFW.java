@@ -9,20 +9,17 @@ import java.awt.image.Raster;
 import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.ByteBuffer;
+import java.nio.IntBuffer;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.file.Files;
 import java.util.*;
 import java.util.function.Consumer;
 
-import javax.sound.sampled.AudioInputStream;
-import javax.sound.sampled.AudioSystem;
-import javax.sound.sampled.Clip;
-import javax.sound.sampled.LineEvent;
-import javax.sound.sampled.LineListener;
-import javax.sound.sampled.LineUnavailableException;
-import javax.sound.sampled.UnsupportedAudioFileException;
+import javax.sound.sampled.*;
 import javax.swing.*;
+import javax.swing.border.BevelBorder;
 
 import application.gui.OptionDialog;
 import application.scenario.FirstApproachQuest;
@@ -81,6 +78,11 @@ import jsceneviewerglfw.Display;
 import jsceneviewerglfw.GLData;
 import jsceneviewerglfw.SWT;
 import loader.TerrainLoader;
+import org.lwjgl.BufferUtils;
+import org.lwjgl.openal.AL;
+import org.lwjgl.openal.AL10;
+import org.lwjgl.openal.ALC;
+import org.lwjgl.openal.ALCCapabilities;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GLDebugMessageCallback;
 import org.ode4j.math.DQuaternion;
@@ -90,8 +92,10 @@ import org.ode4j.ode.*;
 import org.ode4j.ode.internal.ErrorHandler;
 import org.ode4j.ode.internal.ErrorHdl;
 import org.ode4j.ode.internal.Rotation;
+import util.IOUtils;
 
 import static com.badlogic.gdx.physics.bullet.collision.CollisionConstants.DISABLE_DEACTIVATION;
+import static org.lwjgl.openal.ALC10.*;
 import static org.lwjgl.opengl.GL11C.glEnable;
 import static org.lwjgl.opengl.GL11C.glGetError;
 import static org.lwjgl.opengl.GL43C.*;
@@ -223,7 +227,10 @@ public class MainGLFW {
 		southPanel.setBackground(Color.BLACK);
 		southPanel.setLayout(new BoxLayout(southPanel, BoxLayout.PAGE_AXIS));
 
-		southPanel.add(progressBar);
+		JLabel engine = new JLabel("Scenario4j Engine",null,SwingConstants.CENTER);
+		engine.setFont(intro.getFont().deriveFont((float) height / 30f));
+		engine.setForeground(Color.yellow);
+		engine.setBackground(Color.black);
 
 		JLabel keys = new JLabel("[WASD] or [ZQSD] to walk, [left mouse button] to shoot"+ ((SceneGraphIndexedFaceSetShader.AIM ? ", [right mouse button] to aim":"")+", [Esc] for menu"),null,SwingConstants.CENTER);
 		keys.setForeground(Color.yellow);
@@ -234,6 +241,8 @@ public class MainGLFW {
 		keysPanel.setBackground(Color.black);
 		keysPanel.add(keys);
 
+		southPanel.add(engine);
+		southPanel.add(progressBar);
 		southPanel.add(keysPanel);
 
 		window.getContentPane().add(southPanel,BorderLayout.SOUTH);
@@ -290,6 +299,8 @@ public class MainGLFW {
 	static DWorld world;
 	static DSpace space;
 	static DJointGroup contactGroup;
+
+	static Clip seaClip;
 
 	public static void mainGame(final JProgressBar progressBar) {
 		display = new Display();
@@ -544,7 +555,7 @@ public class MainGLFW {
 			protected void onFire(SoMouseButtonEvent event) {
 				//playSound("shortened_40_smith_wesson_single-mike-koenig.wav"/*clipf*/);
 				if (gunSound != null) {
-					playSound(/*"GUN_FIRE-GoodSoundForYou-820112263_10db.wav"*//*clipf*/gunSound);
+					playSoundDelayed(/*"GUN_FIRE-GoodSoundForYou-820112263_10db.wav"*//*clipf*/gunSound, false, 1f);
 				}
 
 				SbViewportRegion vr = this.getSceneHandler().getViewportRegion();
@@ -1371,6 +1382,14 @@ public class MainGLFW {
 			sg.displayObjectives(viewer1);
 		});
 
+		viewer.addIdleListener((viewer1) -> {
+			float distanceFromBeach = sg.getDistanceFromBeach();
+			if (seaClip != null) {
+				float atmosphericAbsorption = (float)Math.pow(0.01, distanceFromBeach/1000.0f);
+				setVolume(seaClip, 1.0f / (15.0f + distanceFromBeach/40.0f) * atmosphericAbsorption);
+			}
+		});
+
 		final int[] id = new int[1];
 
 		final int[] idTrail = new int[1];
@@ -1491,6 +1510,42 @@ public class MainGLFW {
 				System.exit(-1); // Necessary, because of Linux
 			}
 
+//// Can call "alc" functions at any time
+//			long device = alcOpenDevice((ByteBuffer)null);
+//			ALCCapabilities deviceCaps = ALC.createCapabilities(device);
+//
+//			long context = alcCreateContext(device, (IntBuffer)null);
+//			alcMakeContextCurrent(context);
+//			AL.createCapabilities(deviceCaps);
+//// Can now call "al" functions
+//
+//			IntBuffer buffer = BufferUtils.createIntBuffer(1);
+//			AL10.alGenBuffers(buffer);
+//
+//			String args = "ressource/" + "AMBSea_Falaise 2 (ID 2572)_LS_16bit.wav";
+//			File file = new File(args);
+//			if (!file.exists()) {
+//				file = new File("application/" + args);
+//			}
+//			URL url = null;
+//			try {
+//				url = file.toURL();
+//			} catch (MalformedURLException e) {
+//				e.printStackTrace();
+//			}
+//
+//			long time = 0;
+//			try {
+//				time = createBufferData(buffer.get(0),url);
+//			} catch (UnsupportedAudioFileException e) {
+//				e.printStackTrace();
+//			} catch (IOException e) {
+//				e.printStackTrace();
+//			}
+
+			byte[] seaSound = loadSound("AMBSea_Falaise 2 (ID 2572)_LS_16bit.wav");
+
+			seaClip = playSound(seaSound,true, 0.001f);
 
 			boolean success = viewer.setFocus();
 
@@ -1569,18 +1624,28 @@ public class MainGLFW {
 		return fileContent;
 	}
 
-	public static synchronized void playSound(final /*String url*/byte[] sound) {
+	public static synchronized void playSoundDelayed(final /*String url*/byte[] sound, boolean loop, float volume) {
 		new Thread(new Runnable() {
+		// The wrapper thread is unnecessary, unless it blocks on the
+		// Clip finishing; see comments.
+			public void run() {
+		playSound(sound,loop,volume);
+			}
+		}).start();
+	}
+
+	public static synchronized Clip playSound(final /*String url*/byte[] sound, boolean loop, float volume) {
+//		new Thread(new Runnable() {
 			// The wrapper thread is unnecessary, unless it blocks on the
 			// Clip finishing; see comments.
-			public void run() {
+//			public void run() {
 				try {
 					Clip clip = AudioSystem.getClip();
 					clip.addLineListener(new LineListener() {
 
 						@Override
 						public void update(LineEvent event) {
-							if (event.getType() == LineEvent.Type.STOP) {
+							if (event.getType() == LineEvent.Type.STOP && !loop) {
 								clip.close();
 							}
 						}
@@ -1589,12 +1654,15 @@ public class MainGLFW {
 					AudioInputStream inputStream = AudioSystem.getAudioInputStream(
 							new ByteArrayInputStream(sound));
 					clip.open(inputStream);
+					setVolume(clip,volume);
 					clip.start();
+					return clip;
 				} catch (Exception e) {
 					System.err.println(e.getMessage());
 				}
-			}
-		}).start();
+				return null;
+//			}
+//		}).start();
 	}
 
 	public static synchronized void playSound(Clip clip) {
@@ -1611,4 +1679,76 @@ public class MainGLFW {
 			}
 		}).start();
 	}
-}
+	private static long createBufferData(int p, URL fileName) throws UnsupportedAudioFileException, IOException {
+		//shortcut finals:
+		final int MONO = 1, STEREO = 2;
+
+		AudioInputStream stream = null;
+		stream = AudioSystem.getAudioInputStream(fileName);
+
+		AudioFormat format = stream.getFormat();
+		if(format.isBigEndian()) throw new UnsupportedAudioFileException("Can't handle Big Endian formats yet");
+
+		//load stream into byte buffer
+		int openALFormat = -1;
+		switch(format.getChannels()) {
+			case MONO:
+				switch(format.getSampleSizeInBits()) {
+					case 8:
+						openALFormat = AL10.AL_FORMAT_MONO8;
+						break;
+					case 16:
+						openALFormat = AL10.AL_FORMAT_MONO16;
+						break;
+				}
+				break;
+			case STEREO:
+				switch(format.getSampleSizeInBits()) {
+					case 8:
+						openALFormat = AL10.AL_FORMAT_STEREO8;
+						break;
+					case 16:
+						openALFormat = AL10.AL_FORMAT_STEREO16;
+						break;
+				}
+				break;
+		}
+
+		//load data into a byte buffer
+		//I've elected to use IOUtils from Apache Commons here, but the core
+		//notion is to load the entire stream into the byte array--you can
+		//do this however you would like.
+
+		//org.apache.commons.io.IOUtils.toByteArray(stream);
+
+		// https://stackoverflow.com/questions/1264709/convert-inputstream-to-byte-array-in-java
+
+		InputStream is = stream;
+		ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+
+		int nRead;
+		byte[] datab = new byte[16384];
+
+		while ((nRead = is.read(datab, 0, datab.length)) != -1) {
+			buffer.write(datab, 0, nRead);
+		}
+
+		byte[] b = buffer.toByteArray();
+
+
+		ByteBuffer data = BufferUtils.createByteBuffer(b.length).put(b);
+		data.flip();
+
+		//load audio data into appropriate system space....
+		AL10.alBufferData(p, openALFormat, data, (int)format.getSampleRate());
+
+		//and return the rough notion of length for the audio stream!
+		return (long)(1000f * stream.getFrameLength() / format.getFrameRate());
+	}
+
+	public static void setVolume(Clip clip, float volume) {
+		if (volume < 0f || volume > 1f)
+			throw new IllegalArgumentException("Volume not valid: " + volume);
+		FloatControl gainControl = (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);
+		gainControl.setValue(20f * (float) Math.log10(volume));
+	}}
