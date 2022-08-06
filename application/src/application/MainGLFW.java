@@ -1645,7 +1645,7 @@ public class MainGLFW {
 
 						@Override
 						public void update(LineEvent event) {
-							if (event.getType() == LineEvent.Type.STOP && !loop) {
+							if (event.getType() == LineEvent.Type.STOP) {
 								clip.close();
 							}
 						}
@@ -1655,7 +1655,12 @@ public class MainGLFW {
 							new ByteArrayInputStream(sound));
 					clip.open(inputStream);
 					setVolume(clip,volume);
-					clip.start();
+					if (loop) {
+						clip.loop(Integer.MAX_VALUE);
+					}
+					else {
+						clip.start();
+					}
 					return clip;
 				} catch (Exception e) {
 					System.err.println(e.getMessage());
