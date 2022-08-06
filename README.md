@@ -12,6 +12,8 @@ Scenario4j has been used to create the game "Mount Rainier Island"
 
 Credits : 
 
+- LWJGL : https://github.com/LWJGL/lwjgl3
+
 - Terrain : https://apps.nationalmap.gov/downloader/
 
 - Gun sound : https://soundcloud.com/tchan5158/gun-fire-goodsoundforyou-820112263
