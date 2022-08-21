@@ -391,13 +391,18 @@ public class DouglasForest {
 		float delta_x = xMax - xMin;
 		float delta_y = yMax - yMin;
 		
-		float width_x = delta_x / 15;		
-		float width_y = delta_y / 15;
+//		float width_x = delta_x / 15;
+//		float width_y = delta_y / 15;
 		
-		float min_width = Math.min(width_x,width_y);
+		float min_width = 500; //Math.min(width_x,width_y);
+
+		System.out.println("DouglasChunk width : "+min_width);
 		
 		int nb_x = (int)Math.round(Math.ceil(delta_x / min_width));
 		int nb_y = (int)Math.round(Math.ceil(delta_y / min_width));
+
+		System.out.println("nb_x = "+nb_x);
+		System.out.println("nb_y = "+nb_y);
 		
 		for(int i=0;i<nb_x;i++) {
 			SbBox3f xLimitsBBox = new SbBox3f();
