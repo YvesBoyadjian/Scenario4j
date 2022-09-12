@@ -81,6 +81,7 @@ public class SoLODIndexedFaceSet extends SoIndexedFaceSet {
 			}
 			else {
 				clear();
+				chunk.clear();
 			}
 		}
 		  // don't auto cache LOD nodes.

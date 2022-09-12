@@ -1356,9 +1356,12 @@ public class MainGLFW {
 			{
 				dialog.pack();
 				dialog.setLocationRelativeTo(null);
-				dialog.setVisible(true);
+				SwingUtilities.invokeLater(()->
+						{
+							dialog.setVisible(true);
 				dialog.setBounds(GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds());
 				dialog.setAlwaysOnTop(true);
+						});
 			}
 			//);
 		});

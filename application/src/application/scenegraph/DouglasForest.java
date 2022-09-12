@@ -205,7 +205,7 @@ public class DouglasForest {
 					float foliageWidth = (height+ randomBottom/*randomBottomTrees.nextFloat()*/*12.0f) * 0.1f;
 					params.bottomTree = foliageWidth;
 
-					params.baseTree = 1.5f + randomBaseTrees.nextFloat()*height/10;
+					params.baseTree = 1.0f + randomBaseTrees.nextFloat()*height/10;
 					
 					float leanAngleTree = randomLeanAngle_;//randomLeanAngle.nextFloat();
 					params.leanAngle = (float)(Math.pow(leanAngleTree, 5)*Math.PI/2/10);

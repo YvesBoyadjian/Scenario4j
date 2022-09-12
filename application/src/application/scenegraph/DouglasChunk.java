@@ -111,11 +111,29 @@ public class DouglasChunk {
 	FloatMemoryBuffer douglasVerticesT;
 	FloatMemoryBuffer douglasNormalsT;
 	int[] douglasColorsT;
+
+	public void clear() {
+		douglasIndicesF = null;
+		douglasVerticesF = null;
+		douglasNormalsF = null;
+		douglasColorsF = null;
+		douglasTexCoordsF = null;
+
+		douglasIndicesNearF = null;
+		douglasVerticesNearF = null;
+		douglasNormalsNearF = null;
+		douglasColorsNearF = null;
+		douglasTexCoordsNearF = null;
+	}
 	
 	/**
 	 * Compute for foliage
 	 */
 	public void computeDouglasF() {
+
+		if (douglasIndicesF != null) {
+			return;
+		}
 		
 		int nbDouglas = getNbTrees();
 		
@@ -358,7 +376,7 @@ public class DouglasChunk {
 			Random nearFoliageRandom = new Random(treeIndex);
 
 			float zStartBranch = zTopF;
-			final float zDeltaBranch = .3f;
+			final float zDeltaBranch = .25f;
 			float azimuth;
 			float azimuth2;
 			float branchHoriLength;
@@ -629,10 +647,11 @@ public class DouglasChunk {
 
 	public void computeDouglas() {
 		computeDouglasT();
-		computeDouglasF();
+		//computeDouglasF();
 	}
 
 	public IndexedFaceSetParameters getFoliageFarParameters() {
+		computeDouglasF();
 		return new IndexedFaceSetParameters() {
 			@Override
 			public int[] coordIndices() {
@@ -662,6 +681,7 @@ public class DouglasChunk {
 	}
 
 	public IndexedFaceSetParameters getFoliageNearParameters() {
+		computeDouglasF();
 		return new IndexedFaceSetParameters() {
 			@Override
 			public int[] coordIndices() {
