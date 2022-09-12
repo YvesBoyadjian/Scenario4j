@@ -28,6 +28,7 @@ import jscenegraph.database.inventor.actions.SoGLRenderAction;
 import jscenegraph.database.inventor.nodes.SoGroup;
 import jscenegraph.database.inventor.nodes.SoIndexedFaceSet;
 import jscenegraph.database.inventor.nodes.SoSeparator;
+import jscenegraph.database.inventor.nodes.SoShapeHints;
 
 import javax.swing.*;
 
@@ -469,7 +470,7 @@ public class DouglasForest {
 //		}
 	}
 
-	public SoGroup getDouglasTreesT(SbVec3f refPoint, final float[] distance) {
+	public SoGroup getDouglasTreesT(SbVec3f refPoint,SbVec3f refPoint2, final float[] distance) {
 		final int[] counting = new int[2]; 
 		
 		SoGroup separator = new SoGroup() {
@@ -501,7 +502,7 @@ public class DouglasForest {
 					finalCenter.setValue(centerV);
 				}
 				
-				SoLODIndexedFaceSet indexedFaceSetT = new SoLODIndexedFaceSet(refPoint,chunk,SoLODIndexedFaceSet.Type.TRUNK, counting) {
+				SoLODIndexedFaceSet indexedFaceSetT = new SoLODIndexedFaceSet(refPoint,refPoint2,chunk,SoLODIndexedFaceSet.Type.TRUNK, counting) {
 					public void GLRender(SoGLRenderAction action)
 					{
 						super.GLRender(action);
@@ -529,7 +530,7 @@ public class DouglasForest {
 		return separator;
 	}
 
-	public SoGroup getDouglasTreesF(SbVec3f refPoint, final float[] distance, boolean withColors) {
+	public SoGroup getDouglasTreesF(SbVec3f refPoint,SbVec3f refPoint2, final float[] distance, boolean withColors) {
 		final int[] counting = new int[2]; 
 		
 		SoGroup separator = new SoGroup() {
@@ -539,6 +540,10 @@ public class DouglasForest {
 				super.GLRender(action);
 			}			
 		};
+
+//		SoShapeHints shapeHints = new SoShapeHints();
+//
+//		separator.addChild(shapeHints);
 		
 		for( List<DouglasChunk> chunkListForX : douglasChunks ) {
 			SoLODGroup separatorForX = new SoLODGroup();
@@ -560,7 +565,7 @@ public class DouglasForest {
 						finalCenter.setValue(centerV);
 					}
 					
-				SoLODIndexedFaceSet indexedFaceSetF = new SoLODIndexedFaceSet(refPoint, chunk,SoLODIndexedFaceSet.Type.FOLIAGE, counting) {
+				SoLODIndexedFaceSet indexedFaceSetF = new SoLODIndexedFaceSet(refPoint,refPoint2, chunk,SoLODIndexedFaceSet.Type.FOLIAGE, counting) {
 					public void GLRender(SoGLRenderAction action)
 					{
 						super.GLRender(action);
@@ -573,7 +578,7 @@ public class DouglasForest {
 					}
 				};
 				
-				indexedFaceSetF.loadFoliage();
+				//indexedFaceSetF.loadFoliage();
 				
 				indexedFaceSetF.maxDistance = distance;
 				

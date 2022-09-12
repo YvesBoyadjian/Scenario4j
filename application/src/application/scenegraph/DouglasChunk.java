@@ -3,14 +3,15 @@ package application.scenegraph;
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
 
 import application.objects.DouglasFir;
+import application.scenegraph.douglas.IndexedFaceSetParameters;
 import jscenegraph.coin3d.inventor.lists.SbListInt;
-import jscenegraph.database.inventor.SbBox3f;
-import jscenegraph.database.inventor.SbColor;
-import jscenegraph.database.inventor.SbRotation;
-import jscenegraph.database.inventor.SbVec3f;
+import jscenegraph.database.inventor.*;
+import jscenegraph.port.SbVec3fArray;
 import jscenegraph.port.memorybuffer.FloatMemoryBuffer;
 
 public class DouglasChunk {
@@ -99,7 +100,13 @@ public class DouglasChunk {
 	FloatMemoryBuffer douglasNormalsF;
 	int[] douglasColorsF;
 	FloatMemoryBuffer douglasTexCoordsF;
-	
+
+	int[] douglasIndicesNearF;
+	FloatMemoryBuffer douglasVerticesNearF;
+	FloatMemoryBuffer douglasNormalsNearF;
+	int[] douglasColorsNearF;
+	FloatMemoryBuffer douglasTexCoordsNearF;
+
 	int[] douglasIndicesT;
 	FloatMemoryBuffer douglasVerticesT;
 	FloatMemoryBuffer douglasNormalsT;
@@ -149,7 +156,16 @@ public class DouglasChunk {
 		//ByteBuffer douglasTexCoordsFb = douglasTexCoordsF.toByteBuffer();/*.asFloatBuffer()*/;
 		
 		int[] indices = new int[4];
-		
+
+		//final List<SbVec3f> branchStartPoints = new ArrayList<>();
+
+		final float sixtyDegrees = 60.0f * (float)Math.PI / 180.0f;
+
+		final List<SbVec3f> vertices = new ArrayList<>();
+		final List<SbVec3f> normals = new ArrayList<>();
+		final List<Integer> colors = new ArrayList<>();
+		final List<Float> branchHoriLengths = new ArrayList<>();
+
 		for( int tree = 0; tree< nbDouglas; tree++) {
 			
 			float height = getHeight(tree);
@@ -164,7 +180,7 @@ public class DouglasChunk {
 			douglasColorsF[vertex+3] = colorMultiplierTree;//TREE_FOLIAGE.getPackedValue();//BFOL1
 			douglasColorsF[vertex+1+3] = colorMultiplierTree;//TREE_FOLIAGE.getPackedValue();//BFOL2
 			douglasColorsF[vertex+2+3] = colorMultiplierTree;//TREE_FOLIAGE.getPackedValue();//BFOL3
-			
+
 			int vertexCoordIndice = vertex * 3 ;
 			int texCoordIndice = vertex * 2;
 						
@@ -183,14 +199,19 @@ public class DouglasChunk {
 			
 			SbVec3f xyzTop = new SbVec3f(0,0,height);
 			
-			SbVec3f xyzTopLean = rot.multVec(xyzTop);
+			final SbVec3f xyzTopLean = rot.multVec(xyzTop);
 			
-			float widthTop = getRandomTopTree(tree);//width *2.5f * forest.randomTopTrees.nextFloat();
-			
+			final float widthTop = getRandomTopTree(tree);//width *2.5f * forest.randomTopTrees.nextFloat();
+
+			final float zTopF = getZ(tree) /*+ height*/ + xyzTopLean.getZ();
+
+			final float xTopTree = getX(tree) + xyzTopLean.getX();
+			final float yTopTree = getY(tree) + xyzTopLean.getY();
+
 			// top of tree foliage
-			douglasVerticesF.setFloat(vertexCoordIndice, getX(tree)+ widthTop * (float)Math.cos(angleRadian1) + xyzTopLean.getX() );
-			douglasVerticesF.setFloat(vertexCoordIndice+1, getY(tree)+ widthTop * (float)Math.sin(angleRadian1) + xyzTopLean.getY() );
-			douglasVerticesF.setFloat(vertexCoordIndice+2, getZ(tree) /*+ height*/ + xyzTopLean.getZ());
+			douglasVerticesF.setFloat(vertexCoordIndice, xTopTree + widthTop * (float)Math.cos(angleRadian1) );
+			douglasVerticesF.setFloat(vertexCoordIndice+1, yTopTree + widthTop * (float)Math.sin(angleRadian1) );
+			douglasVerticesF.setFloat(vertexCoordIndice+2, zTopF);
 			
 			douglasNormalsF.setFloat(vertexCoordIndice, (float)Math.cos(angleRadian1));
 			douglasNormalsF.setFloat(vertexCoordIndice+1, (float)Math.sin(angleRadian1));
@@ -202,9 +223,9 @@ public class DouglasChunk {
 			vertexCoordIndice += 3;
 			texCoordIndice += 2;
 			
-			douglasVerticesF.setFloat(vertexCoordIndice, getX(tree)+ widthTop * (float)Math.cos(angleRadian2) + xyzTopLean.getX() );
-			douglasVerticesF.setFloat(vertexCoordIndice+1, getY(tree)+ widthTop * (float)Math.sin(angleRadian2) + xyzTopLean.getY() );
-			douglasVerticesF.setFloat(vertexCoordIndice+2, getZ(tree) +  + xyzTopLean.getZ() );
+			douglasVerticesF.setFloat(vertexCoordIndice, xTopTree + widthTop * (float)Math.cos(angleRadian2) );
+			douglasVerticesF.setFloat(vertexCoordIndice+1, yTopTree + widthTop * (float)Math.sin(angleRadian2) );
+			douglasVerticesF.setFloat(vertexCoordIndice+2, zTopF );
 			
 			douglasNormalsF.setFloat(vertexCoordIndice, (float)Math.cos(angleRadian2));
 			douglasNormalsF.setFloat(vertexCoordIndice+1, (float)Math.sin(angleRadian2));
@@ -216,9 +237,9 @@ public class DouglasChunk {
 			vertexCoordIndice += 3;
 			texCoordIndice += 2;
 			
-			douglasVerticesF.setFloat(vertexCoordIndice, getX(tree)+ widthTop * (float)Math.cos(angleRadian3) + xyzTopLean.getX() );
-			douglasVerticesF.setFloat(vertexCoordIndice+1, getY(tree)+ widthTop * (float)Math.sin(angleRadian3) + xyzTopLean.getY() );
-			douglasVerticesF.setFloat(vertexCoordIndice+2, getZ(tree) +  + xyzTopLean.getZ() );
+			douglasVerticesF.setFloat(vertexCoordIndice, xTopTree + widthTop * (float)Math.cos(angleRadian3) );
+			douglasVerticesF.setFloat(vertexCoordIndice+1, yTopTree + widthTop * (float)Math.sin(angleRadian3) );
+			douglasVerticesF.setFloat(vertexCoordIndice+2, zTopF );
 			
 			douglasNormalsF.setFloat(vertexCoordIndice, (float)Math.cos(angleRadian3));
 			douglasNormalsF.setFloat(vertexCoordIndice+1, (float)Math.sin(angleRadian3));
@@ -236,13 +257,15 @@ public class DouglasChunk {
 			float foliageWidth = getRandomBottomTree(tree);//(height+ forest.randomBottomTrees.nextFloat()*12.0f) * 0.1f;
 			
 			float foliageBase = getRandomBaseTree(tree); // 2.5
-			
+
+			final float zBottomF = getZ(tree) + foliageBase;
+
 			douglasVerticesF.setFloat(vertexCoordIndice, getX(tree) + foliageWidth * (float)Math.cos(angleRadian1));
 			douglasVerticesF.setFloat(vertexCoordIndice+1, getY(tree) + foliageWidth * (float)Math.sin(angleRadian1));
 
 			float z = df.sg.getInternalZ(douglasVerticesF.getFloat(vertexCoordIndice),douglasVerticesF.getFloat(vertexCoordIndice+1),indices) + df.sg.getzTranslation();
 			
-			douglasVerticesF.setFloat(vertexCoordIndice+2, Math.max(getZ(tree) + foliageBase,z+0.2f));
+			douglasVerticesF.setFloat(vertexCoordIndice+2, Math.max(zBottomF,z+0.2f));
 			
 			douglasNormalsF.setFloat(vertexCoordIndice,  (float)Math.cos(angleRadian1));
 			douglasNormalsF.setFloat(vertexCoordIndice+1,  (float)Math.sin(angleRadian1));
@@ -259,7 +282,7 @@ public class DouglasChunk {
 			
 			z = df.sg.getInternalZ(douglasVerticesF.getFloat(vertexCoordIndice),douglasVerticesF.getFloat(vertexCoordIndice+1),indices) + df.sg.getzTranslation();
 			
-			douglasVerticesF.setFloat(vertexCoordIndice+2, Math.max(getZ(tree) + foliageBase,z+0.2f));
+			douglasVerticesF.setFloat(vertexCoordIndice+2, Math.max(zBottomF,z+0.2f));
 			
 			douglasNormalsF.setFloat(vertexCoordIndice,   (float)Math.cos(angleRadian2));
 			douglasNormalsF.setFloat(vertexCoordIndice+1,  (float)Math.sin(angleRadian2));
@@ -276,7 +299,7 @@ public class DouglasChunk {
 			
 			z = df.sg.getInternalZ(douglasVerticesF.getFloat(vertexCoordIndice),douglasVerticesF.getFloat(vertexCoordIndice+1),indices) + df.sg.getzTranslation();
 			
-			douglasVerticesF.setFloat(vertexCoordIndice+2, Math.max(getZ(tree) + foliageBase,z+0.2f));
+			douglasVerticesF.setFloat(vertexCoordIndice+2, Math.max(zBottomF,z+0.2f));
 			
 			douglasNormalsF.setFloat(vertexCoordIndice, (float)Math.cos(angleRadian3));
 			douglasNormalsF.setFloat(vertexCoordIndice+1, (float)Math.sin(angleRadian3));
@@ -329,10 +352,138 @@ public class DouglasChunk {
 			douglasIndicesF[i+1] = vertex+2+3-4;
 			douglasIndicesF[i+2] = vertex+3+3-4;
 			douglasIndicesF[i+3] = -1;
-			
+
+			int treeIndex = insideTrees.get(tree);
+
+			Random nearFoliageRandom = new Random(treeIndex);
+
+			float zStartBranch = zTopF;
+			final float zDeltaBranch = .3f;
+			float azimuth;
+			float azimuth2;
+			float branchHoriLength;
+			float xTrunk;
+			float yTrunk;
+			float decrease= 0.6f*(float)nearFoliageRandom.nextDouble();
+
+			while (zStartBranch > zBottomF) {
+
+				azimuth = (float)(Math.PI*2*nearFoliageRandom.nextDouble());
+				azimuth2 = azimuth + sixtyDegrees;
+				branchHoriLength = 1.2f*(widthTop + (zTopF - zStartBranch)/(zTopF - zBottomF)*(foliageWidth - widthTop));
+				branchHoriLengths.add(branchHoriLength);
+
+				xTrunk = xTopTree + (zTopF - zStartBranch)/(zTopF - getZ(tree))*(getX(tree) - xTopTree);
+				yTrunk = yTopTree + (zTopF - zStartBranch)/(zTopF - getZ(tree))*(getY(tree) - yTopTree);
+
+				final SbVec3f branchBase = new SbVec3fSingle();
+				final SbVec3f branchExtremity = new SbVec3fSingle();
+				final SbVec3f branchExtremity2 = new SbVec3fSingle();
+
+				branchBase.setValue(xTrunk,yTrunk,zStartBranch);
+				branchExtremity.setValue(xTrunk+(float)Math.sin(azimuth)*branchHoriLength,yTrunk+(float)Math.cos(azimuth)*branchHoriLength,zStartBranch-decrease*branchHoriLength);
+				branchExtremity2.setValue(xTrunk+(float)Math.sin(azimuth2)*branchHoriLength,yTrunk+(float)Math.cos(azimuth2)*branchHoriLength,zStartBranch-decrease*branchHoriLength);
+
+				vertices.add(branchBase);
+				vertices.add(branchExtremity);
+				vertices.add(branchExtremity2);
+
+				SbVec3f v1 = branchExtremity.operator_minus(branchBase);
+				SbVec3f v2 = branchExtremity2.operator_minus(branchBase);
+				final SbVec3f normal = v1.operator_cross_equal(v2);
+				normal.normalize();
+				normals.add(normal);
+
+				colors.add(colorMultiplierTree);
+				zStartBranch -= zDeltaBranch;
+			}
 		}
 		//douglasVerticesFb.flip();
 		//douglasNormalsFb.flip();
+
+		// ____________________________________________ Compute Near
+
+		// ____________________________________________ vertices
+		int nbVerticesNear = vertices.size();
+
+		douglasVerticesNearF = FloatMemoryBuffer.allocateFloats(nbVerticesNear * 3);
+		int floatIndex = 0;
+		for(SbVec3f vec : vertices) {
+			douglasVerticesNearF.setFloat(floatIndex,vec.getX()); floatIndex++;
+			douglasVerticesNearF.setFloat(floatIndex,vec.getY()); floatIndex++;
+			douglasVerticesNearF.setFloat(floatIndex,vec.getZ()); floatIndex++;
+		}
+
+		// ____________________________________________ indices
+		final int nbTriangles = nbVerticesNear/3;
+		int nbIndicesNear = nbTriangles*4*2;
+
+		douglasIndicesNearF = new int[nbIndicesNear];
+		int indice = 0;
+		for( int i=0; i< nbTriangles; i++) {
+			douglasIndicesNearF[i*8] = indice;
+			douglasIndicesNearF[i*8+4] = indice; indice++;
+			douglasIndicesNearF[i*8+1] = indice;
+			douglasIndicesNearF[i*8+2+4] = indice; indice++;
+			douglasIndicesNearF[i*8+2] = indice;
+			douglasIndicesNearF[i*8+1+4] = indice; indice++;
+			douglasIndicesNearF[i*8+3] = -1;
+			douglasIndicesNearF[i*8+3+4] = -1;
+		}
+
+		// ____________________________________________ normals
+		douglasNormalsNearF = FloatMemoryBuffer.allocateFloats(nbVerticesNear * 3);
+		floatIndex = 0;
+		for (int i=0; i< nbTriangles;i++) {
+			SbVec3f normal = normals.get(i);
+			for(int j=0;j<3;j++) {
+				douglasNormalsNearF.setFloat(floatIndex, -normal.getX());
+				floatIndex++;
+				douglasNormalsNearF.setFloat(floatIndex, -normal.getY());
+				floatIndex++;
+				douglasNormalsNearF.setFloat(floatIndex, -normal.getZ());
+				floatIndex++;
+			}
+		}
+
+		// _______________________________________________ colors
+
+		douglasColorsNearF = new int[nbVerticesNear];
+		indice = 0;
+		for(int i=0;i<nbTriangles;i++) {
+			int color = colors.get(i);
+			douglasColorsNearF[indice] = color; indice++;
+			douglasColorsNearF[indice] = color; indice++;
+			douglasColorsNearF[indice] = color; indice++;
+		}
+
+		// ________________________________________________ texture coordinates
+
+		douglasTexCoordsNearF = FloatMemoryBuffer.allocateFloats(nbVerticesNear*2);
+		floatIndex = 0;
+		for(int i=0;i<nbTriangles;i++) {
+			float branchHoriLength = branchHoriLengths.get(i);
+			douglasTexCoordsNearF.setFloat(floatIndex,0); floatIndex++;
+			douglasTexCoordsNearF.setFloat(floatIndex,0); floatIndex++;
+			douglasTexCoordsNearF.setFloat(floatIndex,branchHoriLength); floatIndex++;
+			douglasTexCoordsNearF.setFloat(floatIndex,-branchHoriLength); floatIndex++;
+			douglasTexCoordsNearF.setFloat(floatIndex,branchHoriLength); floatIndex++;
+			douglasTexCoordsNearF.setFloat(floatIndex,branchHoriLength); floatIndex++;
+		}
+/*
+		douglasIndicesNearF = douglasIndicesF;
+		douglasVerticesNearF = douglasVerticesF;
+		douglasNormalsNearF = douglasNormalsF;
+		douglasColorsNearF = douglasColorsF;
+		douglasTexCoordsNearF = douglasTexCoordsF;
+
+		int colorLength = douglasColorsF.length;
+		SbColor red = new SbColor(1,0,0);
+		int packedValue = red.getPackedValue();
+		douglasColorsNearF = new int[colorLength];
+		Arrays.fill(douglasColorsNearF,packedValue);
+
+ */
 	}
 	public void computeDouglasT() {
 		
@@ -480,4 +631,63 @@ public class DouglasChunk {
 		computeDouglasT();
 		computeDouglasF();
 	}
+
+	public IndexedFaceSetParameters getFoliageFarParameters() {
+		return new IndexedFaceSetParameters() {
+			@Override
+			public int[] coordIndices() {
+				return douglasIndicesF;
+			}
+
+			@Override
+			public FloatMemoryBuffer vertices() {
+				return douglasVerticesF;
+			}
+
+			@Override
+			public FloatMemoryBuffer normals() {
+				return douglasNormalsF;
+			}
+
+			@Override
+			public FloatMemoryBuffer textureCoords() {
+				return douglasTexCoordsF;
+			}
+
+			@Override
+			public int[] colorsRGBA() {
+				return douglasColorsF;
+			}
+		};
+	}
+
+	public IndexedFaceSetParameters getFoliageNearParameters() {
+		return new IndexedFaceSetParameters() {
+			@Override
+			public int[] coordIndices() {
+				return douglasIndicesNearF;
+			}
+
+			@Override
+			public FloatMemoryBuffer vertices() {
+				return douglasVerticesNearF;
+			}
+
+			@Override
+			public FloatMemoryBuffer normals() {
+				return douglasNormalsNearF;
+			}
+
+			@Override
+			public FloatMemoryBuffer textureCoords() {
+				return douglasTexCoordsNearF;
+			}
+
+			@Override
+			public int[] colorsRGBA() {
+				return douglasColorsNearF;
+			}
+		};
+	}
+
 }

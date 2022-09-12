@@ -3,6 +3,7 @@
  */
 package application.scenegraph;
 
+import application.scenegraph.douglas.IndexedFaceSetParameters;
 import jscenegraph.coin3d.inventor.nodes.SoVertexProperty;
 import jscenegraph.database.inventor.SbBox3f;
 import jscenegraph.database.inventor.SbVec3f;
@@ -20,11 +21,19 @@ public class SoLODIndexedFaceSet extends SoIndexedFaceSet {
 		TRUNK,
 		FOLIAGE
 	}
+
+	public static enum LoadState {
+		CLEARED,
+		LOAD_FAR,
+		LOAD_NEAR
+	}
 	
 	private final Type type;
 
 	private final SbVec3f referencePoint;
-	
+
+	private final SbVec3f referencePoint2;
+
 	public float[] maxDistance;
 	
 	private final SbBox3f box = new SbBox3f();
@@ -35,12 +44,13 @@ public class SoLODIndexedFaceSet extends SoIndexedFaceSet {
 	
 	private final DouglasChunk chunk;
 	
-	private boolean loaded = false;
+	private LoadState loaded = LoadState.CLEARED;
 	
 	private final int[] counting;
 	
-	public SoLODIndexedFaceSet(SbVec3f referencePoint, DouglasChunk chunk, Type type, final int[] counting) {
+	public SoLODIndexedFaceSet(SbVec3f referencePoint,SbVec3f referencePoint2, DouglasChunk chunk, Type type, final int[] counting) {
 		this.referencePoint = referencePoint;
+		this.referencePoint2 = referencePoint2;
 		this.chunk = chunk;
 		this.type = type;
 		this.counting = counting;
@@ -50,16 +60,23 @@ public class SoLODIndexedFaceSet extends SoIndexedFaceSet {
 	public void GLRender(SoGLRenderAction action)
 	{		
 		getBBox(action, box, center);
-		
-		if( box.intersect(referencePoint)) {
-			load();
+
+		if( box.intersect(referencePoint2)) {
+			load(true); // Near mode
 			super.GLRender(action);
 		}
 		else {
-			SbVec3f closestPoint = box.getClosestExternalPoint(referencePoint);
-			
-			if( closestPoint.operator_minus(referencePoint,dummy).length() <= maxDistance[0] ) {
-				load();
+
+			SbVec3f closestPoint = new SbVec3f(box.getClosestExternalPoint(referencePoint));
+
+			SbVec3f closestPoint2 = new SbVec3f(box.getClosestExternalPoint(referencePoint2));
+
+			if( closestPoint2.operator_minus(referencePoint2,dummy).length() <= 2500 ) {
+				load(true);
+				super.GLRender(action);
+			}
+			else if( closestPoint.operator_minus(referencePoint,dummy).length() <= maxDistance[0] ) {
+				load(false);
 				super.GLRender(action);				
 			}
 			else {
@@ -71,10 +88,10 @@ public class SoLODIndexedFaceSet extends SoIndexedFaceSet {
 		                                           SoGLCacheContextElement.AutoCache.DONT_AUTO_CACHE.getValue());
 	}		
 	
-	private void load() {
+	private void load(boolean near) {
 		switch(type) {
 		case FOLIAGE:
-			loadFoliage();
+			loadFoliage(near);
 			break;
 		case TRUNK:
 			loadTrunk();
@@ -86,10 +103,10 @@ public class SoLODIndexedFaceSet extends SoIndexedFaceSet {
 	}
 	
 	public void loadTrunk() {
-		if(!loaded && counting[0] < 2 /*&& counting[1] < 50*/) {
+		if(loaded == LoadState.CLEARED && counting[0] < 2 /*&& counting[1] < 50*/) {
 			counting[0]++;
 			counting[1]++;
-			loaded = true;
+			loaded = LoadState.LOAD_FAR;
 		SoLODIndexedFaceSet indexedFaceSetT = this;
 		
 		//boolean wasNotify = indexedFaceSetT.coordIndex.enableNotify(false); // In order not to recompute shaders
@@ -114,30 +131,36 @@ public class SoLODIndexedFaceSet extends SoIndexedFaceSet {
 		}
 	}
 	
-	public void loadFoliage() {
-		if(!loaded && counting[0] < 2 /*&& counting[1] < 50*/) {
+	public void loadFoliage(boolean near) {
+
+		LoadState wanted = near ? LoadState.LOAD_NEAR : LoadState.LOAD_FAR;
+
+		if(loaded != wanted && counting[0] < 2 /*&& counting[1] < 50*/) {
+			clear();
 			counting[0]++;
 			counting[1]++;
-			loaded = true;
+			loaded = wanted;
 		SoLODIndexedFaceSet indexedFaceSetF = this;
+
+			IndexedFaceSetParameters farFoliageParameters = near ? chunk.getFoliageNearParameters() : chunk.getFoliageFarParameters();
 		
 		//boolean wasNotify = indexedFaceSetF.coordIndex.enableNotify(false); // In order not to recompute shaders
-		indexedFaceSetF.coordIndex.setValuesPointer(chunk.douglasIndicesF);
+		indexedFaceSetF.coordIndex.setValuesPointer(/*chunk.douglasIndicesF*/farFoliageParameters.coordIndices());
 		//indexedFaceSetF.coordIndex.enableNotify(wasNotify);
 		
 		SoVertexProperty vertexProperty = new SoVertexProperty();
 		
-		vertexProperty.vertex.setValuesPointer(chunk.douglasVerticesF);
+		vertexProperty.vertex.setValuesPointer(/*chunk.douglasVerticesF*/farFoliageParameters.vertices());
 		
 		vertexProperty.normalBinding.setValue(SoVertexProperty.Binding.PER_VERTEX_INDEXED);
 		
-		vertexProperty.normal.setValuesPointer(chunk.douglasNormalsF);
+		vertexProperty.normal.setValuesPointer(/*chunk.douglasNormalsF*/farFoliageParameters.normals());
 		
 		boolean withColors = true;
 		if(withColors) {
-			vertexProperty.texCoord.setValuesPointer(chunk.douglasTexCoordsF);
+			vertexProperty.texCoord.setValuesPointer(/*chunk.douglasTexCoordsF*/farFoliageParameters.textureCoords());
 			vertexProperty.materialBinding.setValue(SoVertexProperty.Binding.PER_VERTEX_INDEXED);
-			vertexProperty.orderedRGBA.setValuesPointer(chunk.douglasColorsF);
+			vertexProperty.orderedRGBA.setValuesPointer(/*chunk.douglasColorsF*/farFoliageParameters.colorsRGBA());
 		}
 		else {
 			vertexProperty.orderedRGBA.setValue(DouglasChunk.TREE_FOLIAGE_AVERAGE_MULTIPLIER/*SbColor(1,0.0f,0.0f)*/.getPackedValue());
@@ -149,9 +172,9 @@ public class SoLODIndexedFaceSet extends SoIndexedFaceSet {
 		}		
 	}
 	public void clear() {
-		if(loaded) {
+		if(loaded != LoadState.CLEARED) {
 			counting[1]--;
-			loaded = false;
+			loaded = LoadState.CLEARED;
 		    boolean wasEnabled = this.vertexProperty.enableNotify(false);
 			vertexProperty.setValue(null/*recursiveChunk.getVertexProperty()*/);
 			this.vertexProperty.enableNotify(wasEnabled);

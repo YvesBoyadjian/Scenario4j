@@ -204,12 +204,14 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 	SoGroup douglasTreesT;
 	
 	final SbVec3f douglasTreesRefPoint = new SbVec3f();
-	
+	final SbVec3f douglasTreesRefPoint2 = new SbVec3f();
+
 	SoGroup douglasTreesST;
 	SoGroup douglasTreesSF;
 	
 	final SbVec3f douglasTreesSRefPoint = new SbVec3f();
-	
+	final SbVec3f douglasTreesSRefPoint2 = new SbVec3f();
+
 	SoTouchLODMaster master;
 	//SoTouchLODMaster masterS;
 	
@@ -935,7 +937,7 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 
 	    douglas_distance_trunk[0] = DOUGLAS_DISTANCE/2;
 	    
-		douglasTreesT = getDouglasTreesT(douglasTreesRefPoint,douglas_distance_trunk,progressBar);
+		douglasTreesT = getDouglasTreesT(douglasTreesRefPoint,douglasTreesRefPoint2,douglas_distance_trunk,progressBar);
 		
 	    SoSeparator douglasSepF = new SoSeparator();
 	    douglasSepF.renderCaching.setValue(SoSeparator.CacheEnabled.OFF);
@@ -944,7 +946,7 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 
 		douglas_distance_foliage[0] = DOUGLAS_DISTANCE;
 		
-		douglasTreesF = getDouglasTreesF(douglasTreesRefPoint,douglas_distance_foliage,true,progressBar);
+		douglasTreesF = getDouglasTreesF(douglasTreesRefPoint,douglasTreesRefPoint2,douglas_distance_foliage,true,progressBar);
 		
 	    douglasSepF.addChild(douglasTexture);
 	    
@@ -1246,13 +1248,13 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 
 		douglas_distance_shadow_trunk[0] = DOUGLAS_DISTANCE_SHADOW/2;
 	    
-		douglasTreesST = getDouglasTreesT(douglasTreesSRefPoint,douglas_distance_shadow_trunk,progressBar);
+		douglasTreesST = getDouglasTreesT(douglasTreesSRefPoint,douglasTreesSRefPoint2, douglas_distance_shadow_trunk,progressBar);
 		
 		douglasSepS.addChild(douglasTreesST);
 
 		douglas_distance_shadow_foliage[0] = DOUGLAS_DISTANCE_SHADOW;
 		
-		douglasTreesSF = getDouglasTreesF(douglasTreesSRefPoint,douglas_distance_shadow_foliage, false,progressBar);
+		douglasTreesSF = getDouglasTreesF(douglasTreesSRefPoint,douglasTreesSRefPoint2, douglas_distance_shadow_foliage, false,progressBar);
 		
 		douglasSepS.addChild(douglasTreesSF);
 		
@@ -1952,6 +1954,7 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 		float trees_y = current_y + yTransl+douglas_distance_foliage[0]*0.4f/*3000*/*world_camera_direction.getY();
 		
 		douglasTreesRefPoint.setValue(trees_x,trees_y,current_z + zTransl);
+		douglasTreesRefPoint2.setValue(current_x + xTransl,current_y + yTransl,current_z + zTransl);
 		
 		for(SoNode nodeForX : douglasTreesT.getChildren()) {
 			SoLODGroup sepForX = (SoLODGroup) nodeForX;
@@ -1966,8 +1969,9 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 		}
 				
 		for(SoNode nodeForX : douglasTreesF.getChildren()) {
-			SoLODGroup sepForX = (SoLODGroup) nodeForX;
-			sepForX.referencePoint.setValue(trees_x,trees_y,current_z + zTransl);
+			if (nodeForX instanceof SoLODGroup) {
+				SoLODGroup sepForX = (SoLODGroup) nodeForX;
+				sepForX.referencePoint.setValue(trees_x, trees_y, current_z + zTransl);
 //			for( SoNode node : sepForX.getChildren()) {
 //			SoLODIndexedFaceSet lifs = (SoLODIndexedFaceSet) node;
 //			lifs.referencePoint.setValue(
@@ -1975,13 +1979,15 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 //					/*current_y + yTransl+3000*world_camera_direction.getY()*/trees_y,
 //					current_z + zTransl);
 //			}
+			}
 		}
 				
 		float treesS_x = current_x + xTransl+douglas_distance_shadow_foliage[0]*0.3f/*1000*/*world_camera_direction.getX();
 		float treesS_y = current_y + yTransl+douglas_distance_shadow_foliage[0]*0.3f/*1000*/*world_camera_direction.getY();
 		
 		douglasTreesSRefPoint.setValue(treesS_x,treesS_y,current_z + zTransl);
-		
+		douglasTreesSRefPoint2.setValue(current_x + xTransl,current_y + yTransl,current_z + zTransl);
+
 		for (SoNode nodeForX : douglasTreesST.getChildren()) {
 			SoLODGroup sepForX = (SoLODGroup) nodeForX;
 			sepForX.referencePoint.setValue(treesS_x,treesS_y,current_z + zTransl);
@@ -1995,8 +2001,9 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 		}
 				
 		for (SoNode nodeForX : douglasTreesSF.getChildren()) {
-			SoLODGroup sepForX = (SoLODGroup) nodeForX;
-			sepForX.referencePoint.setValue(treesS_x,treesS_y,current_z + zTransl);
+			if (nodeForX instanceof SoLODGroup) {
+				SoLODGroup sepForX = (SoLODGroup) nodeForX;
+				sepForX.referencePoint.setValue(treesS_x, treesS_y, current_z + zTransl);
 //			for( SoNode node : sepForX.getChildren()) {
 //			SoLODIndexedFaceSet lifs = (SoLODIndexedFaceSet) node;
 //			lifs.referencePoint.setValue(
@@ -2004,6 +2011,7 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 //					/*current_y + yTransl+1000*world_camera_direction.getY()*/treesS_y, 
 //					current_z + zTransl);
 //			}
+			}
 		}
 		
 		float targets_x = current_x + xTransl/*+SoTarget.MAX_VIEW_DISTANCE*world_camera_direction.getX()*0.8f*/;
@@ -2216,22 +2224,22 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 		progressBar.setValue(MAX_PROGRESS);
 	}
 		
-	SoGroup getDouglasTreesT(SbVec3f refPoint, final float[] distance,final JProgressBar progressBar) {
+	SoGroup getDouglasTreesT(SbVec3f refPoint,SbVec3f refPoint2, final float[] distance,final JProgressBar progressBar) {
 		
 		if( forest == null) {
 			computeDouglas(progressBar);
 		}
 		
-		return forest.getDouglasTreesT(refPoint, distance);			
+		return forest.getDouglasTreesT(refPoint,refPoint2, distance);
 	}	
 	
-	SoGroup getDouglasTreesF(SbVec3f refPoint, final float[] distance, boolean withColors,final JProgressBar progressBar) {
+	SoGroup getDouglasTreesF(SbVec3f refPoint,SbVec3f refPoint2, final float[] distance, boolean withColors,final JProgressBar progressBar) {
 		
 		if( forest == null) {
 			computeDouglas(progressBar);
 		}
 		
-		return forest.getDouglasTreesF(refPoint, distance, withColors);			
+		return forest.getDouglasTreesF(refPoint, refPoint2, distance, withColors);
 	}	
 	
 	static Random random = new Random(42);
