@@ -75,7 +75,7 @@ public class SoLODIndexedFaceSet extends SoIndexedFaceSet {
 				load(true);
 				super.GLRender(action);
 			}
-			else if( closestPoint.operator_minus(referencePoint,dummy).length() <= maxDistance[0] ) {
+			else if( closestPoint2.operator_minus(referencePoint2,dummy).length() <= maxDistance[0] ) {
 				load(false);
 				super.GLRender(action);				
 			}
