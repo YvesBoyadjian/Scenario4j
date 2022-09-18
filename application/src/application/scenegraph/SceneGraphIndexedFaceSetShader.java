@@ -146,7 +146,7 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 		}
 	};
 	
-	private SoTranslation transl = new SoTranslation();
+	private final SoTranslation transl = new SoTranslation();
 	
 	private float zTranslation;
 
@@ -1774,6 +1774,9 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 
 	@Override
 	public void setPosition(float x, float y) {
+		if(!transl.translation.getValue().isNull()) {
+			throw new IllegalStateException();
+		}
 		transl.translation.setValue(-x,-y,-zTranslation);
 	}
 
@@ -2022,10 +2025,13 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 		
 		targetsRefPoint.setValue(targets_x,targets_y,current_z + zTransl);
 	}
-	
+
 	public int[] getIndexes(float x, float y, int[] indices) {
-		float ifloat = (x - transl.translation.getValue().getX())/delta_x;
-		float jfloat = (delta_y*(h-1) -(y - transl.translation.getValue().getY() - jstart * delta_y))/delta_y;
+		return getIndexes(x,y,indices,false);
+	}
+	public int[] getIndexes(float x, float y, int[] indices, boolean noTransl) {
+		float ifloat = (x - (noTransl ? 0 : transl.translation.getValue().getX()))/delta_x;
+		float jfloat = (delta_y*(h-1) -(y - (noTransl ? 0 : transl.translation.getValue().getY()) - jstart * delta_y))/delta_y;
 		
 		int i = Math.round(ifloat);
 		//int j = Math.round((y - transl.translation.getValue().getY() - 3298)/delta_y);
@@ -2079,11 +2085,25 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 		float jfloat = (delta_y*(h-1) -(y - transl.translation.getValue().getY() - jstart * delta_y))/delta_y;
 		return jfloat;
 	}
-	
+
+	public float getIFloatNoTransl(float x) {
+		float ifloat = x/delta_x;
+		return ifloat;
+	}
+
+	public float getJFloatNoTransl(float y) {
+		float jfloat = (delta_y*(h-1) -(y - jstart * delta_y))/delta_y;
+		return jfloat;
+	}
+
 	public float getInternalZ(float x, float y, int[] indices) {
+		return getInternalZ(x,y,indices,false);
+	}
+
+	public float getInternalZ(float x, float y, int[] indices, boolean noTransl) {
 		
-		float ifloat = getIFloat(x);// (x - transl.translation.getValue().getX())/delta_x;
-		float jfloat = getJFloat(y);// (delta_y*(h-1) -(y - transl.translation.getValue().getY() - jstart * delta_y))/delta_y;
+		float ifloat = noTransl? getIFloatNoTransl(x) : getIFloat(x);// (x - transl.translation.getValue().getX())/delta_x;
+		float jfloat = noTransl ? getJFloatNoTransl(y) : getJFloat(y);// (delta_y*(h-1) -(y - transl.translation.getValue().getY() - jstart * delta_y))/delta_y;
 		
 		int i = Math.round(ifloat);
 		//int j = Math.round((y - transl.translation.getValue().getY() - 3298)/delta_y);
@@ -2118,7 +2138,7 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 		int index3 = imin*h + jmax;
 		*/
 		/*int[] indices = */;
-		if(getIndexes(x,y,indices) == null) {
+		if(getIndexes(x,y,indices,noTransl) == null) {
 			return ZMIN - zTranslation;			
 		}
 		int index0 = indices[0]; // imin, jmin
@@ -2175,7 +2195,7 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 	}
 	
 	public boolean isStone(float x, float y) {
-		int[] indices = getIndexes(x, y, null);
+		int[] indices = getIndexes(x, y, null,true);
 		if(indices == null) {
 			return true;
 		}

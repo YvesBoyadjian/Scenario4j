@@ -89,10 +89,9 @@ public class SceneGraphQuadMesh implements SceneGraph {
 		return 0;
 	}
 
-	@Override
 	public void setPosition(float x, float y) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override

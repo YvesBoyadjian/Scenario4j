@@ -95,15 +95,15 @@ public class BigFoots extends TargetBase implements Target {
         for( int i = 0; i < NB_BIGFOOT_BIRTHS; i++) {
             float x = getRandomX(randomPlacementBigFoots);
             float y = getRandomY(randomPlacementBigFoots);
-            float z = sg.getInternalZ(x,y,indices) + sg.getzTranslation();
+            float z = sg.getInternalZ(x,y,indices,true) + sg.getzTranslation();
 
             boolean isNearWater = Math.abs(z - zWater) < 15;
             boolean isAboveWater = z > zWater;
 
-            float z1 = sg.getInternalZ(x+0.5f,y,indices) + sg.getzTranslation();
-            float z2 = sg.getInternalZ(x-0.5f,y,indices) + sg.getzTranslation();
-            float z3 = sg.getInternalZ(x,y+0.5f,indices) + sg.getzTranslation();
-            float z4 = sg.getInternalZ(x,y-0.5f,indices) + sg.getzTranslation();
+            float z1 = sg.getInternalZ(x+0.5f,y,indices,true) + sg.getzTranslation();
+            float z2 = sg.getInternalZ(x-0.5f,y,indices,true) + sg.getzTranslation();
+            float z3 = sg.getInternalZ(x,y+0.5f,indices,true) + sg.getzTranslation();
+            float z4 = sg.getInternalZ(x,y-0.5f,indices,true) + sg.getzTranslation();
             float d1 = Math.abs(z-z1);
             float d2 = Math.abs(z-z2);
             float d3 = Math.abs(z-z3);

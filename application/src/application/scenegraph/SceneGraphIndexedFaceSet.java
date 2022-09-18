@@ -519,7 +519,6 @@ for(int is=0;is<4;is++) {
 		return centerX;
 	}
 
-	@Override
 	public void setPosition(float x, float y) {
 		transl.translation.setValue(-x,-y,-zTranslation);
 	}

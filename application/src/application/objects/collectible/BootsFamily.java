@@ -98,7 +98,7 @@ public class BootsFamily extends CollectibleBase implements Collectible {
         for( int i = 0; i < NB_BOOTS_BIRTHS; i++) {
             float x = getRandomX(randomPlacementBoots);
             float y = getRandomY(randomPlacementBoots);
-            float z = sg.getInternalZ(x, y, indices) + sg.getzTranslation();
+            float z = sg.getInternalZ(x, y, indices,true) + sg.getzTranslation();
 
             boolean isNearWater = Math.abs(z - zWater) < 5;
             boolean isAboveWater = z > zWater;

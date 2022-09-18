@@ -91,16 +91,16 @@ public class GroundSquirrels extends TargetBase implements Target {
         for( int i = 0; i < NB_SQUIRREL_BIRTHS; i++) {
             float x = getRandomX(randomPlacementSquirrels);
             float y = getRandomY(randomPlacementSquirrels);
-            float z = sg.getInternalZ(x,y,indices) + sg.getzTranslation();
+            float z = sg.getInternalZ(x,y,indices,true) + sg.getzTranslation();
 
             boolean isNearWater = Math.abs(z - zWater) < 10;
             boolean isAboveWater = z > zWater;
             boolean isNotInSnow = z - zWater < 2000;
 
-            float z1 = sg.getInternalZ(x+0.5f,y,indices) + sg.getzTranslation();
-            float z2 = sg.getInternalZ(x-0.5f,y,indices) + sg.getzTranslation();
-            float z3 = sg.getInternalZ(x,y+0.5f,indices) + sg.getzTranslation();
-            float z4 = sg.getInternalZ(x,y-0.5f,indices) + sg.getzTranslation();
+            float z1 = sg.getInternalZ(x+0.5f,y,indices,true) + sg.getzTranslation();
+            float z2 = sg.getInternalZ(x-0.5f,y,indices,true) + sg.getzTranslation();
+            float z3 = sg.getInternalZ(x,y+0.5f,indices,true) + sg.getzTranslation();
+            float z4 = sg.getInternalZ(x,y-0.5f,indices,true) + sg.getzTranslation();
             float d1 = Math.abs(z-z1);
             float d2 = Math.abs(z-z2);
             float d3 = Math.abs(z-z3);

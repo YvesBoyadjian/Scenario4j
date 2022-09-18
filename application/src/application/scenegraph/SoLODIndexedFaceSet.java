@@ -71,7 +71,7 @@ public class SoLODIndexedFaceSet extends SoIndexedFaceSet {
 
 			SbVec3f closestPoint2 = new SbVec3f(box.getClosestExternalPoint(referencePoint2));
 
-			if( closestPoint2.operator_minus(referencePoint2,dummy).length() <= 2500 ) {
+			if( closestPoint2.operator_minus(referencePoint2,dummy).length() <= 200 ) {
 				load(true);
 				super.GLRender(action);
 			}

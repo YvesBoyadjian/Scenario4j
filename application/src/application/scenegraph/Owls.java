@@ -80,7 +80,7 @@ public abstract class Owls extends TargetBase implements Target {
         for( int i = 0; i < NB_OWL_BIRTHS; i++) {
             float x = getRandomX(randomPlacementOwls);
             float y = getRandomY(randomPlacementOwls);
-            float z = sg.getInternalZ(x,y,indices) + sg.getzTranslation();
+            float z = sg.getInternalZ(x,y,indices,true) + sg.getzTranslation();
 
             //boolean isNearWater = Math.abs(z - zWater) < 150;
             boolean isAboveWater = z > zWater;

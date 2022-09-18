@@ -165,7 +165,7 @@ public class DouglasForest {
 
 				float x = getRandomX(randomPlacementTrees);
 				float y = getRandomY(randomPlacementTrees);
-				float z = sg.getInternalZ(x,y,indices) + sg.getzTranslation();
+				float z = sg.getInternalZ(x,y,indices,true) + sg.getzTranslation();
 
 				xyz.setX(x);
 				xyz.setY(y);
