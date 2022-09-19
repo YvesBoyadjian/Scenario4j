@@ -1351,19 +1351,25 @@ public class MainGLFW {
 			if (!viewer2.isTimeStop()) {
 				viewer2.toggleTimeStop();
 			}
-			viewer2.setVisible(false);
-			//SwingUtilities.invokeLater(()->
+			SwingUtilities.invokeLater(()->
 			{
+			viewer2.setVisible(false);
+				SwingUtilities.invokeLater(()->
+						{
 				dialog.pack();
 				dialog.setLocationRelativeTo(null);
 				SwingUtilities.invokeLater(()->
 						{
 							dialog.setVisible(true);
 				dialog.setBounds(GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds());
+							SwingUtilities.invokeLater(()->
+							{
 				dialog.setAlwaysOnTop(true);
+							});
+						});
 						});
 			}
-			//);
+			);
 		});
 
 		viewer.addIdleListener((viewer2)->{
