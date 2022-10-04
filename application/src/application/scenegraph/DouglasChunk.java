@@ -113,11 +113,13 @@ public class DouglasChunk {
 	int[] douglasColorsT;
 
 	public void clear() {
+		/*
 		douglasIndicesF = null;
 		douglasVerticesF = null;
 		douglasNormalsF = null;
 		douglasColorsF = null;
 		douglasTexCoordsF = null;
+		 */
 
 		douglasIndicesNearF = null;
 		douglasVerticesNearF = null;
