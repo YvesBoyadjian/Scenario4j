@@ -436,16 +436,25 @@ public class DouglasChunk {
 			float xTrunk2;
 			float yTrunk2;
 			float zStartBranch2;
-			float decrease= 0.6f*(float)nearFoliageRandom.nextDouble();
+			float decrease= 0.3f*(float)nearFoliageRandom.nextDouble()+0.2f;
 
 			while (zStartBranch > zBottomF) {
 
 				azimuth = (float)(Math.PI*2*nearFoliageRandom.nextDouble());
 				azimuth2 = azimuth + sixtyDegrees;
 				branchHoriLength = (0.6f+(float)nearFoliageRandom.nextDouble())*(widthTop + (zTopF - zStartBranch)/(zTopF - zBottomF)*(foliageWidth - widthTop));
-				branchHoriLengths.add(branchHoriLength);
 
-				zStartBranch2 = zStartBranch - zDeltaBaseBranch;
+				float delta1 = 0.1f*(nearFoliageRandom.nextFloat() - 0.5f);
+				float delta2 = 0.1f*(nearFoliageRandom.nextFloat() - 0.5f);
+				float ze1 = zStartBranch-(decrease + delta1)*branchHoriLength;
+				float ze2 = zStartBranch-(decrease+delta2)*branchHoriLength;
+
+				zStartBranch2 = /*zStartBranch - zDeltaBaseBranch*/(ze1+ze2)/2.0f;
+
+				if(zStartBranch2 < zBottomF) {
+					break;
+				}
+
 				xTrunk = xTopTree + (zTopF - zStartBranch)/(zTopF - getZ(tree))*(getX(tree) - xTopTree);
 				yTrunk = yTopTree + (zTopF - zStartBranch)/(zTopF - getZ(tree))*(getY(tree) - yTopTree);
 				xTrunk2 = xTopTree + (zTopF - zStartBranch2)/(zTopF - getZ(tree))*(getX(tree) - xTopTree);
@@ -456,14 +465,13 @@ public class DouglasChunk {
 				final SbVec3f branchExtremity = new SbVec3fSingle();
 				final SbVec3f branchExtremity2 = new SbVec3fSingle();
 
-				float delta1 = 0.05f*(nearFoliageRandom.nextFloat() - 0.5f);
-				float delta2 = 0.05f*(nearFoliageRandom.nextFloat() - 0.5f);
-
 				branchBase.setValue(xTrunk,yTrunk,zStartBranch);
 				branchBase2.setValue(xTrunk2,yTrunk2,zStartBranch2);
-				branchExtremity.setValue(xTrunk+(float)Math.sin(azimuth)*branchHoriLength,yTrunk+(float)Math.cos(azimuth)*branchHoriLength,zStartBranch-(decrease + delta1)*branchHoriLength);
+				branchExtremity.setValue(xTrunk+(float)Math.sin(azimuth)*branchHoriLength,yTrunk+(float)Math.cos(azimuth)*branchHoriLength,ze1);
 
-				branchExtremity2.setValue(xTrunk+(float)Math.sin(azimuth2)*branchHoriLength,yTrunk+(float)Math.cos(azimuth2)*branchHoriLength,zStartBranch-(decrease+delta2)*branchHoriLength);
+				branchExtremity2.setValue(xTrunk+(float)Math.sin(azimuth2)*branchHoriLength,yTrunk+(float)Math.cos(azimuth2)*branchHoriLength,ze2);
+
+				branchHoriLengths.add(branchHoriLength);
 
 				vertices.add(branchBase);
 				vertices.add(branchBase2);
@@ -510,78 +518,106 @@ public class DouglasChunk {
 		}
 
 		// ____________________________________________ indices
-		final int nbTriangles = nbVerticesNear/(branchExtremityOn ? 6 : 4);
-		final int nbIndicesForTriangle = 4;
-		// _______________________ Top of branch, up and down __ extremity of branch ____ sides of branch
-		final int nbIndicesPerBranch = nbIndicesForTriangle*2 + (branchExtremityOn ?  2*nbIndicesForTriangle : 0) + 2 * nbIndicesForTriangle;
-		int nbIndicesNear = nbTriangles * nbIndicesPerBranch;
+		final int nbBranches = nbVerticesNear/(branchExtremityOn ? 6 : 4);
+		final int nbIndicesForOneTriangle = 4;
+		// _______________________ Top of branch, up and down _________ extremity of branch __________________________ sides of branch_____________bottom of branch
+		final int nbIndicesPerBranch = nbIndicesForOneTriangle*2 + (branchExtremityOn ?  2*nbIndicesForOneTriangle : 0) + 2 * nbIndicesForOneTriangle + nbIndicesForOneTriangle;
+		int nbIndicesNear = nbBranches * nbIndicesPerBranch;
 
 		douglasIndicesNearF = new int[nbIndicesNear];
 		int indice = 0;
 
 		int deltaSides = branchExtremityOn ? 16 : 8;
 		int deltaSides2 = branchExtremityOn ? 20 : 12;
+		int deltaBottom = branchExtremityOn ? 24 : 16;
 
-		for( int i=0; i< nbTriangles; i++) {
-			// Branch base
-			douglasIndicesNearF[i*nbIndicesPerBranch] = indice;
-			douglasIndicesNearF[i*nbIndicesPerBranch+4] = indice;
-			douglasIndicesNearF[i*nbIndicesPerBranch+deltaSides+1] = indice;
-			douglasIndicesNearF[i*nbIndicesPerBranch+deltaSides2] = indice;
+		int startIndice = 0;
+		for( int i=0; i< nbBranches; i++) {
+
+			// Branch base (top)
+			douglasIndicesNearF[startIndice] = indice;
+			douglasIndicesNearF[startIndice+4] = indice;
+			douglasIndicesNearF[startIndice+deltaSides+1] = indice;
+			douglasIndicesNearF[startIndice+deltaSides2] = indice;
 			indice++;
-			// Branch base 2
-			douglasIndicesNearF[i*nbIndicesPerBranch+deltaSides] = indice;
-			douglasIndicesNearF[i*nbIndicesPerBranch+deltaSides2+1] = indice;
+			// Branch base 2 (bottom)
+			douglasIndicesNearF[startIndice+deltaSides] = indice;
+			douglasIndicesNearF[startIndice+deltaSides2+1] = indice;
+			douglasIndicesNearF[startIndice+deltaBottom] = indice;
 			indice++;
 			// Branch extremity
-			douglasIndicesNearF[i*nbIndicesPerBranch+1] = indice;
-			douglasIndicesNearF[i*nbIndicesPerBranch+2+4] = indice;
+			douglasIndicesNearF[startIndice+1] = indice;
+			douglasIndicesNearF[startIndice+2+4] = indice;
 			if(branchExtremityOn) {
-				douglasIndicesNearF[i * nbIndicesPerBranch + 8] = indice;
+				douglasIndicesNearF[startIndice + 8] = indice;
 			}
-			douglasIndicesNearF[i*nbIndicesPerBranch+deltaSides+2] = indice;
+			douglasIndicesNearF[startIndice+deltaSides+2] = indice;
+			douglasIndicesNearF[startIndice+deltaBottom+1] = indice;
 			indice++;
 			// Branch extremity 2
-			douglasIndicesNearF[i*nbIndicesPerBranch+2] = indice;
-			douglasIndicesNearF[i*nbIndicesPerBranch+1+4] = indice;
+			douglasIndicesNearF[startIndice+2] = indice;
+			douglasIndicesNearF[startIndice+1+4] = indice;
 			if(branchExtremityOn) {
-				douglasIndicesNearF[i * nbIndicesPerBranch + 9] = indice;
-				douglasIndicesNearF[i * nbIndicesPerBranch + 12] = indice;
+				douglasIndicesNearF[startIndice + 9] = indice;
+				douglasIndicesNearF[startIndice + 12] = indice;
 			}
-			douglasIndicesNearF[i*nbIndicesPerBranch+deltaSides2+2] = indice;
+			douglasIndicesNearF[startIndice+deltaSides2+2] = indice;
+			douglasIndicesNearF[startIndice+deltaBottom+2] = indice;
 			indice++;
 			if(branchExtremityOn) {
 				// Branch extremity 3
-				douglasIndicesNearF[i * nbIndicesPerBranch + 10] = indice;
-				douglasIndicesNearF[i * nbIndicesPerBranch + 14] = indice;
+				douglasIndicesNearF[startIndice + 10] = indice;
+				douglasIndicesNearF[startIndice + 14] = indice;
 				indice++;
 				// Branch extremity 4
-				douglasIndicesNearF[i * nbIndicesPerBranch + 13] = indice;
+				douglasIndicesNearF[startIndice + 13] = indice;
 				indice++;
 			}
-			douglasIndicesNearF[i*nbIndicesPerBranch+3] = -1;
-			douglasIndicesNearF[i*nbIndicesPerBranch+3+4] = -1;
-			douglasIndicesNearF[i*nbIndicesPerBranch+11] = -1;
-			douglasIndicesNearF[i*nbIndicesPerBranch+15] = -1;
+			douglasIndicesNearF[startIndice+3] = -1; // Topup
+			douglasIndicesNearF[startIndice+3+4] = -1; // Topdown
+			douglasIndicesNearF[startIndice+11] = -1;
+			douglasIndicesNearF[startIndice+15] = -1;
+			douglasIndicesNearF[startIndice+19] = -1;
 			if(branchExtremityOn) {
-				douglasIndicesNearF[i * nbIndicesPerBranch + 15 + 4] = -1;
-				douglasIndicesNearF[i * nbIndicesPerBranch + 15 + 8] = -1;
+				douglasIndicesNearF[startIndice + 19 + 4] = -1;
+				douglasIndicesNearF[startIndice + 19 + 8] = -1;
 			}
+			startIndice += nbIndicesPerBranch;
 		}
 
 		// ____________________________________________ normals
 		douglasNormalsNearF = FloatMemoryBuffer.allocateFloats(nbVerticesNear * 3);
 		floatIndex = 0;
 		final int mult = branchExtremityOn ? 2 : 1;
-		for (int i=0; i< nbTriangles;i++) {
+		//final SbVec3f down = new SbVec3fSingle(0,0,-1);
+
+		for (int i=0; i< nbBranches;i++) {
 			SbVec3f normal = normals.get(mult*i);
 			for(int j=0;j<4;j++) { // four points
-				douglasNormalsNearF.setFloat(floatIndex, -normal.getX());
-				floatIndex++;
-				douglasNormalsNearF.setFloat(floatIndex, -normal.getY());
-				floatIndex++;
-				douglasNormalsNearF.setFloat(floatIndex, -normal.getZ());
-				floatIndex++;
+				if(j==1) {
+					douglasNormalsNearF.setFloat(floatIndex, 0);
+					floatIndex++;
+					douglasNormalsNearF.setFloat(floatIndex, 0);
+					floatIndex++;
+					douglasNormalsNearF.setFloat(floatIndex, -1);
+					floatIndex++;
+				}
+				else if (j==2 || j==3) {
+					douglasNormalsNearF.setFloat(floatIndex, -normal.getX());
+					floatIndex++;
+					douglasNormalsNearF.setFloat(floatIndex, -normal.getY());
+					floatIndex++;
+					douglasNormalsNearF.setFloat(floatIndex, -normal.getZ());
+					floatIndex++;
+				}
+				else {
+					douglasNormalsNearF.setFloat(floatIndex, -normal.getX());
+					floatIndex++;
+					douglasNormalsNearF.setFloat(floatIndex, -normal.getY());
+					floatIndex++;
+					douglasNormalsNearF.setFloat(floatIndex, -normal.getZ());
+					floatIndex++;
+				}
 			}
 			if (branchExtremityOn) {
 				SbVec3f normal2 = normals.get(mult * i + 1);
@@ -600,7 +636,7 @@ public class DouglasChunk {
 
 		douglasColorsNearF = new int[nbVerticesNear];
 		indice = 0;
-		for(int i=0;i<nbTriangles;i++) {
+		for(int i=0;i<nbBranches;i++) {
 			int color = colors.get(i);
 			douglasColorsNearF[indice] = color; indice++;
 			douglasColorsNearF[indice] = color; indice++;
@@ -618,7 +654,7 @@ public class DouglasChunk {
 
 		douglasTexCoordsNearF = FloatMemoryBuffer.allocateFloats(nbVerticesNear*2);
 		floatIndex = 0;
-		for(int i=0;i<nbTriangles;i++) {
+		for(int i=0;i<nbBranches;i++) {
 			float branchHoriLength = branchHoriLengths.get(i);
 			// Branch base
 			douglasTexCoordsNearF.setFloat(floatIndex,0); floatIndex++;
