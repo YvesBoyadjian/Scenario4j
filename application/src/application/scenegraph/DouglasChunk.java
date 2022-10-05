@@ -427,7 +427,7 @@ public class DouglasChunk {
 			Random nearFoliageRandom = new Random(treeIndex);
 
 			float zStartBranch = zTopF;
-			final float zDeltaBranch = .18f;
+			final float zDeltaBranch = .2f;
 			float azimuth;
 			float azimuth2;
 			float branchHoriLength;
