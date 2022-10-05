@@ -401,7 +401,7 @@ public class DouglasChunk {
 
 			SbRotation rot = new SbRotation(rotAxis,getRandomLeanAngleTree(tree));
 
-			SbVec3f xyzTree = new SbVec3f(getX(tree), getY(tree),getZ(tree));
+			//SbVec3f xyzTree = new SbVec3f(getX(tree), getY(tree),getZ(tree));
 
 			SbVec3f xyzTop = new SbVec3f(0,0,height);
 
@@ -427,7 +427,7 @@ public class DouglasChunk {
 			Random nearFoliageRandom = new Random(treeIndex);
 
 			float zStartBranch = zTopF;
-			final float zDeltaBranch = .25f;
+			final float zDeltaBranch = .18f;
 			float azimuth;
 			float azimuth2;
 			float branchHoriLength;
