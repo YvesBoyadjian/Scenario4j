@@ -436,7 +436,7 @@ public class DouglasChunk {
 			float xTrunk2;
 			float yTrunk2;
 			float zStartBranch2;
-			float decrease= 0.3f*(float)nearFoliageRandom.nextDouble()+0.2f;
+			float decrease = 5.0f*(nearFoliageRandom.nextFloat()+0.02f);
 
 			while (zStartBranch > zBottomF) {
 
