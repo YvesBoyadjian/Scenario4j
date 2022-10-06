@@ -558,10 +558,12 @@ protected void onAim(SoMouseButtonEvent event, boolean aim) {
 
 		  }
 
-		  oneShotIdleListeners.forEach((item)->item.accept(this));
-		  
-		  oneShotIdleListeners.clear();
-		  
+		List<Consumer<SoQtWalkViewer>> oneShotIdleListenersCopy = new ArrayList<>(oneShotIdleListeners);
+
+		oneShotIdleListeners.clear();
+
+		  oneShotIdleListenersCopy.forEach((item)->item.accept(this));
+
 		  idleListeners.forEach((item)->item.accept(this));
 		  
 		  if(keysDown.isEmpty()) {
