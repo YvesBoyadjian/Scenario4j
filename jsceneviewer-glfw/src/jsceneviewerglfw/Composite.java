@@ -251,6 +251,6 @@ public class Composite {
 	}
 	
 	public void dispose() {
-		
+		display.unregister(this);
 	}
 }

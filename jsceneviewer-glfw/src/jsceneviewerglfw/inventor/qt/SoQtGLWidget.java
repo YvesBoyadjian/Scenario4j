@@ -157,40 +157,43 @@ public GLData format()
     //! have set the GL format/context. This also calls createBorderWidgets().
     public void buildWidget(int style) {
         if (mainWidget == null) {
-        	
-        	//setLayout(new BorderLayout());
-        	
+        	doBuildWidget();
+        }
+    }
+
+	private void doBuildWidget() {
+		//setLayout(new BorderLayout());
+
 //            Composite borderWidget;
 //            borderWidget = createLowerBorder (this);
 //            if (borderWidget != null) {
-//            	borderWidget.setLayoutData(new BorderLayout.BorderData(BorderLayout.SOUTH));                	  
+//            	borderWidget.setLayoutData(new BorderLayout.BorderData(BorderLayout.SOUTH));
 //                //vertLayout.addWidget (borderWidget);
 //            }
 //            borderWidget = createUpperBorder (this);
 //            if (borderWidget != null) {
-//            	borderWidget.setLayoutData(new BorderLayout.BorderData(BorderLayout.NORTH));                	  
+//            	borderWidget.setLayoutData(new BorderLayout.BorderData(BorderLayout.NORTH));
 //                //vertLayout.insertWidget (0, borderWidget);
 //            }
 //            borderWidget = createRightBorder (this);
 //            if (borderWidget != null) {
-//            	borderWidget.setLayoutData(new BorderLayout.BorderData(BorderLayout.EAST));                	  
+//            	borderWidget.setLayoutData(new BorderLayout.BorderData(BorderLayout.EAST));
 //                //horiLayout.addWidget (borderWidget);
 //            }
 //            borderWidget = createLeftBorder (this);
 //            if (borderWidget != null) {
-//            	borderWidget.setLayoutData(new BorderLayout.BorderData(BorderLayout.WEST));                	  
+//            	borderWidget.setLayoutData(new BorderLayout.BorderData(BorderLayout.WEST));
 //                //horiLayout.insertWidget (0, borderWidget);
 //            }
-            
-    		GLData capsReqUser = null;
-    		GLData capsChooser = null;
-    		
-            replaceWidget (/*new GLCanvas(this,style,capsReqUser,capsChooser)*/
-                contextShareManager.createWidget (glFormat, style, this, shareGroup));
-        	//mainWidget.setLayoutData(new BorderLayout.BorderData(BorderLayout.CENTER));                	  
-			setVisible(true);
-        }
-    }
+
+		GLData capsReqUser = null;
+		GLData capsChooser = null;
+
+		replaceWidget (/*new GLCanvas(this,style,capsReqUser,capsChooser)*/
+				contextShareManager.createWidget (glFormat, style, this, shareGroup));
+		//mainWidget.setLayoutData(new BorderLayout.BorderData(BorderLayout.CENTER));
+		//setVisible(true);
+	}
     
     //! Get pointer to the real GL widget, automatically calls buildWidget
     public GLCanvas  getGLWidget() {
@@ -366,6 +369,9 @@ public GLData format()
 
 			@Override
 			public void paintControl(PaintEvent e) {
+				if (mainWidget == null || !mainWidget.isVisible()) {
+					return;
+				}
 				mainWidget.setCurrent();
 				if(!initialized) {
 					initialized = true;

@@ -95,6 +95,7 @@ import org.ode4j.ode.internal.Rotation;
 import util.IOUtils;
 
 import static com.badlogic.gdx.physics.bullet.collision.CollisionConstants.DISABLE_DEACTIVATION;
+import static org.lwjgl.glfw.GLFW.glfwPollEvents;
 import static org.lwjgl.openal.ALC10.*;
 import static org.lwjgl.opengl.GL11C.glEnable;
 import static org.lwjgl.opengl.GL11C.glGetError;
@@ -846,6 +847,7 @@ public class MainGLFW {
 		viewer.setFormat(glf, style);
 
 		viewer.buildWidget(style);
+		viewer.setVisible(true);
 
 		GL2 gl2 = new GL2() {
 		};
@@ -1352,15 +1354,22 @@ public class MainGLFW {
 				viewer2.toggleTimeStop();
 			}
 			viewer.addOneShotIdleListener((viewer3)->{
+				glfwPollEvents();
 				viewer2.setVisible(false);
+				glfwPollEvents();
 				dialog.setVisible(true);
+				glfwPollEvents();
 				dialog.pack();
+				glfwPollEvents();
 				dialog.setLocationRelativeTo(null);
+				glfwPollEvents();
 				dialog.setBounds(GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds());
+				glfwPollEvents();
 				dialog.setAlwaysOnTop(true);
+				glfwPollEvents();
 			});
 			});
-
+/*
 		viewer.addIdleListener((viewer2)->{
 
 			if(!viewer2.isVisible() && viewer2.getGLWidget().isVisible()) {
@@ -1368,7 +1377,7 @@ public class MainGLFW {
 				return;
 			}
 		});
-
+*/
 		// _____________________________________________________ Physics with ODE4j (End)
 
 		viewer.addIdleListener((viewer1) -> {
@@ -1591,14 +1600,14 @@ public class MainGLFW {
 				try {
 					loop();
 				} catch (Exception e) {
+					e.printStackTrace();
 					viewer.setVisible(false);
 					JOptionPane.showMessageDialog(window, e.toString(), "Exception in Mount Rainier Island", JOptionPane.ERROR_MESSAGE);
-					e.printStackTrace();
 					System.exit(-1); // Necessary, because of Linux
 				} catch (Error e) {
+					e.printStackTrace();
 					viewer.setVisible(false);
 					JOptionPane.showMessageDialog(window, e.toString(), "Error in Mount Rainier Island", JOptionPane.ERROR_MESSAGE);
-					e.printStackTrace();
 					System.exit(-1); // Necessary, because of Linux
 				}
 			});

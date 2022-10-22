@@ -12,15 +12,7 @@ import org.lwjgl.system.*;
 
 import java.nio.*;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.PriorityQueue;
-import java.util.Set;
-import java.util.WeakHashMap;
+import java.util.*;
 import java.util.function.BinaryOperator;
 
 import static org.lwjgl.glfw.Callbacks.*;
@@ -33,7 +25,11 @@ import static org.lwjgl.system.MemoryUtil.*;
  *
  */
 public class Display {
-	
+
+	public void unregister(Composite composite) {
+		composites.remove(composite);
+	}
+
 	private static class FutureEvent {
 		double startTimeMicroseconds;
 		Runnable doit;
@@ -99,7 +95,8 @@ public class Display {
 	}
 
 	public void dispose() {
-		composites.forEach(Composite::dispose);
+		Set<Composite> compositesCopy = new HashSet<>(composites);
+		compositesCopy.forEach(Composite::dispose);
 		
 		// Terminate GLFW and free the error callback
 		glfwTerminate();
