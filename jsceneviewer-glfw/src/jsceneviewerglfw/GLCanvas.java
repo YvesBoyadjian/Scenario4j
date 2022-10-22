@@ -131,6 +131,10 @@ public class GLCanvas extends Composite {
 			@Override
 			public void invoke(long window, double xpos, double ypos) {
 
+				if (!isVisible()) {
+					return;
+				}
+
 				boolean left_button = false;
 
 				int state = glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT);
