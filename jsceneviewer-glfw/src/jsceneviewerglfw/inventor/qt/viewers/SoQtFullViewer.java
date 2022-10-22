@@ -271,34 +271,6 @@ public void setHeadlight (boolean flag)
     //headlightAction.setChecked (getCameraController().isHeadlight()); TODO
 }
 
-
-	    
-protected void showEvent() {
-	super.showEvent();
-}
-	    
-protected void hideEvent ()
-{
-    super.hideEvent ();
-
-//    if (prefSheetDialog != null) {
-//        prefSheetDialog.close();
-//    }
-}
-
-	public void setVisible(boolean visible) {
-		boolean previousvisible = isVisible();
-		super.setVisible(visible);
-		if(visible != previousvisible) {
-			if(visible) {
-				showEvent();
-			}
-			else {
-				hideEvent();
-			}
-		}
-	}
-
 	public void
 	setPopupMenuTitle (final String str)
 	{

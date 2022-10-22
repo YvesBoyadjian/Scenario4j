@@ -1353,15 +1353,11 @@ public class MainGLFW {
 			}
 			viewer.addOneShotIdleListener((viewer3)->{
 				viewer2.setVisible(false);
-				viewer.addOneShotIdleListener((viewer4)->{
+				dialog.setVisible(true);
 				dialog.pack();
 				dialog.setLocationRelativeTo(null);
-				dialog.setVisible(true);
 				dialog.setBounds(GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds());
-					viewer.addOneShotIdleListener((viewer5)->{
 				dialog.setAlwaysOnTop(true);
-					});
-				});
 			});
 			});
 

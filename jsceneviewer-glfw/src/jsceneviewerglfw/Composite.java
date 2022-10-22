@@ -101,9 +101,6 @@ public class Composite {
 
 	public void setVisible (boolean visible) {
 		this.visible = visible;
-		if(parent != null) {
-			parent.setVisible(visible);
-		}
 	}
 	
 	public void setCursor (Cursor cursor) {
@@ -182,7 +179,7 @@ public class Composite {
 	
 	public void loop() {
 		
-		if(redrawAsked) {
+		if(redrawAsked && visible) {
 			redrawAsked = false;
 			PaintEvent pe = new PaintEvent();
 			paintListeners.forEach((pl)-> pl.paintControl(pe));

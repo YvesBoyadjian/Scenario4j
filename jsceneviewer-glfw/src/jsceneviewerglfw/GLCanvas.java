@@ -110,8 +110,9 @@ public class GLCanvas extends Composite {
 
 		// Make the window visible
 		//glfwShowWindow(window);
-		setVisible(true);
-		
+		// Must be called by the parent
+		//setVisible(true);
+
 		glfwSetWindowSizeCallback(window, new GLFWWindowSizeCallbackI() {
 
 			@Override
@@ -236,17 +237,21 @@ public class GLCanvas extends Composite {
 	}
 
 	public void setVisible (boolean visible) {
-		super.setVisible(visible);
-		if(0 != window) {
-			if (!visible) {
-				glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-				glfwHideWindow(window);
-				glfwIconifyWindow(window);
-			} else {
-				glfwRestoreWindow(window);
-				glfwShowWindow(window);
-				glfwSetInputMode(window, GLFW_CURSOR, format.grabCursor ? GLFW_CURSOR_DISABLED : GLFW_CURSOR_HIDDEN);
+		if (visible) {
+			super.setVisible(visible);
+			if(0 != window) {
+					glfwRestoreWindow(window);
+					glfwShowWindow(window);
+					glfwSetInputMode(window, GLFW_CURSOR, format.grabCursor ? GLFW_CURSOR_DISABLED : GLFW_CURSOR_HIDDEN);
 			}
+		}
+		else {
+			if(0 != window) {
+					glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+					glfwHideWindow(window);
+					glfwIconifyWindow(window);
+			}
+			super.setVisible(visible);
 		}
 	}
 

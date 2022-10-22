@@ -188,7 +188,8 @@ public GLData format()
             replaceWidget (/*new GLCanvas(this,style,capsReqUser,capsChooser)*/
                 contextShareManager.createWidget (glFormat, style, this, shareGroup));
         	//mainWidget.setLayoutData(new BorderLayout.BorderData(BorderLayout.CENTER));                	  
-        }    	
+			setVisible(true);
+        }
     }
     
     //! Get pointer to the real GL widget, automatically calls buildWidget
@@ -737,6 +738,20 @@ public int getColorBitDepth()
 	  public void show() {
 		  // TODO
 	  }
+
+	public void setVisible(boolean visible) {
+		boolean previousvisible = isVisible();
+		if(visible != previousvisible) {
+			if(visible) {
+				super.setVisible(visible);
+				showEvent();
+			}
+			else {
+				hideEvent();
+				super.setVisible(visible);
+			}
+		}
+	}
 
 	protected void showEvent() {
 		if( null != mainWidget ) {

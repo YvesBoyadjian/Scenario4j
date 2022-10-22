@@ -100,8 +100,10 @@ public class OptionDialog extends JDialog {
         if(viewer.isTimeStop()) {
             viewer.toggleTimeStop();
         }
+        viewer.addOneShotIdleListener((viewer2)->{
         viewer.setVisible(true);
         viewer.setFocus();
+        });
     }
 
     private void onCancel() {
