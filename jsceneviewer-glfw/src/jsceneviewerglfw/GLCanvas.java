@@ -256,15 +256,9 @@ public class GLCanvas extends Composite {
 		}
 		else {
 			if(0 != window) {
-				glfwPollEvents();
-					glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-				glfwPollEvents();
-					glfwHideWindow(window);
-				//while(!glfwWindowShouldClose(window)) {
-				glfwPollEvents();
-				//}
-					glfwIconifyWindow(window);
-				glfwPollEvents();
+				glfwIconifyWindow(window);
+				glfwHideWindow(window);
+				glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 			}
 			super.setVisible(visible);
 		}
