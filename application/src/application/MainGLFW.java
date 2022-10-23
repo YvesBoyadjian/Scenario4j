@@ -848,6 +848,8 @@ public class MainGLFW {
 
 		viewer.buildWidget(style);
 		viewer.setVisible(true);
+		viewer.setVisible(false);
+		viewer.setVisible(true);
 
 		GL2 gl2 = new GL2() {
 		};
