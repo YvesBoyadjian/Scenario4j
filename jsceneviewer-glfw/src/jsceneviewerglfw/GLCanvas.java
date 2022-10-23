@@ -246,6 +246,7 @@ public class GLCanvas extends Composite {
 	public void dispose() {
 		// Free the window callbacks and destroy the window
 		glfwFreeCallbacks(window);
+		glfwSetWindowShouldClose(window, true);
 		glfwDestroyWindow(window);
 		window = 0;
 		//glfwPollEvents();
