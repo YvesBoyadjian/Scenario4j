@@ -155,6 +155,10 @@ public class SoQtWalkViewer extends SoQtConstrainedViewer {
 		
 		  /* Zjisteni zmeny pozice kurzoru. */
 		  SbVec2f position = getCursorPosition();
+
+		  if (position == null) {
+			  return;
+		  }
 		  
 		  if( ! Float.isNaN(old_position.getX())) {
 		  
@@ -239,9 +243,14 @@ public class SoQtWalkViewer extends SoQtConstrainedViewer {
 
 	 private SbVec2f getCursorPosition()
 	 {
+		 long window = getGLWidget().getWindow();
+
+		 if (!getGLWidget().isVisible() || window == 0) {
+			 return null;
+		 }
 	   /* Ziskani absolutni pozice kurzoru. */
 	   //QPoint position = QCursor.pos();
-		 glfwGetCursorPos(getGLWidget().getWindow(),bufx,bufy);
+		 glfwGetCursorPos(window,bufx,bufy);
 	   //Point position = Display.getCurrent().getCursorLocation();		  
 	   return new SbVec2f((float)bufx.get(0), (float)bufy.get(0));
 	 }

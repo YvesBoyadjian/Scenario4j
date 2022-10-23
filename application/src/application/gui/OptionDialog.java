@@ -114,7 +114,9 @@ public class OptionDialog extends JDialog {
             viewer.toggleTimeStop();
         }
         viewer.onClose(false);
-        glfwSetWindowShouldClose(viewer.getGLWidget().getWindow(), true);
+        long window = viewer.getGLWidget().getWindow();
+        if (window != 0)
+            glfwSetWindowShouldClose(window, true);
     }
 
     private void onLeaveToNew() {

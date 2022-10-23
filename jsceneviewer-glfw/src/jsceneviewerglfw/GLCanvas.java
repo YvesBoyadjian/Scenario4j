@@ -202,7 +202,10 @@ public class GLCanvas extends Composite {
 	}
 
 	public void swapBuffers() {
-		glfwSwapBuffers(window);	}
+		if (isVisible()) {
+			glfwSwapBuffers(window);
+		}
+	}
 
 	public long getWindow() {
 		return window;
@@ -256,11 +259,12 @@ public class GLCanvas extends Composite {
 		}
 		else {
 			if(0 != window) {
-				glfwIconifyWindow(window);
-				glfwHideWindow(window);
 				glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+				glfwHideWindow(window);
+				glfwIconifyWindow(window);
 			}
 			super.setVisible(visible);
+			//dispose();
 		}
 	}
 
