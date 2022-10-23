@@ -77,12 +77,18 @@ public class GLCanvas extends Composite {
 		
 		//glfwWindowHint(GLFW_SRGB_CAPABLE, GLFW_TRUE); this does not seem to have effect
 
-		glfwWindowHint(GLFW_FLOATING, GLFW_TRUE); //seems to make the mouse hang
+		String os = System.getProperty("os.name");
 
-		glfwWindowHint(GLFW_AUTO_ICONIFY, GLFW_FALSE);
+		boolean win = os.startsWith("Windows");
+
+		if (!win) {
+			glfwWindowHint(GLFW_FLOATING, GLFW_TRUE); //seems to make the mouse hang on Windows with Intel Graphics HD 4000
+		}
+
+		//glfwWindowHint(GLFW_AUTO_ICONIFY, GLFW_FALSE);
 			
 		// Create the window
-		window = glfwCreateWindow(width, height, format.name, /*glfwGetPrimaryMonitor()*/NULL, NULL);
+		window = glfwCreateWindow(width, height, format.name, win ? glfwGetPrimaryMonitor() : NULL, NULL);
 		if ( window == NULL )
 			throw new RuntimeException("Failed to create the GLFW window");
 		
