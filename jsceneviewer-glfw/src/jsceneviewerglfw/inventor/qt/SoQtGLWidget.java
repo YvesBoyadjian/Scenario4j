@@ -760,6 +760,11 @@ public int getColorBitDepth()
 	}
 
 	protected void showEvent() {
+		  if (mainWidget.isDisposed()) {
+			  contextShareManager.removeWidget(mainWidget);
+					  mainWidget = null;
+			  buildWidget(0);
+		  }
 		if( null != mainWidget ) {
 			mainWidget.setVisible(true);
 		}

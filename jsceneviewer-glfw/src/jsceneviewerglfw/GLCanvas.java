@@ -278,4 +278,8 @@ public class GLCanvas extends Composite {
 			return super.isVisible();
 		}
 	}
+
+	public boolean isDisposed() {
+		return window == 0;
+	}
 }
