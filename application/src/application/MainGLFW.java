@@ -1340,9 +1340,6 @@ public class MainGLFW {
 			}
 		});
 
-		OptionDialog dialog = new OptionDialog(viewer, sg);
-		dialog.setUndecorated(true);
-
 		viewer.setEscapeCallback((viewer2) -> {
 
 			if(!viewer2.isVisible()) {
@@ -1357,6 +1354,11 @@ public class MainGLFW {
 				glfwPollEvents();
 				viewer2.setVisible(false);
 				glfwPollEvents();
+
+				SwingUtilities.invokeLater(()->{
+				glfwPollEvents();
+				OptionDialog dialog = new OptionDialog(viewer, sg);
+				dialog.setUndecorated(true);
 				dialog.setVisible(true);
 				glfwPollEvents();
 				dialog.pack();
@@ -1368,6 +1370,7 @@ public class MainGLFW {
 				dialog.setAlwaysOnTop(true);
 				SwingUtilities.invokeLater(()->{
 					glfwPollEvents();
+				});
 				});
 			});
 			});
