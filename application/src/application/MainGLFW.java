@@ -1366,7 +1366,9 @@ public class MainGLFW {
 				dialog.setBounds(GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds());
 				glfwPollEvents();
 				dialog.setAlwaysOnTop(true);
-				glfwPollEvents();
+				SwingUtilities.invokeLater(()->{
+					glfwPollEvents();
+				});
 			});
 			});
 /*
