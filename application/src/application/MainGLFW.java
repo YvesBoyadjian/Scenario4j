@@ -1355,7 +1355,7 @@ public class MainGLFW {
 				viewer2.setVisible(false);
 				glfwPollEvents();
 
-				SwingUtilities.invokeLater(()->{
+				viewer.addOneShotIdleListener((viewer4)->{
 				glfwPollEvents();
 				OptionDialog dialog = new OptionDialog(viewer, sg);
 				dialog.setUndecorated(true);
@@ -1368,7 +1368,7 @@ public class MainGLFW {
 				dialog.setBounds(GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds());
 				glfwPollEvents();
 				dialog.setAlwaysOnTop(true);
-				SwingUtilities.invokeLater(()->{
+					viewer.addOneShotIdleListener((viewer5)->{
 					glfwPollEvents();
 				});
 				});
