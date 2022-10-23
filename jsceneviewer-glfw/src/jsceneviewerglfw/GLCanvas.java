@@ -113,77 +113,81 @@ public class GLCanvas extends Composite {
 		// Must be called by the parent
 		//setVisible(true);
 
-		glfwSetWindowSizeCallback(window, new GLFWWindowSizeCallbackI() {
 
-			@Override
-			public void invoke(long window, int width, int height) {				
-				resizeCB(width,height);
-			}
-			
-		});		
-		
-        glfwSetKeyCallback(window, (windowHnd, key, scancode, action, mods) -> {
-        	keyCB(key,scancode,action,mods);
-        });
-        
-        glfwSetCursorPosCallback(window, new GLFWCursorPosCallbackI() {
-
-			@Override
-			public void invoke(long window, double xpos, double ypos) {
-
-				if (!isVisible()) {
-					return;
-				}
-
-				boolean left_button = false;
-
-				int state = glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT);
-				if (state == GLFW_PRESS) {
-						left_button = true;
-				}
-
-				boolean right_button = false;
-
-				state = glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT);
-				if (state == GLFW_PRESS) {
-					right_button = true;
-				}
-				MouseEvent me = new MouseEvent(xpos, ypos);
-				if(left_button) {
-					me.stateMask |= SWT.BUTTON1;
-				}
-				if(right_button) {
-					me.stateMask |= SWT.BUTTON2;
-				}
-				mouseMoveCB(me);
-			}
-        	
-        });
-        
-        glfwSetMouseButtonCallback(window, new GLFWMouseButtonCallbackI() {
-
-			@Override
-			public void invoke(long window, int button, int action, int mods) {
-				mouseClickCB(button,action,mods);
-			}
-        	
-        });
-        
-        glfwSetCursorEnterCallback(window, new GLFWCursorEnterCallbackI() {
-
-			@Override
-			public void invoke(long window, boolean entered) {
-				mouseEnterCB(entered);
-			}
-        	
-        });
-        
         glfwSetInputMode(window, GLFW_CURSOR, format.grabCursor ? GLFW_CURSOR_DISABLED : GLFW_CURSOR_HIDDEN);
 //        if ( format.grabCursor && glfwRawMouseMotionSupported()) does not work
 //            glfwSetInputMode(window, GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);	
         
         //swapBuffers();
         }
+
+		void setCallbacks() {
+
+			glfwSetWindowSizeCallback(window, new GLFWWindowSizeCallbackI() {
+
+				@Override
+				public void invoke(long window, int width, int height) {
+					resizeCB(width,height);
+				}
+
+			});
+
+			glfwSetKeyCallback(window, (windowHnd, key, scancode, action, mods) -> {
+				keyCB(key,scancode,action,mods);
+			});
+
+			glfwSetCursorPosCallback(window, new GLFWCursorPosCallbackI() {
+
+				@Override
+				public void invoke(long window, double xpos, double ypos) {
+
+					if (!isVisible()) {
+						return;
+					}
+
+					boolean left_button = false;
+
+					int state = glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT);
+					if (state == GLFW_PRESS) {
+						left_button = true;
+					}
+
+					boolean right_button = false;
+
+					state = glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT);
+					if (state == GLFW_PRESS) {
+						right_button = true;
+					}
+					MouseEvent me = new MouseEvent(xpos, ypos);
+					if(left_button) {
+						me.stateMask |= SWT.BUTTON1;
+					}
+					if(right_button) {
+						me.stateMask |= SWT.BUTTON2;
+					}
+					mouseMoveCB(me);
+				}
+
+			});
+
+			glfwSetMouseButtonCallback(window, new GLFWMouseButtonCallbackI() {
+
+				@Override
+				public void invoke(long window, int button, int action, int mods) {
+					mouseClickCB(button,action,mods);
+				}
+
+			});
+
+			glfwSetCursorEnterCallback(window, new GLFWCursorEnterCallbackI() {
+
+				@Override
+				public void invoke(long window, boolean entered) {
+					mouseEnterCB(entered);
+				}
+
+			});
+		}
 	
 	public void setCurrent() {
 		glfwMakeContextCurrent(window);
@@ -255,9 +259,11 @@ public class GLCanvas extends Composite {
 					glfwRestoreWindow(window);
 					glfwShowWindow(window);
 					glfwSetInputMode(window, GLFW_CURSOR, format.grabCursor ? GLFW_CURSOR_DISABLED : GLFW_CURSOR_HIDDEN);
+				setCallbacks();
 			}
 		}
 		else {
+			glfwFreeCallbacks(window);
 			super.setVisible(visible);
 			if(0 != window) {
 				glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
