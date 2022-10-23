@@ -78,6 +78,8 @@ public class GLCanvas extends Composite {
 		//glfwWindowHint(GLFW_SRGB_CAPABLE, GLFW_TRUE); this does not seem to have effect
 
 		glfwWindowHint(GLFW_FLOATING, GLFW_TRUE); //seems to make the mouse hang
+
+		glfwWindowHint(GLFW_AUTO_ICONIFY, GLFW_FALSE);
 			
 		// Create the window
 		window = glfwCreateWindow(width, height, format.name, /*glfwGetPrimaryMonitor()*/NULL, NULL);
