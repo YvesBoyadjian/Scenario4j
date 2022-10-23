@@ -258,12 +258,12 @@ public class GLCanvas extends Composite {
 			}
 		}
 		else {
+			super.setVisible(visible);
 			if(0 != window) {
 				glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 				glfwHideWindow(window);
 				glfwIconifyWindow(window);
 			}
-			super.setVisible(visible);
 			//dispose();
 		}
 	}
