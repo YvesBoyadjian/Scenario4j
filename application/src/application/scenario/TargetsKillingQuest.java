@@ -59,7 +59,12 @@ public class TargetsKillingQuest implements Quest {
                     sceneGraph.talk(speech);
                 }
                 else {
-                    sceneGraph.setMessage(speciesToHunt + " species left to hunt");
+                    if (speciesToHunt <= 2 && !sceneGraph.haveShot(BigFoots.BIGFOOT_NAME)) {
+                        sceneGraph.setMessage(speciesToHunt + " species left to hunt, go hunting for Bigfoot");
+                    }
+                    else {
+                        sceneGraph.setMessage(speciesToHunt + " species left to hunt");
+                    }
                 }
             }
             sceneGraph.setSearchForSea(onlyMissingSeal);
