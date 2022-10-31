@@ -22,6 +22,7 @@ import application.nodes.*;
 import application.objects.Target;
 import application.objects.collectible.BootsFamily;
 import application.objects.collectible.Collectible;
+import application.objects.enemy.EnemyFamily;
 import application.scenario.Scenario;
 import application.viewer.glfw.SoQtWalkViewer;
 import com.jogamp.opengl.GL2;
@@ -40,6 +41,7 @@ import jscenegraph.database.inventor.*;
 import jscenegraph.database.inventor.actions.SoGLRenderAction;
 import jscenegraph.database.inventor.actions.SoGetMatrixAction;
 import jscenegraph.database.inventor.actions.SoSearchAction;
+import jscenegraph.database.inventor.fields.SoMFVec3f;
 import jscenegraph.database.inventor.misc.SoNotList;
 import jscenegraph.database.inventor.nodes.*;
 import jscenegraph.port.Ctx;
@@ -295,6 +297,14 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 	boolean CBRunning = false;
 
 	final Collection<Runnable> idleCallbacks = new ArrayList<>();
+
+	final SoEnemies enemiesSeparator = new SoEnemies();
+
+	final SbBSPTree enemiesBSPTree = new SbBSPTree();
+
+	final List<Integer> enemiesInstances = new ArrayList<>();
+
+	final EnemyFamily enemyFamily = new EnemyFamily();
 
 	DBody heroBody;
 
@@ -1196,6 +1206,54 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 		//planksSeparator.addChild(ot.getTexture());
 
 		shadowGroup.addChild(planksSeparator);
+
+		// _______________________________________________ Enemies
+
+		final int NB_ENEMIES = 10000;
+		final int ENEMIES_SEED = 58;
+
+		Random randomPlacementEnemies = new Random(ENEMIES_SEED);
+
+		final int[] indices = new int[4];
+
+		final float zWater =  - 150 + getzTranslation() - CUBE_DEPTH /2;
+
+		float[] xyz = new float[3];
+		int start;
+
+		for (int i=0; i<NB_ENEMIES; i++) {
+			float x = getRandomX(randomPlacementEnemies);
+			float y = getRandomY(randomPlacementEnemies);
+			float z = getInternalZ(x, y, indices,true) + getzTranslation();
+
+			boolean isAboveWater = z > zWater;
+
+			if (isAboveWater) {
+				xyz[0] = x;
+				xyz[1] = y;
+				xyz[2] = z;
+				start = enemyFamily.enemiesInitialCoords.getNum();
+				enemyFamily.enemiesInitialCoords.setValues(start,xyz);
+				enemiesInstances.add(i);
+				enemyFamily.nbEnemies++;
+			}
+		}
+		System.out.println("Enemies: "+enemyFamily.nbEnemies);
+
+		//final int nbCollectibles = collectibleFamily.getNbCollectibles();
+
+		final float[] vector = new float[3];
+
+		for (int index = 0; index < enemyFamily.nbEnemies; index++) {
+			int instance = enemiesInstances.get(index);
+
+			final SbVec3f enemyPosition = new SbVec3f();
+			enemyPosition.setValue(enemyFamily.getEnemy(index, vector));
+
+			enemiesSeparator.addMember(enemyPosition, instance);
+		}
+
+		shadowGroup.addChild(enemiesSeparator);
 
 		sep.addChild(shadowGroup);
 
@@ -3111,5 +3169,19 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 		sunLight[1].enableNotify(wasNotify); // In order not to recompute shaders
 		sunLight[2].enableNotify(wasNotify); // In order not to recompute shaders
 		sunLight[3].enableNotify(wasNotify); // In order not to recompute shaders
+	}
+
+	float getRandomX(Random randomPlacementTrees) {
+		SbBox3f sceneBox = getChunks().getSceneBoxFullIsland();
+		float xMin = sceneBox.getBounds()[0];
+		float xMax = sceneBox.getBounds()[3];
+		return xMin + (xMax - xMin) * randomPlacementTrees.nextFloat();
+	}
+
+	float getRandomY(Random randomPlacementTrees) {
+		SbBox3f sceneBox = getChunks().getSceneBoxFullIsland();
+		float yMin = sceneBox.getBounds()[1];
+		float yMax = sceneBox.getBounds()[4];
+		return yMin + (yMax - yMin) * randomPlacementTrees.nextFloat();
 	}
 }
