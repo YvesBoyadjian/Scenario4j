@@ -1603,59 +1603,10 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 
 	private SoNode buildOracle(boolean shadow) {
 
-		SoSeparator oracleSeparator = new SoSeparator();
+		SoPill oracleSeparator = new SoPill();//SoSeparator();
 
-		SoTranslation oraclePosition = new SoTranslation();
-
-		oraclePosition.translation.setValue(ORACLE_X,ORACLE_Y,ORACLE_Z-zTranslation - 0.74f);
-
-		oracleSeparator.addChild(oraclePosition);
-
-		//oracleSeparator.addChild(transl);
-
-		SoRotation oracleRot = new SoRotation();
-		oracleRot.rotation.setValue(new SbVec3f(1,0,0),(float)Math.PI/2);
-
-		oracleSeparator.addChild(oracleRot);
-
-		SoComplexity complexity = new SoComplexity();
-		complexity.value.setValue(1); // Complexity must not exceed one
-
-		oracleSeparator.addChild(complexity);
-
-		SoMaterial material = new SoMaterial();
-
-		material.diffuseColor.setValue(1,0,0);
-
-		oracleSeparator.addChild(material);
-
-		SoCylinder oracle = new SoCylinder();
-
-		oracle.height.setValue(1.75f - 0.8f);
-		oracle.radius.setValue(0.4f);
-		oracle.parts.setValue(SoCylinder.Part.SIDES);
-
-		oracleSeparator.addChild(oracle);
-
-		SoTranslation headPos = new SoTranslation();
-
-		headPos.translation.setValue(0,1.75f/2 - 0.4f,0);
-
-		oracleSeparator.addChild(headPos);
-
-		SoSphere oracleHead = new SoSphere();
-		oracleHead.radius.setValue(0.4f);
-		oracleHead.subdivision.setValue(32);
-
-		oracleSeparator.addChild(oracleHead);
-
-		SoTranslation footPos = new SoTranslation();
-
-		footPos.translation.setValue(0,(-1.75f/2 + 0.4f)*2,0);
-
-		oracleSeparator.addChild(footPos);
-
-		oracleSeparator.addChild(oracleHead);
+		oracleSeparator.position.translation.setValue(ORACLE_X,ORACLE_Y,ORACLE_Z-zTranslation - 0.74f);
+		oracleSeparator.material.diffuseColor.setValue(1,0,0);
 
 		oracleSeparator.addChild( shadow ? oracleSpeechSwitchShadow : oracleSpeechSwitch);
 
