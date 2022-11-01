@@ -298,11 +298,9 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 
 	final Collection<Runnable> idleCallbacks = new ArrayList<>();
 
-	final SoEnemies enemiesSeparator = new SoEnemies();
+	SoEnemies enemiesSeparator;
 
 	final SbBSPTree enemiesBSPTree = new SbBSPTree();
-
-	final List<Integer> enemiesInstances = new ArrayList<>();
 
 	final EnemyFamily enemyFamily = new EnemyFamily();
 
@@ -1209,7 +1207,7 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 
 		// _______________________________________________ Enemies
 
-		final int NB_ENEMIES = 10000;
+		final int NB_ENEMIES = 100000;
 		final int ENEMIES_SEED = 58;
 
 		Random randomPlacementEnemies = new Random(ENEMIES_SEED);
@@ -1231,21 +1229,24 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 			if (isAboveWater) {
 				xyz[0] = x;
 				xyz[1] = y;
-				xyz[2] = z;
+				xyz[2] = z + 1.75f/2 - 0.03f;
 				start = enemyFamily.enemiesInitialCoords.getNum();
 				enemyFamily.enemiesInitialCoords.setValues(start,xyz);
-				enemiesInstances.add(i);
+				enemyFamily.enemiesInstances.add(i);
 				enemyFamily.nbEnemies++;
 			}
 		}
 		System.out.println("Enemies: "+enemyFamily.nbEnemies);
+
+		enemiesSeparator = new SoEnemies(enemyFamily);
+		enemiesSeparator.setReferencePoint(targetsRefPoint);
 
 		//final int nbCollectibles = collectibleFamily.getNbCollectibles();
 
 		final float[] vector = new float[3];
 
 		for (int index = 0; index < enemyFamily.nbEnemies; index++) {
-			int instance = enemiesInstances.get(index);
+			int instance = enemyFamily.enemiesInstances.get(index);
 
 			final SbVec3f enemyPosition = new SbVec3f();
 			enemyPosition.setValue(enemyFamily.getEnemy(index, vector));
@@ -1253,7 +1254,12 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 			enemiesSeparator.addMember(enemyPosition, instance);
 		}
 
-		shadowGroup.addChild(enemiesSeparator);
+		SoSeparator mainEnemySep = new SoSeparator();
+		mainEnemySep.addChild(transl);
+
+		mainEnemySep.addChild(enemiesSeparator);
+
+		shadowGroup.addChild(mainEnemySep);
 
 		sep.addChild(shadowGroup);
 

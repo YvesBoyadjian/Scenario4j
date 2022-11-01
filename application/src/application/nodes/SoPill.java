@@ -53,4 +53,8 @@ public class SoPill extends SoSeparator {
         addChild(footPos);
         addChild(head);
     }
+
+    public SbVec3f getCoordinates() {
+        return position.translation.getValue();
+    }
 }
