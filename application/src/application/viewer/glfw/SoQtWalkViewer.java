@@ -591,12 +591,16 @@ protected void onAim(SoMouseButtonEvent event, boolean aim) {
 	int nbFrames = 0;
 	
 	long lastFrameTime = -100;
+
+	long newFrameTime;
 	
 	final static int NB_FRAMES = 120;
 
 	final static double FPS_FREQUENCY_SEC = 1.0;
 
 	float fps;
+
+	float minFPS;
 
     protected void paintGL(GL2 gl2) {
     	
@@ -612,9 +616,14 @@ protected void onAim(SoMouseButtonEvent event, boolean aim) {
     	else {
     		nbFrames++;
     	}
-		long newFrameTime = System.nanoTime();
+		long deltaTime = newFrameTime;
+		newFrameTime = System.nanoTime();
+		deltaTime -= newFrameTime;
+		fps = Math.min(fps, -1e9f/deltaTime);
     	if(nbFrames == NB_FRAMES || (newFrameTime - lastFrameTime) > FPS_FREQUENCY_SEC*1e9 ) {
-    		fps = 1.0e9f/(newFrameTime - lastFrameTime)*nbFrames;
+			minFPS = fps;
+    		//fps = 1.0e9f/(newFrameTime - lastFrameTime)*nbFrames;
+			fps = 999;
     		//System.out.println("fps = "+fps);
     		nbFrames = 0;
     		lastFrameTime = newFrameTime;
@@ -622,7 +631,7 @@ protected void onAim(SoMouseButtonEvent event, boolean aim) {
     }
 
     public float getFPS() {
-    	return fps;
+    	return minFPS;
 	}
     
 //    public void actualRedraw()
