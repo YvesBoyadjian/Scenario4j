@@ -94,7 +94,7 @@ public class SoTriangleIntArrayIndexer implements Destroyable, VertexArrayIndexe
             this.vbo.bindBuffer(contextid);
             SoGL.cc_glglue_glDrawElements(glue,
                     GL2.GL_TRIANGLES,
-                    numBytes/Short.BYTES,
+                    numBytes/Integer.BYTES,
                     GL2.GL_UNSIGNED_INT, (ByteBuffer) null);
             SoGL.cc_glglue_glBindBuffer(glue, GL2.GL_ELEMENT_ARRAY_BUFFER, 0);
         }
