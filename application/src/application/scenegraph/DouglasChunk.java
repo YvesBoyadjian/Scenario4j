@@ -1,9 +1,6 @@
 package application.scenegraph;
 
-import java.nio.ByteBuffer;
-import java.nio.FloatBuffer;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.ExecutionException;
@@ -13,7 +10,6 @@ import application.objects.DouglasFir;
 import application.scenegraph.douglas.IndexedFaceSetParameters;
 import jscenegraph.coin3d.inventor.lists.SbListInt;
 import jscenegraph.database.inventor.*;
-import jscenegraph.port.SbVec3fArray;
 import jscenegraph.port.memorybuffer.FloatMemoryBuffer;
 
 public class DouglasChunk {
@@ -113,17 +109,15 @@ public class DouglasChunk {
 	FloatMemoryBuffer douglasVerticesT;
 	FloatMemoryBuffer douglasNormalsT;
 	int[] douglasColorsT;
-
+/*
 	public void clear() {
-		/*
-		douglasIndicesF = null;
-		douglasVerticesF = null;
-		douglasNormalsF = null;
-		douglasColorsF = null;
-		douglasTexCoordsF = null;
-		 */
 		nearF = null;
+		doClearNear();
+	}
+*/
+	private void doClearNear() {
 
+		nearF = null;
 		douglasIndicesNearF = null;
 		douglasVerticesNearF = null;
 		douglasNormalsNearF = null;
@@ -875,6 +869,11 @@ public class DouglasChunk {
 			public int[] colorsRGBA() {
 				return douglasColorsF;
 			}
+
+			@Override
+			public void markConsumed() {
+				//Don't clear far
+			}
 		};
 	}
 
@@ -882,7 +881,7 @@ public class DouglasChunk {
 
 	public IndexedFaceSetParameters getFoliageNearParameters() {
 		if (nearF == null) {
-			nearF = df.es.submit(() -> {
+			nearF = RecursiveChunk.es.submit(() -> {
 				computeDouglasNearF();
 				return new IndexedFaceSetParameters() {
 					@Override
@@ -908,6 +907,11 @@ public class DouglasChunk {
 					@Override
 					public int[] colorsRGBA() {
 						return douglasColorsNearF;
+					}
+
+					@Override
+					public void markConsumed() {
+						doClearNear();
 					}
 				};
 			});

@@ -73,7 +73,7 @@ public class SoCollectibles extends SoSeparator {
 
     void update_children_list() {
 
-        nearSphere.setValue(referencePoint.operator_add(cameraDirection.operator_mul(collectible.getViewDistance()*0.8f)), collectible.getViewDistance());
+        nearSphere.setValue(referencePoint.operator_add(cameraDirection.operator_mul(collectible.getViewDistance()*0.0f)), collectible.getViewDistance());
 
         nearIDS.truncate(0);
         bspTree.findPoints(nearSphere,nearIDS);

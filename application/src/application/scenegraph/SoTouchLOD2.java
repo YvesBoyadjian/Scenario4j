@@ -26,7 +26,7 @@ import jscenegraph.database.inventor.nodes.SoSeparator;
 public abstract class SoTouchLOD2 extends SoLOD implements SoTouchLODMaster.SoTouchLODSlave {
 	
 	public static final int FRONT_DISTANCE = 0;//1000;
-	
+
 	public static final int MOST_DETAILED = 0;
 
 	public static final int LEAST_DETAILED = 1;
@@ -50,41 +50,77 @@ public abstract class SoTouchLOD2 extends SoLOD implements SoTouchLODMaster.SoTo
 	}
 	
 //	public static final int MAX_CHANGE = 9999;
-	
+
 	public void
 	GLRenderBelowPath(SoGLRenderAction action)
 	{
-		  int idx = this.whichToTraverse(action);
-		  
-//		  int wanted_idx = idx;
-		  
+		// _____________________________________________ Get the ideal to traverse
+		final int wanted_idx = this.whichToTraverse(action);
+		final int choosed_idx = wanted_idx;
+
+		// ____________________________________________________ Draw the chosen one
+		if (choosed_idx >= 0) {
+			SoNode choosed_child = this.children.get(choosed_idx);
+			action.pushCurPath(choosed_idx, choosed_child);
+			if (!action.abortNow()) {
+				//SoNodeProfiling profiling; TODO
+				//profiling.preTraversal(action);
+				choosed_child.GLRenderBelowPath(action);
+				//profiling.postTraversal(action);
+			}
+			action.popCurPath();
+			cleared = false;
+		}
+		if (choosed_idx == LEAST_DETAILED) {
+			SoNode mostDetailed = this.children.get(MOST_DETAILED);
+			clearTree(mostDetailed);
+		}
+		currentVisible = choosed_idx;
+
+		// don't auto cache LOD nodes.
+		SoGLCacheContextElement.shouldAutoCache(action.getState(),
+				SoGLCacheContextElement.AutoCache.DONT_AUTO_CACHE.getValue());
+	}
+
+	public void
+	GLRenderBelowPath_(SoGLRenderAction action)
+	{
+		// _____________________________________________ Get the ideal to traverse
+		final int wanted_idx = this.whichToTraverse(action);
+
+		// ___________________________________________ Get the least detailed
 	    SoRecursiveIndexedFaceSet least_detailed = (SoRecursiveIndexedFaceSet) this.children.get(LEAST_DETAILED);
-	    
-		  boolean leastDetailedWasCleared = false;
-		  if(idx == MOST_DETAILED) {
-			    if(least_detailed.cleared) {
-			    	idx = LEAST_DETAILED;
-			    	leastDetailedWasCleared = true;
-			    }
+
+		// ___________________________________________ See if the least detailed was cleared
+		boolean leastDetailedWasClearedAndChosen = false;
+		int choosed_idx = wanted_idx;
+
+		  // ________________ If wanted is most detailed but least detailed was cleared, choose least detailed
+		  if(wanted_idx == MOST_DETAILED && least_detailed.cleared) {
+			    	choosed_idx = LEAST_DETAILED;
+			    	leastDetailedWasClearedAndChosen = true;
 		  }
-		  
-		  if (idx >= 0) {
-		    SoNode child = (SoNode) this.children.get(idx);
-		    action.pushCurPath(idx, child);
+
+		  // ____________________________________________________ Draw the chosen one
+		  if (choosed_idx >= 0) {
+		    SoNode choosed_child = this.children.get(choosed_idx);
+		    action.pushCurPath(choosed_idx, choosed_child);
 		    if (!action.abortNow()) {
 		      //SoNodeProfiling profiling; TODO
 		      //profiling.preTraversal(action);
-		      child.GLRenderBelowPath(action);
+		      choosed_child.GLRenderBelowPath(action);
 		      //profiling.postTraversal(action);
 		    }
 		    action.popCurPath();
 		    
-		    currentVisible = idx;
-		  
+		    currentVisible = choosed_idx;
+
 			  if(/*idx == MOST_DETAILED*/!least_detailed.cleared) {
-			  int other_idx = 1 -idx;
-				  if(leastDetailedWasCleared || !all_children_have_been_loaded(child,action, 0)) {
-					    SoNode otherChild = (SoNode) this.children.get(other_idx);	
+			  	int other_idx = 1 - choosed_idx;
+				  if(leastDetailedWasClearedAndChosen || !all_children_have_been_loaded(choosed_child,action, 0)) {
+
+					  // ________________________________________________ Draw other child
+					    SoNode otherChild = this.children.get(other_idx);
 					    action.pushCurPath(other_idx, otherChild);
 					    if (!action.abortNow()) {
 					      //SoNodeProfiling profiling; TODO
@@ -97,7 +133,7 @@ public abstract class SoTouchLOD2 extends SoLOD implements SoTouchLODMaster.SoTo
 							  currentVisible = -1;
 						  }
 						  else
-					    currentVisible = other_idx;
+					    	currentVisible = other_idx;
 				  }
 				  else {
 					  if(other_idx == MOST_DETAILED) {
@@ -119,8 +155,7 @@ public abstract class SoTouchLOD2 extends SoLOD implements SoTouchLODMaster.SoTo
 		    else if( currentVisible == LEAST_DETAILED) {
 		    	currentVisible = -1;
 		    }
-		    
-		    
+
 		  // don't auto cache LOD nodes.
 		  SoGLCacheContextElement.shouldAutoCache(action.getState(),
 		                                           SoGLCacheContextElement.AutoCache.DONT_AUTO_CACHE.getValue());
@@ -193,7 +228,8 @@ public abstract class SoTouchLOD2 extends SoLOD implements SoTouchLODMaster.SoTo
 //			clearTree(node);
 //		}
 		//long stop = System.nanoTime();
-		//System.out.println("SoTouchLOD2 " + (stop - start)+" ns");				
+		//System.out.println("SoTouchLOD2 " + (stop - start)+" ns");
+		System.out.println("change child");
 		previousChild = wantedChild;
 //		if (getChild(wantedChild) instanceof SoSeparatorWithDirty) {
 //			SoSeparatorWithDirty sepwd = (SoSeparatorWithDirty)getChild(wantedChild);
@@ -203,6 +239,8 @@ public abstract class SoTouchLOD2 extends SoLOD implements SoTouchLODMaster.SoTo
 	}
 
 	public static boolean clearTree(SoNode node) {
+
+		//System.out.println("clearTree");
 		
 		if(node instanceof SoRecursiveIndexedFaceSet) {
 			
@@ -216,22 +254,22 @@ public abstract class SoTouchLOD2 extends SoLOD implements SoTouchLODMaster.SoTo
 			if(!group.cleared) {
 				int nbChilds = group.getNumChildren();
 				for( int i=0; i<nbChilds; i++) {
-					if(clearTree( group.getChild(i))) {
-						return true;
-					}
+					/*if(*/clearTree( group.getChild(i));/*){*/
+						//return true;
+					//}
 				}		
 				group.cleared = true;
 				return false;
 			}
 			return false;
 		}			
-		else if( node.isOfType(SoGroup.getClassTypeId())){
+		else if( node instanceof SoGroup){
 			SoGroup group = (SoGroup) node;
 			int nbChilds = group.getNumChildren();
 			for( int i=0; i<nbChilds; i++) {
-				if( clearTree( group.getChild(i))) {
+				/*if(*/ clearTree( group.getChild(i));/*){*/
 					return true;
-				}
+				//}
 			}				
 			return false;
 		}
@@ -255,12 +293,12 @@ public abstract class SoTouchLOD2 extends SoLOD implements SoTouchLODMaster.SoTo
 	{
 	  SoState state = action.getState();
 	  final SbMatrix mat = SoModelMatrixElement.get(state); //ref
-	  final SbViewVolume vv = SoViewVolumeElement.get(state); //ref
+	  //final SbViewVolume vv = SoViewVolumeElement.get(state); //ref
 
 	  final SbVec3f worldcenter = new SbVec3f();
 	  mat.multVecMatrix(this.center.getValue(), worldcenter);
 
-	  float dist = (vv.getProjectionPoint().operator_minus( worldcenter)).length();
+	  //float dist = (vv.getProjectionPoint().operator_minus( worldcenter)).length();
 	  
 	  SoNode node = getChild(1);
 	  if(node instanceof SoGroup) {
@@ -288,6 +326,8 @@ public abstract class SoTouchLOD2 extends SoLOD implements SoTouchLODMaster.SoTo
 	  
 	  model_x = model_xyz.getX();
 	  model_y = model_xyz.getY();
+
+	  float dist;
 	  
 	  if( rc.isInside(model_x, model_y)) {
 		  dist = 0;

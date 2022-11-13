@@ -92,9 +92,12 @@ public class SoTargets extends SoSeparator {
 		}
 	}
 */
+	void update_children_list_() {
+
+	}
 	void update_children_list() {
 
-		nearSphere.setValue(referencePoint.operator_add(cameraDirection.operator_mul(target.getViewDistance()*0.8f)), target.getViewDistance());
+		nearSphere.setValue(referencePoint.operator_add(cameraDirection.operator_mul(target.getViewDistance()*0.0f)), target.getViewDistance());
 
 		nearIDS.truncate(0);
 		bspTree.findPoints(nearSphere,nearIDS);

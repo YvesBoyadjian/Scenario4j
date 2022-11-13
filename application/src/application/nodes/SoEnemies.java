@@ -122,7 +122,7 @@ public class SoEnemies extends SoSeparator {
         super.addChild(target);
         idxToCollectibles.put(id,target);
 //        target.unref();
-        System.out.println("Add enemy "+actualChildren.size());
+        //System.out.println("Add enemy "+actualChildren.size());
     }
     void removeEnemy(SoPill target, int id) {
         actualChildren.remove(id);

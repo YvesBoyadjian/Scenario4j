@@ -624,7 +624,7 @@ protected void onAim(SoMouseButtonEvent event, boolean aim) {
 			minFPS = fps;
     		//fps = 1.0e9f/(newFrameTime - lastFrameTime)*nbFrames;
 			fps = 999;
-    		//System.out.println("fps = "+fps);
+    		//System.out.println("fps = "+minFPS);
     		nbFrames = 0;
     		lastFrameTime = newFrameTime;
     	}

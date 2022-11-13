@@ -81,7 +81,7 @@ public class SoLODIndexedFaceSet extends SoIndexedFaceSet {
 			}
 			else {
 				clear();
-				chunk.clear();
+				//chunk.clear();
 			}
 		}
 		  // don't auto cache LOD nodes.
@@ -143,29 +143,29 @@ public class SoLODIndexedFaceSet extends SoIndexedFaceSet {
 			loaded = wanted;
 		SoLODIndexedFaceSet indexedFaceSetF = this;
 
-			IndexedFaceSetParameters farFoliageParameters = near ? chunk.getFoliageNearParameters() : chunk.getFoliageFarParameters();
-			if (farFoliageParameters == null) {
-				farFoliageParameters = chunk.getFoliageFarParameters();
+			IndexedFaceSetParameters foliageParameters = near ? chunk.getFoliageNearParameters() : chunk.getFoliageFarParameters();
+			if (foliageParameters == null) {
+				foliageParameters = chunk.getFoliageFarParameters();
 				loaded = LoadState.LOAD_FAR;
 			}
 		
 		//boolean wasNotify = indexedFaceSetF.coordIndex.enableNotify(false); // In order not to recompute shaders
-		indexedFaceSetF.coordIndex.setValuesPointer(/*chunk.douglasIndicesF*/farFoliageParameters.coordIndices());
+		indexedFaceSetF.coordIndex.setValuesPointer(/*chunk.douglasIndicesF*/foliageParameters.coordIndices());
 		//indexedFaceSetF.coordIndex.enableNotify(wasNotify);
 		
 		SoVertexProperty vertexProperty = new SoVertexProperty();
 		
-		vertexProperty.vertex.setValuesPointer(/*chunk.douglasVerticesF*/farFoliageParameters.vertices());
+		vertexProperty.vertex.setValuesPointer(/*chunk.douglasVerticesF*/foliageParameters.vertices());
 		
 		vertexProperty.normalBinding.setValue(SoVertexProperty.Binding.PER_VERTEX_INDEXED);
 		
-		vertexProperty.normal.setValuesPointer(/*chunk.douglasNormalsF*/farFoliageParameters.normals());
+		vertexProperty.normal.setValuesPointer(/*chunk.douglasNormalsF*/foliageParameters.normals());
 		
 		boolean withColors = true;
 		if(withColors) {
-			vertexProperty.texCoord.setValuesPointer(/*chunk.douglasTexCoordsF*/farFoliageParameters.textureCoords());
+			vertexProperty.texCoord.setValuesPointer(/*chunk.douglasTexCoordsF*/foliageParameters.textureCoords());
 			vertexProperty.materialBinding.setValue(SoVertexProperty.Binding.PER_VERTEX_INDEXED);
-			vertexProperty.orderedRGBA.setValuesPointer(/*chunk.douglasColorsF*/farFoliageParameters.colorsRGBA());
+			vertexProperty.orderedRGBA.setValuesPointer(/*chunk.douglasColorsF*/foliageParameters.colorsRGBA());
 		}
 		else {
 			vertexProperty.orderedRGBA.setValue(DouglasChunk.TREE_FOLIAGE_AVERAGE_MULTIPLIER/*SbColor(1,0.0f,0.0f)*/.getPackedValue());
@@ -174,6 +174,7 @@ public class SoLODIndexedFaceSet extends SoIndexedFaceSet {
 		//wasNotify = indexedFaceSetF.vertexProperty.enableNotify(false);
 		indexedFaceSetF.vertexProperty.setValue(vertexProperty);
 		//indexedFaceSetF.vertexProperty.enableNotify(wasNotify); // In order not to recompute shaders
+			foliageParameters.markConsumed();
 		}		
 	}
 	public void clear() {

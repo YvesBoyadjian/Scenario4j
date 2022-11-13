@@ -13,11 +13,16 @@ import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.locks.Lock;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
+import application.scenegraph.douglas.IndexedFaceSetParameters;
 import org.lwjgl.BufferUtils;
 
 import jscenegraph.coin3d.inventor.nodes.SoLOD;
@@ -41,7 +46,8 @@ import javax.swing.*;
  *
  */
 public class RecursiveChunk {
-	
+
+	public final static ExecutorService es = Executors.newSingleThreadExecutor();
 	final private boolean KEEP_IN_MEMORY = false;
 	
 	final int MIN_CHUNK_SIZE = 120;
@@ -60,6 +66,8 @@ public class RecursiveChunk {
 	SbVec3f sceneCenter = new SbVec3f();
 	
 	List<RecursiveChunk> childs = new ArrayList<>();
+
+	private Future<IndexedFaceSetParameters> decimatedParameters;
 
 	public RecursiveChunk(ChunkArray ca, RecursiveChunk parent,int rank, int i0, int j0, int ni, int nj) {
 		this.ca = ca;
@@ -294,7 +302,6 @@ public class RecursiveChunk {
 				//System.out.println("loadRC");
 			}
 		}
-		decimatedVerticesCount++;
 		return decimatedVertices;
 	}
 	
@@ -706,5 +713,59 @@ public class RecursiveChunk {
 		FloatMemoryBuffer.free(decimatedTextCoords); decimatedTextCoords = null; //decimatedTexCoordsBuffer = null;
 		decimatedCoordIndices = null;
 		}
+	}
+
+	public IndexedFaceSetParameters getDecimatedParameters() {
+		if (decimatedParameters == null) {
+			decimatedVerticesCount++;
+			decimatedParameters = es.submit(()->{
+
+				getDecimatedVertices();
+				getDecimatedNormals();
+				getDecimatedTexCoords();
+				getDecimatedCoordIndices();
+				return new IndexedFaceSetParameters() {
+					@Override
+					public int[] coordIndices() {
+						return decimatedCoordIndices;
+					}
+
+					@Override
+					public FloatMemoryBuffer vertices() {
+						return decimatedVertices;
+					}
+
+					@Override
+					public FloatMemoryBuffer normals() {
+						return decimatedNormals;
+					}
+
+					@Override
+					public FloatMemoryBuffer textureCoords() {
+						return decimatedTextCoords;
+					}
+
+					@Override
+					public int[] colorsRGBA() {
+						return new int[0]; // not used
+					}
+
+					@Override
+					public void markConsumed() {
+						decimatedParameters = null;
+					}
+				};
+			});
+		}
+		if (decimatedParameters.isDone()) {
+			try {
+				return decimatedParameters.get();
+			} catch (InterruptedException e) {
+				throw new RuntimeException(e);
+			} catch (ExecutionException e) {
+				throw new RuntimeException(e);
+			}
+		}
+		return null;
 	}
 }

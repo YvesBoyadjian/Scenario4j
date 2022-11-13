@@ -3,6 +3,7 @@
  */
 package application.scenegraph;
 
+import application.scenegraph.douglas.IndexedFaceSetParameters;
 import jscenegraph.coin3d.inventor.nodes.SoVertexProperty;
 import jscenegraph.database.inventor.SbBox3f;
 import jscenegraph.database.inventor.SbVec3f;
@@ -27,22 +28,24 @@ public class SoRecursiveIndexedFaceSet extends SoIndexedFaceSet {
 		enableNotify(false); // In order not to invalidate shaders
 	}
 	
-	private void doLoad() {
+	private void doLoad(IndexedFaceSetParameters parameters) {
 		nbDoLoad++;
-				
+
 		SoVertexProperty vertexProperty = new SoVertexProperty();
-		vertexProperty.vertex.setValuesPointer(recursiveChunk.getDecimatedVertices()/*,recursiveChunk.getDecimatedVerticesBuffer()*/);
+		vertexProperty.vertex.setValuesPointer(parameters.vertices()/*recursiveChunk.getDecimatedVertices()*//*,recursiveChunk.getDecimatedVerticesBuffer()*/);
 	    vertexProperty.normalBinding.setValue(SoVertexProperty.Binding.PER_VERTEX_INDEXED);
-	    vertexProperty.normal.setValuesPointer(/*0,*/ recursiveChunk.getDecimatedNormals()/*,recursiveChunk.getDecimatedNormalsBuffer()*/);
-	    vertexProperty.texCoord.setValuesPointer(/*0,*/ recursiveChunk.getDecimatedTexCoords()/*,recursiveChunk.getDecimatedTexCoordsBuffer()*/);
-		
+	    vertexProperty.normal.setValuesPointer(/*0,*/ parameters.normals()/*recursiveChunk.getDecimatedNormals()*//*,recursiveChunk.getDecimatedNormalsBuffer()*/);
+	    vertexProperty.texCoord.setValuesPointer(/*0,*/ parameters.textureCoords()/*recursiveChunk.getDecimatedTexCoords()*//*,recursiveChunk.getDecimatedTexCoordsBuffer()*/);
+
 	    boolean wasEnabled = this.vertexProperty.enableNotify(false);
 		this.vertexProperty.setValue(vertexProperty);
 		this.vertexProperty.enableNotify(wasEnabled);
 
 		wasEnabled = coordIndex.enableNotify(false);
-	    coordIndex.setValuesPointer(/*0,*/ recursiveChunk.getDecimatedCoordIndices());
+	    coordIndex.setValuesPointer(/*0,*/ parameters.coordIndices()/*recursiveChunk.getDecimatedCoordIndices()*/);
 	    coordIndex.enableNotify(wasEnabled);
+
+		parameters.markConsumed();
 	}
 
 	/**
@@ -75,9 +78,12 @@ public class SoRecursiveIndexedFaceSet extends SoIndexedFaceSet {
 	public void GLRender(SoGLRenderAction action)
 	{
 		if(cleared && nbDoLoad<0) {
-			doLoad();
-			cleared = false;
-			
+
+			IndexedFaceSetParameters parameters = recursiveChunk.getDecimatedParameters();
+			if (parameters != null) {
+				doLoad(parameters);
+				cleared = false;
+			}
 //		long delta = stop - start;
 //		
 //		if(delta > 10e6) {
@@ -86,7 +92,9 @@ public class SoRecursiveIndexedFaceSet extends SoIndexedFaceSet {
 //		int i=0;
 		}
 		//long start = System.nanoTime();
-		super.GLRender(action);
+		if (!cleared) {
+			super.GLRender(action);
+		}
 		//long stop = System.nanoTime();
 	}
 }

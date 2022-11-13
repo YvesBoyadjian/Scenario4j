@@ -1637,13 +1637,13 @@ updateDirectionalCamera(SoState state, SoShadowLightCache cache, final SbMatrix 
   final SbPlane plane = new SbPlane(dir, cam.position.getValue());
   // move to eye space
   plane.transform(SoViewingMatrixElement.get(state));
-  SbVec3f N = new SbVec3f(plane.getNormal());
+  SbVec3fSingle N = new SbVec3fSingle(plane.getNormal());
   float D = plane.getDistanceFromOrigin();
 
 	final SbPlane nearPlane = new SbPlane(dir, nearCam.position.getValue());
 	// move to eye space
 	nearPlane.transform(SoViewingMatrixElement.get(state));
-	SbVec3f nearN = new SbVec3f(nearPlane.getNormal());
+	SbVec3fSingle nearN = new SbVec3fSingle(nearPlane.getNormal());
 	float nearD = nearPlane.getDistanceFromOrigin();
 
 //#if 0
@@ -1659,8 +1659,8 @@ updateDirectionalCamera(SoState state, SoShadowLightCache cache, final SbMatrix 
 //  fprintf(stderr,"aspect: %g\n", SoViewportRegionElement::get(state).getViewportAspectRatio());
 //#endif
 
-  cache.fragment_lightplane.value.setValue(N.getValueRead()[0], N.getValueRead()[1], N.getValueRead()[2], D);
-	cache.fragment_lightnearplane.value.setValue(nearN.getValueRead()[0], nearN.getValueRead()[1], nearN.getValueRead()[2], nearD);
+  cache.fragment_lightplane.value.setValue(N.getValue()[0], N.getValue()[1], N.getValue()[2], D);
+	cache.fragment_lightnearplane.value.setValue(nearN.getValue()[0], nearN.getValue()[1], nearN.getValue()[2], nearD);
 
   //SoShadowGroup::VisibilityFlag visflag = (SoShadowGroup::VisibilityFlag) this.master.visibilityFlag.getValue();
 
