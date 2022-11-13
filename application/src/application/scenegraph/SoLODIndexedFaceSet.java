@@ -144,6 +144,10 @@ public class SoLODIndexedFaceSet extends SoIndexedFaceSet {
 		SoLODIndexedFaceSet indexedFaceSetF = this;
 
 			IndexedFaceSetParameters farFoliageParameters = near ? chunk.getFoliageNearParameters() : chunk.getFoliageFarParameters();
+			if (farFoliageParameters == null) {
+				farFoliageParameters = chunk.getFoliageFarParameters();
+				loaded = LoadState.LOAD_FAR;
+			}
 		
 		//boolean wasNotify = indexedFaceSetF.coordIndex.enableNotify(false); // In order not to recompute shaders
 		indexedFaceSetF.coordIndex.setValuesPointer(/*chunk.douglasIndicesF*/farFoliageParameters.coordIndices());

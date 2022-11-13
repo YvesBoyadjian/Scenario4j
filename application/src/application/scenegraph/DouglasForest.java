@@ -15,6 +15,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import application.MainGLFW;
 import application.objects.DouglasFir;
@@ -72,6 +74,8 @@ public class DouglasForest {
 	private List<SbBox3f> xLimits = new ArrayList<>();
 	
 	private int nbDouglas = 0;
+
+	public final ExecutorService es = Executors.newSingleThreadExecutor();
 	
 	public DouglasForest( SceneGraphIndexedFaceSetShader sg ) {
 		this.sg = sg;

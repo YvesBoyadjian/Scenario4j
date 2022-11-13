@@ -11,6 +11,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
+import java.util.concurrent.*;
 import java.util.stream.Stream;
 
 import javax.imageio.ImageIO;
@@ -323,6 +324,10 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 	boolean softShadows = true;
 
 	float distanceFromSea = 1e6f;
+
+	private final ExecutorService es = Executors.newSingleThreadExecutor();
+
+	private Future<SoSeparator> enemiesSeparatorFuture;
 
     public SceneGraphIndexedFaceSetShader(
 			RasterProvider rwp,
@@ -827,6 +832,9 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 	    
 		shadowGroup.addChild(landSep);
 
+		// ___________________________________ pre load enemies
+		computeEnemies();
+
 		// ___________________________________________________________ Douglas trees
 
 		for(long i =0; i<trails.length;i++) {
@@ -1207,57 +1215,16 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 
 		// _______________________________________________ Enemies
 
-		final int NB_ENEMIES = 100000;
-		final int ENEMIES_SEED = 58;
-
-		Random randomPlacementEnemies = new Random(ENEMIES_SEED);
-
-		final int[] indices = new int[4];
-
-		final float zWater =  - 150 + getzTranslation() - CUBE_DEPTH /2;
-
-		float[] xyz = new float[3];
-		int start;
-
-		for (int i=0; i<NB_ENEMIES; i++) {
-			float x = getRandomX(randomPlacementEnemies);
-			float y = getRandomY(randomPlacementEnemies);
-			float z = getInternalZ(x, y, indices,true) + getzTranslation();
-
-			boolean isAboveWater = z > zWater;
-
-			if (isAboveWater) {
-				xyz[0] = x;
-				xyz[1] = y;
-				xyz[2] = z + 1.75f/2 - 0.03f;
-				start = enemyFamily.enemiesInitialCoords.getNum();
-				enemyFamily.enemiesInitialCoords.setValues(start,xyz);
-				enemyFamily.enemiesInstances.add(i);
-				enemyFamily.nbEnemies++;
-			}
+		SoSeparator mainEnemySep = null;
+		try {
+			mainEnemySep = enemiesSeparatorFuture.get(1, TimeUnit.HOURS);
+		} catch (InterruptedException e) {
+			throw new RuntimeException(e);
+		} catch (ExecutionException e) {
+			throw new RuntimeException(e);
+		} catch (TimeoutException e) {
+			throw new RuntimeException(e);
 		}
-		System.out.println("Enemies: "+enemyFamily.nbEnemies);
-
-		enemiesSeparator = new SoEnemies(enemyFamily);
-		enemiesSeparator.setReferencePoint(targetsRefPoint);
-
-		//final int nbCollectibles = collectibleFamily.getNbCollectibles();
-
-		final float[] vector = new float[3];
-
-		for (int index = 0; index < enemyFamily.nbEnemies; index++) {
-			int instance = enemyFamily.enemiesInstances.get(index);
-
-			final SbVec3f enemyPosition = new SbVec3f();
-			enemyPosition.setValue(enemyFamily.getEnemy(index, vector));
-
-			enemiesSeparator.addMember(enemyPosition, instance);
-		}
-
-		SoSeparator mainEnemySep = new SoSeparator();
-		mainEnemySep.addChild(transl);
-
-		mainEnemySep.addChild(enemiesSeparator);
 
 		shadowGroup.addChild(mainEnemySep);
 
@@ -3140,5 +3107,64 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 		float yMin = sceneBox.getBounds()[1];
 		float yMax = sceneBox.getBounds()[4];
 		return yMin + (yMax - yMin) * randomPlacementTrees.nextFloat();
+	}
+
+	private void computeEnemies() {
+		enemiesSeparatorFuture = es.submit(()->{
+
+			final int NB_ENEMIES = 100000;
+			final int ENEMIES_SEED = 58;
+
+			Random randomPlacementEnemies = new Random(ENEMIES_SEED);
+
+			final int[] indices = new int[4];
+
+			final float zWater =  - 150 + getzTranslation() - CUBE_DEPTH /2;
+
+			float[] xyz = new float[3];
+			int start;
+
+			for (int i=0; i<NB_ENEMIES; i++) {
+				float x = getRandomX(randomPlacementEnemies);
+				float y = getRandomY(randomPlacementEnemies);
+				float z = getInternalZ(x, y, indices,true) + getzTranslation();
+
+				boolean isAboveWater = z > zWater;
+
+				if (isAboveWater) {
+					xyz[0] = x;
+					xyz[1] = y;
+					xyz[2] = z + 1.75f/2 - 0.03f;
+					start = enemyFamily.enemiesInitialCoords.getNum();
+					enemyFamily.enemiesInitialCoords.setValues(start,xyz);
+					enemyFamily.enemiesInstances.add(i);
+					enemyFamily.nbEnemies++;
+				}
+			}
+			System.out.println("Enemies: "+enemyFamily.nbEnemies);
+
+			enemiesSeparator = new SoEnemies(enemyFamily);
+			enemiesSeparator.setReferencePoint(targetsRefPoint);
+
+			//final int nbCollectibles = collectibleFamily.getNbCollectibles();
+
+			final float[] vector = new float[3];
+
+			for (int index = 0; index < enemyFamily.nbEnemies; index++) {
+				int instance = enemyFamily.enemiesInstances.get(index);
+
+				final SbVec3f enemyPosition = new SbVec3f();
+				enemyPosition.setValue(enemyFamily.getEnemy(index, vector));
+
+				enemiesSeparator.addMember(enemyPosition, instance);
+			}
+
+			SoSeparator mainEnemySep = new SoSeparator();
+			mainEnemySep.addChild(transl);
+
+			mainEnemySep.addChild(enemiesSeparator);
+
+			return mainEnemySep;
+		});
 	}
 }

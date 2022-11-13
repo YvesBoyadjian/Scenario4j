@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 
 import application.objects.DouglasFir;
 import application.scenegraph.douglas.IndexedFaceSetParameters;
@@ -120,6 +122,7 @@ public class DouglasChunk {
 		douglasColorsF = null;
 		douglasTexCoordsF = null;
 		 */
+		nearF = null;
 
 		douglasIndicesNearF = null;
 		douglasVerticesNearF = null;
@@ -875,34 +878,50 @@ public class DouglasChunk {
 		};
 	}
 
+	private Future<IndexedFaceSetParameters> nearF;
+
 	public IndexedFaceSetParameters getFoliageNearParameters() {
-		computeDouglasNearF();
-		return new IndexedFaceSetParameters() {
-			@Override
-			public int[] coordIndices() {
-				return douglasIndicesNearF;
-			}
+		if (nearF == null) {
+			nearF = df.es.submit(() -> {
+				computeDouglasNearF();
+				return new IndexedFaceSetParameters() {
+					@Override
+					public int[] coordIndices() {
+						return douglasIndicesNearF;
+					}
 
-			@Override
-			public FloatMemoryBuffer vertices() {
-				return douglasVerticesNearF;
-			}
+					@Override
+					public FloatMemoryBuffer vertices() {
+						return douglasVerticesNearF;
+					}
 
-			@Override
-			public FloatMemoryBuffer normals() {
-				return douglasNormalsNearF;
-			}
+					@Override
+					public FloatMemoryBuffer normals() {
+						return douglasNormalsNearF;
+					}
 
-			@Override
-			public FloatMemoryBuffer textureCoords() {
-				return douglasTexCoordsNearF;
-			}
+					@Override
+					public FloatMemoryBuffer textureCoords() {
+						return douglasTexCoordsNearF;
+					}
 
-			@Override
-			public int[] colorsRGBA() {
-				return douglasColorsNearF;
+					@Override
+					public int[] colorsRGBA() {
+						return douglasColorsNearF;
+					}
+				};
+			});
+		}
+		if (nearF.isDone()) {
+			try {
+				return nearF.get();
+			} catch (InterruptedException e) {
+				throw new RuntimeException(e);
+			} catch (ExecutionException e) {
+				throw new RuntimeException(e);
 			}
-		};
+		}
+		return null;
 	}
 
 }
