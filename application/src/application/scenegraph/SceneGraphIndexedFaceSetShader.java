@@ -573,8 +573,11 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 				chunks.saveNormalsAndStones();
 			}
 		}
-		
+
 		chunks.initIndexedFaceSets();
+
+		// ___________________________________ pre load enemies
+		computeEnemies();
 
 		sep.renderCaching.setValue(SoSeparator.CacheEnabled.OFF);
 
@@ -831,9 +834,6 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 	    landSep.addChild(chunkTree);
 	    
 		shadowGroup.addChild(landSep);
-
-		// ___________________________________ pre load enemies
-		computeEnemies();
 
 		// ___________________________________________________________ Douglas trees
 
