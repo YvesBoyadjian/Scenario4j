@@ -57,7 +57,7 @@ import jscenegraph.port.VoidPtr;
  * @author Yves Boyadjian
  *
  */
-public class SoVertexArrayIndexer implements Destroyable {
+public class SoVertexArrayIndexer implements Destroyable, VertexArrayIndexer {
 
 	  private int target;
 	  private SoVertexArrayIndexer next; //ptr
@@ -311,7 +311,7 @@ public class SoVertexArrayIndexer implements Destroyable {
 	      SoGL.cc_glglue_glDrawElements(glue,
 	                               this.target,
 	                               this.indexarray.getLength(),
-	                               this.use_shorts ? GL2.GL_UNSIGNED_SHORT : GL2.GL_UNSIGNED_INT, null);
+	                               this.use_shorts ? GL2.GL_UNSIGNED_SHORT : GL2.GL_UNSIGNED_INT, (IntArrayPtr)null);
 	      SoGL.cc_glglue_glBindBuffer(glue, GL2.GL_ELEMENT_ARRAY_BUFFER, 0);
 	    }
 	    else {

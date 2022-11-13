@@ -3573,6 +3573,17 @@ ByteBuffer data ) {
 		org.lwjgl.opengl.GL11.glDrawElements(mode,count,type,indices);
 	}
 
+	default void glDrawElements(int mode, int count, int type, ByteBuffer indices) {
+
+//		try ( MemoryStack stack = stackPush() ) {
+//			ByteBuffer bb = stack.malloc(indices.size()*Integer.BYTES);
+//			bb.asIntBuffer().put(indices.getValues(),indices.getStart(),indices.size());
+//			bb.clear();
+//			org.lwjgl.opengl.GL11.glDrawElements(mode,type,bb);
+//		}
+		org.lwjgl.opengl.GL11.glDrawElements(mode,/*type,*/indices);
+	}
+
 	default void glMultiDrawElements(int mode, IntArrayPtr count, int type, VoidPtr[] indices, int primcount) {
 		
 		assert(primcount == count.size());

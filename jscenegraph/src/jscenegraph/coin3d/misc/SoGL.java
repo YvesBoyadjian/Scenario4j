@@ -746,6 +746,15 @@ cc_glglue_glDrawElements(cc_glglue glue,
   glue.glDrawElements(mode, count, type, indices);
 }
 
+    public static void
+    cc_glglue_glDrawElements(cc_glglue glue,
+            /*GLenum*/int mode, /*GLsizei*/int count, /*GLenum*/int type,
+            /*VoidPtr*/ByteBuffer indices)
+    {
+        //assert(glue.glDrawElements);
+        glue.glDrawElements(mode, count, type, indices);
+    }
+
 public static void cc_glglue_glMultiDrawElements(cc_glglue glue, int mode, IntArrayPtr count, int type,
 		VoidPtr[] indices, int primcount) {
 	  //assert(glue.glMultiDrawElements);

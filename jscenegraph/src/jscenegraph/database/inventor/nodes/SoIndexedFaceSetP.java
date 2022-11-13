@@ -3,6 +3,7 @@
  */
 package jscenegraph.database.inventor.nodes;
 
+import jscenegraph.coin3d.inventor.rendering.VertexArrayIndexer;
 import jscenegraph.coin3d.inventor.threads.SbRWMutex;
 import jscenegraph.database.inventor.caches.SoConvexDataCache;
 import jscenegraph.mevis.inventor.misc.SoVertexArrayIndexer;
@@ -14,7 +15,7 @@ import jscenegraph.port.Destroyable;
  */
 public class SoIndexedFaceSetP implements Destroyable {
 
-	  public jscenegraph.coin3d.inventor.rendering.SoVertexArrayIndexer vaindexer; //ptr
+	  public VertexArrayIndexer vaindexer; //ptr
 	  public SoConvexDataCache convexCache; //ptr
 	  public int concavestatus;
 

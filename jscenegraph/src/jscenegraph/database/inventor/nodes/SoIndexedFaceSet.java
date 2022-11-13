@@ -247,6 +247,9 @@ import jscenegraph.coin3d.inventor.elements.SoGLMultiTextureCoordinateElement;
 import jscenegraph.coin3d.inventor.elements.SoVertexAttributeBindingElement;
 import jscenegraph.coin3d.inventor.misc.SoGLDriverDatabase;
 import jscenegraph.coin3d.inventor.nodes.SoVertexProperty;
+import jscenegraph.coin3d.inventor.rendering.SoTriangleIntArrayIndexer;
+import jscenegraph.coin3d.inventor.rendering.SoTriangleShortArrayIndexer;
+import jscenegraph.coin3d.inventor.rendering.VertexArrayIndexer;
 import jscenegraph.coin3d.misc.SoGL;
 import jscenegraph.database.inventor.SbMatrix;
 import jscenegraph.database.inventor.SbVec3f;
@@ -716,47 +719,54 @@ public void GLRender(SoGLRenderAction action)
 		      
 		    final IntArrayPtr cindices_0 = cindices[0]; // java port
 		      
-		    jscenegraph.coin3d.inventor.rendering.SoVertexArrayIndexer indexer;
-	        int cnt = 0;
-	        int i = 0;
-	        while (i + cnt < numindices_0 && cindices_0.get(i+cnt) >= 0) cnt++;
-	        
-	        if(cnt == 3) {
-	        	indexer = new jscenegraph.coin3d.inventor.rendering.SoVertexArrayIndexer(numindices_0/4*3); //ptr
-	        }
-	        else if(cnt == 4) {
-	        	indexer = new jscenegraph.coin3d.inventor.rendering.SoVertexArrayIndexer(numindices_0/5*4); //ptr	        	
-	        }
-	        else {
-	        	indexer = new jscenegraph.coin3d.inventor.rendering.SoVertexArrayIndexer(); //ptr	        	
-	        }
-	        
-	      i = 0;
-	      
-	      while (i < numindices_0) {
-	        cnt = 0;
-	        while (i + cnt < numindices_0 && cindices_0.get(i+cnt) >= 0) cnt++;
-	        
-	        switch (cnt) {
-	        case 3:
-	          indexer.addTriangle(cindices_0.get(i),cindices_0.get(i+1), cindices_0.get(i+2));
-	          break;
-	        case 4:
-	          indexer.addQuad(cindices_0.get(i),cindices_0.get(i+1),cindices_0.get(i+2),cindices_0.get(i+3));
-	          break;
-	        default:
-	          if (cnt > 4) {
-	            indexer.beginTarget(GL2.GL_POLYGON);
-	            for (int j = 0; j < cnt; j++) {
-	              indexer.targetVertex(GL2.GL_POLYGON, cindices_0.get(i+j));
-	            }
-	            indexer.endTarget(GL2.GL_POLYGON);
-	          }
-	        }
-	        i += cnt + 1;
-	      }
-			//long inter = System.nanoTime();
-	      indexer.close();
+		    VertexArrayIndexer indexer;
+
+			if (dovbo && (numindices_0+1)/4*3 < 65536 && SoTriangleShortArrayIndexer.isEligible(cindices_0)) {
+				indexer = new SoTriangleShortArrayIndexer(cindices_0);
+			}
+			else if (dovbo && SoTriangleIntArrayIndexer.isEligible(cindices_0)) {
+				indexer = new SoTriangleIntArrayIndexer(cindices_0);
+			}
+			else {
+				int cnt = 0;
+				int i = 0;
+				while (i + cnt < numindices_0 && cindices_0.get(i + cnt) >= 0) cnt++;
+
+				if (cnt == 3) {
+					indexer = new jscenegraph.coin3d.inventor.rendering.SoVertexArrayIndexer(numindices_0 / 4 * 3); //ptr
+				} else if (cnt == 4) {
+					indexer = new jscenegraph.coin3d.inventor.rendering.SoVertexArrayIndexer(numindices_0 / 5 * 4); //ptr
+				} else {
+					indexer = new jscenegraph.coin3d.inventor.rendering.SoVertexArrayIndexer(); //ptr
+				}
+
+				i = 0;
+
+				while (i < numindices_0) {
+					cnt = 0;
+					while (i + cnt < numindices_0 && cindices_0.get(i + cnt) >= 0) cnt++;
+
+					switch (cnt) {
+						case 3:
+							indexer.addTriangle(cindices_0.get(i), cindices_0.get(i + 1), cindices_0.get(i + 2));
+							break;
+						case 4:
+							indexer.addQuad(cindices_0.get(i), cindices_0.get(i + 1), cindices_0.get(i + 2), cindices_0.get(i + 3));
+							break;
+						default:
+							if (cnt > 4) {
+								indexer.beginTarget(GL2.GL_POLYGON);
+								for (int j = 0; j < cnt; j++) {
+									indexer.targetVertex(GL2.GL_POLYGON, cindices_0.get(i + j));
+								}
+								indexer.endTarget(GL2.GL_POLYGON);
+							}
+					}
+					i += cnt + 1;
+				}
+				//long inter = System.nanoTime();
+				indexer.close();
+			}
 			//long stop = System.nanoTime();
 			//long delta1 = inter - start;
 			//long delta2 = stop - inter;

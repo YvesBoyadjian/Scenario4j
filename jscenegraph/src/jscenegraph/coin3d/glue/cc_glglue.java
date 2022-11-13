@@ -576,6 +576,14 @@ public void glDrawElements(int mode, int count, int type, /*VoidPtr*/IntArrayPtr
 		gl2.glDrawElements(mode, count, type, indices);
 	}
 }
+	public void glDrawElements(int mode, int count, int type, ByteBuffer indices) {
+		if(indices == null) {
+			gl2.glDrawElements(mode, count, type, 0);
+		}
+		else {
+			gl2.glDrawElements(mode, count, type, indices);
+		}
+	}
 
 public void glMultiDrawElements(int mode, IntArrayPtr count, int type, VoidPtr[] indices, int primcount) {
 	gl2.glMultiDrawElements(mode,count,type,indices,primcount);
