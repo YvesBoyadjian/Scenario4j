@@ -137,7 +137,7 @@ split()
   final SbBox3f box = new SbBox3f();
   int i, n = this.indices.getLength();
   for (i = 0; i < n; i++) {
-    box.extendBy((pointsArray).operator_square_bracket(this.indices.operator_square_bracket(i)));
+    box.extendBy((pointsArray).operator_square_bracket_fast(this.indices.operator_square_bracket(i)));
   }
   final SbVec3f diag = box.getMax().operator_minus( box.getMin());
   int dim;
@@ -202,7 +202,7 @@ split()
     n = this.indices.getLength();
     //final SbVec3f[] pts = this.pointsArray.getArrayPtr(new SbVec3f[pointsArray.getLength()]);
     for (i = 0; i < n; i++) {
-      SbVec3f vec = pointsArray.operator_square_bracket(this.indices.operator_square_bracket(i));
+      SbVec3f vec = pointsArray.operator_square_bracket_fast(this.indices.operator_square_bracket(i));
       System.err.print("pt: "+vec.getValueRead()[0]+" "+vec.getValueRead()[1]+" "+vec.getValueRead()[2]+"\n");
     }
     System.err.print("pos: "+pos+"\n"
@@ -321,7 +321,7 @@ findPoints(final SbSphere sphere, final SbListInt array)
 	    int smallidx = -1;
 	    float smalldist = Float.MAX_VALUE;//FLT_MAX;
 	    for (int i = 0; i < n; i++) {
-	      tmp.copyFrom(this.pointsArray.operator_square_bracket(i));
+	      tmp.copyFrom(this.pointsArray.operator_square_bracket_fast(i));
 	      float dist = (tmp.operator_minus(pos)).sqrLength();
 	      if (dist < smalldist) {
 	        smalldist = dist;
@@ -368,7 +368,7 @@ findPoints(final SbSphere sphere, final SbListInt array)
 			int smallidx = -1;
 			float smalldist = Float.MAX_VALUE;//FLT_MAX;
 			for (int i = 0; i < n; i++) {
-				tmp.copyFrom(this.pointsArray.operator_square_bracket(i));
+				tmp.copyFrom(this.pointsArray.operator_square_bracket_fast(i));
 				float dist = (tmp.operator_minus(pos)).sqrLength();
 				if (dist < smalldist && filter.filter(tmp)) {
 					smalldist = dist;
@@ -416,13 +416,13 @@ findPoints(final SbSphere sphere, final SbListInt array)
 	                       final SbListInt arr)
 	{
 	  this.findPoints(sphere, arr);
-	  final SbVec3f pos = new SbVec3f(sphere.getCenter());
+	  final SbVec3fSingle pos = new SbVec3fSingle(sphere.getCenter());
 	  int n = arr.getLength();
 	  int closeidx = -1;
 	  float closedist = Float.MAX_VALUE;
 	  for (int i = 0; i < n; i++) {
 	    int idx = arr.operator_square_bracket(i);
-	    float tmp = (pos.operator_minus(this.pointsArray.operator_square_bracket(idx))).sqrLength();
+	    float tmp = (pos.operator_minus(this.pointsArray.operator_square_bracket_fast(idx))).sqrLength();
 	    if (tmp < closedist) {
 	      closeidx = idx;
 	      closedist = tmp;
@@ -441,7 +441,7 @@ findPoints(final SbSphere sphere, final SbListInt array)
 		float closedist = Float.MAX_VALUE;
 		for (int i = 0; i < n; i++) {
 			int idx = arr.operator_square_bracket(i);
-			SbVec3f pt = this.pointsArray.operator_square_bracket(idx);
+			SbVec3f pt = this.pointsArray.operator_square_bracket_fast(idx);
 			float tmp = (pos.operator_minus(pt)).sqrLength();
 			if (tmp < closedist && filter.filter(pt)) {
 				closeidx = idx;
@@ -474,7 +474,7 @@ findPoints(final SbSphere sphere, final SbListInt array)
 	getPoint(final int idx)
 	{
 		assert(idx < this.pointsArray.getLength());
-		return new SbVec3fSingle(this.pointsArray.operator_square_bracket(idx));
+		return new SbVec3fSingle(this.pointsArray.operator_square_bracket_fast(idx));
 	}
 
 }
