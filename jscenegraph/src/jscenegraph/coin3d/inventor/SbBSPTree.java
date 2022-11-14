@@ -417,12 +417,13 @@ findPoints(final SbSphere sphere, final SbListInt array)
 	{
 	  this.findPoints(sphere, arr);
 	  final SbVec3fSingle pos = new SbVec3fSingle(sphere.getCenter());
+	  final SbVec3fSingle dummy = new SbVec3fSingle();
 	  int n = arr.getLength();
 	  int closeidx = -1;
 	  float closedist = Float.MAX_VALUE;
 	  for (int i = 0; i < n; i++) {
 	    int idx = arr.operator_square_bracket(i);
-	    float tmp = (pos.operator_minus(this.pointsArray.operator_square_bracket_fast(idx))).sqrLength();
+	    float tmp = (pos.operator_minus(this.pointsArray.operator_square_bracket_fast(idx),dummy)).sqrLength();
 	    if (tmp < closedist) {
 	      closeidx = idx;
 	      closedist = tmp;
