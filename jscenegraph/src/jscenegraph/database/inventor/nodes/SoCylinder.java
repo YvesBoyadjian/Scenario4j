@@ -88,11 +88,7 @@ import jscenegraph.database.inventor.fields.SoSFFloat;
 import jscenegraph.database.inventor.fields.SoSFInt32;
 import jscenegraph.database.inventor.misc.SoState;
 import jscenegraph.mevis.inventor.misc.SoVBO;
-import jscenegraph.port.CharPtr;
-import jscenegraph.port.Ctx;
-import jscenegraph.port.FloatPtr;
-import jscenegraph.port.VectorOfSbVec3f;
-import jscenegraph.port.VoidPtr;
+import jscenegraph.port.*;
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -335,6 +331,7 @@ hasPart(SoCylinder.Part part)
 //    Performs GL rendering of a cylinder.
 //
 // Use: private
+private final IntArray sideVertexEboArray = new IntArray(128*3*2);
 
 public void
 GLRender(SoGLRenderAction action)
@@ -380,7 +377,7 @@ GLRender(SoGLRenderAction action)
 	                       this.height.getValue(),
 	                       (int)(CYL_SIDE_NUMTRIS * complexity),
 	                       mb,
-	                       flags, state);
+	                       flags, state,sideVertexEboArray);
 	  mb.destructor();
 	}
 

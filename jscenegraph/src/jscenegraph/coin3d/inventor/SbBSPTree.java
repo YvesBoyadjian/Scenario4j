@@ -313,7 +313,11 @@ findPoints(final SbSphere sphere, final SbListInt array)
 	  \overload
 	*/
 	public int
-	findClosest(final SbVec3f pos)
+	findClosest(final SbVec3f pos) {
+		return findClosest(pos,new SbListInt());
+	}
+	public int
+	findClosest(final SbVec3f pos, final SbListInt tmparray)
 	{
 	  int n = this.pointsArray.getLength();
 	  if (n < 32) { // points are very scattered when few are inserted
@@ -341,7 +345,7 @@ findPoints(final SbSphere sphere, final SbListInt array)
 	  float currsize = siz / 65536.0f;  // max 16 iterations (too much?).
 
 	  final SbSphere sphere = new SbSphere(pos, currsize);
-	  final SbListInt tmparray = new SbListInt(); // use only one array to avoid reallocs
+	  //final SbListInt tmparray = new SbListInt(); // use only one array to avoid reallocs
 	  int idx = -1;
 
 	  // double size of sphere until a vertex is found

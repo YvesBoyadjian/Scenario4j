@@ -89,6 +89,7 @@ import org.ode4j.math.DQuaternion;
 import org.ode4j.math.DVector3;
 import org.ode4j.math.DVector3C;
 import org.ode4j.ode.*;
+import org.ode4j.ode.internal.DxHashSpace;
 import org.ode4j.ode.internal.ErrorHandler;
 import org.ode4j.ode.internal.ErrorHdl;
 import org.ode4j.ode.internal.Rotation;
@@ -300,6 +301,8 @@ public class MainGLFW {
 	static DWorld world;
 	static DSpace space;
 	static DJointGroup contactGroup;
+
+	static final DxHashSpace.Node[][] tablePtr = new DxHashSpace.Node[1][];
 
 	static Clip seaClip;
 
@@ -1255,7 +1258,7 @@ public class MainGLFW {
 			for (int i = 0; i < nbSteps; i++) {
 				physics_error = false;
 				saved_pos.set(body.getPosition());
-				space.collide(data, /*callback*/callback2);
+				((DxHashSpace)space).collide(data, /*callback*/callback2,tablePtr);
 				world.step(dt / nbSteps);
 				contactGroup.empty();
 				if(physics_error) {

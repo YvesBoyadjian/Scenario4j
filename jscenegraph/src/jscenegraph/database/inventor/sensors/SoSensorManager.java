@@ -59,6 +59,7 @@
 
 package jscenegraph.database.inventor.sensors;
 
+import jscenegraph.database.inventor.SbName;
 import jscenegraph.database.inventor.SbTime;
 import jscenegraph.database.inventor.SoDebug;
 import jscenegraph.database.inventor.errors.SoDebugError;
@@ -487,6 +488,8 @@ processDelayQueue(boolean isIdle)
 //
 // Use: public
 
+	private static final SbName IV_DEBUG_SENSORS = new SbName("IV_DEBUG_SENSORS");
+
 public void processTimerQueue()
 //
 ////////////////////////////////////////////////////////////////////////
@@ -522,7 +525,7 @@ public void processTimerQueue()
         first.setNextInQueue(null);
 
 //#ifdef DEBUG
-        if (SoDebug.GetEnv("IV_DEBUG_SENSORS") != null) {
+        if (SoDebug.GetEnv(/*"IV_DEBUG_SENSORS"*/IV_DEBUG_SENSORS) != null) {
             SoDebug.RTPrintf("Triggering timer sensor  "+
                       "Name: "+SoDebug.PtrName(first)+", trig time: "+(((SoTimerQueueSensor )first).
                               getTriggerTime().operator_minus(startTime)).getValue()+"\n"   );

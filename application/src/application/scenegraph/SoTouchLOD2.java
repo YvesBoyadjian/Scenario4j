@@ -52,7 +52,7 @@ public abstract class SoTouchLOD2 extends SoLOD implements SoTouchLODMaster.SoTo
 //	public static final int MAX_CHANGE = 9999;
 
 	public void
-	GLRenderBelowPath(SoGLRenderAction action)
+	GLRenderBelowPath_experimental(SoGLRenderAction action)
 	{
 		// _____________________________________________ Get the ideal to traverse
 		final int wanted_idx = this.whichToTraverse(action);
@@ -83,84 +83,80 @@ public abstract class SoTouchLOD2 extends SoLOD implements SoTouchLODMaster.SoTo
 	}
 
 	public void
-	GLRenderBelowPath_(SoGLRenderAction action)
+	GLRenderBelowPath(SoGLRenderAction action)
 	{
-		// _____________________________________________ Get the ideal to traverse
-		final int wanted_idx = this.whichToTraverse(action);
+		int idx = this.whichToTraverse(action);
 
-		// ___________________________________________ Get the least detailed
-	    SoRecursiveIndexedFaceSet least_detailed = (SoRecursiveIndexedFaceSet) this.children.get(LEAST_DETAILED);
+//		  int wanted_idx = idx;
 
-		// ___________________________________________ See if the least detailed was cleared
-		boolean leastDetailedWasClearedAndChosen = false;
-		int choosed_idx = wanted_idx;
+		SoRecursiveIndexedFaceSet least_detailed = (SoRecursiveIndexedFaceSet) this.children.get(LEAST_DETAILED);
 
-		  // ________________ If wanted is most detailed but least detailed was cleared, choose least detailed
-		  if(wanted_idx == MOST_DETAILED && least_detailed.cleared) {
-			    	choosed_idx = LEAST_DETAILED;
-			    	leastDetailedWasClearedAndChosen = true;
-		  }
+		boolean leastDetailedWasCleared = false;
+		if(idx == MOST_DETAILED) {
+			if(least_detailed.cleared) {
+				idx = LEAST_DETAILED;
+				leastDetailedWasCleared = true;
+			}
+		}
 
-		  // ____________________________________________________ Draw the chosen one
-		  if (choosed_idx >= 0) {
-		    SoNode choosed_child = this.children.get(choosed_idx);
-		    action.pushCurPath(choosed_idx, choosed_child);
-		    if (!action.abortNow()) {
-		      //SoNodeProfiling profiling; TODO
-		      //profiling.preTraversal(action);
-		      choosed_child.GLRenderBelowPath(action);
-		      //profiling.postTraversal(action);
-		    }
-		    action.popCurPath();
-		    
-		    currentVisible = choosed_idx;
+		if (idx >= 0) {
+			SoNode child = (SoNode) this.children.get(idx);
+			action.pushCurPath(idx, child);
+			if (!action.abortNow()) {
+				//SoNodeProfiling profiling; TODO
+				//profiling.preTraversal(action);
+				child.GLRenderBelowPath(action);
+				//profiling.postTraversal(action);
+			}
+			action.popCurPath();
 
-			  if(/*idx == MOST_DETAILED*/!least_detailed.cleared) {
-			  	int other_idx = 1 - choosed_idx;
-				  if(leastDetailedWasClearedAndChosen || !all_children_have_been_loaded(choosed_child,action, 0)) {
+			currentVisible = idx;
 
-					  // ________________________________________________ Draw other child
-					    SoNode otherChild = this.children.get(other_idx);
-					    action.pushCurPath(other_idx, otherChild);
-					    if (!action.abortNow()) {
-					      //SoNodeProfiling profiling; TODO
-					      //profiling.preTraversal(action);
-					    	otherChild.GLRenderBelowPath(action);
-					      //profiling.postTraversal(action);
-					    }
-					    action.popCurPath();				  
-						  if( !all_children_have_been_loaded(otherChild,action, 0)) {
-							  currentVisible = -1;
-						  }
-						  else
-					    	currentVisible = other_idx;
-				  }
-				  else {
-					  if(other_idx == MOST_DETAILED) {
+			if(/*idx == MOST_DETAILED*/!least_detailed.cleared) {
+				int other_idx = 1 -idx;
+				if(leastDetailedWasCleared || !all_children_have_been_loaded(child,action, 0)) {
+					SoNode otherChild = (SoNode) this.children.get(other_idx);
+					action.pushCurPath(other_idx, otherChild);
+					if (!action.abortNow()) {
+						//SoNodeProfiling profiling; TODO
+						//profiling.preTraversal(action);
+						otherChild.GLRenderBelowPath(action);
+						//profiling.postTraversal(action);
+					}
+					action.popCurPath();
+					if( !all_children_have_been_loaded(otherChild,action, 0)) {
+						currentVisible = -1;
+					}
+					else
+						currentVisible = other_idx;
+				}
+				else {
+					if(other_idx == MOST_DETAILED) {
 //						  if(wanted_idx == MOST_DETAILED) {
 //							  int ii=0;
 //						  }
 //						  else {
-							SoNode node = getChild(MOST_DETAILED);
-							clearTree(node);
+						SoNode node = getChild(MOST_DETAILED);
+						clearTree(node);
 //						  }
-					  }
-				  }
-			  }
-		  }
-		  
-		    if(!least_detailed.cleared) {
-		    	cleared = false;
-		    }
-		    else if( currentVisible == LEAST_DETAILED) {
-		    	currentVisible = -1;
-		    }
+					}
+				}
+			}
+		}
 
-		  // don't auto cache LOD nodes.
-		  SoGLCacheContextElement.shouldAutoCache(action.getState(),
-		                                           SoGLCacheContextElement.AutoCache.DONT_AUTO_CACHE.getValue());
+		if(!least_detailed.cleared) {
+			cleared = false;
+		}
+		else if( currentVisible == LEAST_DETAILED) {
+			currentVisible = -1;
+		}
+
+
+		// don't auto cache LOD nodes.
+		SoGLCacheContextElement.shouldAutoCache(action.getState(),
+				SoGLCacheContextElement.AutoCache.DONT_AUTO_CACHE.getValue());
 	}
-	
+
 	public boolean all_children_have_been_loaded(SoNode child, SoAction action, int depth) {
 		
 //		if(depth > 2) {
@@ -229,7 +225,7 @@ public abstract class SoTouchLOD2 extends SoLOD implements SoTouchLODMaster.SoTo
 //		}
 		//long stop = System.nanoTime();
 		//System.out.println("SoTouchLOD2 " + (stop - start)+" ns");
-		System.out.println("change child");
+		//System.out.println("change child");
 		previousChild = wantedChild;
 //		if (getChild(wantedChild) instanceof SoSeparatorWithDirty) {
 //			SoSeparatorWithDirty sepwd = (SoSeparatorWithDirty)getChild(wantedChild);
@@ -239,6 +235,48 @@ public abstract class SoTouchLOD2 extends SoLOD implements SoTouchLODMaster.SoTo
 	}
 
 	public static boolean clearTree(SoNode node) {
+
+		if(node instanceof SoRecursiveIndexedFaceSet) {
+
+			SoRecursiveIndexedFaceSet SoIndexedFaceSet = (SoRecursiveIndexedFaceSet)node;
+			//SoIndexedFaceSet.clear();
+			//builder.append(depth+" ");
+			return SoIndexedFaceSet.clear();
+		}
+		else if( node instanceof SoTouchLOD2){
+			SoTouchLOD2 group = (SoTouchLOD2) node;
+			if(!group.cleared) {
+				int nbChilds = group.getNumChildren();
+				for( int i=0; i<nbChilds; i++) {
+					if(clearTree( group.getChild(i))) {
+						return true;
+					}
+				}
+				group.cleared = true;
+				return false;
+			}
+			return false;
+		}
+		else if( node.isOfType(SoGroup.getClassTypeId())){
+			SoGroup group = (SoGroup) node;
+			int nbChilds = group.getNumChildren();
+			for( int i=0; i<nbChilds; i++) {
+				if( clearTree( group.getChild(i))) {
+					return true;
+				}
+			}
+			return false;
+		}
+		else {
+			throw new IllegalStateException();
+		}
+//		if (node instanceof SoSeparatorWithDirty) {
+//			SoSeparatorWithDirty sepwd = (SoSeparatorWithDirty)node;
+//			sepwd.dirty = true;
+//		}
+	}
+
+	public static boolean clearTree_experimental(SoNode node) {
 
 		//System.out.println("clearTree");
 		

@@ -226,6 +226,8 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 
 	final SbBSPTree treesBSPTree = new SbBSPTree();
 
+	private Future<GeomsResult> geomsResultFuture;
+
 	Raster rw;
 	Raster re;
 	int overlap;
@@ -292,6 +294,8 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 
 	final SbBSPTree trailsBSPTree = new SbBSPTree();
 
+	private Future<Float> distanceFromTrailFuture;
+
 	List<Long> sorted_trails;
 
 	boolean trailsDirty = false;
@@ -324,6 +328,8 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 	boolean softShadows = true;
 
 	float distanceFromSea = 1e6f;
+
+	private Future<Float> distanceFromSeaFuture;
 
 	private final ExecutorService es = Executors.newSingleThreadExecutor();
 
@@ -1850,23 +1856,51 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 		
 		current_z = newZ;
 
-		updateNearGeoms();
+		if (geomsResultFuture == null) {
+			final float curx = current_x;
+			final float cury = current_y;
+			final float curz = current_z;
+			geomsResultFuture = es.submit(()->{
+				return updateNearGeoms(curx,cury,curz);
+			});
+		}
+		if (geomsResultFuture.isDone()) {
+
+			GeomsResult geomsResult = null;//updateNearGeoms(current_x, current_y, current_z);
+			try {
+				geomsResult = geomsResultFuture.get();
+			} catch (InterruptedException e) {
+				throw new RuntimeException(e);
+			} catch (ExecutionException e) {
+				throw new RuntimeException(e);
+			}
+			if (geomsResult != null) {
+				consumeGeomsResult(geomsResult);
+			}
+			geomsResultFuture = null;
+		}
 
 		//setBBoxCenter();
 		return current_z;
 	}
 
-	public void updateNearGeoms() {
+	private static class GeomsResult {
+		private final Set<Integer> geomsToAdd = new HashSet<>();
+		private final Set<Integer> geomsToRemove = new HashSet<>();
+	}
+	public GeomsResult updateNearGeoms(final float curx, final float cury, final float curz) {
 
 		if( null == forest) {
-			return;
+			return null;
 		}
 		if( null == space) {
-			return;
+			return null;
 		}
 
+		GeomsResult geomsResult = new GeomsResult();
+
 		SbVec3f trans = transl.translation.getValue();
-		dummy.setValue(current_x - trans.getX(), current_y - trans.getY(), current_z - trans.getZ());
+		dummy.setValue(curx - trans.getX(), cury - trans.getY(), curz - trans.getZ());
 
 		SbSphere sphere = new SbSphere(dummy,99);
 		SbListInt points = new SbListInt();
@@ -1880,27 +1914,55 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 			}
 			int tree_index = (int) treesBSPTree.getUserData(bsp_index);
 			if (!geoms.containsKey(tree_index)) {
-				float xd = forest.getX(tree_index);
-				float yd = forest.getY(tree_index);
-				float zd = forest.getZ(tree_index);
-				float height = forest.getHeight(tree_index);
-				float width = height * trunk_width_coef;
-
-				DGeom box = OdeHelper.createCapsule(space, width, height);
-				box.setPosition(xd + trans.getX(), yd + trans.getY(), zd + trans.getZ()+height/2);
-				geoms.put(tree_index,box);
+//				float xd = forest.getX(tree_index);
+//				float yd = forest.getY(tree_index);
+//				float zd = forest.getZ(tree_index);
+//				float height = forest.getHeight(tree_index);
+//				float width = height * trunk_width_coef;
+//
+//				DGeom box = OdeHelper.createCapsule(space, width, height);
+//				box.setPosition(xd + trans.getX(), yd + trans.getY(), zd + trans.getZ()+height/2);
+//				geoms.put(tree_index,box);
+				geomsResult.geomsToAdd.add(tree_index);
 			}
 			nearGeoms.add(tree_index);
 		}
-		Set<Map.Entry<Integer,DGeom>> entrySet = new HashSet<>();
-		entrySet.addAll(geoms.entrySet()); // To avoid ConcurrentModificationException
-		for( Map.Entry entry : entrySet) {
-			if(!nearGeoms.contains(entry.getKey())) {
-				DGeom g = (DGeom)entry.getValue();
+		for( Integer entry : geoms.keySet()) {
+			if(!nearGeoms.contains(entry)) {
+//				DGeom g = (DGeom)entry.getValue();
+//				g.destroy();
+//				//space.remove(g);
+//				geoms.remove(entry.getKey());
+				geomsResult.geomsToRemove.add(entry);
+			}
+		}
+
+		return geomsResult;
+	}
+
+	private void consumeGeomsResult(GeomsResult result) {
+		float trunk_width_coef = DouglasFir.trunk_diameter_angle_degree*(float)Math.PI/180.0f;
+		SbVec3f trans = transl.translation.getValue();
+		for( Integer entry : result.geomsToAdd) {
+			int tree_index = entry;
+			float xd = forest.getX(tree_index);
+			float yd = forest.getY(tree_index);
+			float zd = forest.getZ(tree_index);
+			float height = forest.getHeight(tree_index);
+			float width = height * trunk_width_coef;
+
+			DGeom box = OdeHelper.createCapsule(space, width, height);
+			box.setPosition(xd + trans.getX(), yd + trans.getY(), zd + trans.getZ()+height/2);
+			geoms.put(tree_index,box);
+		}
+
+		for( Integer entry : result.geomsToRemove) {
+//			if(!nearGeoms.contains(entry.getKey())) {
+				DGeom g = (DGeom)geoms.get(entry);
 				g.destroy();
 				//space.remove(g);
-				geoms.remove(entry.getKey());
-			}
+				geoms.remove(entry);
+//			}
 		}
 	}
 
@@ -2312,7 +2374,26 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 				temporaryMessageDisplay.string.setNum(0);
 			}
 		}
-		distanceFromSea = computeDistanceFromBeach();
+		if (distanceFromSeaFuture == null) {
+			final float curx = current_x;
+			final float cury = current_y;
+			final float curz = current_z;
+			distanceFromSeaFuture = es.submit(()-> {
+				return computeDistanceFromBeach(curx,cury,curz);
+			});
+		}
+		if (distanceFromSeaFuture.isDone()) {
+			try {
+				distanceFromSea = distanceFromSeaFuture.get();
+			} catch (InterruptedException e) {
+				throw new RuntimeException(e);
+			} catch (ExecutionException e) {
+				throw new RuntimeException(e);
+			}
+			distanceFromSeaFuture = null;
+		}
+
+		//distanceFromSea = computeDistanceFromBeach();
 	}
 
 	synchronized void addIdleCB(Runnable r) {
@@ -2837,10 +2918,10 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 		return (heightMax - heightMin)/2;
 	}
 
-	public float getDistanceFromTrail() {
+	public float getDistanceFromTrail(final float curx, final float cury, final float curz) {
 		SbVec3f trans = transl.translation.getValue();
 
-		SbVec3f hero = new SbVec3f(current_x - trans.getX(),current_y - trans.getY(),current_z - trans.getZ());
+		SbVec3f hero = new SbVec3f(curx - trans.getX(),cury - trans.getY(),curz - trans.getZ());
 		SbBSPTree.Filter filter = new SbBSPTree.Filter() {
 			@Override
 			public boolean filter(SbVec3f point) {
@@ -2873,9 +2954,9 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 		if( -1 != closest ) {
 			SbVec3f closestPoint = trailsBSPTree.getPoint(closest);
 			distance = (float)Math.sqrt(
-					(current_x - trans.getX() - closestPoint.getX())*(current_x - trans.getX() - closestPoint.getX()) +
-							(current_y - trans.getY() - closestPoint.getY())*(current_y - trans.getY() - closestPoint.getY()) +
-							(current_z - trans.getZ() - closestPoint.getZ())*(current_z - trans.getZ() - closestPoint.getZ())
+					(curx - trans.getX() - closestPoint.getX())*(curx - trans.getX() - closestPoint.getX()) +
+							(cury - trans.getY() - closestPoint.getY())*(cury - trans.getY() - closestPoint.getY()) +
+							(curz - trans.getZ() - closestPoint.getZ())*(curz - trans.getZ() - closestPoint.getZ())
 			);
 		}
 		return distance;
@@ -2885,30 +2966,49 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 		return distanceFromSea;
 	}
 
-	private float computeDistanceFromBeach() {
+	final SbListInt tmparray = new SbListInt();
+
+	private float computeDistanceFromBeach(final float curx, final float cury, final float curz) {
 		SbVec3f trans = transl.translation.getValue();
 
-		SbVec3f hero = new SbVec3f(current_x - trans.getX(),current_y - trans.getY(),current_z - trans.getZ());
-		int closest = beachBSPTree.findClosest(hero);
+		SbVec3f hero = new SbVec3f(curx - trans.getX(),cury - trans.getY(),curz - trans.getZ());
+		int closest = beachBSPTree.findClosest(hero,tmparray);
 
 		float distance = Float.MAX_VALUE;
 
 		if(-1 != closest) {
 			SbVec3f closestPoint = beachBSPTree.getPoint(closest);
 			distance = (float)Math.sqrt(
-					(current_x - trans.getX() - closestPoint.getX())*(current_x - trans.getX() - closestPoint.getX()) +
-							(current_y - trans.getY() - closestPoint.getY())*(current_y - trans.getY() - closestPoint.getY()) +
-							(current_z - trans.getZ() - closestPoint.getZ())*(current_z - trans.getZ() - closestPoint.getZ())
+					(curx - trans.getX() - closestPoint.getX())*(curx - trans.getX() - closestPoint.getX()) +
+							(cury - trans.getY() - closestPoint.getY())*(cury - trans.getY() - closestPoint.getY()) +
+							(curz - trans.getZ() - closestPoint.getZ())*(curz - trans.getZ() - closestPoint.getZ())
 			);
 		}
 		return distance;
 	}
 
+	float distanceFromTrail;
+
 	public void displayObjectives(SoQtWalkViewer viewer) {
 
 		String string1 = "Oracle distance: "+(int)getDistanceFromOracle()+ " m";
 
-		float distanceFromTrail = getDistanceFromTrail();
+		if (distanceFromTrailFuture == null) {
+			distanceFromTrailFuture = es.submit(()->{
+				return getDistanceFromTrail(current_x,current_y,current_z);
+			});
+		}
+
+		if(distanceFromTrailFuture.isDone()) {
+			try {
+				distanceFromTrail = distanceFromTrailFuture.get();//getDistanceFromTrail(current_x, current_y, current_z);
+			} catch (InterruptedException e) {
+				throw new RuntimeException(e);
+			} catch (ExecutionException e) {
+				throw new RuntimeException(e);
+			}
+			distanceFromTrailFuture = null;
+		}
 
 		String string2 = "Trail distance: "+(int)distanceFromTrail+ " m";
 		offscreenTargetDisplay.string.set1Value(0,string1);

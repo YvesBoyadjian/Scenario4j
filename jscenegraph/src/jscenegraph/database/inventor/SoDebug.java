@@ -88,24 +88,30 @@ public class SoDebug {
 //    search through your whole environment).
 //
 // Use: public 
-
 public static String
 GetEnv(String envVar)
 //
 ////////////////////////////////////////////////////////////////////////
 {
+    return GetEnv(new SbName(envVar));
+}
+public static String
+GetEnv(SbName name)
+//
+////////////////////////////////////////////////////////////////////////
+{
     if (envDict == null) envDict = new SbDict();
 
-    final SbName name = new SbName(envVar);
+    //final SbName name = new SbName(envVar);
     String key = name.getString();
 
     final Object[] value = new Object[1];
 
     // Try looking in the dictionary first...
     if (!envDict.find(key, value)) {
-        value[0] = (Object)System.getenv(envVar);
+        value[0] = (Object)System.getenv(/*envVar*/key);
         if(value[0] == null) {
-        	value[0] = System.getProperty(envVar);
+        	value[0] = System.getProperty(/*envVar*/key);
         }
         envDict.enter(key, value[0]);
     }

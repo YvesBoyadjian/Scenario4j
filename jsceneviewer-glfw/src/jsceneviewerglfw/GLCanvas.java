@@ -88,7 +88,7 @@ public class GLCanvas extends Composite {
 		//glfwWindowHint(GLFW_AUTO_ICONIFY, GLFW_FALSE);
 			
 		// Create the window
-		window = glfwCreateWindow(width, height, format.name, /*win ? glfwGetPrimaryMonitor() :*/ NULL, NULL);
+		window = glfwCreateWindow(width, height, format.name, format.debug ? glfwGetPrimaryMonitor() : NULL, NULL);
 		if ( window == NULL )
 			throw new RuntimeException("Failed to create the GLFW window");
 		

@@ -25,6 +25,7 @@
 package org.ode4j.ode.internal;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import org.ode4j.ode.DAABB;
 import org.ode4j.ode.DHashSpace;
@@ -72,7 +73,7 @@ public class DxHashSpace extends DxSpace implements DHashSpace {
 
 	// a hash table node that represents an AABB that intersects a particular cell
 	// at a particular level
-	private static class Node {
+	public static class Node {
 		Node next;		// next node in hash table collision list, 0 if none
 		int x,y,z;		// cell position in space, discretized to cell size
 		dxAABB aabb;		// axis aligned bounding box that intersects this cell
@@ -197,7 +198,11 @@ public class DxHashSpace extends DxSpace implements DHashSpace {
 	}
 
 	@Override
-	public void collide (Object data, DNearCallback callback)
+	public void collide (Object data, DNearCallback callback) {
+		collide(data,callback,new Node[1][]);
+	}
+
+	public void collide (Object data, DNearCallback callback, Node[][]tablePtr)
 	{
 		dAASSERT(callback);
 		//dxGeom geom; //*
@@ -272,7 +277,15 @@ public class DxHashSpace extends DxSpace implements DHashSpace {
 
 		// allocate and initialize hash table node pointers
 		//std::vector<Node*> table(sz);
-		Node[] table = new Node[sz];
+		Node[] table;
+		if ( tablePtr[0] == null || tablePtr[0].length < sz) {
+			table = new Node[sz];
+			tablePtr[0] = table;
+		}
+		else {
+			table = tablePtr[0];
+			Arrays.fill(table,null);
+		}
 
 		// add each AABB to the hash table (may need to add it to up to 8 cells)
 		//TODO use proper List here!
@@ -351,9 +364,10 @@ public class DxHashSpace extends DxSpace implements DHashSpace {
 		// every AABB in the normal list must now be intersected against every
 		// AABB in the big_boxes list. so let's hope there are not too many objects
 		// in the big_boxes list.
+		final int big_boxes_size = big_boxes.size();
 		for (dxAABB aabb: hash_boxes) {
-			for (dxAABB aabb2: big_boxes) {
-				collideAABBs (aabb.geom,aabb2.geom,data,callback);
+			for (/*dxAABB aabb2: big_boxes*/i=0; i< big_boxes_size;i++) {
+				collideAABBs (aabb.geom,/*aabb2*/big_boxes.get(i).geom,data,callback);
 			}
 		}
 

@@ -2060,7 +2060,7 @@ sogl_render_cylinder( float radius,
                       int numslices,
                      SoMaterialBundle material,
                      int flagsin,
-                     SoState state)
+                     SoState state,final IntArray sideVertexEboArray)
 {
   boolean[] unitenabled = null;
   final int[] maxunit = new int[1];
@@ -2123,7 +2123,6 @@ sogl_render_cylinder( float radius,
 
       SbVec3fArray sideVertexVboArray = new SbVec3fArray(FloatMemoryBuffer.allocateFloats(129*3*2));
       SbVec3fArray sideNormalVboArray = new SbVec3fArray(FloatMemoryBuffer.allocateFloats(129*3*2));
-      IntArray sideVertexEboArray = new IntArray(128*3*2);
 
       int sideVertexVboArrayIndex = 0;
       int sideNormalVboArrayIndex = 0;

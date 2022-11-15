@@ -49,6 +49,9 @@ import jscenegraph.database.inventor.misc.SoState;
 import jscenegraph.database.inventor.nodes.SoNode;
 import jscenegraph.port.Mutable;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * @author Yves Boyadjian
  *
@@ -140,6 +143,7 @@ push(SoState state)
   prev.capture(state);
 }
 
+private final List<SbName> coin_texunitx_model = new ArrayList<>();
 
 // Documented in superclass. Overridden to pass GL state to the
 // previous element.
@@ -152,10 +156,17 @@ pop(SoState state,
     prevTopElement;
 
   SoGLShaderProgram prog = SoGLShaderProgramElement.get(state);
-  String str;
+  //String str;
   
   int maxunits = Math.max(prev.pimpl.unitdata.getLength(),
                              this.pimpl.unitdata.getLength());
+
+  int size = coin_texunitx_model.size();
+    if (size < maxunits) {
+        for (int i=size;i<maxunits;i++) {
+            coin_texunitx_model.add(new SbName("coin_texunit"+i+"_model"));
+        }
+    }
 
   for (int i = 0; i < maxunits; i++) {
     GLUnitData prevud = 
@@ -169,8 +180,8 @@ pop(SoState state,
       this.pimpl.defaultdata;
 
     if (thisud.glimage != prevud.glimage) this.updateGL(i);
-    str = "coin_texunit"+i+"_model";
-    if (prog != null) prog.updateCoinParameter(state, new SbName(str/*.getString()*/),
+    //str = "coin_texunit"+i+"_model";
+    if (prog != null) prog.updateCoinParameter(state, /*new SbName(str)*/coin_texunitx_model.get(i),
                                         thisud.glimage != null ? this.getUnitData(i).model.getValue() : 0);
   }
 }
