@@ -143,7 +143,7 @@ public class SoLODIndexedFaceSet extends SoIndexedFaceSet {
 			loaded = wanted;
 		SoLODIndexedFaceSet indexedFaceSetF = this;
 
-			IndexedFaceSetParameters foliageParameters = near ? chunk.getFoliageNearParameters() : chunk.getFoliageFarParameters();
+			IndexedFaceSetParameters foliageParameters = (wanted == LoadState.LOAD_NEAR) ? chunk.getFoliageNearParameters() : chunk.getFoliageFarParameters();
 			if (foliageParameters == null) {
 				foliageParameters = chunk.getFoliageFarParameters();
 				loaded = LoadState.LOAD_FAR;
