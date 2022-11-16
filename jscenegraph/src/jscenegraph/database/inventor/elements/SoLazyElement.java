@@ -1883,12 +1883,14 @@ getTwoSidedLighting(SoState state)
   return elem.coinstate.twoside != 0;
 }
 
+private final static SbColor grey = new SbColor(0.8f, 0.8f, 0.8f);
+
 // helper functions to handle default diffuse/transp values
 public static long
 get_diffuse_node_id(SoNode node, int numdiffuse,
                     SbColorArray color)
 {
-  if (numdiffuse == 1 && color.get(0).operator_equal_equal(new SbColor(0.8f, 0.8f, 0.8f))) return 0;
+  if (numdiffuse == 1 && color.get(0).operator_equal_equal(grey)) return 0;
   return node.getNodeId();
 }
 

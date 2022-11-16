@@ -62,7 +62,7 @@ public class SoLODIndexedFaceSet extends SoIndexedFaceSet {
 		getBBox(action, box, center);
 
 		if( box.intersect(referencePoint2)) {
-			load(true); // Near mode
+			if(!load(true)) // Near mode
 			super.GLRender(action);
 		}
 		else {
@@ -72,11 +72,11 @@ public class SoLODIndexedFaceSet extends SoIndexedFaceSet {
 			SbVec3f closestPoint2 = new SbVec3f(box.getClosestExternalPoint(referencePoint2));
 
 			if( closestPoint2.operator_minus(referencePoint2,dummy).length() <= 200 ) {
-				load(true);
+				if(!load(true))
 				super.GLRender(action);
 			}
 			else if( closestPoint2.operator_minus(referencePoint2,dummy).length() <= maxDistance[0] ) {
-				load(false);
+				if(!load(false))
 				super.GLRender(action);				
 			}
 			else {
@@ -89,21 +89,19 @@ public class SoLODIndexedFaceSet extends SoIndexedFaceSet {
 		                                           SoGLCacheContextElement.AutoCache.DONT_AUTO_CACHE.getValue());
 	}		
 	
-	private void load(boolean near) {
+	private boolean load(boolean near) {
 		switch(type) {
 		case FOLIAGE:
-			loadFoliage(near);
-			break;
+			return loadFoliage(near);
 		case TRUNK:
-			loadTrunk();
-			break;
+			return loadTrunk();
 		default:
-			break;
+			return false;
 		
 		}
 	}
 	
-	public void loadTrunk() {
+	public boolean loadTrunk() {
 		if(loaded == LoadState.CLEARED && counting[0] < 1 /*&& counting[1] < 50*/) {
 			counting[0]++;
 			counting[1]++;
@@ -129,10 +127,12 @@ public class SoLODIndexedFaceSet extends SoIndexedFaceSet {
 		//wasNotify = indexedFaceSetT.vertexProperty.enableNotify(false);
 		indexedFaceSetT.vertexProperty.setValue(vertexProperty);
 		//indexedFaceSetT.vertexProperty.enableNotify(wasNotify); // In order not to recompute shaders
+			return true;
 		}
+		return false;
 	}
 	
-	public void loadFoliage(boolean near) {
+	public boolean loadFoliage(boolean near) {
 
 		LoadState wanted = near ? LoadState.LOAD_NEAR : LoadState.LOAD_FAR;
 
@@ -175,7 +175,9 @@ public class SoLODIndexedFaceSet extends SoIndexedFaceSet {
 		indexedFaceSetF.vertexProperty.setValue(vertexProperty);
 		//indexedFaceSetF.vertexProperty.enableNotify(wasNotify); // In order not to recompute shaders
 			foliageParameters.markConsumed();
-		}		
+			return true;
+		}
+		return false;
 	}
 	public void clear() {
 		if(loaded != LoadState.CLEARED) {

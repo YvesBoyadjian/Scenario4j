@@ -6,11 +6,7 @@ package jscenegraph.coin3d.inventor.VRMLnodes;
 import jscenegraph.coin3d.glue.Gl;
 import jscenegraph.coin3d.inventor.annex.profiler.SoNodeProfiling;
 import jscenegraph.coin3d.misc.SoGL;
-import jscenegraph.database.inventor.SbMatrix;
-import jscenegraph.database.inventor.SbRotation;
-import jscenegraph.database.inventor.SbVec3f;
-import jscenegraph.database.inventor.SbViewVolume;
-import jscenegraph.database.inventor.SoType;
+import jscenegraph.database.inventor.*;
 import jscenegraph.database.inventor.actions.SoAction;
 import jscenegraph.database.inventor.actions.SoCallbackAction;
 import jscenegraph.database.inventor.actions.SoGLRenderAction;
@@ -252,6 +248,18 @@ public void search(SoSearchAction action)
   if (action.isFound()) return;
   SoGroup_doAction(action);
 }
+	ThreadLocal<PerformRotationThreadLocal> performRotationStorage = new ThreadLocal();
+
+private static class PerformRotationThreadLocal {
+
+	public final SbRotation rot = new SbRotation();
+	public final SbMatrix imm = new SbMatrix();
+
+	public void constructor() {
+		rot.constructor();
+		imm.constructor();
+	}
+}
 
 	//
 	// private method that appends the needed rotation to the state
@@ -260,8 +268,14 @@ public void search(SoSearchAction action)
 	performRotation(SoState state)
 	{
 		// For multithreading reasons, these variables must be instantiated
-		final SbRotation rot = new SbRotation();
-		final SbMatrix imm = new SbMatrix();
+		if (performRotationStorage.get() == null) {
+			performRotationStorage.set(new PerformRotationThreadLocal());
+		}
+
+		PerformRotationThreadLocal local = performRotationStorage.get();
+		local.constructor();
+		final SbRotation rot = local.rot;//new SbRotation();
+		final SbMatrix imm = local.imm;//new SbMatrix();
 
 	  /*imm = new SbMatrix(*/SoModelMatrixElement.get(state).inverse(imm)/*)*/;
 	  final SbViewVolume vv = SoViewVolumeElement.get(state); // ref
@@ -281,6 +295,7 @@ public void search(SoSearchAction action)
 		public final SbVec3f zVector = new SbVec3f(0.0f, 0.0f, 1.0f);
 		public final SbVec3f dummy = new SbVec3f();
 		public final SbMatrix matrix = new SbMatrix();
+		public final SbVec3d dummyd = new SbVec3d();
 
 		public void constructor() {
 			up.constructor(); look.constructor(); right.constructor();
@@ -288,6 +303,7 @@ public void search(SoSearchAction action)
 			zVector.constructor();
 			dummy.constructor();
 			matrix.constructor();
+			dummyd.constructor();
 		}
 	}
 
@@ -314,10 +330,11 @@ public void search(SoSearchAction action)
 		final SbVec3f zVector = local.zVector;//new SbVec3f(0.0f, 0.0f, 1.0f);
 		final SbVec3f dummy = local.dummy;//new SbVec3f();
 		final SbMatrix matrix = local.matrix;//new SbMatrix();
+		final SbVec3d dummyd = local.dummyd;//new SbVec3f();
 
 	  //up.constructor(); look.constructor(); right.constructor();
 	  
-	  invMM.multDirMatrix(vv.getViewUp(dummy), up);
+	  invMM.multDirMatrix(vv.getViewUp(dummy,dummyd), up);
 	  invMM.multDirMatrix(vv.getProjectionDirection().operator_minus_with_dummy(dummy), look);
 
 	  if (rotaxis.operator_equal_equal(/*new SbVec3f(0.0f, 0.0f, 0.0f)*/zero)) {

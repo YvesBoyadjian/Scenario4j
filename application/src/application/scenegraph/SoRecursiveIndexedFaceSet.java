@@ -77,12 +77,14 @@ public class SoRecursiveIndexedFaceSet extends SoIndexedFaceSet {
 
 	public void GLRender(SoGLRenderAction action)
 	{
+		boolean hasJustBeenLoaded = false;
 		if(cleared && nbDoLoad<0) {
 
 			IndexedFaceSetParameters parameters = recursiveChunk.getDecimatedParameters();
 			if (parameters != null) {
 				doLoad(parameters);
 				cleared = false;
+				hasJustBeenLoaded = true;
 			}
 //		long delta = stop - start;
 //		
@@ -92,7 +94,7 @@ public class SoRecursiveIndexedFaceSet extends SoIndexedFaceSet {
 //		int i=0;
 		}
 		//long start = System.nanoTime();
-		if (!cleared) {
+		if (!cleared && !hasJustBeenLoaded) {
 			super.GLRender(action);
 		}
 		//long stop = System.nanoTime();

@@ -1374,10 +1374,10 @@ public class SbViewVolume implements Mutable {
 	}	
 
 	public SbVec3f
-	getViewUp(final SbVec3f dummy) 
+	getViewUp(final SbVec3f dummy, final SbVec3d dummyd)
 	{
 		this.dpvv.update(this); //YB 
-		return to_sbvec3f(this.dpvv.getViewUp(), dummy);
+		return to_sbvec3f(this.dpvv.getViewUp(dummyd), dummy);
 	}	
 
 	// ! Returns projection information.

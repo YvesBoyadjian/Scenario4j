@@ -110,6 +110,10 @@ public class SbRotation implements Mutable {
 		// This translates to zero rotation around the positive Z-axis.
 		quat[3] = 1;
 	}
+
+	public void constructor() {
+		quat[3] = 1;
+	}
 	
 	public SbRotation(SbRotation other) {
 		quat[0] = other.quat[0];

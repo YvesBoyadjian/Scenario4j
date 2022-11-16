@@ -300,5 +300,17 @@ public class SbDPViewVolume {
 	  }
 	  return v;
 	}
-	
+	public SbVec3d
+	getViewUp(SbVec3d dummyd)
+	{
+		final SbVec3d v = this.ulf.operator_minus( this.llf, dummyd);
+		if (v.normalize() == 0.0) {
+			//#if COIN_DEBUG
+			SoDebugError.postWarning("SbDPViewVolume::getViewUp",
+					"View volume is empty.");
+			//#endif // COIN_DEBUG
+		}
+		return v;
+	}
+
 }
