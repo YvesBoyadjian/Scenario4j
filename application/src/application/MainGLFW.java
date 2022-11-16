@@ -1218,8 +1218,8 @@ public class MainGLFW {
 		final double[] data = new double[1];
 		data[0] = 100.0;//0.8;
 
-		final int nb_step = 50;
-		final double max_physics_frequency = 500;
+		final int nb_step = 25;
+		final double max_physics_frequency = 250;
 
 		final boolean firstDT[] = new boolean[1];
 		firstDT[0] = true;
@@ -1249,7 +1249,7 @@ public class MainGLFW {
 
 			double nbSteps = firstDT[0] ? 999 : nb_step;
 
-			double dt = Math.min(0.5, viewer1.dt());
+			final double dt = Math.min(0.25, viewer1.dt()); // 4 FPS min
 			if(!firstDT[0] && max_physics_frequency < nbSteps/dt) {
 				nbSteps = Math.ceil(max_physics_frequency*dt);
 			}
