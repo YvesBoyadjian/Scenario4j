@@ -271,6 +271,26 @@ public void search(SoSearchAction action)
 	  // append the desired rotation to the state
 	  SoModelMatrixElement.rotateBy(state, (SoNode) this, rot);
 	}
+
+	ThreadLocal<ComputeRotationThreadLocal> computeRotationStorage = new ThreadLocal();
+
+	private static class ComputeRotationThreadLocal {
+		// For multithreading reasons, these variables must be instantiated
+		public final SbVec3f up = new SbVec3f(), look = new SbVec3f(), right = new SbVec3f();
+		public final SbVec3f zero = new SbVec3f();
+		public final SbVec3f zVector = new SbVec3f(0.0f, 0.0f, 1.0f);
+		public final SbVec3f dummy = new SbVec3f();
+		public final SbMatrix matrix = new SbMatrix();
+
+		public void constructor() {
+			up.constructor(); look.constructor(); right.constructor();
+			zero.constructor();
+			zVector.constructor();
+			dummy.constructor();
+			matrix.constructor();
+		}
+	}
+
 	//
 	// private method that computes the needed rotation
 	//
@@ -280,11 +300,20 @@ public void search(SoSearchAction action)
 	  final SbVec3f rotaxis = /*new SbVec3f(*/this.axisOfRotation.getValue()/*)*/;
 
 	  // For multithreading reasons, these variables must be instantiated
-		final SbVec3f up = new SbVec3f(), look = new SbVec3f(), right = new SbVec3f();
-		final SbVec3f zero = new SbVec3f();
-		final SbVec3f zVector = new SbVec3f(0.0f, 0.0f, 1.0f);
-		final SbVec3f dummy = new SbVec3f();
-		final SbMatrix matrix = new SbMatrix();
+		if (computeRotationStorage.get() == null) {
+			computeRotationStorage.set(new ComputeRotationThreadLocal());
+		}
+
+		ComputeRotationThreadLocal local = computeRotationStorage.get();
+		local.constructor();
+
+		final SbVec3f up = local.up;//new SbVec3f();
+		final SbVec3f look = local.look;//new SbVec3f();
+		final SbVec3f right = local.right;//new SbVec3f();
+		final SbVec3f zero = local.zero;//new SbVec3f();
+		final SbVec3f zVector = local.zVector;//new SbVec3f(0.0f, 0.0f, 1.0f);
+		final SbVec3f dummy = local.dummy;//new SbVec3f();
+		final SbMatrix matrix = local.matrix;//new SbMatrix();
 
 	  //up.constructor(); look.constructor(); right.constructor();
 	  

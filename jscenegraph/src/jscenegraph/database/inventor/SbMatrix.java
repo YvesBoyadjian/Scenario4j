@@ -181,6 +181,7 @@
 package jscenegraph.database.inventor;
 
 import java.nio.FloatBuffer;
+import java.util.Arrays;
 import java.util.function.DoubleConsumer;
 
 import jscenegraph.port.Mutable;
@@ -214,7 +215,12 @@ public class SbMatrix implements Mutable {
 	public SbMatrix() {
 		
 	}
-	
+
+	public void constructor() {
+		for (float[] row: matrix)
+			Arrays.fill(row,0);
+	}
+
 	// Constructor given all 16 elements in row-major order. 
 	public SbMatrix(float a11, float a12, float a13, float a14,
 			  float a21, float a22, float a23, float a24,

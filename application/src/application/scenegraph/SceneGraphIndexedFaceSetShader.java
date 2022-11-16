@@ -1902,7 +1902,7 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 		SbVec3f trans = transl.translation.getValue();
 		dummy.setValue(curx - trans.getX(), cury - trans.getY(), curz - trans.getZ());
 
-		SbSphere sphere = new SbSphere(dummy,99);
+		SbSphere sphere = new SbSphere(dummy,40);
 		SbListInt points = new SbListInt();
 		treesBSPTree.findPoints(sphere,points);
 		float trunk_width_coef = DouglasFir.trunk_diameter_angle_degree*(float)Math.PI/180.0f;
