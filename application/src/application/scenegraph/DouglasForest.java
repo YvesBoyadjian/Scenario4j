@@ -474,16 +474,9 @@ public class DouglasForest {
 //		}
 	}
 
-	public SoGroup getDouglasTreesT(SbVec3f refPoint,SbVec3f refPoint2, final float[] distance) {
-		final int[] counting = new int[2]; 
-		
-		SoGroup separator = new SoGroup() {
-			public void GLRender(SoGLRenderAction action)
-			{
-				counting[0] = 0;
-				super.GLRender(action);
-			}			
-		};
+	public SoGroup getDouglasTreesT(SbVec3f refPoint,SbVec3f refPoint2, final float[] distance,final int[] douglasLoadCount) {
+
+		SoGroup separator = new SoGroup();
 		
 		for( List<DouglasChunk> chunkListForX : douglasChunks ) {
 			SoLODGroup separatorForX = new SoLODGroup();
@@ -506,7 +499,7 @@ public class DouglasForest {
 					finalCenter.setValue(centerV);
 				}
 				
-				SoLODIndexedFaceSet indexedFaceSetT = new SoLODIndexedFaceSet(refPoint,refPoint2,chunk,SoLODIndexedFaceSet.Type.TRUNK, counting) {
+				SoLODIndexedFaceSet indexedFaceSetT = new SoLODIndexedFaceSet(refPoint,refPoint2,chunk,SoLODIndexedFaceSet.Type.TRUNK, douglasLoadCount) {
 					public void GLRender(SoGLRenderAction action)
 					{
 						super.GLRender(action);
@@ -534,16 +527,9 @@ public class DouglasForest {
 		return separator;
 	}
 
-	public SoGroup getDouglasTreesF(SbVec3f refPoint,SbVec3f refPoint2, final float[] distance, boolean withColors) {
-		final int[] counting = new int[2]; 
-		
-		SoGroup separator = new SoGroup() {
-			public void GLRender(SoGLRenderAction action)
-			{
-				counting[0] = 0;
-				super.GLRender(action);
-			}			
-		};
+	public SoGroup getDouglasTreesF(SbVec3f refPoint,SbVec3f refPoint2, final float[] distance, boolean withColors,final int[] douglasLoadCount) {
+
+		SoGroup separator = new SoGroup();
 
 //		SoShapeHints shapeHints = new SoShapeHints();
 //
@@ -569,7 +555,7 @@ public class DouglasForest {
 						finalCenter.setValue(centerV);
 					}
 					
-				SoLODIndexedFaceSet indexedFaceSetF = new SoLODIndexedFaceSet(refPoint,refPoint2, chunk,SoLODIndexedFaceSet.Type.FOLIAGE, counting) {
+				SoLODIndexedFaceSet indexedFaceSetF = new SoLODIndexedFaceSet(refPoint,refPoint2, chunk,SoLODIndexedFaceSet.Type.FOLIAGE, douglasLoadCount) {
 					public void GLRender(SoGLRenderAction action)
 					{
 						super.GLRender(action);

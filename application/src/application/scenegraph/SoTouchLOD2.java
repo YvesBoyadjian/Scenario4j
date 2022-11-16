@@ -49,7 +49,7 @@ public abstract class SoTouchLOD2 extends SoLOD implements SoTouchLODMaster.SoTo
 		super.destructor();
 	}
 	
-//	public static final int MAX_CHANGE = 9999;
+	public static final int MAX_CHANGE = 1;
 
 	public void
 	GLRenderBelowPath_experimental(SoGLRenderAction action)
@@ -204,19 +204,19 @@ public abstract class SoTouchLOD2 extends SoLOD implements SoTouchLODMaster.SoTo
 //			}
 			return wantedChild;
 		}
-//		if(wantedChild == MOST_DETAILED) {
-//			if(master.getCount() >= MAX_CHANGE) {
-//				if(previousChild == -1) {
-//					wantedChild = getNumChildren() - 1;
-//				}
-//				else {
-//					wantedChild = previousChild; // Changing canceled
-//				}
-//			}
-//			else {
-//				master.increment(); // Changing accepted 
-//			}
-//		}
+		if(wantedChild == MOST_DETAILED) {
+			if(master.getCount() >= MAX_CHANGE) {
+				if(previousChild == -1) {
+					wantedChild = getNumChildren() - 1;
+				}
+				else {
+					wantedChild = previousChild; // Changing canceled
+				}
+			}
+			else {
+				master.increment(); // Changing accepted
+			}
+		}
 		//System.out.println("SoTouchLOD2");
 		//long start = System.nanoTime();
 //		if(previousChild != -1 && wantedChild != previousChild) {

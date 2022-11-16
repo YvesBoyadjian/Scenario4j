@@ -104,7 +104,7 @@ public class SoLODIndexedFaceSet extends SoIndexedFaceSet {
 	}
 	
 	public void loadTrunk() {
-		if(loaded == LoadState.CLEARED && counting[0] < 2 /*&& counting[1] < 50*/) {
+		if(loaded == LoadState.CLEARED && counting[0] < 1 /*&& counting[1] < 50*/) {
 			counting[0]++;
 			counting[1]++;
 			loaded = LoadState.LOAD_FAR;
@@ -136,7 +136,7 @@ public class SoLODIndexedFaceSet extends SoIndexedFaceSet {
 
 		LoadState wanted = near ? LoadState.LOAD_NEAR : LoadState.LOAD_FAR;
 
-		if(loaded != wanted && counting[0] < 2 /*&& counting[1] < 50*/) {
+		if(loaded != wanted && counting[0] < 1 /*&& counting[1] < 50*/) {
 			clear();
 			counting[0]++;
 			counting[1]++;
