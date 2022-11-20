@@ -1134,6 +1134,12 @@ public class MainGLFW {
 			}
 		};
 
+
+		// Maximum number of contacts to create between bodies (see ODE documentation)
+		final int MAX_NUM_CONTACTS = 8;
+		//dContact contacts[MAX_NUM_CONTACTS];
+		final DContactBuffer contacts = new DContactBuffer(MAX_NUM_CONTACTS);
+
 		DGeom.DNearCallback callback2 = new DGeom.DNearCallback() {
 
 			@Override
@@ -1168,11 +1174,6 @@ public class MainGLFW {
 //				if (body2 == body && body1 == ballBody) {
 //					return;
 //				}
-
-				// Maximum number of contacts to create between bodies (see ODE documentation)
-				int MAX_NUM_CONTACTS = 8;
-				//dContact contacts[MAX_NUM_CONTACTS];
-				DContactBuffer contacts = new DContactBuffer(MAX_NUM_CONTACTS);
 
 				// Add collision joints
 				int numc = OdeHelper.collide(geom1, geom2, MAX_NUM_CONTACTS, contacts.getGeomBuffer());
