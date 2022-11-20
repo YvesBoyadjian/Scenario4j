@@ -479,7 +479,7 @@ public boolean convertToUCS(long nodeid, final SoMFString strings)
         for(int ii=0;ii <shorts.length;ii++) {
         	shorts[ii] = (short)chars[ii];
         }
-        ByteBuffer sb = BufferUtils.createByteBuffer(shorts.length*2);
+        ByteBuffer sb = /*BufferUtils.createByteBuffer*/ByteBuffer.allocate(shorts.length*2); // No need to be direct
         sb.asShortBuffer().put(shorts).flip();
     	UCSStrings.operator_square_bracket(i, sb);
         int inbytes = strings.operator_square_bracket(i).length();

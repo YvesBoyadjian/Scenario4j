@@ -265,9 +265,9 @@ public void init(SoState stateptr)
     
     //gl2.glDisable(GL2.GL_POLYGON_STIPPLE); CORE
 
-    byte[] rgba = new byte[1];
-    gl2.glGetBooleanv(GL2.GL_RGBA_MODE, rgba,0);
-    if (rgba[0] == 0) this.colorIndex = true;
+    boolean rgba;//byte[] rgba = new byte[1];
+    rgba = gl2.glGetBoolean/*v*/(GL2.GL_RGBA_MODE/*, rgba,0*/);
+    if (/*rgba[0] == 0*/!rgba) this.colorIndex = true;
     else {
       this.sendPackedDiffuse(state,0xccccccff);
     }

@@ -2054,13 +2054,27 @@ sogl_render_cube( float width,
   }
 }
 
+private static ThreadLocal<SoGLRenderCylinderThreadLocal> threadLocal = new ThreadLocal<SoGLRenderCylinderThreadLocal>();
+
+private static class SoGLRenderCylinderThreadLocal {
+
+    public final IntArray sideVertexEboArray = new IntArray(128*3*2);
+    public final SbVec3fArray coords = new SbVec3fArray(FloatMemoryBuffer.allocateFromFloatArray(new float[129*3]));
+    public final SbVec3fArray normals = new SbVec3fArray(FloatMemoryBuffer.allocateFromFloatArray(new float[130*3]));
+    public final SbVec2fArray texcoords = new SbVec2fArray(FloatMemoryBuffer.allocateFromFloatArray(new float[129*2]));
+
+    public final SbVec3fArray sideVertexVboArray = new SbVec3fArray(FloatMemoryBuffer.allocateFloats(129*3*2));
+    public final SbVec3fArray sideNormalVboArray = new SbVec3fArray(FloatMemoryBuffer.allocateFloats(129*3*2));
+
+}
+
 public static void
 sogl_render_cylinder( float radius,
                       float height,
                       int numslices,
                      SoMaterialBundle material,
                      int flagsin,
-                     SoState state,final IntArray sideVertexEboArray)
+                     SoState state/*,final IntArray sideVertexEboArray*/)
 {
   boolean[] unitenabled = null;
   final int[] maxunit = new int[1];
@@ -2085,9 +2099,19 @@ sogl_render_cylinder( float radius,
 
   float h2 = height * 0.5f;
 
-  final SbVec3fArray coords = new SbVec3fArray(FloatMemoryBuffer.allocateFromFloatArray(new float[129*3]));
-  final SbVec3fArray normals = new SbVec3fArray(FloatMemoryBuffer.allocateFromFloatArray(new float[130*3]));
-  final SbVec2fArray texcoords = new SbVec2fArray(FloatMemoryBuffer.allocateFromFloatArray(new float[129*2]));
+    SoGLRenderCylinderThreadLocal tl = threadLocal.get();
+    if (tl == null) {
+        tl = new SoGLRenderCylinderThreadLocal();
+        threadLocal.set(tl);
+    }
+
+    final SbVec3fArray coords = tl.coords;
+    final SbVec2fArray texcoords = tl.texcoords;
+    final SbVec3fArray normals = tl.normals;
+    final IntArray sideVertexEboArray = tl.sideVertexEboArray;
+
+    final SbVec3fArray sideVertexVboArray = tl.sideVertexVboArray;
+    final SbVec3fArray sideNormalVboArray = tl.sideNormalVboArray;
 
   sogl_generate_3d_circle(coords, slices, radius, -h2);
   coords.get(slices).copyFrom( coords.get(0));
@@ -2120,9 +2144,6 @@ sogl_render_cylinder( float radius,
 
     float t = 0.0f;
     float inc = 1.0f / slices;
-
-      SbVec3fArray sideVertexVboArray = new SbVec3fArray(FloatMemoryBuffer.allocateFloats(129*3*2));
-      SbVec3fArray sideNormalVboArray = new SbVec3fArray(FloatMemoryBuffer.allocateFloats(129*3*2));
 
       int sideVertexVboArrayIndex = 0;
       int sideNormalVboArrayIndex = 0;

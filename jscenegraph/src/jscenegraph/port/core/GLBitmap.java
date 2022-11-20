@@ -22,6 +22,10 @@ public class GLBitmap {
         SbVec3f transform(SbVec3f in);
     }
 
+    private final static SbVec3fArray vboArray = new SbVec3fArray(FloatMemoryBuffer.allocateFloats(3 * 6));
+
+    private final static SbVec2fArray tcArray = new SbVec2fArray(FloatMemoryBuffer.allocateFloats(2 * 6));
+
     public static void glBitmap(
             SoState state,
             SoNode node,
@@ -62,8 +66,6 @@ public class GLBitmap {
 
         SoGLMultiTextureEnabledElement.set(state,node,0,true);
 
-        SbVec3fArray vboArray = new SbVec3fArray(FloatMemoryBuffer.allocateFloats(3 * 6));
-
         float xScreenStart = charPosition.getX();
         float yScreenStart = charPosition.getY();
         float xScreenEnd = xScreenStart + width;
@@ -85,8 +87,6 @@ public class GLBitmap {
         vboArray.setO(3,b);
         vboArray.setO(4,d);
         vboArray.setO(5,c);
-
-        SbVec2fArray tcArray = new SbVec2fArray(FloatMemoryBuffer.allocateFloats(2 * 6));
 
         SbVec2f at = new SbVec2fSingle(0,0);
         SbVec2f bt = new SbVec2fSingle(1,0);

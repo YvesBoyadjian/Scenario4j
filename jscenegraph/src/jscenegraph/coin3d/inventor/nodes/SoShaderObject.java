@@ -886,7 +886,7 @@ updateStateMatrixParameters(final int cachecontext, SoState state)
   int i, cnt = this.owner.parameter.getNum();
   for (i= 0; i <cnt; i++) {
 	  SoUniformShaderParameter param = (SoUniformShaderParameter)this.owner.parameter.operator_square_bracket(i).get();
-    if (param.isOfType(SoShaderStateMatrixParameter.getClassTypeId())) {
+    if (param/*.isOfType(*/instanceof SoShaderStateMatrixParameter/*.getClassTypeId())*/) {
     	((SoShaderStateMatrixParameter)param).updateValue(state);
       ((SoShaderStateMatrixParameter)param).updateParameter(shaderobject);
     }

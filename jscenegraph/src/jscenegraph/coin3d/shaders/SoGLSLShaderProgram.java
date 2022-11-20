@@ -67,7 +67,7 @@ protected
     public static class Uniform {
       public int location = -1;
       final float[] value4 = new float[4];
-      final FloatBuffer value16 = BufferUtils.createFloatBuffer(16);
+      final FloatBuffer value16 = /*BufferUtils.createFloatBuffer*/FloatBuffer.allocate(16); // No need to be direct
       final float[] value9 = new float[9];
 
       public Uniform() {

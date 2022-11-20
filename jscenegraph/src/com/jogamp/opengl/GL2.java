@@ -3358,6 +3358,10 @@ ByteBuffer data ) {
 		b[0] = buf.get();
 	}
 
+	default boolean glGetBoolean(int name) {
+		return org.lwjgl.opengl.GL11.glGetBoolean(name);
+	}
+
 	default void glColorMaterial(int glFrontAndBack, int glDiffuse) {
 		// org.lwjgl.opengl.GL11.glColorMaterial( glFrontAndBack, glDiffuse); CORE
 	}

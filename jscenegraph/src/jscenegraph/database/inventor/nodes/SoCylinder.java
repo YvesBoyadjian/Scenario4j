@@ -331,8 +331,6 @@ hasPart(SoCylinder.Part part)
 //    Performs GL rendering of a cylinder.
 //
 // Use: private
-private final IntArray sideVertexEboArray = new IntArray(128*3*2);
-
 public void
 GLRender(SoGLRenderAction action)
 //
@@ -377,7 +375,7 @@ GLRender(SoGLRenderAction action)
 	                       this.height.getValue(),
 	                       (int)(CYL_SIDE_NUMTRIS * complexity),
 	                       mb,
-	                       flags, state,sideVertexEboArray);
+	                       flags, state/*,sideVertexEboArray*/);
 	  mb.destructor();
 	}
 
