@@ -149,6 +149,7 @@ public class SoLODIndexedFaceSet extends SoIndexedFaceSet {
 	public boolean loadFoliage(boolean near) {
 
 		LoadState wanted = near ? LoadState.LOAD_NEAR : LoadState.LOAD_FAR;
+		final LoadState originalLoaded = loaded;
 
 		if(loaded != wanted && counting[0] < 1 /*&& counting[1] < 50*/) {
 			counting[0]++;
@@ -194,14 +195,24 @@ public class SoLODIndexedFaceSet extends SoIndexedFaceSet {
 			//indexedFaceSetF.vertexProperty.enableNotify(wasNotify); // In order not to recompute shaders
 			foliageParameters.markConsumed();
 
-			// if loaded was far, we must immediately draw near in order not to have flickering
-			boolean mustDraw = (loaded == LoadState.LOAD_FAR);
+			// if was not cleared, we must immediately draw in order not to have flickering
+			boolean mustDraw = (originalLoaded != LoadState.CLEARED);
 
 			loaded = wanted;
 
+//			try {
+//				Thread.sleep(50);
+//			} catch (InterruptedException e) {
+//				throw new RuntimeException(e);
+//			}
 			return !mustDraw; // don't want to draw after an update
 		}
-		return loaded == LoadState.CLEARED; // must not render if cleared
+//		try {
+//			Thread.sleep(10);
+//		} catch (InterruptedException e) {
+//			throw new RuntimeException(e);
+//		}
+		return originalLoaded == LoadState.CLEARED; // must not render if cleared
 	}
 	public void clear() {
 		if(loaded != LoadState.CLEARED) {
