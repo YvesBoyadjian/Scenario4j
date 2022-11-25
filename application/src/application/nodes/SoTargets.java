@@ -41,11 +41,18 @@ public class SoTargets extends SoSeparator {
 
 //	private final List<SoTarget> targets = new ArrayList<>();
 
+	private SoCube targetCube = new SoCube();
+
 	public SoTargets(Target target) {
 		super();
 		renderCaching.setValue(SoSeparator.CacheEnabled.OFF);
 		this.target = target;
 		this.target.setGraphicObject(this);
+		targetCube.ref();
+
+		targetCube.height.setValue(target.getSize());
+		targetCube.width.setValue(target.getRatio() * targetCube.height.getValue());
+		targetCube.depth.setValue(0.1f);
 	}
 
 	public void
@@ -135,11 +142,6 @@ public class SoTargets extends SoSeparator {
 					billboard.addChild(c);
 					target.setGroup(billboard,instance);
 				}
-
-				SoCube targetCube = new SoCube();
-				targetCube.height.setValue(target.getSize());
-				targetCube.width.setValue(target.getRatio() * targetCube.height.getValue());
-				targetCube.depth.setValue(0.1f);
 
 				billboard.addChild(targetCube);
 
