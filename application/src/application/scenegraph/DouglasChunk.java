@@ -23,7 +23,7 @@ public class DouglasChunk {
 	
 	private static final SbColor GREEN = new SbColor(5.0f/255,52.0f/255,0.0f/255);
 
-	private static final int NUM_NEAR_FOLIAGE = 10;
+	public static final int NUM_NEAR_FOLIAGE = 5;
 	
 	DouglasForest df;
 
@@ -114,10 +114,10 @@ public class DouglasChunk {
 		doClearNear();
 	}
 */
-	private void doClearNear() {
+	private void doClearNear(final int nearIndex) {
 
-        nearFFuture = null;
-        nearF[0] = null;
+        nearFFuture[nearIndex] = null;
+        nearF[nearIndex] = null;
 	}
 	
 	/**
@@ -385,7 +385,7 @@ public class DouglasChunk {
 		final float zDeltaBaseBranch = 1.5f;
 		final boolean branchExtremityOn = false;
 
-		for( int tree = 0; tree< nbDouglas; tree++) {
+		for( int tree = groupIndex; tree< nbDouglas; tree += NUM_NEAR_FOLIAGE) {
 
 			float height = getHeight(tree);
 
@@ -703,49 +703,49 @@ public class DouglasChunk {
 		};
 	}
 
-	private Future<IndexedFaceSetParameters> nearFFuture;
+	private final Future<IndexedFaceSetParameters>[] nearFFuture = new Future[DouglasChunk.NUM_NEAR_FOLIAGE];
 
-	public IndexedFaceSetParameters getFoliageNearParameters() {
-		if (nearFFuture == null) {
-            nearFFuture = RecursiveChunk.es.submit(() -> {
-				computeDouglasNearF(0);
+	public IndexedFaceSetParameters getFoliageNearParameters(final int nearIndex) {
+		if (nearFFuture[nearIndex] == null) {
+            nearFFuture[nearIndex] = RecursiveChunk.es.submit(() -> {
+				computeDouglasNearF(nearIndex);
 				return new IndexedFaceSetParameters() {
 					@Override
 					public int[] coordIndices() {
-						return nearF[0].douglasIndicesNearF;
+						return nearF[nearIndex].douglasIndicesNearF;
 					}
 
 					@Override
 					public FloatMemoryBuffer vertices() {
-						return nearF[0].douglasVerticesNearF;
+						return nearF[nearIndex].douglasVerticesNearF;
 					}
 
 					@Override
 					public FloatMemoryBuffer normals() {
-						return nearF[0].douglasNormalsNearF;
+						return nearF[nearIndex].douglasNormalsNearF;
 					}
 
 					@Override
 					public FloatMemoryBuffer textureCoords() {
-						return nearF[0].douglasTexCoordsNearF;
+						return nearF[nearIndex].douglasTexCoordsNearF;
 					}
 
 					@Override
 					public int[] colorsRGBA() {
-						return nearF[0].douglasColorsNearF;
+						return nearF[nearIndex].douglasColorsNearF;
 					}
 
 					@Override
 					public void markConsumed() {
-                        nearF[0].markConsumed();
-						doClearNear();
+                        nearF[nearIndex].markConsumed();
+						doClearNear(nearIndex);
 					}
 				};
 			});
 		}
-		if (nearFFuture.isDone()) {
+		if (nearFFuture[nearIndex].isDone()) {
 			try {
-				return nearFFuture.get();
+				return nearFFuture[nearIndex].get();
 			} catch (InterruptedException e) {
 				throw new RuntimeException(e);
 			} catch (ExecutionException e) {

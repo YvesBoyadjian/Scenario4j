@@ -499,18 +499,7 @@ public class DouglasForest {
 					finalCenter.setValue(centerV);
 				}
 				
-				SoLODIndexedFaceSet indexedFaceSetT = new SoLODIndexedFaceSet(refPoint,refPoint2,chunk,SoLODIndexedFaceSet.Type.TRUNK, douglasLoadCount) {
-					public void GLRender(SoGLRenderAction action)
-					{
-						super.GLRender(action);
-					}
-					public void computeBBox(SoAction action, SbBox3f box, SbVec3f center) {
-						
-						box.copyFrom(finalBox);
-						center.copyFrom(finalCenter);
-	//					super.computeBBox(action, box, center);
-					}
-				};
+				SoLODIndexedFaceSet indexedFaceSetT = new SoLODIndexedFaceSet(refPoint,refPoint2,chunk,SoLODIndexedFaceSet.Type.TRUNK, douglasLoadCount,finalBox,finalCenter);
 				
 				indexedFaceSetT.loadTrunk();
 				
@@ -555,18 +544,7 @@ public class DouglasForest {
 						finalCenter.setValue(centerV);
 					}
 					
-				SoLODIndexedFaceSet indexedFaceSetF = new SoLODIndexedFaceSet(refPoint,refPoint2, chunk,SoLODIndexedFaceSet.Type.FOLIAGE, douglasLoadCount) {
-					public void GLRender(SoGLRenderAction action)
-					{
-						super.GLRender(action);
-					}			
-					public void computeBBox(SoAction action, SbBox3f box, SbVec3f center) {
-						
-						box.copyFrom(finalBox);
-						center.copyFrom(finalCenter);
-						//super.computeBBox(action, box, center);
-					}
-				};
+				SoLODIndexedFaceSet indexedFaceSetF = new SoLODIndexedFaceSet(refPoint,refPoint2, chunk,SoLODIndexedFaceSet.Type.FOLIAGE, douglasLoadCount,finalBox,finalCenter);
 				
 				//indexedFaceSetF.loadFoliage();
 				

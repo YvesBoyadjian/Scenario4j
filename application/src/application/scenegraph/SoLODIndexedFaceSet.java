@@ -7,15 +7,17 @@ import application.scenegraph.douglas.IndexedFaceSetParameters;
 import jscenegraph.coin3d.inventor.nodes.SoVertexProperty;
 import jscenegraph.database.inventor.SbBox3f;
 import jscenegraph.database.inventor.SbVec3f;
+import jscenegraph.database.inventor.actions.SoAction;
 import jscenegraph.database.inventor.actions.SoGLRenderAction;
 import jscenegraph.database.inventor.elements.SoGLCacheContextElement;
+import jscenegraph.database.inventor.nodes.SoGroup;
 import jscenegraph.database.inventor.nodes.SoIndexedFaceSet;
 
 /**
  * @author Yves Boyadjian
  *
  */
-public class SoLODIndexedFaceSet extends SoIndexedFaceSet {
+public class SoLODIndexedFaceSet extends /*SoIndexedFaceSet*/SoGroup {
 	
 	public static enum Type {
 		TRUNK,
@@ -44,22 +46,58 @@ public class SoLODIndexedFaceSet extends SoIndexedFaceSet {
 	
 	private final DouglasChunk chunk;
 	
-	private LoadState loaded = LoadState.CLEARED;
-	
+	private LoadState loadedFar = LoadState.CLEARED;
+	private LoadState[] loadedNear = new LoadState[DouglasChunk.NUM_NEAR_FOLIAGE];//LoadState.CLEARED;
+
 	private final int[] counting;
+
+	private final SoIndexedFaceSet sonFar;
+
+	private final SoIndexedFaceSet[] sonsNear = new SoIndexedFaceSet[DouglasChunk.NUM_NEAR_FOLIAGE];
 	
-	public SoLODIndexedFaceSet(SbVec3f referencePoint,SbVec3f referencePoint2, DouglasChunk chunk, Type type, final int[] counting) {
+	public SoLODIndexedFaceSet(SbVec3f referencePoint,SbVec3f referencePoint2, DouglasChunk chunk, Type type, final int[] counting,SbBox3f finalBox, SbVec3f finalCenter) {
 		this.referencePoint = referencePoint;
 		this.referencePoint2 = referencePoint2;
 		this.chunk = chunk;
 		this.type = type;
 		this.counting = counting;
 		enableNotify(false); // In order not to invalidate shaders
+
+		sonFar = new SoIndexedFaceSet() {
+
+		public void computeBBox (SoAction action, SbBox3f box, SbVec3f center){
+
+			box.copyFrom(finalBox);
+			center.copyFrom(finalCenter);
+			//super.computeBBox(action, box, center);
+		}
+	};
+
+	if (type == SoLODIndexedFaceSet.Type.FOLIAGE) {
+		for (int i=0;i<DouglasChunk.NUM_NEAR_FOLIAGE; i++) {
+
+			loadedNear[i] = LoadState.CLEARED;
+			sonsNear[i] = new SoIndexedFaceSet() {
+
+				public void computeBBox (SoAction action, SbBox3f box, SbVec3f center){
+
+					box.copyFrom(finalBox);
+					center.copyFrom(finalCenter);
+					//super.computeBBox(action, box, center);
+				}
+			};
+			sonsNear[i].enableNotify(false);
+			addChild(sonsNear[i]);
+		}
+	}
+
+		sonFar.enableNotify(false);
+		addChild(sonFar);
 	}
 	
 	public void GLRender(SoGLRenderAction action)
 	{		
-		getBBox(action, box, center);
+		sonFar.getBBox(action, box, center);
 
 		if( box.intersect(referencePoint2)) {
 			if(!load(true)) // Near mode
@@ -80,7 +118,7 @@ public class SoLODIndexedFaceSet extends SoIndexedFaceSet {
 				super.GLRender(action);				
 			}
 			else {
-				clear();
+				clearAll();
 				//chunk.clear();
 			}
 		}
@@ -111,11 +149,11 @@ public class SoLODIndexedFaceSet extends SoIndexedFaceSet {
 	 * @return false if must render
 	 */
 	public boolean loadTrunk() {
-		if(loaded == LoadState.CLEARED && counting[0] < 1 /*&& counting[1] < 50*/) {
+		if(loadedFar == LoadState.CLEARED && counting[0] < 1 /*&& counting[1] < 50*/) {
 			counting[0]++;
 			counting[1]++;
-			loaded = LoadState.LOAD_FAR;
-		SoLODIndexedFaceSet indexedFaceSetT = this;
+			loadedFar = LoadState.LOAD_FAR;
+		SoIndexedFaceSet indexedFaceSetT = sonFar;
 		
 		//boolean wasNotify = indexedFaceSetT.coordIndex.enableNotify(false); // In order not to recompute shaders
 		indexedFaceSetT.coordIndex.setValuesPointer(chunk.douglasIndicesT);
@@ -138,7 +176,25 @@ public class SoLODIndexedFaceSet extends SoIndexedFaceSet {
 		//indexedFaceSetT.vertexProperty.enableNotify(wasNotify); // In order not to recompute shaders
 			return true; // must not render the first time
 		}
-		return loaded == LoadState.CLEARED; // must not render if cleared
+		return loadedFar == LoadState.CLEARED; // must not render if cleared
+	}
+
+	private boolean isAllNearLoaded() {
+		for (int i=0; i<DouglasChunk.NUM_NEAR_FOLIAGE;i++) {
+			if (loadedNear[i] != LoadState.LOAD_NEAR) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	private int firstNearIndexToLoad() {
+		for (int i=0; i<DouglasChunk.NUM_NEAR_FOLIAGE;i++) {
+			if (loadedNear[i] != LoadState.LOAD_NEAR) {
+				return i;
+			}
+		}
+		return -1;
 	}
 
 	/**
@@ -148,25 +204,38 @@ public class SoLODIndexedFaceSet extends SoIndexedFaceSet {
 	 */
 	public boolean loadFoliage(boolean near) {
 
-		LoadState wanted = near ? LoadState.LOAD_NEAR : LoadState.LOAD_FAR;
-		final LoadState originalLoaded = loaded;
+		final LoadState initiallyWanted = near ? LoadState.LOAD_NEAR : LoadState.LOAD_FAR;
+		//final LoadState originalLoadedFar = loadedFar;
+		//final LoadState originalLoadedNear = loadedNear[0];
 
-		if(loaded != wanted && counting[0] < 1 /*&& counting[1] < 50*/) {
+		// Loading must be done
+		if (
+				(
+				((initiallyWanted == LoadState.LOAD_FAR) && (loadedFar != initiallyWanted))
+				|| ((initiallyWanted == LoadState.LOAD_NEAR) && !isAllNearLoaded())
+				)
+				&& counting[0] < 1 /*&& counting[1] < 50*/) {
 			counting[0]++;
 			counting[1]++;
-			SoLODIndexedFaceSet indexedFaceSetF = this;
 
-			IndexedFaceSetParameters foliageParameters = (wanted == LoadState.LOAD_NEAR) ? chunk.getFoliageNearParameters() : chunk.getFoliageFarParameters();
-			if (wanted == LoadState.LOAD_NEAR && foliageParameters == null) {
+			final int nearIndexToLoad = firstNearIndexToLoad();
+
+			IndexedFaceSetParameters foliageParameters = (initiallyWanted == LoadState.LOAD_NEAR) ? chunk.getFoliageNearParameters(nearIndexToLoad) : chunk.getFoliageFarParameters();
+
+			LoadState oneToLoad = initiallyWanted;
+
+			if (initiallyWanted == LoadState.LOAD_NEAR && foliageParameters == null) { // Near not still computed, we fall on far
 				foliageParameters = chunk.getFoliageFarParameters();
-				wanted = LoadState.LOAD_FAR;
-				if (loaded == wanted) {
-					return false; // nothing to do, we can draw
+				oneToLoad = LoadState.LOAD_FAR;
+				if (loadedFar == oneToLoad) {
+					return false; // nothing to do, we can draw far at first time
 				}
 			}
-			else if (loaded == LoadState.LOAD_NEAR){
-					clear(); // Wanted is always far
+			else if (initiallyWanted == LoadState.LOAD_FAR /*&& loadedNear[0] == LoadState.LOAD_NEAR*/){ // Clear near if far is initially wanted
+					clearNear(); // We must clear near if far is wanted and near is loaded
 			}
+
+			final SoIndexedFaceSet indexedFaceSetF = (oneToLoad == LoadState.LOAD_FAR) ? sonFar : sonsNear[nearIndexToLoad];
 
 			//boolean wasNotify = indexedFaceSetF.coordIndex.enableNotify(false); // In order not to recompute shaders
 			indexedFaceSetF.coordIndex.setValuesPointer(/*chunk.douglasIndicesF*/foliageParameters.coordIndices());
@@ -196,9 +265,20 @@ public class SoLODIndexedFaceSet extends SoIndexedFaceSet {
 			foliageParameters.markConsumed();
 
 			// if was not cleared, we must immediately draw in order not to have flickering
-			boolean mustDraw = (originalLoaded != LoadState.CLEARED);
+			boolean mustDraw = true;//(originalLoaded != LoadState.CLEARED);
 
-			loaded = wanted;
+			switch(oneToLoad) {
+
+				case LOAD_FAR:
+					loadedFar = oneToLoad;
+					break;
+				case LOAD_NEAR:
+					loadedNear[nearIndexToLoad] = oneToLoad;
+					if (isAllNearLoaded()) {
+						clearFar();
+					}
+					break;
+			}
 
 //			try {
 //				Thread.sleep(50);
@@ -212,20 +292,47 @@ public class SoLODIndexedFaceSet extends SoIndexedFaceSet {
 //		} catch (InterruptedException e) {
 //			throw new RuntimeException(e);
 //		}
-		return originalLoaded == LoadState.CLEARED; // must not render if cleared
+		return /*originalLoaded == LoadState.CLEARED*/false; // must not render if cleared
 	}
-	public void clear() {
-		if(loaded != LoadState.CLEARED) {
+	public void clearNear() {
+
+		// No near for trunk
+		if (type == Type.TRUNK) {
+			return;
+		}
+
+		for (int nearIndex=0; nearIndex<DouglasChunk.NUM_NEAR_FOLIAGE; nearIndex++) {
+			if (loadedNear[nearIndex] != LoadState.CLEARED) {
+				counting[1]--;
+				loadedNear[nearIndex] = LoadState.CLEARED;
+				boolean wasEnabled = sonsNear[0].vertexProperty.enableNotify(false);
+				sonsNear[nearIndex].vertexProperty.setValue(null/*recursiveChunk.getVertexProperty()*/);
+				sonsNear[nearIndex].vertexProperty.enableNotify(wasEnabled);
+
+				//coordIndex.setValuesPointer(recursiveChunk.getDecimatedCoordIndices());
+				//wasEnabled = coordIndex.enableNotify(false); // In order not to recompute shaders
+				sonsNear[nearIndex].coordIndex.setNum(0); // Notification MUST be enabled for this, or else there is a memory leak
+				//coordIndex.enableNotify(wasEnabled);
+			}
+		}
+	}
+	public void clearFar() {
+		if(loadedFar != LoadState.CLEARED) {
 			counting[1]--;
-			loaded = LoadState.CLEARED;
-		    boolean wasEnabled = this.vertexProperty.enableNotify(false);
-			vertexProperty.setValue(null/*recursiveChunk.getVertexProperty()*/);
-			this.vertexProperty.enableNotify(wasEnabled);
-			
+			loadedFar = LoadState.CLEARED;
+			boolean wasEnabled = sonFar.vertexProperty.enableNotify(false);
+			sonFar.vertexProperty.setValue(null/*recursiveChunk.getVertexProperty()*/);
+			sonFar.vertexProperty.enableNotify(wasEnabled);
+
 			//coordIndex.setValuesPointer(recursiveChunk.getDecimatedCoordIndices());
 			//wasEnabled = coordIndex.enableNotify(false); // In order not to recompute shaders
-			coordIndex.setNum(0); // Notification MUST be enabled for this, or else there is a memory leak
-		    //coordIndex.enableNotify(wasEnabled);
+			sonFar.coordIndex.setNum(0); // Notification MUST be enabled for this, or else there is a memory leak
+			//coordIndex.enableNotify(wasEnabled);
 		}
+	}
+
+	public void clearAll() {
+		clearFar();
+		clearNear();
 	}
 }

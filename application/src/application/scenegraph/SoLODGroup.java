@@ -41,7 +41,7 @@ public class SoLODGroup extends SoGroup {
 				cleared = true;
 				int nbChildren = getNumChildren();
 				for( int i=0;i <nbChildren;i++) {
-					((SoLODIndexedFaceSet)getChild(i)).clear();
+					((SoLODIndexedFaceSet)getChild(i)).clearAll();
 				}
 			}
 //			else {
