@@ -87,8 +87,13 @@ public class SoLODIndexedFaceSet extends SoIndexedFaceSet {
 		  // don't auto cache LOD nodes.
 		  SoGLCacheContextElement.shouldAutoCache(action.getState(),
 		                                           SoGLCacheContextElement.AutoCache.DONT_AUTO_CACHE.getValue());
-	}		
-	
+	}
+
+	/**
+	 *
+	 * @param near
+	 * @return false if must render
+	 */
 	private boolean load(boolean near) {
 		switch(type) {
 		case FOLIAGE:
@@ -100,7 +105,11 @@ public class SoLODIndexedFaceSet extends SoIndexedFaceSet {
 		
 		}
 	}
-	
+
+	/**
+	 *
+	 * @return false if must render
+	 */
 	public boolean loadTrunk() {
 		if(loaded == LoadState.CLEARED && counting[0] < 1 /*&& counting[1] < 50*/) {
 			counting[0]++;
@@ -127,57 +136,72 @@ public class SoLODIndexedFaceSet extends SoIndexedFaceSet {
 		//wasNotify = indexedFaceSetT.vertexProperty.enableNotify(false);
 		indexedFaceSetT.vertexProperty.setValue(vertexProperty);
 		//indexedFaceSetT.vertexProperty.enableNotify(wasNotify); // In order not to recompute shaders
-			return true;
+			return true; // must not render the first time
 		}
-		return false;
+		return loaded == LoadState.CLEARED; // must not render if cleared
 	}
-	
+
+	/**
+	 *
+	 * @param near
+	 * @return false if must render
+	 */
 	public boolean loadFoliage(boolean near) {
 
 		LoadState wanted = near ? LoadState.LOAD_NEAR : LoadState.LOAD_FAR;
 
 		if(loaded != wanted && counting[0] < 1 /*&& counting[1] < 50*/) {
-			clear();
 			counting[0]++;
 			counting[1]++;
-			loaded = wanted;
-		SoLODIndexedFaceSet indexedFaceSetF = this;
+			SoLODIndexedFaceSet indexedFaceSetF = this;
 
 			IndexedFaceSetParameters foliageParameters = (wanted == LoadState.LOAD_NEAR) ? chunk.getFoliageNearParameters() : chunk.getFoliageFarParameters();
-			if (foliageParameters == null) {
+			if (wanted == LoadState.LOAD_NEAR && foliageParameters == null) {
 				foliageParameters = chunk.getFoliageFarParameters();
-				loaded = LoadState.LOAD_FAR;
+				wanted = LoadState.LOAD_FAR;
+				if (loaded == wanted) {
+					return false; // nothing to do, we can draw
+				}
 			}
-		
-		//boolean wasNotify = indexedFaceSetF.coordIndex.enableNotify(false); // In order not to recompute shaders
-		indexedFaceSetF.coordIndex.setValuesPointer(/*chunk.douglasIndicesF*/foliageParameters.coordIndices());
-		//indexedFaceSetF.coordIndex.enableNotify(wasNotify);
-		
-		SoVertexProperty vertexProperty = new SoVertexProperty();
-		
-		vertexProperty.vertex.setValuesPointer(/*chunk.douglasVerticesF*/foliageParameters.vertices());
-		
-		vertexProperty.normalBinding.setValue(SoVertexProperty.Binding.PER_VERTEX_INDEXED);
-		
-		vertexProperty.normal.setValuesPointer(/*chunk.douglasNormalsF*/foliageParameters.normals());
-		
-		boolean withColors = true;
-		if(withColors) {
-			vertexProperty.texCoord.setValuesPointer(/*chunk.douglasTexCoordsF*/foliageParameters.textureCoords());
-			vertexProperty.materialBinding.setValue(SoVertexProperty.Binding.PER_VERTEX_INDEXED);
-			vertexProperty.orderedRGBA.setValuesPointer(/*chunk.douglasColorsF*/foliageParameters.colorsRGBA());
-		}
-		else {
-			vertexProperty.orderedRGBA.setValue(DouglasChunk.TREE_FOLIAGE_AVERAGE_MULTIPLIER/*SbColor(1,0.0f,0.0f)*/.getPackedValue());
-		}
-		
-		//wasNotify = indexedFaceSetF.vertexProperty.enableNotify(false);
-		indexedFaceSetF.vertexProperty.setValue(vertexProperty);
-		//indexedFaceSetF.vertexProperty.enableNotify(wasNotify); // In order not to recompute shaders
+			else if (loaded == LoadState.LOAD_NEAR){
+					clear(); // Wanted is always far
+			}
+
+			//boolean wasNotify = indexedFaceSetF.coordIndex.enableNotify(false); // In order not to recompute shaders
+			indexedFaceSetF.coordIndex.setValuesPointer(/*chunk.douglasIndicesF*/foliageParameters.coordIndices());
+			//indexedFaceSetF.coordIndex.enableNotify(wasNotify);
+
+			SoVertexProperty vertexProperty = new SoVertexProperty();
+
+			vertexProperty.vertex.setValuesPointer(/*chunk.douglasVerticesF*/foliageParameters.vertices());
+
+			vertexProperty.normalBinding.setValue(SoVertexProperty.Binding.PER_VERTEX_INDEXED);
+
+			vertexProperty.normal.setValuesPointer(/*chunk.douglasNormalsF*/foliageParameters.normals());
+
+			boolean withColors = true;
+			if(withColors) {
+				vertexProperty.texCoord.setValuesPointer(/*chunk.douglasTexCoordsF*/foliageParameters.textureCoords());
+				vertexProperty.materialBinding.setValue(SoVertexProperty.Binding.PER_VERTEX_INDEXED);
+				vertexProperty.orderedRGBA.setValuesPointer(/*chunk.douglasColorsF*/foliageParameters.colorsRGBA());
+			}
+			else {
+				vertexProperty.orderedRGBA.setValue(DouglasChunk.TREE_FOLIAGE_AVERAGE_MULTIPLIER/*SbColor(1,0.0f,0.0f)*/.getPackedValue());
+			}
+
+			//wasNotify = indexedFaceSetF.vertexProperty.enableNotify(false);
+			indexedFaceSetF.vertexProperty.setValue(vertexProperty);
+			//indexedFaceSetF.vertexProperty.enableNotify(wasNotify); // In order not to recompute shaders
 			foliageParameters.markConsumed();
-			return true;
+
+			// if loaded was far, we must immediately draw near in order not to have flickering
+			boolean mustDraw = (loaded == LoadState.LOAD_FAR);
+
+			loaded = wanted;
+
+			return !mustDraw; // don't want to draw after an update
 		}
-		return false;
+		return loaded == LoadState.CLEARED; // must not render if cleared
 	}
 	public void clear() {
 		if(loaded != LoadState.CLEARED) {
