@@ -22,6 +22,8 @@ public class DouglasChunk {
 	public static final SbColor TREE_FOLIAGE_AVERAGE_MULTIPLIER = new SbColor(0.8f,0.85f,0.4f);
 	
 	private static final SbColor GREEN = new SbColor(5.0f/255,52.0f/255,0.0f/255);
+
+	private static final int NUM_NEAR_FOLIAGE = 10;
 	
 	DouglasForest df;
 
@@ -100,7 +102,7 @@ public class DouglasChunk {
 	int[] douglasColorsF;
 	FloatMemoryBuffer douglasTexCoordsF;
 
-    IndexedFaceSetParametersImpl nearF = new IndexedFaceSetParametersImpl();
+    private final IndexedFaceSetParametersImpl[] nearF = new IndexedFaceSetParametersImpl[NUM_NEAR_FOLIAGE];
 
 	int[] douglasIndicesT;
 	FloatMemoryBuffer douglasVerticesT;
@@ -115,7 +117,7 @@ public class DouglasChunk {
 	private void doClearNear() {
 
         nearFFuture = null;
-        nearF = null;
+        nearF[0] = null;
 	}
 	
 	/**
@@ -363,9 +365,9 @@ public class DouglasChunk {
 	/**
 	 * Compute for foliage
 	 */
-	public void computeDouglasNearF() {
+	public void computeDouglasNearF(int groupIndex) {
 
-		if (nearF != null) {
+		if (nearF[groupIndex] != null) {
 			return;
 		}
 
@@ -499,180 +501,9 @@ public class DouglasChunk {
 		// ____________________________________________ vertices
 		final int nbVerticesNear = vertices.size(); // Quatre ou six fois le nombre de trianges
 
-        nearF = new IndexedFaceSetParametersImpl();
+        nearF[groupIndex] = new IndexedFaceSetParametersImpl();
 
-        nearF.douglasVerticesNearF = FloatMemoryBuffer.allocateFloats(nbVerticesNear * 3);
-		int floatIndex = 0;
-		for(SbVec3f vec : vertices) {
-            nearF.douglasVerticesNearF.setFloat(floatIndex,vec.getX()); floatIndex++;
-            nearF.douglasVerticesNearF.setFloat(floatIndex,vec.getY()); floatIndex++;
-            nearF.douglasVerticesNearF.setFloat(floatIndex,vec.getZ()); floatIndex++;
-		}
-
-		// ____________________________________________ indices
-		final int nbBranches = nbVerticesNear/(branchExtremityOn ? 6 : 4);
-		final int nbIndicesForOneTriangle = 4;
-		// _______________________ Top of branch, up and down _________ extremity of branch __________________________ sides of branch_____________bottom of branch
-		final int nbIndicesPerBranch = nbIndicesForOneTriangle*2 + (branchExtremityOn ?  2*nbIndicesForOneTriangle : 0) + 2 * nbIndicesForOneTriangle + nbIndicesForOneTriangle;
-		int nbIndicesNear = nbBranches * nbIndicesPerBranch;
-
-        nearF.douglasIndicesNearF = new int[nbIndicesNear];
-		int indice = 0;
-
-		int deltaSides = branchExtremityOn ? 16 : 8;
-		int deltaSides2 = branchExtremityOn ? 20 : 12;
-		int deltaBottom = branchExtremityOn ? 24 : 16;
-
-		int startIndice = 0;
-		for( int i=0; i< nbBranches; i++) {
-
-			// Branch base (top)
-            nearF.douglasIndicesNearF[startIndice] = indice;
-            nearF.douglasIndicesNearF[startIndice+4] = indice;
-            nearF.douglasIndicesNearF[startIndice+deltaSides+1] = indice;
-            nearF.douglasIndicesNearF[startIndice+deltaSides2] = indice;
-			indice++;
-			// Branch base 2 (bottom)
-            nearF.douglasIndicesNearF[startIndice+deltaSides] = indice;
-            nearF.douglasIndicesNearF[startIndice+deltaSides2+1] = indice;
-            nearF.douglasIndicesNearF[startIndice+deltaBottom] = indice;
-			indice++;
-			// Branch extremity
-            nearF.douglasIndicesNearF[startIndice+1] = indice;
-            nearF.douglasIndicesNearF[startIndice+2+4] = indice;
-			if(branchExtremityOn) {
-                nearF.douglasIndicesNearF[startIndice + 8] = indice;
-			}
-            nearF.douglasIndicesNearF[startIndice+deltaSides+2] = indice;
-            nearF.douglasIndicesNearF[startIndice+deltaBottom+1] = indice;
-			indice++;
-			// Branch extremity 2
-            nearF.douglasIndicesNearF[startIndice+2] = indice;
-            nearF.douglasIndicesNearF[startIndice+1+4] = indice;
-			if(branchExtremityOn) {
-                nearF.douglasIndicesNearF[startIndice + 9] = indice;
-                nearF.douglasIndicesNearF[startIndice + 12] = indice;
-			}
-            nearF.douglasIndicesNearF[startIndice+deltaSides2+2] = indice;
-            nearF.douglasIndicesNearF[startIndice+deltaBottom+2] = indice;
-			indice++;
-			if(branchExtremityOn) {
-				// Branch extremity 3
-                nearF.douglasIndicesNearF[startIndice + 10] = indice;
-                nearF.douglasIndicesNearF[startIndice + 14] = indice;
-				indice++;
-				// Branch extremity 4
-                nearF.douglasIndicesNearF[startIndice + 13] = indice;
-				indice++;
-			}
-            nearF.douglasIndicesNearF[startIndice+3] = -1; // Topup
-            nearF.douglasIndicesNearF[startIndice+3+4] = -1; // Topdown
-            nearF.douglasIndicesNearF[startIndice+11] = -1;
-            nearF.douglasIndicesNearF[startIndice+15] = -1;
-            nearF.douglasIndicesNearF[startIndice+19] = -1;
-			if(branchExtremityOn) {
-                nearF.douglasIndicesNearF[startIndice + 19 + 4] = -1;
-                nearF.douglasIndicesNearF[startIndice + 19 + 8] = -1;
-			}
-			startIndice += nbIndicesPerBranch;
-		}
-
-		// ____________________________________________ normals
-        nearF.douglasNormalsNearF = FloatMemoryBuffer.allocateFloats(nbVerticesNear * 3);
-		floatIndex = 0;
-		final int mult = branchExtremityOn ? 2 : 1;
-		//final SbVec3f down = new SbVec3fSingle(0,0,-1);
-
-		for (int i=0; i< nbBranches;i++) {
-			SbVec3f normal = normals.get(mult*i);
-			for(int j=0;j<4;j++) { // four points
-				if(j==1) {
-                    nearF.douglasNormalsNearF.setFloat(floatIndex, 0);
-					floatIndex++;
-                    nearF.douglasNormalsNearF.setFloat(floatIndex, 0);
-					floatIndex++;
-                    nearF.douglasNormalsNearF.setFloat(floatIndex, -1);
-					floatIndex++;
-				}
-				else if (j==2 || j==3) {
-                    nearF.douglasNormalsNearF.setFloat(floatIndex, -normal.getX());
-					floatIndex++;
-                    nearF.douglasNormalsNearF.setFloat(floatIndex, -normal.getY());
-					floatIndex++;
-                    nearF.douglasNormalsNearF.setFloat(floatIndex, -normal.getZ());
-					floatIndex++;
-				}
-				else {
-                    nearF.douglasNormalsNearF.setFloat(floatIndex, -normal.getX());
-					floatIndex++;
-                    nearF.douglasNormalsNearF.setFloat(floatIndex, -normal.getY());
-					floatIndex++;
-                    nearF.douglasNormalsNearF.setFloat(floatIndex, -normal.getZ());
-					floatIndex++;
-				}
-			}
-			if (branchExtremityOn) {
-				SbVec3f normal2 = normals.get(mult * i + 1);
-				for (int j = 0; j < 2; j++) { // two points
-                    nearF.douglasNormalsNearF.setFloat(floatIndex, -normal2.getX());
-					floatIndex++;
-                    nearF.douglasNormalsNearF.setFloat(floatIndex, -normal2.getY());
-					floatIndex++;
-                    nearF.douglasNormalsNearF.setFloat(floatIndex, -normal2.getZ());
-					floatIndex++;
-				}
-			}
-		}
-
-		// _______________________________________________ colors
-
-        nearF.douglasColorsNearF = new int[nbVerticesNear];
-		indice = 0;
-		for(int i=0;i<nbBranches;i++) {
-			int color = colors.get(i);
-            nearF.douglasColorsNearF[indice] = color; indice++;
-            nearF.douglasColorsNearF[indice] = color; indice++;
-            nearF.douglasColorsNearF[indice] = color; indice++;
-            nearF.douglasColorsNearF[indice] = color; indice++;
-			if(branchExtremityOn) {
-                nearF.douglasColorsNearF[indice] = color;
-				indice++;
-                nearF.douglasColorsNearF[indice] = color;
-				indice++;
-			}
-		}
-
-		// ________________________________________________ texture coordinates
-
-        nearF.douglasTexCoordsNearF = FloatMemoryBuffer.allocateFloats(nbVerticesNear*2);
-		floatIndex = 0;
-		for(int i=0;i<nbBranches;i++) {
-			float branchHoriLength = branchHoriLengths.get(i);
-			// Branch base
-            nearF.douglasTexCoordsNearF.setFloat(floatIndex,0); floatIndex++;
-            nearF.douglasTexCoordsNearF.setFloat(floatIndex,0); floatIndex++;
-			// Branch base 2
-            nearF.douglasTexCoordsNearF.setFloat(floatIndex,zDeltaBaseBranch); floatIndex++;
-            nearF.douglasTexCoordsNearF.setFloat(floatIndex,0); floatIndex++;
-			// Branch extremity
-            nearF.douglasTexCoordsNearF.setFloat(floatIndex,branchHoriLength); floatIndex++;
-            nearF.douglasTexCoordsNearF.setFloat(floatIndex,-branchHoriLength); floatIndex++;
-			// Branch Extremity 2
-            nearF.douglasTexCoordsNearF.setFloat(floatIndex,branchHoriLength); floatIndex++;
-            nearF.douglasTexCoordsNearF.setFloat(floatIndex,branchHoriLength); floatIndex++;
-			if(branchExtremityOn) {
-				// Branch extremity 3
-                nearF.douglasTexCoordsNearF.setFloat(floatIndex, branchHoriLength + falling);
-				floatIndex++;
-                nearF.douglasTexCoordsNearF.setFloat(floatIndex, -branchHoriLength);
-				floatIndex++;
-				// Branch Extremity 4
-                nearF.douglasTexCoordsNearF.setFloat(floatIndex, branchHoriLength + falling);
-				floatIndex++;
-                nearF.douglasTexCoordsNearF.setFloat(floatIndex, branchHoriLength);
-				floatIndex++;
-			}
-		}
+		nearF[groupIndex].fill(nbVerticesNear, vertices, branchExtremityOn, normals, colors, branchHoriLengths, zDeltaBaseBranch, falling);
 /*
 		douglasIndicesNearF = douglasIndicesF;
 		douglasVerticesNearF = douglasVerticesF;
@@ -877,36 +708,36 @@ public class DouglasChunk {
 	public IndexedFaceSetParameters getFoliageNearParameters() {
 		if (nearFFuture == null) {
             nearFFuture = RecursiveChunk.es.submit(() -> {
-				computeDouglasNearF();
+				computeDouglasNearF(0);
 				return new IndexedFaceSetParameters() {
 					@Override
 					public int[] coordIndices() {
-						return nearF.douglasIndicesNearF;
+						return nearF[0].douglasIndicesNearF;
 					}
 
 					@Override
 					public FloatMemoryBuffer vertices() {
-						return nearF.douglasVerticesNearF;
+						return nearF[0].douglasVerticesNearF;
 					}
 
 					@Override
 					public FloatMemoryBuffer normals() {
-						return nearF.douglasNormalsNearF;
+						return nearF[0].douglasNormalsNearF;
 					}
 
 					@Override
 					public FloatMemoryBuffer textureCoords() {
-						return nearF.douglasTexCoordsNearF;
+						return nearF[0].douglasTexCoordsNearF;
 					}
 
 					@Override
 					public int[] colorsRGBA() {
-						return nearF.douglasColorsNearF;
+						return nearF[0].douglasColorsNearF;
 					}
 
 					@Override
 					public void markConsumed() {
-                        nearF.markConsumed();
+                        nearF[0].markConsumed();
 						doClearNear();
 					}
 				};
