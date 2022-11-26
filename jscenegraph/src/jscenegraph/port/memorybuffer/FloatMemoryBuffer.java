@@ -50,7 +50,7 @@ public class FloatMemoryBuffer extends MemoryBuffer {
 		
 			int numBytes = numFloats*Float.BYTES;
 		
-			memoryBuffer.byteBuffer = MemoryBufferPool.createByteBuffer(numBytes);//BufferUtils.createByteBuffer(numBytes);
+			memoryBuffer.byteBuffer = MemoryBufferPool.pool.createByteBuffer(numBytes);//BufferUtils.createByteBuffer(numBytes);
 		}
 		else {
 			memoryBuffer.floatArray = new float[numFloats];
@@ -67,7 +67,7 @@ public class FloatMemoryBuffer extends MemoryBuffer {
 		
 			int numBytes = numFloats*Float.BYTES;
 		
-			memoryBuffer.byteBuffer = MemoryUtil.memAlloc(numBytes);
+			memoryBuffer.byteBuffer = MemoryBufferPool.pool.memAlloc(numBytes);//MemoryUtil.memAlloc(numBytes);
 			memoryBuffer.malloc = true;
 		}
 		else {
