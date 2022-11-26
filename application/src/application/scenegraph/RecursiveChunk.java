@@ -751,6 +751,11 @@ public class RecursiveChunk {
 					}
 
 					@Override
+					public boolean keepOwnership() {
+						return true;
+					}
+
+					@Override
 					public void markConsumed() {
 						decimatedParameters = null;
 					}

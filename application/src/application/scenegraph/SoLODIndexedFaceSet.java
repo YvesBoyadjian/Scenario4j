@@ -243,15 +243,15 @@ public class SoLODIndexedFaceSet extends /*SoIndexedFaceSet*/SoGroup {
 
 			SoVertexProperty vertexProperty = new SoVertexProperty();
 
-			vertexProperty.vertex.setValuesPointer(/*chunk.douglasVerticesF*/foliageParameters.vertices());
+			vertexProperty.vertex.setValuesPointer(/*chunk.douglasVerticesF*/foliageParameters.vertices(),foliageParameters.keepOwnership());
 
 			vertexProperty.normalBinding.setValue(SoVertexProperty.Binding.PER_VERTEX_INDEXED);
 
-			vertexProperty.normal.setValuesPointer(/*chunk.douglasNormalsF*/foliageParameters.normals());
+			vertexProperty.normal.setValuesPointer(/*chunk.douglasNormalsF*/foliageParameters.normals(),foliageParameters.keepOwnership());
 
 			boolean withColors = true;
 			if(withColors) {
-				vertexProperty.texCoord.setValuesPointer(/*chunk.douglasTexCoordsF*/foliageParameters.textureCoords());
+				vertexProperty.texCoord.setValuesPointer(/*chunk.douglasTexCoordsF*/foliageParameters.textureCoords(),foliageParameters.keepOwnership());
 				vertexProperty.materialBinding.setValue(SoVertexProperty.Binding.PER_VERTEX_INDEXED);
 				vertexProperty.orderedRGBA.setValuesPointer(/*chunk.douglasColorsF*/foliageParameters.colorsRGBA());
 			}

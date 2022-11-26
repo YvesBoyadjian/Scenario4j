@@ -697,6 +697,11 @@ public class DouglasChunk {
 			}
 
 			@Override
+			public boolean keepOwnership() {
+				return true;
+			}
+
+			@Override
 			public void markConsumed() {
 				//Don't clear far
 			}
@@ -722,17 +727,22 @@ public class DouglasChunk {
 
 					@Override
 					public FloatMemoryBuffer normals() {
-						return nearF[nearIndex].douglasNormalsNearF;
+						return nearF[nearIndex].normals();//douglasNormalsNearF;
 					}
 
 					@Override
 					public FloatMemoryBuffer textureCoords() {
-						return nearF[nearIndex].douglasTexCoordsNearF;
+						return nearF[nearIndex].textureCoords();//douglasTexCoordsNearF;
 					}
 
 					@Override
 					public int[] colorsRGBA() {
 						return nearF[nearIndex].douglasColorsNearF;
+					}
+
+					@Override
+					public boolean keepOwnership() {
+						return nearF[nearIndex].keepOwnership();
 					}
 
 					@Override

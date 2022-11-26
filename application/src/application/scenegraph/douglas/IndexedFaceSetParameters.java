@@ -9,5 +9,7 @@ public interface IndexedFaceSetParameters {
     FloatMemoryBuffer textureCoords();
     int[] colorsRGBA();
 
+    boolean keepOwnership();
+
     void markConsumed();
 }

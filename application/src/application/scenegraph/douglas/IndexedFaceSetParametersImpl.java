@@ -9,9 +9,9 @@ public class IndexedFaceSetParametersImpl implements IndexedFaceSetParameters {
 
     public int[] douglasIndicesNearF;
     private FloatMemoryBuffer douglasVerticesNearF;
-    public FloatMemoryBuffer douglasNormalsNearF;
+    private FloatMemoryBuffer douglasNormalsNearF;
     public int[] douglasColorsNearF;
-    public FloatMemoryBuffer douglasTexCoordsNearF;
+    private FloatMemoryBuffer douglasTexCoordsNearF;
 
     @Override
     public int[] coordIndices() {
@@ -36,6 +36,11 @@ public class IndexedFaceSetParametersImpl implements IndexedFaceSetParameters {
     @Override
     public int[] colorsRGBA() {
         return douglasColorsNearF;
+    }
+
+    @Override
+    public boolean keepOwnership() {
+        return false;
     }
 
     @Override
