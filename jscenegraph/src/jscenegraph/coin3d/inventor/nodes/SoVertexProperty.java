@@ -339,14 +339,18 @@ public class SoVertexProperty extends SoNode {
 	*/
 	public void destructor()
 	{
-		Destroyable.delete(vertex);
-		Destroyable.delete(texCoord);
-		Destroyable.delete(texCoord3);		
-		Destroyable.delete(normal);		
-		Destroyable.delete(orderedRGBA);
-		Destroyable.delete(textureUnit);
+		//Destroyable.delete(vertex);
+		//Destroyable.delete(texCoord);
+		//Destroyable.delete(texCoord3);
+		//Destroyable.delete(normal);
+		//Destroyable.delete(orderedRGBA);
+		//Destroyable.delete(textureUnit);
 		
 	  Destroyable.delete(this.pimpl);
+	  pimpl = null;
+
+	  nodeHeader.destructor();
+
 	  super.destructor();
 	}
 
