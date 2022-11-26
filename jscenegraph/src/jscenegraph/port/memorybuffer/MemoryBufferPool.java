@@ -41,7 +41,7 @@ public class MemoryBufferPool {
         for(ByteBuffer byteBuffer : s) {
             int c = byteBuffer.capacity();
             if (c >= numBytes) {
-                if (numBytes * 120 / 100 >= c) {
+                if (numBytes * 130 / 100 >= c) {
                     s.remove(byteBuffer);
                     byteBuffer.position(0);
                     byteBuffer.limit(numBytes);
@@ -65,7 +65,7 @@ public class MemoryBufferPool {
         for(ByteBuffer byteBuffer : smalloc) {
             int c = byteBuffer.capacity();
             if (c >= numBytes) {
-                if (numBytes * 120 / 100 >= c) {
+                if (numBytes * 130 / 100 >= c) {
                     smalloc.remove(byteBuffer);
                     byteBuffer.position(0);
                     byteBuffer.limit(numBytes);
