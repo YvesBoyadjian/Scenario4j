@@ -31,7 +31,7 @@ public class FloatMemoryBuffer extends MemoryBuffer {
 
 	public int numBytes() {
 		if(byteBuffer != null) {
-			return byteBuffer.capacity();
+			return byteBuffer.limit();// capacity();
 		}
 		else {
 			return floatArray.length * Float.BYTES;
@@ -50,7 +50,7 @@ public class FloatMemoryBuffer extends MemoryBuffer {
 		
 			int numBytes = numFloats*Float.BYTES;
 		
-			memoryBuffer.byteBuffer = BufferUtils.createByteBuffer(numBytes);
+			memoryBuffer.byteBuffer = MemoryBufferPool.createByteBuffer(numBytes);//BufferUtils.createByteBuffer(numBytes);
 		}
 		else {
 			memoryBuffer.floatArray = new float[numFloats];

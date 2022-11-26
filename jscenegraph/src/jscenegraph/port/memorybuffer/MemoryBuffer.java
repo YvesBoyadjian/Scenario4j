@@ -28,7 +28,7 @@ public class MemoryBuffer implements Destroyable, ByteBufferAble {
 	}
 
 	public int numBytes() {
-		return byteBuffer.capacity();
+		return byteBuffer.limit();//capacity();
 	}
 	
 	public static final MemoryBuffer allocateBytes(int numBytes) {
@@ -131,7 +131,11 @@ public class MemoryBuffer implements Destroyable, ByteBufferAble {
 	public void free() {
 		if(byteBuffer != null && malloc) {
 			MemoryUtil.memFree(byteBuffer);
+			byteBuffer = null;
 			malloc = false;
+		}
+		if (byteBuffer != null) {
+			MemoryBufferPool.deleteByteBuffer(byteBuffer);
 		}
 		byteBuffer = null;
 	}

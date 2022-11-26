@@ -24,7 +24,7 @@ public class DoubleMemoryBuffer extends MemoryBuffer {
 
     public int numBytes() {
         if(byteBuffer != null) {
-            return byteBuffer.capacity();
+            return byteBuffer.limit();//capacity();
         }
         else {
             return doubleArray.length * Double.BYTES;
