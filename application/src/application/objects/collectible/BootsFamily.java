@@ -107,7 +107,10 @@ public class BootsFamily extends CollectibleBase implements Collectible {
                 xyz[0] = x;
                 xyz[1] = y;
                 xyz[2] = z + 0.6f;
-                start = bootsCoords.getNum();
+                start = nbBootPairs;//bootsCoords.getNum();
+                if (start >= bootsCoords.getNum()) {
+                    bootsCoords.setNum(1000+start);
+                }
                 bootsCoords.setValues(start, xyz);
 
                 addInstance(i);
@@ -115,6 +118,7 @@ public class BootsFamily extends CollectibleBase implements Collectible {
             }
         }
         System.out.println("Boot pairs: "+nbBootPairs);
+        bootsCoords.setNum(nbBootPairs);
     }
 
     public float[] getCollectible(int sealIndex, float[] vector) {

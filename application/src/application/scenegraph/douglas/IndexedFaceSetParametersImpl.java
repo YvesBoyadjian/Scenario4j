@@ -8,7 +8,7 @@ import java.util.List;
 public class IndexedFaceSetParametersImpl implements IndexedFaceSetParameters {
 
     public int[] douglasIndicesNearF;
-    public FloatMemoryBuffer douglasVerticesNearF;
+    private FloatMemoryBuffer douglasVerticesNearF;
     public FloatMemoryBuffer douglasNormalsNearF;
     public int[] douglasColorsNearF;
     public FloatMemoryBuffer douglasTexCoordsNearF;

@@ -90,13 +90,17 @@ public class Seals extends TargetBase implements Target {
 				xyz[0] = x;
 				xyz[1] = y;
 				xyz[2] = z + 0.3f;
-				start = sealCoords.getNum();
+				start = nbSeals;
+				if (sealCoords.getNum() <= start) {
+					sealCoords.setNum(1000+start);
+				}
 				sealCoords.setValues(start, xyz);
 
 				addInstance(i);
 				nbSeals++;
 			}
 		}
+		sealCoords.setNum(nbSeals);
 	}
 
 	float getRandomX(Random randomPlacementTrees) {

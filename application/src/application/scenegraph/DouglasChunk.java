@@ -717,7 +717,7 @@ public class DouglasChunk {
 
 					@Override
 					public FloatMemoryBuffer vertices() {
-						return nearF[nearIndex].douglasVerticesNearF;
+						return nearF[nearIndex].vertices();//douglasVerticesNearF;
 					}
 
 					@Override

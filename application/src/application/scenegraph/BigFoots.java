@@ -128,13 +128,17 @@ public class BigFoots extends TargetBase implements Target {
                 xyz[0] = x;
                 xyz[1] = y;
                 xyz[2] = z + 0.7f;
-                start = bigFootCoords.getNum();
+                start = nbBigFoots;//bigFootCoords.getNum();
+                if (start >= bigFootCoords.getNum()) {
+                    bigFootCoords.setNum(1000+start);
+                }
                 bigFootCoords.setValues(start, xyz);
 
                 addInstance(i);
                 nbBigFoots++;
             }
         }
+        bigFootCoords.setNum(nbBigFoots);
     }
 
     float getRandomX(Random randomPlacementBigFoot) {

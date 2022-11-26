@@ -3235,6 +3235,8 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 			float[] xyz = new float[3];
 			int start;
 
+			enemyFamily.enemiesInitialCoords.setNum(NB_ENEMIES);
+
 			for (int i=0; i<NB_ENEMIES; i++) {
 				float x = getRandomX(randomPlacementEnemies);
 				float y = getRandomY(randomPlacementEnemies);
@@ -3246,13 +3248,14 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 					xyz[0] = x;
 					xyz[1] = y;
 					xyz[2] = z + 1.75f/2 - 0.03f;
-					start = enemyFamily.enemiesInitialCoords.getNum();
+					start = enemyFamily.nbEnemies;
 					enemyFamily.enemiesInitialCoords.setValues(start,xyz);
 					enemyFamily.enemiesInstances.add(i);
 					enemyFamily.nbEnemies++;
 				}
 			}
 			System.out.println("Enemies: "+enemyFamily.nbEnemies);
+			enemyFamily.enemiesInitialCoords.setNum(enemyFamily.nbEnemies);
 
 			enemiesSeparator = new SoEnemies(enemyFamily);
 			enemiesSeparator.setReferencePoint(targetsRefPoint);
