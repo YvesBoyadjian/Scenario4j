@@ -131,9 +131,9 @@ public class MemoryBuffer implements Destroyable, ByteBufferAble {
 	public void free() {
 		if(byteBuffer != null && malloc) {
 			MemoryUtil.memFree(byteBuffer);
-			byteBuffer = null;
 			malloc = false;
 		}
+		byteBuffer = null;
 	}
 	
 	public static void free(MemoryBuffer buffer) {
