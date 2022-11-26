@@ -698,12 +698,16 @@ public class DouglasChunk {
 
 			@Override
 			public boolean keepOwnership() {
-				return true;
+				return false;
 			}
 
 			@Override
 			public void markConsumed() {
-				//Don't clear far
+				douglasIndicesF = null;
+				douglasVerticesF = null;
+				douglasNormalsF = null;
+				douglasTexCoordsF = null;
+				douglasColorsF = null;
 			}
 		};
 	}

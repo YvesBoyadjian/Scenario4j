@@ -225,11 +225,11 @@ public class SoLODIndexedFaceSet extends /*SoIndexedFaceSet*/SoGroup {
 			LoadState oneToLoad = initiallyWanted;
 
 			if (initiallyWanted == LoadState.LOAD_NEAR && foliageParameters == null) { // Near not still computed, we fall on far
-				foliageParameters = chunk.getFoliageFarParameters();
 				oneToLoad = LoadState.LOAD_FAR;
 				if (loadedFar == oneToLoad) {
 					return false; // nothing to do, we can draw far at first time
 				}
+				foliageParameters = chunk.getFoliageFarParameters();
 			}
 			else if (initiallyWanted == LoadState.LOAD_FAR /*&& loadedNear[0] == LoadState.LOAD_NEAR*/){ // Clear near if far is initially wanted
 					clearNear(); // We must clear near if far is wanted and near is loaded
