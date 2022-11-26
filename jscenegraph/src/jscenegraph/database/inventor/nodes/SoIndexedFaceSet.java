@@ -550,6 +550,8 @@ public void destructor()
   Destroyable.delete(pimpl.vaindexer);
   if (pimpl.convexCache != null) pimpl.convexCache.unref();
   Destroyable.delete(pimpl);
+
+  nodeHeader.destructor();
   
   super.destructor();
 }

@@ -431,6 +431,9 @@ public class SoBrepFaceSet extends SoIndexedFaceSet {
 
     public void destructor() {
         pimpl.destructor();
+
+        nodeHeader.destructor();
+
         super.destructor();
     }
 

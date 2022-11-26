@@ -148,6 +148,15 @@ public class SoSubNode {
 
 		  thisClassTypeId = classTypeId.get(thisClass);
 	  }
+
+	  public void destructor() {
+		  SoFieldData fd = fieldData.get(thisClass)[0];
+		  final int numFields = fd.getNumFields();
+		  for ( int i=0; i< numFields; i++) {
+			  SoField field = fd.getField(thisParent,i);
+			  field.destructor();
+		  }
+	  }
 	  
 	public                                                                     
     static SoType       getClassTypeId(Class klass)        /* Returns class type id */   

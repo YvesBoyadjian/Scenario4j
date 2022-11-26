@@ -250,7 +250,9 @@ public void destructor()
 {    
     if (pimpl.normalcache != null) pimpl.normalcache.unref();
     Destroyable.delete(pimpl);
-    
+
+    nodeHeader.destructor();
+
     super.destructor();
 }
 

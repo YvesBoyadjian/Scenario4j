@@ -232,6 +232,8 @@ public void destructor()
     if (texCoordBinding == SoTextureCoordinateBindingElement.Binding.PER_VERTEX.getValue()) 
             texCoordI = null;
 
+    nodeHeader.destructor();
+
     super.destructor();
 }
 
