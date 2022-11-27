@@ -305,7 +305,7 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 
 	SoEnemies enemiesSeparator;
 
-	final SbBSPTree enemiesBSPTree = new SbBSPTree();
+	//final SbBSPTree enemiesBSPTree = new SbBSPTree();
 
 	final EnemyFamily enemyFamily = new EnemyFamily();
 
