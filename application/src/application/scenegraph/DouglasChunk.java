@@ -360,6 +360,7 @@ public class DouglasChunk {
 		}
 		//douglasVerticesFb.flip();
 		//douglasNormalsFb.flip();
+//		System.out.print("cf");
 	}
 
 	/**
@@ -518,6 +519,7 @@ public class DouglasChunk {
 		Arrays.fill(douglasColorsNearF,packedValue);
 
  */
+//		System.out.print("cn");
 
 	}
 
@@ -661,55 +663,71 @@ public class DouglasChunk {
 			i+= NB_INDICES_PER_TRIANGLE;
 
 		}
+//		System.out.print("ct");
 	}
 
 	public void computeDouglas() {
 		computeDouglasT();
 		//computeDouglasFarF();
 	}
+	private Future<IndexedFaceSetParameters> farFoliageFuture;
 
 	public IndexedFaceSetParameters getFoliageFarParameters() {
-		computeDouglasFarF();
-		return new IndexedFaceSetParameters() {
-			@Override
-			public int[] coordIndices() {
-				return douglasIndicesF;
-			}
+		if (farFoliageFuture == null) {
+			farFoliageFuture = RecursiveChunk.es.submit(() -> {
+			computeDouglasFarF();
+			return new IndexedFaceSetParameters() {
+				@Override
+				public int[] coordIndices() {
+					return douglasIndicesF;
+				}
 
-			@Override
-			public FloatMemoryBuffer vertices() {
-				return douglasVerticesF;
-			}
+				@Override
+				public FloatMemoryBuffer vertices() {
+					return douglasVerticesF;
+				}
 
-			@Override
-			public FloatMemoryBuffer normals() {
-				return douglasNormalsF;
-			}
+				@Override
+				public FloatMemoryBuffer normals() {
+					return douglasNormalsF;
+				}
 
-			@Override
-			public FloatMemoryBuffer textureCoords() {
-				return douglasTexCoordsF;
-			}
+				@Override
+				public FloatMemoryBuffer textureCoords() {
+					return douglasTexCoordsF;
+				}
 
-			@Override
-			public int[] colorsRGBA() {
-				return douglasColorsF;
-			}
+				@Override
+				public int[] colorsRGBA() {
+					return douglasColorsF;
+				}
 
-			@Override
-			public boolean keepOwnership() {
-				return false;
-			}
+				@Override
+				public boolean keepOwnership() {
+					return false;
+				}
 
-			@Override
-			public void markConsumed() {
-				douglasIndicesF = null;
-				douglasVerticesF = null;
-				douglasNormalsF = null;
-				douglasTexCoordsF = null;
-				douglasColorsF = null;
+				@Override
+				public void markConsumed() {
+					douglasIndicesF = null;
+					douglasVerticesF = null;
+					douglasNormalsF = null;
+					douglasTexCoordsF = null;
+					douglasColorsF = null;
+				}
+			};
+			});
+		}
+		if (farFoliageFuture.isDone()) {
+			try {
+				return farFoliageFuture.get();
+			} catch (InterruptedException e) {
+				throw new RuntimeException(e);
+			} catch (ExecutionException e) {
+				throw new RuntimeException(e);
 			}
-		};
+		}
+		return null;
 	}
 
 	private final Future<IndexedFaceSetParameters>[] nearFFuture = new Future[DouglasChunk.NUM_NEAR_FOLIAGE];

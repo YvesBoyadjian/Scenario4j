@@ -181,6 +181,10 @@ public class SoLODIndexedFaceSet extends /*SoIndexedFaceSet*/SoGroup {
 		//wasNotify = indexedFaceSetT.vertexProperty.enableNotify(false);
 		indexedFaceSetT.vertexProperty.setValue(vertexProperty);
 		//indexedFaceSetT.vertexProperty.enableNotify(wasNotify); // In order not to recompute shaders
+
+			//System.out.print("lt");
+
+
 			return true; // must not render the first time
 		}
 		return loadedFar == LoadState.CLEARED; // must not render if cleared
@@ -242,6 +246,10 @@ public class SoLODIndexedFaceSet extends /*SoIndexedFaceSet*/SoGroup {
 					clearNear(); // We must clear near if far is wanted and near is loaded
 			}
 
+			if (foliageParameters == null) {
+				return true;
+			}
+
 			final SoIndexedFaceSet indexedFaceSetF = (oneToLoad == LoadState.LOAD_FAR) ? sonFar : sonsNear[nearIndexToLoad];
 
 			//boolean wasNotify = indexedFaceSetF.coordIndex.enableNotify(false); // In order not to recompute shaders
@@ -270,6 +278,8 @@ public class SoLODIndexedFaceSet extends /*SoIndexedFaceSet*/SoGroup {
 			indexedFaceSetF.vertexProperty.setValue(vertexProperty);
 			//indexedFaceSetF.vertexProperty.enableNotify(wasNotify); // In order not to recompute shaders
 			foliageParameters.markConsumed();
+
+			//System.out.print("lf");
 
 			// if was not cleared, we must immediately draw in order not to have flickering
 			boolean mustDraw = true;//(originalLoaded != LoadState.CLEARED);
