@@ -71,6 +71,13 @@ public class SoLODIndexedFaceSet extends /*SoIndexedFaceSet*/SoGroup {
 			center.copyFrom(finalCenter);
 			//super.computeBBox(action, box, center);
 		}
+
+		public void GLRender(SoGLRenderAction action) {
+			if (isAllNearLoaded()) {
+				return;
+			}
+			super.GLRender(action);
+		}
 	};
 
 	if (type == SoLODIndexedFaceSet.Type.FOLIAGE) {
@@ -275,7 +282,7 @@ public class SoLODIndexedFaceSet extends /*SoIndexedFaceSet*/SoGroup {
 				case LOAD_NEAR:
 					loadedNear[nearIndexToLoad] = oneToLoad;
 					if (isAllNearLoaded()) {
-						clearFar();
+						//clearFar();
 					}
 					break;
 			}
