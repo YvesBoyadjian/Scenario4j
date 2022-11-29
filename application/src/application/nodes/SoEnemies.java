@@ -5,6 +5,7 @@ import jscenegraph.coin3d.inventor.SbBSPTree;
 import jscenegraph.coin3d.inventor.lists.SbListInt;
 import jscenegraph.database.inventor.SbSphere;
 import jscenegraph.database.inventor.SbVec3f;
+import jscenegraph.database.inventor.SbVec3fSingle;
 import jscenegraph.database.inventor.actions.SoGLRenderAction;
 import jscenegraph.database.inventor.elements.SoCacheElement;
 import jscenegraph.database.inventor.misc.SoState;
@@ -25,11 +26,17 @@ public class SoEnemies extends SoSeparator {
     //private SbVec3f cameraDirection;
     private final SbBSPTree bspTree = new SbBSPTree();
     private final SbSphere nearSphere = new SbSphere();
-    private final SbListInt nearIDS = new SbListInt();
     private final Set<Integer> actualChildren = new HashSet<>();
-    private final Set<Integer> nearChildren = new HashSet<>();
     private final Map<Integer,SoPill> idxToCollectibles = new HashMap<>();
     private float nearestCollectibleDistance = 99;
+
+    private final SbVec3fSingle dummy = new SbVec3fSingle();
+
+    private final SbVec3fSingle dummy2 = new SbVec3fSingle();
+
+    private final SbVec3fSingle feetToCenter = new SbVec3fSingle(0,0,1.75f/2);
+
+    private long nanoTime = 0;
 
     public SoEnemies(EnemyFamily enemies) {
         super();
@@ -45,6 +52,8 @@ public class SoEnemies extends SoSeparator {
     ////////////////////////////////////////////////////////////////////////
     {
         update_children_list();
+
+        update_children_position();
 
         SoState state = action.getState();
 
@@ -65,9 +74,11 @@ public class SoEnemies extends SoSeparator {
 
         nearSphere.setValue(referencePoint, 250);
 
+        final SbListInt nearIDS = new SbListInt();
         nearIDS.truncate(0);
         bspTree.findPoints(nearSphere,nearIDS);
 
+        final Set<Integer> nearChildren = new HashSet<>();
         nearChildren.clear();
 
         nearestCollectibleDistance = 99;
@@ -129,5 +140,28 @@ public class SoEnemies extends SoSeparator {
         idxToCollectibles.remove(id);
 //        target.ref();
         super.removeChild(target);
+    }
+
+    private void update_children_position() {
+
+        long now = System.nanoTime();
+        float deltaT = (now - nanoTime)*1.0e-9f;
+        float speed = 1.5f;
+        if (nanoTime == 0) {
+            nanoTime = now;
+            return;
+        }
+        nanoTime = now;
+
+        for(Integer id : actualChildren) {
+            SoPill pill = idxToCollectibles.get(id);
+            SbVec3f pillPosition = pill.position.translation.getValue();
+            SbVec3f direction = referencePoint.operator_minus(pillPosition.operator_minus(feetToCenter,dummy2), dummy);
+            if (direction.length() <= 0.8f) {
+                continue;
+            }
+            direction.normalize();
+            pill.position.translation.setValue(pillPosition.operator_add(direction.operator_mul(deltaT*speed)));
+        }
     }
 }
