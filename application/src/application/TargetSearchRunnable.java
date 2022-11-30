@@ -3,6 +3,8 @@
  */
 package application;
 
+import application.nodes.SoEnemies;
+import application.nodes.SoPill;
 import application.nodes.SoTarget;
 import application.nodes.SoTargets;
 import application.objects.Target;
@@ -56,8 +58,8 @@ public class TargetSearchRunnable implements Runnable {
 					SoPath pat = pp.getPath();
 					if( pat != null) {
 						SoNode n = pat.getTail();
+						final int len = pat.getLength();
 						if( n.isOfType(SoCube.getClassTypeId())) {
-							int len = pat.getLength();
 							if( len > 3) {
 								SoNode cube_parent = pat.getNode(len-2);
 								SoNode maybe_targets = pat.getNode(len-4);
@@ -98,6 +100,15 @@ public class TargetSearchRunnable implements Runnable {
 								}
 							}
 							//System.out.println(pp.getPath().getTail().getClass());
+						}
+						else if(len >= 4) {
+							SoNode maybePill = pat.getNode(len-3);
+							SoNode maybeEnemies = pat.getNode(len-4);
+							if (maybePill instanceof SoPill && maybeEnemies instanceof SoEnemies) {
+								SoPill pill = (SoPill)maybePill;
+								SoEnemies enemies = (SoEnemies) maybeEnemies;
+								enemies.kill(pill);
+							}
 						}
 					}
 					fireAction.destructor();

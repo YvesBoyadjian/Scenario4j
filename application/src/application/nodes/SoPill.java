@@ -5,13 +5,16 @@ import jscenegraph.database.inventor.nodes.*;
 
 public class SoPill extends SoSeparator {
 
+    private int instance; // -1 if oracle
+
     private static SoGroup commonPart;
 
     public final SoTranslation position = new SoTranslation();
 
     public final SoMaterial material = new SoMaterial();
 
-    public SoPill() {
+    public SoPill(final int instance) {
+        this.instance = instance;
         addChild(position);
 
         if(commonPart== null) {
@@ -26,6 +29,10 @@ public class SoPill extends SoSeparator {
 
     public SbVec3f getCoordinates() {
         return position.translation.getValue();
+    }
+
+    public int getInstance() {
+        return instance;
     }
 
     private void buildCommonPart() {

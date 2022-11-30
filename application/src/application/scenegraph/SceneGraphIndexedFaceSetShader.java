@@ -1593,7 +1593,7 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 
 	private SoNode buildOracle(boolean shadow) {
 
-		SoPill oracleSeparator = new SoPill();//SoSeparator();
+		SoPill oracleSeparator = new SoPill(-1);//SoSeparator();
 
 		oracleSeparator.position.translation.setValue(ORACLE_X,ORACLE_Y,ORACLE_Z-zTranslation - 0.74f);
 		oracleSeparator.material.diffuseColor.setValue(1,0,0);

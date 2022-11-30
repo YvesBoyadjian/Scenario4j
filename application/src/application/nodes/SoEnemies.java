@@ -26,8 +26,8 @@ public class SoEnemies extends SoSeparator {
     //private SbVec3f cameraDirection;
     private final SbBSPTree bspTree = new SbBSPTree();
     private final SbSphere nearSphere = new SbSphere();
-    private final Set<Integer> actualChildren = new HashSet<>();
-    private final Map<Integer,SoPill> idxToCollectibles = new HashMap<>();
+    private final Set<Integer> actualChildrenInstances = new HashSet<>();
+    private final Map<Integer,SoPill> instancesToCollectibles = new HashMap<>();
     private float nearestCollectibleDistance = 99;
 
     private final SbVec3fSingle dummy = new SbVec3fSingle();
@@ -78,66 +78,67 @@ public class SoEnemies extends SoSeparator {
         nearIDS.truncate(0);
         bspTree.findPoints(nearSphere,nearIDS);
 
-        final Set<Integer> nearChildren = new HashSet<>();
-        nearChildren.clear();
+        final Set<Integer> nearChildrenInstances = new HashSet<>();
+        nearChildrenInstances.clear();
 
         nearestCollectibleDistance = 99;
 
-        int nbIDS = nearIDS.size();
+        final int nbIDS = nearIDS.size();
         for( int i=0;i<nbIDS;i++) {
-            int id = nearIDS.get(i);
-            if( !actualChildren.contains(id)) {
-                int instance = (Integer)bspTree.getUserData(id);
-
-                SoPill pill = new SoPill();
-                pill.ref();
-
-                //SoTranslation collectibleTranslation = new SoTranslation();
-                //collectibleTranslation.enableNotify(false); // Will change often
-
-                final SbVec3f collectiblePosition = new SbVec3f();
+            final int instance = (Integer)bspTree.getUserData(nearIDS.get(i));
+            if( !actualChildrenInstances.contains(instance)) {
                 int index = enemies.indexOfInstance(instance);
-                final float[] vector = new float[3];
-                collectiblePosition.setValue(enemies.getEnemy(index, vector));
-                pill.position.translation.setValue(collectiblePosition);
+                if (index != -1 && !enemies.isKilled(index)) {
 
-                //collectibleSeparator.addChild(collectibleTranslation);
+                    SoPill pill = new SoPill(instance);
+                    pill.ref();
 
-                //SoNode collectibleNode = enemies.getNode();
+                    //SoTranslation collectibleTranslation = new SoTranslation();
+                    //collectibleTranslation.enableNotify(false); // Will change often
 
-                //collectibleSeparator.addChild(collectibleNode);
+                    final SbVec3f collectiblePosition = new SbVec3f();
+                    final float[] vector = new float[3];
+                    collectiblePosition.setValue(enemies.getEnemy(index, vector));
+                    pill.position.translation.setValue(collectiblePosition);
 
-                addEnemy(pill, id);
-                pill.unref();
+                    //collectibleSeparator.addChild(collectibleTranslation);
+
+                    //SoNode collectibleNode = enemies.getNode();
+
+                    //collectibleSeparator.addChild(collectibleNode);
+
+                    addEnemy(pill, instance);
+                    pill.unref();
+                }
             }
-            nearChildren.add(id);
+            nearChildrenInstances.add(instance);
         }
 
         final Set<Integer> actualChildrenSaved = new HashSet<>();
-        actualChildrenSaved.addAll(actualChildren);
-        for( int id : actualChildrenSaved) {
-            if(actualChildren.contains(id) && !nearChildren.contains(id)) {
-                SoPill child = idxToCollectibles.get(id);
-                removeEnemy(child,id);
+        actualChildrenSaved.addAll(actualChildrenInstances);
+        for( int instance : actualChildrenSaved) {
+            if(actualChildrenInstances.contains(instance) && !nearChildrenInstances.contains(instance)) {
+                SoPill child = instancesToCollectibles.get(instance);
+                removeEnemy(child,instance);
             }
         }
-        for(int id : actualChildren) {
-            SoPill child = idxToCollectibles.get(id);
+        for(int instance : actualChildrenInstances) {
+            SoPill child = instancesToCollectibles.get(instance);
             float distance = referencePoint.operator_minus(child.getCoordinates()).length();
             nearestCollectibleDistance = Math.min(nearestCollectibleDistance,distance);
         }
         //System.out.println(nearestCollectibleDistance);
     }
-    void addEnemy(SoPill target, int id) {
-        actualChildren.add(id);
+    void addEnemy(SoPill target, int instance) {
+        actualChildrenInstances.add(instance);
         super.addChild(target);
-        idxToCollectibles.put(id,target);
+        instancesToCollectibles.put(instance,target);
 //        target.unref();
         //System.out.println("Add enemy "+actualChildren.size());
     }
-    void removeEnemy(SoPill target, int id) {
-        actualChildren.remove(id);
-        idxToCollectibles.remove(id);
+    void removeEnemy(SoPill target, int instance) {
+        actualChildrenInstances.remove(instance);
+        instancesToCollectibles.remove(instance);
 //        target.ref();
         super.removeChild(target);
     }
@@ -153,15 +154,22 @@ public class SoEnemies extends SoSeparator {
         }
         nanoTime = now;
 
-        for(Integer id : actualChildren) {
-            SoPill pill = idxToCollectibles.get(id);
+        for(Integer instance : actualChildrenInstances) {
+            SoPill pill = instancesToCollectibles.get(instance);
             SbVec3f pillPosition = pill.position.translation.getValue();
             SbVec3f direction = referencePoint.operator_minus(pillPosition.operator_minus(feetToCenter,dummy2), dummy);
-            if (direction.length() <= 0.8f) {
+            final float distance = direction.length(); 
+            if ( distance <= 0.8f || distance > 50) {
                 continue;
             }
             direction.normalize();
             pill.position.translation.setValue(pillPosition.operator_add(direction.operator_mul(deltaT*speed)));
         }
+    }
+
+    public void kill(SoPill target) {
+        final int instance = target.getInstance();
+        removeEnemy(target,instance);
+        enemies.kill(instance);
     }
 }

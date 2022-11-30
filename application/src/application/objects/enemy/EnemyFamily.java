@@ -6,6 +6,7 @@ import jscenegraph.database.inventor.nodes.SoNode;
 import jscenegraph.database.inventor.nodes.SoSeparator;
 
 import java.util.ArrayList;
+import java.util.BitSet;
 import java.util.List;
 
 public class EnemyFamily {
@@ -14,6 +15,8 @@ public class EnemyFamily {
     public final SoMFVec3f enemiesInitialCoords = new SoMFVec3f();
 
     public final List<Integer> enemiesInstances = new ArrayList<>();
+
+    private final BitSet killedEnemies = new BitSet();
 
     SoSeparator node = new SoSeparator();
 
@@ -30,6 +33,10 @@ public class EnemyFamily {
         return vector;
     }
 
+    public boolean isKilled(int index) {
+        return killedEnemies.get(index);
+    }
+
     void compute() {
         //TODO
     }
@@ -38,5 +45,12 @@ public class EnemyFamily {
     }
     public SoNode getNode() {
         return node;
+    }
+
+    public void kill(int instance) {
+        int index = enemiesInstances.indexOf(instance);
+        if (index >= 0) {
+            killedEnemies.set(index);
+        }
     }
 }
