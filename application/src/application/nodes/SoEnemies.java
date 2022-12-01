@@ -165,7 +165,7 @@ public class SoEnemies extends SoSeparator {
             SbVec3f pillPosition = pill.position.translation.getValue();
             SbVec3f direction = referencePoint.operator_minus(pillPosition.operator_minus(feetToCenter,dummy2), dummy);
             final float distance = direction.length(); 
-            if ( distance <= 0.8f || distance > 50) {
+            if ( distance <= 0.8f || distance > 80) {
                 continue;
             }
             direction.normalize();
