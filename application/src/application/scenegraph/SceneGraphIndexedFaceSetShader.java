@@ -3257,7 +3257,7 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 			System.out.println("Enemies: "+enemyFamily.nbEnemies);
 			enemyFamily.enemiesInitialCoords.setNum(enemyFamily.nbEnemies);
 
-			enemiesSeparator = new SoEnemies(enemyFamily);
+			enemiesSeparator = new SoEnemies(enemyFamily,this);
 			enemiesSeparator.setReferencePoint(targetsRefPoint);
 
 			//final int nbCollectibles = collectibleFamily.getNbCollectibles();

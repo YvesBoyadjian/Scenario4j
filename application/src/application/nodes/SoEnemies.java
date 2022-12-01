@@ -1,6 +1,7 @@
 package application.nodes;
 
 import application.objects.enemy.EnemyFamily;
+import application.scenegraph.SceneGraphIndexedFaceSetShader;
 import jscenegraph.coin3d.inventor.SbBSPTree;
 import jscenegraph.coin3d.inventor.lists.SbListInt;
 import jscenegraph.database.inventor.SbSphere;
@@ -20,6 +21,8 @@ import java.util.Set;
 
 public class SoEnemies extends SoSeparator {
 
+    private SceneGraphIndexedFaceSetShader sg;
+
     private EnemyFamily enemies;
 
     private SbVec3f referencePoint;
@@ -38,10 +41,13 @@ public class SoEnemies extends SoSeparator {
 
     private long nanoTime = 0;
 
-    public SoEnemies(EnemyFamily enemies) {
+    private final int[] indices = new int[8];
+
+    public SoEnemies(EnemyFamily enemies, SceneGraphIndexedFaceSetShader sg) {
         super();
         renderCaching.setValue(CacheEnabled.OFF);
         this.enemies = enemies;
+        this.sg = sg;
     }
     public void setReferencePoint(SbVec3f referencePoint) {
         this.referencePoint = referencePoint;
@@ -164,6 +170,7 @@ public class SoEnemies extends SoSeparator {
             }
             direction.normalize();
             pill.position.translation.setValue(pillPosition.operator_add(direction.operator_mul(deltaT*speed)));
+            pillPosition.setZ(sg.getInternalZ(pillPosition.getX(),pillPosition.getY(),indices,true)+sg.getzTranslation() + 1.75f/2 - 0.03f);
         }
     }
 
