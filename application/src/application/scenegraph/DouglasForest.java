@@ -40,6 +40,8 @@ import javax.swing.*;
  */
 public class DouglasForest {
 
+	final static float DOUGLAS_CHUNK_WIDTH = 1000;
+
 	final static int FOUR_MILLION = 4000000;
 	
 	private final int NB_DOUGLAS_SEEDS = FOUR_MILLION;
@@ -399,7 +401,7 @@ public class DouglasForest {
 //		float width_x = delta_x / 15;
 //		float width_y = delta_y / 15;
 		
-		float min_width = 500; //Math.min(width_x,width_y);
+		float min_width = DOUGLAS_CHUNK_WIDTH; //Math.min(width_x,width_y);
 
 		System.out.println("DouglasChunk width : "+min_width);
 		

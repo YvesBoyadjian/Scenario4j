@@ -88,17 +88,17 @@ public class GLBitmap {
         vboArray.setO(4,d);
         vboArray.setO(5,c);
 
-        SbVec2f at = new SbVec2fSingle(0,0);
-        SbVec2f bt = new SbVec2fSingle(1,0);
-        SbVec2f ct = new SbVec2fSingle(0,1);
-        SbVec2f dt = new SbVec2fSingle(1,1);
+//        SbVec2f at = new SbVec2fSingle(0,0);
+//        SbVec2f bt = new SbVec2fSingle(1,0);
+//        SbVec2f ct = new SbVec2fSingle(0,1);
+//        SbVec2f dt = new SbVec2fSingle(1,1);
 
-        tcArray.setO(0,at);
-        tcArray.setO(1,bt);
-        tcArray.setO(2,ct);
-        tcArray.setO(3,bt);
-        tcArray.setO(4,dt);
-        tcArray.setO(5,ct);
+        tcArray.getFast(0).setValue(0,0);//,at);
+        tcArray.getFast(1).setValue(1,0);//,bt);
+        tcArray.getFast(2).setValue(0,1);//,ct);
+        tcArray.getFast(3).setValue(1,0);//,bt);
+        tcArray.getFast(4).setValue(1,1);//,dt);
+        tcArray.getFast(5).setValue(0,1);//,ct);
 
         // ________________________________________________ Vertex coords
         final int[] vertex_bo = new int[1];

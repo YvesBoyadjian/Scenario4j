@@ -23,7 +23,7 @@ public class DouglasChunk {
 	
 	private static final SbColor GREEN = new SbColor(5.0f/255,52.0f/255,0.0f/255);
 
-	public static final int NUM_NEAR_FOLIAGE = 5;
+	public static final int NUM_NEAR_FOLIAGE = 10;
 	
 	DouglasForest df;
 

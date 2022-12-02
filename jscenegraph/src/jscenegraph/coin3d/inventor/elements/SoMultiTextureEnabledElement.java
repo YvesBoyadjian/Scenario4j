@@ -60,6 +60,8 @@ import jscenegraph.database.inventor.elements.SoShapeStyleElement;
 import jscenegraph.database.inventor.misc.SoState;
 import jscenegraph.database.inventor.nodes.SoNode;
 
+import java.util.BitSet;
+
 /**
  * @author Yves Boyadjian
  *
@@ -96,7 +98,9 @@ public class SoMultiTextureEnabledElement extends SoElement {
 			}
 		  };
 
-		final SbList<Boolean> enabled = new SbList<>();
+		//final SbList<Boolean> enabled = new SbList<>();
+    final BitSet enabled = new BitSet();
+    int enabled_length = 0; // java port
 		final SbList<SoMultiTextureEnabledElement.Mode> mode = new SbList<>();
 	
 		  
@@ -149,7 +153,8 @@ public void
 init(SoState state)
 {
   mode.truncate(0);
-  enabled.truncate(0);
+  //enabled.truncate(0);
+    enabled.clear(); enabled_length = 0;
 }
 
 /*!
@@ -162,8 +167,8 @@ get(SoState state, int unit)
     (SoMultiTextureEnabledElement)
     (SoElement.getConstElement(state, classStackIndexMap.get(SoMultiTextureEnabledElement.class)));
 
-  if (unit < elem.enabled.getLength()) {
-    return elem.enabled.operator_square_bracket(unit);
+  if (unit < elem.enabled_length) {
+    return elem.enabled.get(unit);
   }
   return false;
 }
@@ -175,11 +180,11 @@ public void
 setElt( int unit, int mode_in)
 {
   Mode mode1 = Mode.fromValue(mode_in);
-  for (int i = enabled.getLength(); i <= unit; i++) { 
-    enabled.append(false);
+  for (int i = enabled_length; i <= unit; i++) {
+    enabled.set(enabled_length,false); enabled_length++;//append(false);
     mode.append(Mode.DISABLED);
   }
-  enabled.operator_square_bracket(unit, mode1 != Mode.DISABLED);
+  enabled.set(unit, mode1 != Mode.DISABLED);
   mode.operator_square_bracket(unit, mode1);
 }
 
@@ -189,7 +194,7 @@ setElt( int unit, int mode_in)
   is set to the last enabled unit.
 
 */
-public static boolean[] 
+public static boolean[]
 getEnabledUnits(SoState state,
                                              final int[] lastenabled)
 {
@@ -197,14 +202,17 @@ getEnabledUnits(SoState state,
     (SoMultiTextureEnabledElement)
     (SoElement.getConstElement(state, classStackIndexMap.get(SoMultiTextureEnabledElement.class)));
 
-  int i = elem.enabled.getLength()-1;
-  while (i >= 0) {
-    if (elem.enabled.operator_square_bracket(i)) break;
-    i--;
-  }
+  int i = elem.enabled.length() - 1;//elem.enabled_length-1;
+//  while (i >= 0) {
+//    if (elem.enabled.get(i)) break;
+//    i--;
+//  }
   if (i >= 0) {
     lastenabled[0] = i;
-    boolean[] retVal =  elem.enabled.getArrayPtr(new boolean[elem.enabled.getLength()]);
+    boolean[] retVal = new boolean[/*elem.enabled_length*/i+1];
+    for (int j=0; j <= i/*elem.enabled_length*/; j++) {
+        retVal[j] = elem.enabled.get(j);
+    }
     return retVal;
   }
   lastenabled[0] = -1;
@@ -217,8 +225,8 @@ getEnabledUnits(SoState state,
 protected boolean
 isEnabled( int unit) 
 {
-  if (unit < enabled.getLength()) {
-    return enabled.operator_square_bracket(unit);
+  if (unit < enabled_length) {
+    return enabled.get(unit);
   }
   return false;
 }
@@ -231,7 +239,10 @@ push(SoState state)
     (this.getNextInStack());
 
   mode.operator_assign(prev.mode);
-  enabled.operator_assign(prev.enabled);
+  enabled.clear();
+  enabled.or(prev.enabled);
+  enabled_length = prev.enabled_length;
+  //enabled.operator_assign(prev.enabled);
 }
 
 public boolean

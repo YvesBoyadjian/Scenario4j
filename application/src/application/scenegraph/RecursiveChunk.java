@@ -50,7 +50,7 @@ public class RecursiveChunk {
 	public final static ExecutorService es = Executors.newSingleThreadExecutor();
 	final private boolean KEEP_IN_MEMORY = false;
 	
-	final int MIN_CHUNK_SIZE = 120;
+	final int MIN_CHUNK_SIZE = 300;
 	
 	RecursiveChunk parent;
 	int rank;

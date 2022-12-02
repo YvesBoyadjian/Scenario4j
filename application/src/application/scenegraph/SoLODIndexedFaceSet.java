@@ -37,10 +37,13 @@ public class SoLODIndexedFaceSet extends /*SoIndexedFaceSet*/SoGroup {
 	private final SbVec3f referencePoint2;
 
 	public float[] maxDistance;
+
+	private final SbBox3f finalBox;
+	private final SbVec3f finalCenter;
 	
-	private final SbBox3f box = new SbBox3f();
+	//private final SbBox3f box = new SbBox3f();
 	
-	private final SbVec3f center = new SbVec3f();
+	//private final SbVec3f center = new SbVec3f();
 	
 	private final SbVec3f dummy = new SbVec3f(); //SINGLE_THREAD
 	
@@ -61,6 +64,8 @@ public class SoLODIndexedFaceSet extends /*SoIndexedFaceSet*/SoGroup {
 		this.chunk = chunk;
 		this.type = type;
 		this.counting = counting;
+		this.finalBox = finalBox;
+		this.finalCenter = finalCenter;
 		enableNotify(false); // In order not to invalidate shaders
 
 		sonFar = new SoIndexedFaceSet() {
@@ -104,17 +109,17 @@ public class SoLODIndexedFaceSet extends /*SoIndexedFaceSet*/SoGroup {
 	
 	public void GLRender(SoGLRenderAction action)
 	{		
-		sonFar.getBBox(action, box, center);
+		//sonFar.getBBox(action, box, center);
 
-		if( box.intersect(referencePoint2)) {
+		if( finalBox.intersect(referencePoint2)) {
 			if(!load(true)) // Near mode
 			super.GLRender(action);
 		}
 		else {
 
-			SbVec3f closestPoint = new SbVec3f(box.getClosestExternalPoint(referencePoint));
+			SbVec3f closestPoint = new SbVec3f(finalBox.getClosestExternalPoint(referencePoint));
 
-			SbVec3f closestPoint2 = new SbVec3f(box.getClosestExternalPoint(referencePoint2));
+			SbVec3f closestPoint2 = new SbVec3f(finalBox.getClosestExternalPoint(referencePoint2));
 
 			if( closestPoint2.operator_minus(referencePoint2,dummy).length() <= 200 ) {
 				if(!load(true))

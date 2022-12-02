@@ -354,13 +354,13 @@ public abstract class SoTouchLOD2 extends SoLOD implements SoTouchLODMaster.SoTo
 
 	  SbVec3f world_camera_position = camera.position.getValue();
 
-	  SbVec3f world_camera_direction = camera.orientation.getValue().multVec(new SbVec3f(0,0,-1)); 
+	  //SbVec3f world_camera_direction = camera.orientation.getValue().multVec(new SbVec3f(0,0,-1));
 	  
 	  mat.inverse().multVecMatrix(world_camera_position, model_xyz);
 	  
-	  world_camera_direction.normalize();
+	  //world_camera_direction.normalize();
 	  
-	  model_xyz.add(world_camera_direction.operator_mul(FRONT_DISTANCE));
+	  //model_xyz.add(world_camera_direction.operator_mul(FRONT_DISTANCE));
 	  
 	  model_x = model_xyz.getX();
 	  model_y = model_xyz.getY();
