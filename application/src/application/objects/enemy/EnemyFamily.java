@@ -53,4 +53,15 @@ public class EnemyFamily {
             killedEnemies.set(index);
         }
     }
+
+    public String getKilledInstances() {
+        StringBuilder builder = new StringBuilder();
+        for(Integer instance : enemiesInstances) {
+            if (isKilled(indexOfInstance(instance))) {
+                builder.append(instance);
+                builder.append(',');
+            }
+        }
+        return builder.toString();
+    }
 }

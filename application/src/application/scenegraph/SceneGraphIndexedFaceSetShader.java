@@ -1895,7 +1895,11 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 		return current_z;
 	}
 
-	private static class GeomsResult {
+    public EnemyFamily getEnemies() {
+		return enemyFamily;
+    }
+
+    private static class GeomsResult {
 		private final Set<Integer> geomsToAdd = new HashSet<>();
 		private final Set<Integer> geomsToRemove = new HashSet<>();
 	}
