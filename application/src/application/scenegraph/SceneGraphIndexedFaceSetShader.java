@@ -1899,7 +1899,19 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 		return enemyFamily;
     }
 
-    private static class GeomsResult {
+	public void loadEnemiesKills(Properties saveGameProperties) {
+		String killedEnemies = saveGameProperties.getProperty(KILLED_ENEMIES);
+		if (killedEnemies == null) {
+			return;
+		}
+		String[] enemiesKilledInstances = killedEnemies.split(",");
+		for(String enemyKilledInstance : enemiesKilledInstances) {
+			int instance = Integer.valueOf(enemyKilledInstance);
+			enemyFamily.kill(instance);
+		}
+	}
+
+	private static class GeomsResult {
 		private final Set<Integer> geomsToAdd = new HashSet<>();
 		private final Set<Integer> geomsToRemove = new HashSet<>();
 	}

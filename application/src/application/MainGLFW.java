@@ -108,6 +108,8 @@ import static org.lwjgl.opengl.GL43C.*;
  */
 public class MainGLFW {
 
+	public static final boolean DEBUG_MODE = false;
+
 	public static final float CONTACT_SURFACE_MU_DEFAULT = 0.838f; // Original value in game
 
 	public static final float CONTACT_SURFACE_MU_BAREFOOT = 0.5f;
@@ -808,6 +810,8 @@ public class MainGLFW {
 
 				sg.setBoots("true".equals(saveGameProperties.getProperty(BOOTS,"false")));
 
+				sg.loadEnemiesKills(saveGameProperties);
+
 				in.close();
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
@@ -849,8 +853,8 @@ public class MainGLFW {
 		glf.minorVersion = 0;//1;
 		glf.api = GLData.API.GL;
 		glf.profile = GLData.Profile.CORE;
-		glf.debug = false;//true;
-		glf.grabCursor = true;
+		glf.debug = DEBUG_MODE;//true;
+		glf.grabCursor = !DEBUG_MODE;
 		viewer.setFormat(glf, style);
 
 		viewer.buildWidget(style);
