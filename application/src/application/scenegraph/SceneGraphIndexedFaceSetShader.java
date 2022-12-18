@@ -1901,7 +1901,7 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 
 	public void loadEnemiesKills(Properties saveGameProperties) {
 		String killedEnemies = saveGameProperties.getProperty(KILLED_ENEMIES);
-		if (killedEnemies == null) {
+		if (killedEnemies == null || killedEnemies.isBlank()) {
 			return;
 		}
 		String[] enemiesKilledInstances = killedEnemies.split(",");

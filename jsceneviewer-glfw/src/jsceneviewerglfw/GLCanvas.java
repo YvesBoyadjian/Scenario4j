@@ -35,99 +35,106 @@ public class GLCanvas extends Composite {
 	public GLCanvas(Composite parent, int style, GLData format) {
 		super(parent, style);
 		this.format = format;
-		
-		  GLFWVidMode vidMode = glfwGetVideoMode(glfwGetPrimaryMonitor());
-		  
-	      int  width = vidMode.width();
-	      int  height = vidMode.height();
-	      
-	      if( format.majorVersion > 0 ) {
-	    	  glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, format.majorVersion);
-	      }
-	      if( format.minorVersion >= 0 ) {
-	    	  glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, format.minorVersion);
-	      }
-	      if( format.profile != null ) {
-	    	  glfwWindowHint(GLFW_OPENGL_PROFILE, format.profile ==  GLData.Profile.COMPATIBILITY ? GLFW_OPENGL_COMPAT_PROFILE : GLFW_OPENGL_CORE_PROFILE);
-	      }
-	      if( format.debug) {
-	    	  glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GLFW_TRUE);
-	      }
-		glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GLFW_FALSE);
-		if(format.depthSize > 0) {
-			glfwWindowHint(GLFW_DEPTH_BITS, format.depthSize);			
-		}
-		
-		glfwWindowHint(GLFW_RED_BITS, /*vidMode.redBits()*/format.redSize);
-		glfwWindowHint(GLFW_GREEN_BITS, /*vidMode.greenBits()*/format.greenSize);
-		glfwWindowHint(GLFW_BLUE_BITS, /*vidMode.blueBits()*/format.blueSize);
-		glfwWindowHint(GLFW_REFRESH_RATE, vidMode.refreshRate());		
-		
-		if(format.accumRedSize > 0) glfwWindowHint(GLFW_ACCUM_RED_BITS, format.accumRedSize);
-		if(format.accumGreenSize > 0) glfwWindowHint(GLFW_ACCUM_GREEN_BITS, format.accumGreenSize);
-		if(format.accumBlueSize > 0) glfwWindowHint(GLFW_ACCUM_BLUE_BITS, format.accumBlueSize);
-		
-		//if( vidMode.redBits() == 10) {
-			glfwWindowHint(GLFW_ALPHA_BITS, format.alphaSize != 0 ? format.alphaSize : GLFW_DONT_CARE);
-		//}
-		System.out.println("RGB : "+ vidMode.redBits()+" "+vidMode.greenBits()+" "+vidMode.blueBits());
-		System.out.println("Refresh Rate : "+vidMode.refreshRate()+" Hz");
-		
-		glfwWindowHint(GLFW_DECORATED, GLFW_FALSE); //makes flashing the screen in windows, but necessary for linux
-		
-		//glfwWindowHint(GLFW_SRGB_CAPABLE, GLFW_TRUE); this does not seem to have effect
 
-		String os = System.getProperty("os.name");
-
-		boolean win = os.startsWith("Windows");
-
-		if (!win) {
-			glfwWindowHint(GLFW_FLOATING, GLFW_TRUE); //seems to make the mouse hang on Windows with Intel Graphics HD 4000
-		}
-
-		//glfwWindowHint(GLFW_AUTO_ICONIFY, GLFW_FALSE);
-			
-		// Create the window
-		window = glfwCreateWindow(width, height, format.name, /*win ? glfwGetPrimaryMonitor() :*/ NULL, NULL);
-		if ( window == NULL )
-			throw new RuntimeException("Failed to create the GLFW window");
-		
-		// Get the thread stack and push a new frame
-		try ( MemoryStack stack = stackPush() ) {
-			IntBuffer pWidth = stack.mallocInt(1); // int*
-			IntBuffer pHeight = stack.mallocInt(1); // int*
-
-			// Get the window size passed to glfwCreateWindow
-			glfwGetWindowSize(window, pWidth, pHeight);
-
-			// Get the resolution of the primary monitor
-			GLFWVidMode vidmode = glfwGetVideoMode(glfwGetPrimaryMonitor());
-
-			// Center the window
-			glfwSetWindowPos(
-				window,
-				(vidmode.width() - pWidth.get(0)) / 2,
-				(vidmode.height() - pHeight.get(0)) / 2
-			);
-		} // the stack frame is popped automatically
-
-		// Make the OpenGL context current
-		glfwMakeContextCurrent(window);
-		// Enable v-sync (or not)
-		glfwSwapInterval(format.waitForRefresh ? 1 : 0);
-
-		// Make the window visible
-		//glfwShowWindow(window);
-		// Must be called by the parent
-		//setVisible(true);
-
-
-        glfwSetInputMode(window, GLFW_CURSOR, format.grabCursor ? GLFW_CURSOR_DISABLED : GLFW_CURSOR_HIDDEN);
-//        if ( format.grabCursor && glfwRawMouseMotionSupported()) does not work
-//            glfwSetInputMode(window, GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);	
-        
-        //swapBuffers();
+		createWindow();
+		//setCallbacks();
         }
+
+		private void createWindow() {
+
+			GLFWVidMode vidMode = glfwGetVideoMode(glfwGetPrimaryMonitor());
+
+			int  width = vidMode.width();
+			int  height = vidMode.height();
+
+			if( format.majorVersion > 0 ) {
+				glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, format.majorVersion);
+			}
+			if( format.minorVersion >= 0 ) {
+				glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, format.minorVersion);
+			}
+			if( format.profile != null ) {
+				glfwWindowHint(GLFW_OPENGL_PROFILE, format.profile ==  GLData.Profile.COMPATIBILITY ? GLFW_OPENGL_COMPAT_PROFILE : GLFW_OPENGL_CORE_PROFILE);
+			}
+			if( format.debug) {
+				glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GLFW_TRUE);
+			}
+			glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GLFW_FALSE);
+			if(format.depthSize > 0) {
+				glfwWindowHint(GLFW_DEPTH_BITS, format.depthSize);
+			}
+
+			glfwWindowHint(GLFW_RED_BITS, /*vidMode.redBits()*/format.redSize);
+			glfwWindowHint(GLFW_GREEN_BITS, /*vidMode.greenBits()*/format.greenSize);
+			glfwWindowHint(GLFW_BLUE_BITS, /*vidMode.blueBits()*/format.blueSize);
+			glfwWindowHint(GLFW_REFRESH_RATE, vidMode.refreshRate());
+
+			if(format.accumRedSize > 0) glfwWindowHint(GLFW_ACCUM_RED_BITS, format.accumRedSize);
+			if(format.accumGreenSize > 0) glfwWindowHint(GLFW_ACCUM_GREEN_BITS, format.accumGreenSize);
+			if(format.accumBlueSize > 0) glfwWindowHint(GLFW_ACCUM_BLUE_BITS, format.accumBlueSize);
+
+			//if( vidMode.redBits() == 10) {
+			glfwWindowHint(GLFW_ALPHA_BITS, format.alphaSize != 0 ? format.alphaSize : GLFW_DONT_CARE);
+			//}
+			System.out.println("RGB : "+ vidMode.redBits()+" "+vidMode.greenBits()+" "+vidMode.blueBits());
+			System.out.println("Refresh Rate : "+vidMode.refreshRate()+" Hz");
+
+			glfwWindowHint(GLFW_DECORATED, GLFW_FALSE); //makes flashing the screen in windows, but necessary for linux
+
+			//glfwWindowHint(GLFW_SRGB_CAPABLE, GLFW_TRUE); this does not seem to have effect
+
+			String os = System.getProperty("os.name");
+
+			boolean win = os.startsWith("Windows");
+
+			if (!win) {
+				glfwWindowHint(GLFW_FLOATING, GLFW_TRUE); //seems to make the mouse hang on Windows with Intel Graphics HD 4000
+			}
+
+			//glfwWindowHint(GLFW_AUTO_ICONIFY, GLFW_FALSE);
+
+			// Create the window
+			window = glfwCreateWindow(width, height, format.name, /*win ? glfwGetPrimaryMonitor() :*/ NULL, NULL);
+			if ( window == NULL )
+				throw new RuntimeException("Failed to create the GLFW window");
+
+			// Get the thread stack and push a new frame
+			try ( MemoryStack stack = stackPush() ) {
+				IntBuffer pWidth = stack.mallocInt(1); // int*
+				IntBuffer pHeight = stack.mallocInt(1); // int*
+
+				// Get the window size passed to glfwCreateWindow
+				glfwGetWindowSize(window, pWidth, pHeight);
+
+				// Get the resolution of the primary monitor
+				GLFWVidMode vidmode = glfwGetVideoMode(glfwGetPrimaryMonitor());
+
+				// Center the window
+				glfwSetWindowPos(
+						window,
+						(vidmode.width() - pWidth.get(0)) / 2,
+						(vidmode.height() - pHeight.get(0)) / 2
+				);
+			} // the stack frame is popped automatically
+
+			// Make the OpenGL context current
+			glfwMakeContextCurrent(window);
+			// Enable v-sync (or not)
+			glfwSwapInterval(format.waitForRefresh ? 1 : 0);
+
+			// Make the window visible
+			//glfwShowWindow(window);
+			// Must be called by the parent
+			//setVisible(true);
+
+
+			glfwSetInputMode(window, GLFW_CURSOR, format.grabCursor ? GLFW_CURSOR_DISABLED : GLFW_CURSOR_HIDDEN);
+//        if ( format.grabCursor && glfwRawMouseMotionSupported()) does not work
+//            glfwSetInputMode(window, GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);
+
+			//swapBuffers();
+
+		}
 
 		void setCallbacks() {
 
@@ -244,6 +251,9 @@ public class GLCanvas extends Composite {
 
 	
 	public boolean shouldClose() {
+		if (0 == window) {
+			return false;
+		}
 		return glfwWindowShouldClose(window) ;
 	}
 	
@@ -251,12 +261,16 @@ public class GLCanvas extends Composite {
 		glfwMaximizeWindow(window);
 	}
 
-	public void dispose() {
+	private void destroyWindow() {
 		// Free the window callbacks and destroy the window
 		glfwFreeCallbacks(window);
 		glfwSetWindowShouldClose(window, true);
 		glfwDestroyWindow(window);
 		window = 0;
+	}
+
+	public void dispose() {
+		destroyWindow();
 		//glfwPollEvents();
 		super.dispose();
 	}

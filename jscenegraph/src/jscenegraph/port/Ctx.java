@@ -23,6 +23,10 @@ public class Ctx {
 		cacheContexts.put(ctx, gl2);
 	}
 
+	public static void removeContext(int ctx) {
+		cacheContexts.remove(ctx);
+	}
+
 	public static GL2 get(int shareID) {
 		GL2 gl2 = cacheContexts.get(shareID);
 		if(gl2 == null) {

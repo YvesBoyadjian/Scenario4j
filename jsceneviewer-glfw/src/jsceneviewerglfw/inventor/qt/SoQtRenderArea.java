@@ -65,6 +65,8 @@ import jsceneviewerglfw.TypedEvent;
  *
  */
 public class SoQtRenderArea extends SoQtGLWidget {
+
+	private static int contextId = 0;
 	
 	private final SoQtSceneHandler soQtSceneHandler = new SoQtSceneHandler(this) {
 		
@@ -229,8 +231,10 @@ processSoEvent(final SoEvent event)
     }
     protected void initializeGL(GL2 gl2) {
         super.initializeGL(gl2);
-        Ctx.addContext(1, gl2);
-        shareID = 1;
+		Ctx.removeContext(contextId);
+		contextId++;
+        Ctx.addContext(contextId, gl2);
+        shareID = contextId;
         soQtSceneHandler.initializeScene(/*getShareID()*/shareID);
         isGLinitialized = true;    	
     }
