@@ -830,7 +830,7 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 	    
 	    RecursiveChunk rc = chunks.getRecursiveChunk(progressBar);
 
-		final int[] douglasLoadCount = new int[2];
+		final Counter douglasLoadCount = new Counter();
 
 	    master = new SoTouchLODMaster("viewer",douglasLoadCount);
 
@@ -850,7 +850,7 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 		sep.addChild(douglasLoadCountCallback);
 
 		douglasLoadCountCallback.setCallback((action)->{
-			douglasLoadCount[0] = 0;
+			douglasLoadCount.reset();
 		});
 
 
@@ -2318,7 +2318,7 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 		progressBar.setValue(MAX_PROGRESS);
 	}
 		
-	SoGroup getDouglasTreesT(SbVec3f refPoint,SbVec3f refPoint2, final float[] distance,final JProgressBar progressBar,final int[] douglasLoadCount) {
+	SoGroup getDouglasTreesT(SbVec3f refPoint,SbVec3f refPoint2, final float[] distance,final JProgressBar progressBar,final Counter douglasLoadCount) {
 		
 		if( forest == null) {
 			computeDouglas(progressBar);
@@ -2327,7 +2327,7 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 		return forest.getDouglasTreesT(refPoint,refPoint2, distance,douglasLoadCount);
 	}	
 	
-	SoGroup getDouglasTreesF(SbVec3f refPoint,SbVec3f refPoint2, final float[] distance, boolean withColors,final JProgressBar progressBar,final int[] douglasLoadCount) {
+	SoGroup getDouglasTreesF(SbVec3f refPoint,SbVec3f refPoint2, final float[] distance, boolean withColors,final JProgressBar progressBar,final Counter douglasLoadCount) {
 		
 		if( forest == null) {
 			computeDouglas(progressBar);

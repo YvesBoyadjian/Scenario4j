@@ -714,6 +714,7 @@ public class DouglasChunk {
 					douglasNormalsF = null;
 					douglasTexCoordsF = null;
 					douglasColorsF = null;
+					farFoliageFuture = null;
 				}
 			};
 			});

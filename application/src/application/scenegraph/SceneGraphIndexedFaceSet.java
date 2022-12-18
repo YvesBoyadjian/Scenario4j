@@ -400,7 +400,7 @@ for(int is=0;is<4;is++) {
 	    
 	    RecursiveChunk rc = chunks.getRecursiveChunk(null);
 	    
-	    master = new SoTouchLODMaster("truc",new int[2]);
+	    master = new SoTouchLODMaster("truc",new Counter());
 
 	    master.setLodFactor(250);
 	    

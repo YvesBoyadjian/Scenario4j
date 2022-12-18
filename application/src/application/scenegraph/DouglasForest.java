@@ -476,7 +476,7 @@ public class DouglasForest {
 //		}
 	}
 
-	public SoGroup getDouglasTreesT(SbVec3f refPoint,SbVec3f refPoint2, final float[] distance,final int[] douglasLoadCount) {
+	public SoGroup getDouglasTreesT(SbVec3f refPoint,SbVec3f refPoint2, final float[] distance,final Counter douglasLoadCount) {
 
 		SoGroup separator = new SoGroup();
 		
@@ -518,7 +518,7 @@ public class DouglasForest {
 		return separator;
 	}
 
-	public SoGroup getDouglasTreesF(SbVec3f refPoint,SbVec3f refPoint2, final float[] distance, boolean withColors,final int[] douglasLoadCount) {
+	public SoGroup getDouglasTreesF(SbVec3f refPoint,SbVec3f refPoint2, final float[] distance, boolean withColors,final Counter douglasLoadCount) {
 
 		SoGroup separator = new SoGroup();
 

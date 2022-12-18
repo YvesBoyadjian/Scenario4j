@@ -52,13 +52,13 @@ public class SoLODIndexedFaceSet extends /*SoIndexedFaceSet*/SoGroup {
 	private LoadState loadedFar = LoadState.CLEARED;
 	private LoadState[] loadedNear = new LoadState[DouglasChunk.NUM_NEAR_FOLIAGE];//LoadState.CLEARED;
 
-	private final int[] counting;
+	private final Counter counting;
 
 	private final SoIndexedFaceSet sonFar;
 
 	private final SoIndexedFaceSet[] sonsNear = new SoIndexedFaceSet[DouglasChunk.NUM_NEAR_FOLIAGE];
 	
-	public SoLODIndexedFaceSet(SbVec3f referencePoint,SbVec3f referencePoint2, DouglasChunk chunk, Type type, final int[] counting,SbBox3f finalBox, SbVec3f finalCenter) {
+	public SoLODIndexedFaceSet(SbVec3f referencePoint,SbVec3f referencePoint2, DouglasChunk chunk, Type type, final Counter counting,SbBox3f finalBox, SbVec3f finalCenter) {
 		this.referencePoint = referencePoint;
 		this.referencePoint2 = referencePoint2;
 		this.chunk = chunk;
@@ -161,9 +161,9 @@ public class SoLODIndexedFaceSet extends /*SoIndexedFaceSet*/SoGroup {
 	 * @return false if must render
 	 */
 	public boolean loadTrunk() {
-		if(loadedFar == LoadState.CLEARED && counting[0] < 1 /*&& counting[1] < 50*/) {
-			counting[0]++;
-			counting[1]++;
+		if(loadedFar == LoadState.CLEARED && counting.count() < 1 /*&& counting[1] < 50*/) {
+			counting.increment();
+			//counting[1]++;
 			loadedFar = LoadState.LOAD_FAR;
 		SoIndexedFaceSet indexedFaceSetT = sonFar;
 		
@@ -230,9 +230,9 @@ public class SoLODIndexedFaceSet extends /*SoIndexedFaceSet*/SoGroup {
 				((initiallyWanted == LoadState.LOAD_FAR) && (loadedFar != initiallyWanted))
 				|| ((initiallyWanted == LoadState.LOAD_NEAR) && !isAllNearLoaded())
 				)
-				&& counting[0] < 1 /*&& counting[1] < 50*/) {
-			counting[0]++;
-			counting[1]++;
+				&& counting.count() < 1 /*&& counting[1] < 50*/) {
+			counting.increment();
+			//counting[1]++;
 
 			final int nearIndexToLoad = firstNearIndexToLoad();
 
@@ -325,7 +325,7 @@ public class SoLODIndexedFaceSet extends /*SoIndexedFaceSet*/SoGroup {
 
 		for (int nearIndex=0; nearIndex<DouglasChunk.NUM_NEAR_FOLIAGE; nearIndex++) {
 			if (loadedNear[nearIndex] != LoadState.CLEARED) {
-				counting[1]--;
+				//counting[1]--;
 				loadedNear[nearIndex] = LoadState.CLEARED;
 				boolean wasEnabled = sonsNear[0].vertexProperty.enableNotify(false);
 				sonsNear[nearIndex].vertexProperty.setValue(null/*recursiveChunk.getVertexProperty()*/);
@@ -340,7 +340,7 @@ public class SoLODIndexedFaceSet extends /*SoIndexedFaceSet*/SoGroup {
 	}
 	public void clearFar() {
 		if(loadedFar != LoadState.CLEARED) {
-			counting[1]--;
+			//counting[1]--;
 			loadedFar = LoadState.CLEARED;
 			boolean wasEnabled = sonFar.vertexProperty.enableNotify(false);
 			sonFar.vertexProperty.setValue(null/*recursiveChunk.getVertexProperty()*/);

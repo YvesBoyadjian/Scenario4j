@@ -31,13 +31,13 @@ public class SoTouchLODMaster extends SoNode {
 
 	private List<SoTouchLODSlave> slaves = new ArrayList<>();
 
-	private int[] douglasLoads;
+	private Counter douglasLoads;
 
 	public interface SoTouchLODSlave {
 		void setLodFactor(float lodFactor);
 	}
 	
-	public SoTouchLODMaster(String name,int[] douglasLoads) {
+	public SoTouchLODMaster(String name,Counter douglasLoads) {
 		this.name = name;
 		this.douglasLoads = douglasLoads;
 	}
@@ -56,12 +56,12 @@ public class SoTouchLODMaster extends SoNode {
 	}
 	
 	public void increment() {
-		douglasLoads[0]++;
+		douglasLoads.increment();
 		counter++;
 	}
 	
 	public int getCount() {
-		return douglasLoads[0] != 0 ? 9999 : counter;
+		return douglasLoads.count() != 0 ? 9999 : counter;
 	}
 	
 	public int getMaxChange() {
