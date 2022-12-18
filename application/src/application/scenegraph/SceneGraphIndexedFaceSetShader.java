@@ -3127,6 +3127,8 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 		for( Collectible collectible : collectibleFamilies) {
 			nearestCollectibleDistance = Math.min(nearestCollectibleDistance,collectible.getGraphicObject().getNearestCollectibleDistance());
 		}
+		nearestCollectibleDistance = Math.min(nearestCollectibleDistance,enemiesSeparator.getNearestEnemyDistance());
+
 		return nearestCollectibleDistance;
 	}
 

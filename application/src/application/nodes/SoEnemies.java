@@ -179,4 +179,8 @@ public class SoEnemies extends SoSeparator {
         removeEnemy(target,instance);
         enemies.kill(instance);
     }
+
+    public float getNearestEnemyDistance() {
+        return nearestCollectibleDistance;
+    }
 }
