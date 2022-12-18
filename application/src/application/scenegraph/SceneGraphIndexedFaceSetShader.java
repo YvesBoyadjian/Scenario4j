@@ -1906,6 +1906,9 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 		}
 		String[] enemiesKilledInstances = killedEnemies.split(",");
 		for(String enemyKilledInstance : enemiesKilledInstances) {
+			if (enemyKilledInstance.isBlank()) {
+				continue;
+			}
 			int instance = Integer.valueOf(enemyKilledInstance);
 			enemyFamily.kill(instance);
 		}
