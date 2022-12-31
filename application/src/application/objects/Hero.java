@@ -24,4 +24,6 @@ public class Hero {
 
     public DBody body;
     public DBody ballBody;
+
+    public float life = 1; // From 0 to 1
 }

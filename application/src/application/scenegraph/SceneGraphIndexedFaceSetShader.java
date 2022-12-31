@@ -1584,6 +1584,10 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 		offscreenTargetSeparator.addChild(offscreenTargetDisplay);
 
 		sep.addChild(offscreenTargetSeparator);
+
+		// ________________________________________ Life Bar
+
+		SoSeparator lifeBarSeparator = new SoSeparator();
 	}
 
 	private SoNode buildOracle(boolean shadow) {
