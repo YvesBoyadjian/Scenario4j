@@ -1,5 +1,6 @@
 package application.gui;
 
+import application.objects.Hero;
 import application.scenegraph.SceneGraphIndexedFaceSetShader;
 import application.viewer.glfw.SoQtWalkViewer;
 
@@ -127,7 +128,7 @@ public class OptionDialog extends JDialog {
         if(viewer.isTimeStop()) {
             viewer.toggleTimeStop();
         }
-        sg.setHeroPosition(sg.STARTING_X,sg.STARTING_Y,sg.STARTING_Z);
+        sg.setHeroPosition(Hero.STARTING_X,Hero.STARTING_Y,Hero.STARTING_Z);
         sg.resurrectTheAnimals();
         sg.resetScenario(viewer);
         SwingUtilities.invokeLater(()->sg.setBoots(false));

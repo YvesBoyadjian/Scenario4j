@@ -22,6 +22,7 @@ import javax.swing.*;
 import javax.swing.border.BevelBorder;
 
 import application.gui.OptionDialog;
+import application.objects.Hero;
 import application.scenario.FirstApproachQuest;
 import application.scenario.LeaveKlapatchePointQuest;
 import application.scenario.Scenario;
@@ -95,6 +96,7 @@ import org.ode4j.ode.internal.ErrorHdl;
 import org.ode4j.ode.internal.Rotation;
 import util.IOUtils;
 
+import static application.objects.Hero.*;
 import static com.badlogic.gdx.physics.bullet.collision.CollisionConstants.DISABLE_DEACTIVATION;
 import static org.lwjgl.glfw.GLFW.glfwPollEvents;
 import static org.lwjgl.openal.ALC10.*;
@@ -126,17 +128,9 @@ public class MainGLFW {
 
 	public static final double COMPUTER_START_TIME_SEC = REAL_START_TIME_SEC / TimeConstants./*JMEMBA_TIME_ACCELERATION*/GTA_SA_TIME_ACCELERATION;
 
-	public static final String HERO_X = "hero_x";
-
-	public static final String HERO_Y = "hero_y";
-
-	public static final String HERO_Z = "hero_z";
-
 	public static final String TIME = "time_sec";
 
 	public static final String TIME_STOP = "time_stop";
-
-	public static final String FLY = "fly";
 
 	public static final String ALLOW_FLY = "allow_fly";
 
@@ -157,8 +151,6 @@ public class MainGLFW {
 	public static final String VOLUMETRIC_SKY = "volumetric_sky";
 
 	public static final String DISPLAY_FPS = "display_fps";
-
-	public static final String BOOTS = "boots";
 
 	public static final String KILLED_ENEMIES = "killed_enemies";
 
@@ -299,7 +291,8 @@ public class MainGLFW {
 	static double previousTimeSec = 0;
 
 	static boolean timeStop = false;
-	static boolean fly = false;
+
+	static final Hero hero = new Hero();
 	static boolean allowFly = false;
 
 	static DWorld world;
@@ -788,11 +781,11 @@ public class MainGLFW {
 
 				saveGameProperties.load(in);
 
-				float x = Float.valueOf(saveGameProperties.getProperty(HERO_X, String.valueOf(sg.STARTING_X)));
+				float x = Float.valueOf(saveGameProperties.getProperty(HERO_X, String.valueOf(Hero.STARTING_X)));
 
-				float y = Float.valueOf(saveGameProperties.getProperty(HERO_Y, String.valueOf(sg.STARTING_Y)));
+				float y = Float.valueOf(saveGameProperties.getProperty(HERO_Y, String.valueOf(Hero.STARTING_Y)));
 
-				float z = Float.valueOf(saveGameProperties.getProperty(HERO_Z, String.valueOf(sg.STARTING_Z/* - SCENE_POSITION.getZ()*/)));
+				float z = Float.valueOf(saveGameProperties.getProperty(HERO_Z, String.valueOf(Hero.STARTING_Z/* - SCENE_POSITION.getZ()*/)));
 
 				previousTimeSec = Double.valueOf(saveGameProperties.getProperty(TIME, "0"));
 
@@ -800,7 +793,7 @@ public class MainGLFW {
 
 				timeStop = "true".equals(saveGameProperties.getProperty(TIME_STOP, "false"));
 
-				fly = "true".equals(saveGameProperties.getProperty(FLY, "false")) ? true : false;
+				hero.fly = "true".equals(saveGameProperties.getProperty(FLY, "false")) ? true : false;
 
 				allowFly = "true".equals(saveGameProperties.getProperty(ALLOW_FLY,"false"));
 
@@ -821,7 +814,7 @@ public class MainGLFW {
 
 
 		} else {
-			camera.position.setValue(sg.STARTING_X, sg.STARTING_Y, sg.STARTING_Z - SCENE_POSITION.getZ());
+			camera.position.setValue(Hero.STARTING_X, Hero.STARTING_Y, Hero.STARTING_Z - SCENE_POSITION.getZ());
 		}
 		viewer.getCameraController().changeCameraValues(camera);
 
@@ -884,7 +877,7 @@ public class MainGLFW {
 
 		viewer.setAllowToggleFly(allowFly);
 
-		if (fly) {
+		if (hero.fly) {
 			viewer.toggleFly();
 		}
 
@@ -997,8 +990,9 @@ public class MainGLFW {
 		m.setBox(1000.0f, 0.25, 0.25, 1.312);
 		body.setMass(m);
 		body.setMaxAngularSpeed(0);
+		hero.body = body;
 
-		sg.setBody(body);
+		sg.setHero(hero);
 
 		//DGeom box = OdeHelper.createCapsule(space, 0.4, 1.75 - 2 * 0.4);
 		DGeom box = OdeHelper.createSphere(space,0.4);
@@ -1020,7 +1014,9 @@ public class MainGLFW {
 		ballm.setSphere(1000.0f, 0.25);
 		ballBody.setMass(ballm);
 
-		sg.setBallBody(ballBody);
+		hero.ballBody = ballBody;
+
+		//sg.setBallBody(ballBody);
 
 		ball.setBody(ballBody);
 
@@ -1248,13 +1244,13 @@ public class MainGLFW {
 				saved_pos.set0(camera.position.getValue().getX());
 				saved_pos.set1(camera.position.getValue().getY());
 				saved_pos.set2(camera.position.getValue().getZ()/*zref + 1.0f*/ - /*1.75f / 2*/0.4f + 0.13f + above_ground);
-				body.setPosition(saved_pos);
+				hero.body.setPosition(saved_pos);
 				//body.setLinearVel(0,0,0);
 				//ballBody.setPosition(camera.position.getValue().getX(), camera.position.getValue().getY(), camera.position.getValue().getZ() - /*1.75f / 2*/0.4f + 0.13f - 1.75f+ 2*0.4f + above_ground);
 				ballBody.setPosition(
-						body.getPosition().get0()/*cameraPositionValue.getX()*/,
-						body.getPosition().get1()/*cameraPositionValue.getY()*/,
-						body.getPosition().get2() /*cameraPositionValue.getZ() - 0.4f + 0.13f + above_ground*/ - 1.75f+ 2*0.4f);
+						hero.body.getPosition().get0()/*cameraPositionValue.getX()*/,
+						hero.body.getPosition().get1()/*cameraPositionValue.getY()*/,
+						hero.body.getPosition().get2() /*cameraPositionValue.getZ() - 0.4f + 0.13f + above_ground*/ - 1.75f+ 2*0.4f);
 				return;
 			}
 
@@ -1274,21 +1270,21 @@ public class MainGLFW {
 				contactGroup.empty();
 				if(physics_error) {
 					saved_pos.add2(0.1);
-					body.setPosition(saved_pos);
+					hero.body.setPosition(saved_pos);
 					ballBody.setPosition(
-							body.getPosition().get0()/*cameraPositionValue.getX()*/,
-							body.getPosition().get1()/*cameraPositionValue.getY()*/,
-							body.getPosition().get2() /*cameraPositionValue.getZ() - 0.4f + 0.13f + above_ground*/ - 1.75f+ 2*0.4f);
+							hero.body.getPosition().get0()/*cameraPositionValue.getX()*/,
+							hero.body.getPosition().get1()/*cameraPositionValue.getY()*/,
+							hero.body.getPosition().get2() /*cameraPositionValue.getZ() - 0.4f + 0.13f + above_ground*/ - 1.75f+ 2*0.4f);
 				}
 			}
-			if(body.getPosition().get2() < zref - 1.9f) {
+			if(hero.body.getPosition().get2() < zref - 1.9f) {
 				System.err.println("Error in placement, too low");
 				saved_pos.set2(zref + 1.0f);
-				body.setPosition(saved_pos);
+				hero.body.setPosition(saved_pos);
 				ballBody.setPosition(
-						body.getPosition().get0()/*cameraPositionValue.getX()*/,
-						body.getPosition().get1()/*cameraPositionValue.getY()*/,
-						body.getPosition().get2() /*cameraPositionValue.getZ() - 0.4f + 0.13f + above_ground*/ - 1.75f+ 2*0.4f);
+						hero.body.getPosition().get0()/*cameraPositionValue.getX()*/,
+						hero.body.getPosition().get1()/*cameraPositionValue.getY()*/,
+						hero.body.getPosition().get2() /*cameraPositionValue.getZ() - 0.4f + 0.13f + above_ground*/ - 1.75f+ 2*0.4f);
 			}
 			sg.updateTargetPositions(dt);
 		});
@@ -1306,7 +1302,7 @@ public class MainGLFW {
 		viewer.setPositionProvider(new PositionProvider() {
 			@Override
 			public SbVec3f getPosition() {
-				DVector3C position = body.getPosition();
+				DVector3C position = hero.body.getPosition();
 
 				if(Double.isNaN(position.get0())) {
 					return null;

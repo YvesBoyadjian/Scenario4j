@@ -1,6 +1,7 @@
 package application.scenario;
 
 import application.MainGLFW;
+import application.objects.Hero;
 import application.scenegraph.SceneGraphIndexedFaceSetShader;
 import application.viewer.glfw.SoQtWalkViewer;
 import jscenegraph.database.inventor.nodes.SoCamera;
@@ -37,8 +38,8 @@ public class LeaveKlapatchePointQuest implements Quest {
         float x = camera.position.getValue().x();
         float y = camera.position.getValue().y();
 
-        float xStart = SceneGraphIndexedFaceSetShader.STARTING_X;
-        float yStart = SceneGraphIndexedFaceSetShader.STARTING_Y;
+        float xStart = Hero.STARTING_X;
+        float yStart = Hero.STARTING_Y;
 
         return Math.sqrt(Math.pow(x-xStart,2)+Math.pow(y-yStart,2));
     }

@@ -19,6 +19,7 @@ import javax.swing.*;
 
 import application.RasterProvider;
 import application.nodes.*;
+import application.objects.Hero;
 import application.objects.Target;
 import application.objects.collectible.BootsFamily;
 import application.objects.collectible.Collectible;
@@ -119,12 +120,6 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 	static public final float ORACLE_Y = 169.77f;//137.62f;
 
 	static public final float ORACLE_Z = 1250.24f;//1248.5f;
-
-	static public final float STARTING_X = 250.5f;
-
-	static public final float STARTING_Y = 303.5f;
-
-	static public final float STARTING_Z = 1256f;
 
 	static public final float LOADING_HEIGHMAP_TIME_PERCENTAGE = 40;
 
@@ -308,9 +303,10 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 
 	final EnemyFamily enemyFamily = new EnemyFamily();
 
-	DBody heroBody;
+	Hero hero;
+	//DBody heroBody;
 
-	DBody heroFeetBody;
+	//DBody heroFeetBody;
 
 	Scenario scenario;
 
@@ -2865,21 +2861,19 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 		}
 	}
 
-	public void setBody(DBody body) {
-		heroBody = body;
+	public void setHero(Hero hero) {
+		this.hero = hero;
+		//heroBody = hero.body;
 	}
 
-	public void setBallBody(DBody ballBody) {
-		heroFeetBody = ballBody;
-	}
 
 	public void stopBody() {
-		if(null != heroBody) {
-			heroBody.setLinearVel(0,0,0);
+		if(null != hero.body) {
+			hero.body.setLinearVel(0,0,0);
 		}
-		if(null != heroFeetBody) {
-			heroFeetBody.setLinearVel(0,0,0);
-			heroFeetBody.setAngularVel(0,0,0);
+		if(null != hero.ballBody) {
+			hero.ballBody.setLinearVel(0,0,0);
+			hero.ballBody.setAngularVel(0,0,0);
 		}
 	}
 
@@ -2892,16 +2886,16 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 		final float above_ground = //4.5f; // Necessary for planks
 				0.2f; // Necessary when respawning on water
 
-		heroBody.setPosition(cameraPositionValue.getX(), cameraPositionValue.getY(), cameraPositionValue.getZ() - /*1.75f / 2*/0.4f + 0.13f + above_ground);
-		heroBody.setLinearVel(0,0,0);
+		hero.body.setPosition(cameraPositionValue.getX(), cameraPositionValue.getY(), cameraPositionValue.getZ() - /*1.75f / 2*/0.4f + 0.13f + above_ground);
+		hero.body.setLinearVel(0,0,0);
 
-		heroFeetBody.setPosition(
-				heroBody.getPosition().get0()/*cameraPositionValue.getX()*/,
-				heroBody.getPosition().get1()/*cameraPositionValue.getY()*/,
-				heroBody.getPosition().get2() /*cameraPositionValue.getZ() - 0.4f + 0.13f + above_ground*/ - 1.75f+ 2*0.4f);
+		hero.ballBody.setPosition(
+				hero.body.getPosition().get0()/*cameraPositionValue.getX()*/,
+				hero.body.getPosition().get1()/*cameraPositionValue.getY()*/,
+				hero.body.getPosition().get2() /*cameraPositionValue.getZ() - 0.4f + 0.13f + above_ground*/ - 1.75f+ 2*0.4f);
 
-		heroFeetBody.setLinearVel(0,0,0);
-		heroFeetBody.setAngularVel(0,0,0);
+		hero.ballBody.setLinearVel(0,0,0);
+		hero.ballBody.setAngularVel(0,0,0);
 	}
 
 	public void setScenario(Scenario scenario) {
