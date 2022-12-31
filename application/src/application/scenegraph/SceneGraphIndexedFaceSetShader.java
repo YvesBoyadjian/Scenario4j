@@ -17,7 +17,6 @@ import java.util.stream.Stream;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 
-import application.MainGLFW;
 import application.RasterProvider;
 import application.nodes.*;
 import application.objects.Target;
@@ -25,6 +24,7 @@ import application.objects.collectible.BootsFamily;
 import application.objects.collectible.Collectible;
 import application.objects.enemy.EnemyFamily;
 import application.scenario.Scenario;
+import application.targets.*;
 import application.viewer.glfw.SoQtWalkViewer;
 import com.jogamp.opengl.GL2;
 
@@ -42,7 +42,6 @@ import jscenegraph.database.inventor.*;
 import jscenegraph.database.inventor.actions.SoGLRenderAction;
 import jscenegraph.database.inventor.actions.SoGetMatrixAction;
 import jscenegraph.database.inventor.actions.SoSearchAction;
-import jscenegraph.database.inventor.fields.SoMFVec3f;
 import jscenegraph.database.inventor.misc.SoNotList;
 import jscenegraph.database.inventor.nodes.*;
 import jscenegraph.port.Ctx;

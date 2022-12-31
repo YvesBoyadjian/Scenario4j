@@ -1,7 +1,8 @@
-package application.scenegraph;
+package application.targets;
 
 import application.objects.Target;
 import application.objects.TargetBase;
+import application.scenegraph.SceneGraphIndexedFaceSetShader;
 import jscenegraph.coin3d.inventor.lists.SbListFloat;
 import jscenegraph.database.inventor.SbBox3f;
 import jscenegraph.database.inventor.SbVec3f;
@@ -9,51 +10,51 @@ import jscenegraph.database.inventor.fields.SoMFVec3f;
 
 import java.util.Random;
 
-public class HoaryMarmots extends TargetBase implements Target {
+public class GroundSquirrels extends TargetBase implements Target {
 
-    public static final String HOARY_MARMOT_NAME = "Marmot";
+    public final static String GROUND_SQUIRREL_NAME = "Squirrel";
 
     @Override
     public String targetName() {
-        return HOARY_MARMOT_NAME;
+        return GROUND_SQUIRREL_NAME;
     }
 
     @Override
     public String getTexturePath() {
-        return "ressource/Hoary_marmot_rainier_2008.jpg";
+        return "ressource/Golden-Mantled_Ground_Squirrel,_Mount_Rainier,_July_2006.jpg";
     }
 
     @Override
     public int getNbTargets() {
 
-        if( nbMarmots == 0 ) {
+        if( nbSquirrels == 0 ) {
             compute();
         }
-        return nbMarmots;
+        return nbSquirrels;
     }
 
     @Override
     public float[] getTarget(int marmotIndex, float[] vector) {
 
-        if (nbMarmots == 0) {
+        if (nbSquirrels == 0) {
             compute();
         }
 
-        vector[0] = marmotCoords.get(marmotIndex*3);
-        vector[1] = marmotCoords.get(marmotIndex*3+1);
-        vector[2] = marmotCoords.get(marmotIndex*3+2);
+        vector[0] = squirrelCoords.get(marmotIndex*3);
+        vector[1] = squirrelCoords.get(marmotIndex*3+1);
+        vector[2] = squirrelCoords.get(marmotIndex*3+2);
 
         return vector;
     }
 
     @Override
     public float getSize() {
-        return 0.6f;
+        return 0.5f;
     }
 
     @Override
     public float getRatio() {
-        return 1707.0f/1219.0f;
+        return 1;
     }
 
     @Override
@@ -63,34 +64,37 @@ public class HoaryMarmots extends TargetBase implements Target {
 
     SceneGraphIndexedFaceSetShader sg;
 
-    int nbMarmots = 0;
+    int nbSquirrels = 0;
 
-    SbListFloat marmotCoords = new SbListFloat();
+    SbListFloat squirrelCoords = new SbListFloat();
 
     final int HUNDRED_THOUSAND = 100000;
 
-    int NB_MARMOT_BIRTHS = HUNDRED_THOUSAND;
+    int NB_SQUIRREL_BIRTHS = HUNDRED_THOUSAND;
 
-    final static int SEED_MARMOT_PLACEMENT = 51;
+    final static int SEED_SQUIRREL_PLACEMENT = 52;
 
-    public HoaryMarmots( SceneGraphIndexedFaceSetShader sg ) {
+    public GroundSquirrels( SceneGraphIndexedFaceSetShader sg ) {
         this.sg = sg;
     }
 
     private void compute() {
 
-        Random randomPlacementBigFoots = new Random(SEED_MARMOT_PLACEMENT);
+        Random randomPlacementSquirrels = new Random(SEED_SQUIRREL_PLACEMENT);
 
         int[] indices = new int[4];
 
         float zWater = - 150 + sg.getzTranslation() - sg.CUBE_DEPTH/2;
 
-        for( int i = 0; i < NB_MARMOT_BIRTHS; i++) {
-            float x = getRandomX(randomPlacementBigFoots);
-            float y = getRandomY(randomPlacementBigFoots);
+        float[] xyz = new float[3];
+        int start;
+
+        for( int i = 0; i < NB_SQUIRREL_BIRTHS; i++) {
+            float x = getRandomX(randomPlacementSquirrels);
+            float y = getRandomY(randomPlacementSquirrels);
             float z = sg.getInternalZ(x,y,indices,true) + sg.getzTranslation();
 
-            boolean isNearWater = Math.abs(z - zWater) < 150;
+            boolean isNearWater = Math.abs(z - zWater) < 10;
             boolean isAboveWater = z > zWater;
             boolean isNotInSnow = z - zWater < 2000;
 
@@ -106,27 +110,30 @@ public class HoaryMarmots extends TargetBase implements Target {
             boolean isNotTooSteep = (d1<dzMax) && (d2<dzMax) && (d3<dzMax) && (d4<dzMax);
 
             if( !isNearWater && isAboveWater && isNotTooSteep && isNotInSnow ) {
-                marmotCoords.append(x);
-                marmotCoords.append(y);
-                marmotCoords.append(z);
+                xyz[0] = x;
+                xyz[1] = y;
+                xyz[2] = z - 0.1f;
+                squirrelCoords.append( xyz[0]);
+                squirrelCoords.append( xyz[1]);
+                squirrelCoords.append( xyz[2]);
 
                 addInstance(i);
-                nbMarmots++;
+                nbSquirrels++;
             }
         }
     }
 
-    float getRandomX(Random randomPlacementMarmot) {
+    float getRandomX(Random randomPlacementSquirrel) {
         SbBox3f sceneBox = sg.getChunks().getSceneBoxFullIsland();
         float xMin = sceneBox.getBounds()[0];
         float xMax = sceneBox.getBounds()[3];
-        return xMin + (xMax - xMin) * randomPlacementMarmot.nextFloat();
+        return xMin + (xMax - xMin) * randomPlacementSquirrel.nextFloat();
     }
 
-    float getRandomY(Random randomPlacementMarmot) {
+    float getRandomY(Random randomPlacementSquirrel) {
         SbBox3f sceneBox = sg.getChunks().getSceneBoxFullIsland();
         float yMin = sceneBox.getBounds()[1];
         float yMax = sceneBox.getBounds()[4];
-        return yMin + (yMax - yMin) * randomPlacementMarmot.nextFloat();
+        return yMin + (yMax - yMin) * randomPlacementSquirrel.nextFloat();
     }
 }

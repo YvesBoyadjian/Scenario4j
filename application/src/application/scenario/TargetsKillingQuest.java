@@ -2,6 +2,7 @@ package application.scenario;
 
 import application.MainGLFW;
 import application.scenegraph.*;
+import application.targets.*;
 import application.viewer.glfw.SoQtWalkViewer;
 import jscenegraph.database.inventor.nodes.SoCamera;
 

@@ -1,7 +1,8 @@
-package application.scenegraph;
+package application.targets;
 
 import application.objects.Target;
 import application.objects.TargetBase;
+import application.scenegraph.SceneGraphIndexedFaceSetShader;
 import jscenegraph.database.inventor.SbBox3f;
 import jscenegraph.database.inventor.SbVec3f;
 import jscenegraph.database.inventor.fields.SoMFVec3f;

@@ -1,12 +1,13 @@
 /**
  * 
  */
-package application.scenegraph;
+package application.targets;
 
 import java.util.Random;
 
 import application.objects.Target;
 import application.objects.TargetBase;
+import application.scenegraph.SceneGraphIndexedFaceSetShader;
 import jscenegraph.database.inventor.SbBox3f;
 import jscenegraph.database.inventor.SbVec3f;
 import jscenegraph.database.inventor.fields.SoMFVec3f;
@@ -24,7 +25,7 @@ public class Seals extends TargetBase implements Target {
 	
 	final static int SEED_SEAL_PLACEMENT = 48;
 	
-	SceneGraphIndexedFaceSetShader sg; 
+	SceneGraphIndexedFaceSetShader sg;
 	 
 	int nbSeals = 0;
 	
