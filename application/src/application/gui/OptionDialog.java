@@ -129,6 +129,7 @@ public class OptionDialog extends JDialog {
             viewer.toggleTimeStop();
         }
         sg.setHeroPosition(Hero.STARTING_X,Hero.STARTING_Y,Hero.STARTING_Z);
+        sg.getHero().life = 1.0f;
         sg.resurrectTheAnimals();
         sg.resetScenario(viewer);
         SwingUtilities.invokeLater(()->sg.setBoots(false));

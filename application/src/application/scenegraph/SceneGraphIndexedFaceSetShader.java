@@ -1588,6 +1588,72 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 		// ________________________________________ Life Bar
 
 		SoSeparator lifeBarSeparator = new SoSeparator();
+
+		SoOrthographicCamera offscreenLifeBarCamera = new SoOrthographicCamera();
+
+		lifeBarSeparator.addChild(offscreenLifeBarCamera);
+
+		SoCallback lifeBarCallback = new SoCallback();
+
+		lifeBarSeparator.addChild(lifeBarCallback);
+
+		SoIndexedFaceSet lifeBar = new SoIndexedFaceSet();
+
+		float[] xyz = new float[4*3];
+
+		SoVertexProperty lifeBarVertexProperty = new SoVertexProperty();
+
+		lifeBarVertexProperty.vertex.setValues(0,xyz);
+
+		lifeBar.vertexProperty.setValue(lifeBarVertexProperty);
+
+		final float[] currentViewportAspectRatio = new float[1];
+		final float[] currentHeroLife = new float[1];
+
+		lifeBarCallback.setCallback(action->{
+			if (action.isOfType(SoGLRenderAction.getClassTypeId())) {
+				SoGLRenderAction glRenderAction = (SoGLRenderAction) action;
+				float viewportAspectRatio = glRenderAction.getViewportRegion().getViewportAspectRatio();
+				if(currentViewportAspectRatio[0] != viewportAspectRatio
+				||
+				currentHeroLife[0] != hero.life) {
+					currentViewportAspectRatio[0] = viewportAspectRatio;
+					currentHeroLife[0] = hero.life;
+
+					if (viewportAspectRatio > 16.0/9.0) {
+						viewportAspectRatio = 16.0f/9.0f;
+					}
+
+					xyz[0] = 0.9f*viewportAspectRatio;
+					xyz[1] = -0.95f;
+
+					xyz[3] = 0.95f*viewportAspectRatio;
+					xyz[4] = -0.95f;
+
+					xyz[6] = 0.95f*viewportAspectRatio;
+					xyz[7] = -0.95f + 0.95f*hero.life;
+
+					xyz[9] = 0.9f*viewportAspectRatio;
+					xyz[10] = -0.95f + 0.95f*hero.life;
+
+					lifeBarVertexProperty.vertex.setValues(0, xyz);
+
+					lifeBar.vertexProperty.setValue(lifeBarVertexProperty);
+				}
+			}
+		});
+
+		int[] lifeBarIndices = new int[5];
+		lifeBarIndices[1] = 1;
+		lifeBarIndices[2] = 2;
+		lifeBarIndices[3] = 3;
+		lifeBarIndices[4] = -1;
+
+		lifeBar.coordIndex.setValues(0, lifeBarIndices);
+
+		lifeBarSeparator.addChild(lifeBar);
+
+		sep.addChild(lifeBarSeparator);
 	}
 
 	private SoNode buildOracle(boolean shadow) {
@@ -1911,6 +1977,10 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 			int instance = Integer.valueOf(enemyKilledInstance);
 			enemyFamily.kill(instance);
 		}
+	}
+
+	public Hero getHero() {
+		return hero;
 	}
 
 	private static class GeomsResult {
@@ -3124,19 +3194,29 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 		for( Collectible collectible : collectibleFamilies) {
 			nearestCollectibleDistance = Math.min(nearestCollectibleDistance,collectible.getGraphicObject().getNearestCollectibleDistance());
 		}
-		nearestCollectibleDistance = Math.min(nearestCollectibleDistance,enemiesSeparator.getNearestEnemyDistance());
+		//nearestCollectibleDistance = Math.min(nearestCollectibleDistance,enemiesSeparator.getNearestEnemyDistance());
 
 		return nearestCollectibleDistance;
 	}
 
+	public float getNearestEnemyDistance() {
+		return enemiesSeparator.getNearestEnemyDistance();
+	}
+
+	public float getNearestObjectDistance() {
+		return Math.min(getNearestCollectibleDistance(),getNearestEnemyDistance());
+	}
+
 	private void setNearDistance() {
-		float nearest = getNearestCollectibleDistance();
+		float nearestCollectible = getNearestCollectibleDistance();
+		float nearestEnemy = getNearestEnemyDistance();
+		float nearest = Math.min(nearestCollectible,nearestEnemy);
 		float minViewDistance = Math.min(nearest/2.0f, MINIMUM_VIEW_DISTANCE);
 		minViewDistance = Math.max(0.5f, minViewDistance);
 		camera.nearDistance.setValue(minViewDistance);
 		//System.out.println(minViewDistance);
 
-		if (nearest < 1.4) {
+		if (nearestCollectible < 1.4) {
 			if (setBoots(true)) {
 				String[] message = new String[2];
 				message[0] = "Got the boots !";

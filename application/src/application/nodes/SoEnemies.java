@@ -1,5 +1,6 @@
 package application.nodes;
 
+import application.objects.Hero;
 import application.objects.enemy.EnemyFamily;
 import application.scenegraph.SceneGraphIndexedFaceSetShader;
 import jscenegraph.coin3d.inventor.SbBSPTree;
@@ -165,7 +166,15 @@ public class SoEnemies extends SoSeparator {
             SbVec3f pillPosition = pill.position.translation.getValue();
             SbVec3f direction = referencePoint.operator_minus(pillPosition.operator_minus(feetToCenter,dummy2), dummy);
             final float distance = direction.length(); 
-            if ( distance <= 0.8f || distance > 80) {
+            if ( distance <= 0.8f) {
+                Hero hero = sg.getHero();
+                hero.life -= deltaT/10.0f;
+                if (hero.life < 0) {
+                    hero.life = 0;
+                }
+                continue;
+            }
+            if ( distance > 80) {
                 continue;
             }
             direction.normalize();
