@@ -87,6 +87,11 @@ public class TargetSearchRunnable implements Runnable {
 
 											main.shootTarget(t, targetNode.getInstance());
 
+											main.getHero().life += 0.1f;
+											if (main.getHero().life > 1.0f) {
+												main.getHero().life = 1.0f;
+											}
+
 											SbVec3f pickedPoint = pp.getPoint();
 											SbVec3f hero = main.getPosition();
 											float distance = hero.operator_minus(pickedPoint).length();

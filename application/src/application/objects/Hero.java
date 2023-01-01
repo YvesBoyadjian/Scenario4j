@@ -20,6 +20,8 @@ public class Hero {
 
     public static final String BOOTS = "boots";
 
+    public static final String LIFE = "life";
+
     public boolean fly = false;
 
     public DBody body;

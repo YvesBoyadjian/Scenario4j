@@ -464,6 +464,8 @@ public class MainGLFW {
 
 						saveGameProperties.setProperty(BOOTS, sg.haveBoots() ? "true" : "false");
 
+						saveGameProperties.setProperty(LIFE, String.valueOf(sg.getHero().life));
+
 						saveGameProperties.setProperty(KILLED_ENEMIES, sg.getEnemies().getKilledInstances());
 
 						sg.saveShots(saveGameProperties);
@@ -786,6 +788,8 @@ public class MainGLFW {
 				float y = Float.valueOf(saveGameProperties.getProperty(HERO_Y, String.valueOf(Hero.STARTING_Y)));
 
 				float z = Float.valueOf(saveGameProperties.getProperty(HERO_Z, String.valueOf(Hero.STARTING_Z/* - SCENE_POSITION.getZ()*/)));
+
+				hero.life = Float.valueOf(saveGameProperties.getProperty(LIFE, String.valueOf(1.0f)));
 
 				previousTimeSec = Double.valueOf(saveGameProperties.getProperty(TIME, "0"));
 
