@@ -161,6 +161,8 @@ public class SoEnemies extends SoSeparator {
         }
         nanoTime = now;
 
+        boolean hurting = false;
+
         for(Integer instance : actualChildrenInstances) {
             SoPill pill = instancesToCollectibles.get(instance);
             SbVec3f pillPosition = pill.position.translation.getValue();
@@ -169,6 +171,7 @@ public class SoEnemies extends SoSeparator {
             if ( distance <= 0.8f) {
                 Hero hero = sg.getHero();
                 hero.life -= deltaT/10.0f;
+                hurting = true;
                 if (hero.life < 0) {
                     hero.life = 0;
                 }
@@ -181,6 +184,8 @@ public class SoEnemies extends SoSeparator {
             pill.position.translation.setValue(pillPosition.operator_add(direction.operator_mul(deltaT*speed)));
             pillPosition.setZ(sg.getInternalZ(pillPosition.getX(),pillPosition.getY(),indices,true)+sg.getzTranslation() + 1.75f/2 - 0.03f);
         }
+
+        sg.getHero().hurting = hurting;
     }
 
     public void kill(SoPill target) {

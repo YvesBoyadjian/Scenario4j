@@ -600,6 +600,21 @@ public class MainGLFW {
 			}
 		};
 
+		final byte[] screamSound = loadSound("VOXEfrt_Cri de douleur (ID 2361)_LS_16bit.wav");
+		final Clip[] screamClip = new Clip[1];
+
+				viewer.addIdleListener((viewer0) -> {
+					if (screamClip[0] != null) {
+						Clip clip = screamClip[0];
+						if (clip.isRunning()) {
+							return;
+						}
+					}
+			if (sg.getHero() != null && sg.getHero().hurting) {
+				screamClip[0] = playSound(screamSound, false,1.0f);
+			}
+		});
+
 		viewer.setHeadlight(false);
 
 
