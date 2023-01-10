@@ -125,18 +125,9 @@ public class OptionDialog extends JDialog {
         //dispose();
         setVisible(false);
         apply();
-        if(viewer.isTimeStop()) {
-            viewer.toggleTimeStop();
-        }
-        sg.setHeroPosition(Hero.STARTING_X,Hero.STARTING_Y,Hero.STARTING_Z);
-        sg.getHero().life = 1.0f;
-        sg.resurrectTheAnimals();
-        sg.resetScenario(viewer);
-        SwingUtilities.invokeLater(()->sg.setBoots(false));
-        if(viewer.isFlying()) {
-            viewer.toggleFly();
-        }
-        viewer.setAllowToggleFly(false);
+
+        sg.newGame(viewer);
+        
 //        viewer.onClose(true);
 //        glfwSetWindowShouldClose(viewer.getGLWidget().getWindow(), true);
         viewer.setVisible(true);

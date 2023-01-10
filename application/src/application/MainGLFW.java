@@ -1538,6 +1538,15 @@ public class MainGLFW {
 			scenario.idle(viewer1);
 		});
 
+        viewer.addIdleListener((v)->{
+            if (hero.life <= 0) {
+                hero.life = 1;
+                SwingUtilities.invokeLater(()->{
+                    sg.newGame(v);
+                });
+            }
+        });
+
 		SwingUtilities.invokeLater(() -> {
 			try {
 				loop();

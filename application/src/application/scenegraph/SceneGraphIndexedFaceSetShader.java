@@ -3379,4 +3379,19 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 			return mainEnemySep;
 		});
 	}
+
+	public void newGame(SoQtWalkViewer viewer) {
+		if(viewer.isTimeStop()) {
+			viewer.toggleTimeStop();
+		}
+		setHeroPosition(Hero.STARTING_X,Hero.STARTING_Y,Hero.STARTING_Z);
+		getHero().life = 1.0f;
+		resurrectTheAnimals();
+		resetScenario(viewer);
+		SwingUtilities.invokeLater(()->setBoots(false));
+		if(viewer.isFlying()) {
+			viewer.toggleFly();
+		}
+		viewer.setAllowToggleFly(false);
+	}
 }
