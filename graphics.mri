@@ -1,10 +1,10 @@
 #Mount Rainier Island graphics
-#Fri Jul 09 20:36:15 CEST 2021
-tree_shadow_distance=1500.0
-tree_distance=3000.0
-max_i=7000
+#Thu Jan 26 18:25:32 CET 2023
+tree_shadow_distance=500.0
+tree_distance=1500.0
+max_i=5612
 volumetric_sky=false
-lod_factor=0.5
-lod_factor_shadow=0.5
-shadow_precision=0.15
+lod_factor=0.25
+lod_factor_shadow=0.05
+shadow_precision=0.05
 display_fps=false

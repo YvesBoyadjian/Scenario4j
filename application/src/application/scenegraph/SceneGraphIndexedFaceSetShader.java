@@ -2540,7 +2540,7 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 	}
 
 	public float getLevelOfDetailShadow() {
-		return LEVEL_OF_DETAIL_SHADOW /*/ masterS.getLodFactor()*/;
+		return 0.05f;
 	}
 
 	public void setLevelOfDetail(float levelOfDetail) {
