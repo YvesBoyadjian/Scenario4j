@@ -15,6 +15,7 @@ import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.file.Files;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
 
 import javax.sound.sampled.*;
@@ -302,6 +303,11 @@ public class MainGLFW {
 	static final DxHashSpace.Node[][] tablePtr = new DxHashSpace.Node[1][];
 
 	static Clip seaClip;
+
+	static final AtomicLong[] lastAliveMillis = new AtomicLong[1];
+	static {
+		lastAliveMillis[0] = new AtomicLong();
+	}
 
 	public static void mainGame(final JProgressBar progressBar) {
 		display = new Display();
@@ -1609,6 +1615,28 @@ public class MainGLFW {
 			} catch (AWTException e) {
 				e.printStackTrace();
 			}
+
+			lastAliveMillis[0].set(System.currentTimeMillis()+10000);
+
+			final Thread aliveThread = new Thread(()->{
+				while(true) {
+					try {
+						Thread.sleep(100);
+						if(System.currentTimeMillis() - lastAliveMillis[0].get()>3000) {
+							File graphicsFile = new File("graphics.mri");
+							if (graphicsFile.exists()) {
+								Toolkit.getDefaultToolkit().beep();
+								graphicsFile.delete();
+							}
+							System.exit(-2);
+						}
+					} catch (InterruptedException e) {
+						throw new RuntimeException(e);
+					}
+
+				}
+			});
+			aliveThread.start();
 		});
 	}
 
@@ -1644,6 +1672,7 @@ public class MainGLFW {
 			SwingUtilities.invokeLater(() -> {
 				try {
 					loop();
+					lastAliveMillis[0].set(System.currentTimeMillis());
 				} catch (Exception e) {
 					e.printStackTrace();
 					viewer.setVisible(false);
