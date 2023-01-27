@@ -1626,7 +1626,7 @@ public class MainGLFW {
 							File graphicsFile = new File("graphics.mri");
 							if (graphicsFile.exists()) {
 								Toolkit.getDefaultToolkit().beep();
-								graphicsFile.delete();
+//								graphicsFile.delete();
 							}
 //							System.exit(-2);
 						}

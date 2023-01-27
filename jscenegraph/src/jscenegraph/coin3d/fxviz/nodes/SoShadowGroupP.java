@@ -1137,7 +1137,6 @@ setFragmentShader(SoState state)
     }
   }
 
-  gen.addMainStatement("color = vec3(clamp(color.r, 0.0, 1.0), clamp(color.g, 0.0, 1.0), clamp(color.b, 0.0, 1.0));");
   gen.addMainStatement("if (coin_light_model != 0) { color *= texcolor.rgb; color += scolor; }\n"+
                        "else color = mydiffuse.rgb * texcolor.rgb;\n");
 
@@ -1156,7 +1155,8 @@ setFragmentShader(SoState state)
   gen.addMainStatement("float noise1 = fract((gl_FragCoord.x*2+gl_FragCoord.y)*0.125f)/256.0f;\n");
   gen.addMainStatement("float noise2 = fract((3+gl_FragCoord.x*2+gl_FragCoord.y)*0.125f)/256.0f;\n");
   gen.addMainStatement("float noise3 = fract((5+gl_FragCoord.x*2+gl_FragCoord.y)*0.125f)/256.0f;\n");
-  
+
+  gen.addMainStatement("color = vec3(clamp(color.r, 0.0, 1.0), clamp(color.g, 0.0, 1.0), clamp(color.b, 0.0, 1.0));");
   gen.addMainStatement("color = pow(color,vec3(0.47f))+vec3(noise1,noise2,noise3);\n"); // YB CHANGE GAMMA CORRECTION
 
   gen.addMainStatement("s4j_FragColor = vec4(color, mydiffuse.a);");
