@@ -421,7 +421,7 @@ public class MainGLFW {
 		sg.setTreeShadowDistance(tree_shadow_distance);
 
 		sg.getShadowGroup().isVolumetricActive.setValue(volumetric_sky);
-		sg.getEnvironment().fogColor.setValue(volumetric_sky ? sg.SKY_COLOR.darker().darker().darker().darker().darker().darker() : sg.SKY_COLOR.darker());
+		sg.getEnvironment().fogColor.setValue(volumetric_sky ? new SbColor(sg.SKY_COLOR.darker().darker().darker().darker().darker().darker().operator_mul(sg.getOverallContrast())) : new SbColor(sg.SKY_COLOR.darker().operator_mul(sg.getOverallContrast())));
 
 		sg.enableFPS(display_fps);
 

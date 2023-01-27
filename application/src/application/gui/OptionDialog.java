@@ -3,6 +3,7 @@ package application.gui;
 import application.objects.Hero;
 import application.scenegraph.SceneGraphIndexedFaceSetShader;
 import application.viewer.glfw.SoQtWalkViewer;
+import jscenegraph.database.inventor.SbColor;
 
 import javax.swing.*;
 import java.awt.event.*;
@@ -206,7 +207,7 @@ public class OptionDialog extends JDialog {
         sg.setMaxI(((int)((SpinnerNumberModel)spinnerMaxI.getModel()).getNumber()));
         boolean volumetric = volumetricSkyCheckBox.getModel().isSelected();
         sg.getShadowGroup().isVolumetricActive.setValue(volumetric);
-        sg.getEnvironment().fogColor.setValue(volumetric ? sg.SKY_COLOR.darker().darker().darker().darker().darker().darker() : sg.SKY_COLOR.darker());
+        sg.getEnvironment().fogColor.setValue(volumetric ? new SbColor(sg.SKY_COLOR.darker().darker().darker().darker().darker().darker().operator_mul(sg.getOverallContrast())) : new SbColor(sg.SKY_COLOR.darker().operator_mul(sg.getOverallContrast())));
         sg.enableFPS(displayFPSCheckBox.getModel().isSelected());
         //sg.disableNotifySun();
     }

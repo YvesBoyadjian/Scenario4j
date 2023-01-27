@@ -604,8 +604,8 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 	    environment.ambientColor.setValue(0, 0, 0);
 	    environment.ambientIntensity.setValue(0);
 	    environment.fogType.setValue(SoEnvironment.FogType.FOG);
-	    environment.fogColor.setValue(SKY_COLOR.darker());
-	    environment.fogVisibility.setValue(5e4f);
+	    environment.fogColor.setValue(new SbColor(SKY_COLOR.darker().operator_mul(overallContrast)));
+	    environment.fogVisibility.setValue(4.5e4f/*5e4f*/);
 	    
 	    sep.addChild(environment);
 

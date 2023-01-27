@@ -75,7 +75,7 @@ public class SoVolumetricShadowGroupP extends SoShadowGroupP {
         gen.addMainStatement("  {");
         gen.addMainStatement("    float scatter = ComputeScattering(dot(rayDirection, sunDirection));");
         gen.addMainStatement("    scatter = scatter * shadeFactor;");
-        gen.addMainStatement("    accumFog += vec3(scatter,scatter,scatter) * g_SunColor * 2.2;");
+        gen.addMainStatement("    accumFog += vec3(scatter,scatter,scatter) * g_SunColor * 2.5;");
         gen.addMainStatement("  }");
         gen.addMainStatement("  currentPosition += step;");
         gen.addMainStatement("}");
