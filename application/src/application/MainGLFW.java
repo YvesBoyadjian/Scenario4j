@@ -1636,7 +1636,7 @@ public class MainGLFW {
 
 				}
 			});
-			aliveThread.start();
+			//aliveThread.start();
 		});
 	}
 
