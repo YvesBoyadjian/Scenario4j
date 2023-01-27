@@ -41,6 +41,7 @@ in vec3 fragmentNormal;
 in vec3 perVertexColor;
 in vec2 texCoord;
 in vec4 frontColor;
+uniform mat4 textureMatrix0;
 uniform sampler2D textureMap0;
 
 uniform int coin_texunit0_model;
@@ -134,6 +135,23 @@ vec4 map;
 vec4 nearmap;
 mydiffuse.a *= texcolor.a;
 
+  vec3 g_CameraPosition = vec3(0.0f,0.0f,0.0f);
+  vec3 endRayPosition = ecPosition3;
+  mat4 g_ShadowViewProjectionMatrix;
+  vec3 sunDirection;
+  vec3 g_SunColor;
+  vec3 startPosition = g_CameraPosition;
+  vec3 rayVector = endRayPosition.xyz - startPosition;
+  float rayLength = length(rayVector);
+  rayLength = min(rayLength,20000);
+  vec3 rayDirection = rayVector / rayLength;
+  rayDirection = normalize(rayDirection);
+  float stepLength = rayLength / NB_STEPS;
+  vec3 step = rayDirection * stepLength;
+  vec3 currentPosition;
+  vec3 accumFog;
+  vec3 colorFog = vec3(0.0f,0.0f,0.0f);
+  vec4 pos;
   // _______________________ Begin ShadowLight 0
 
   dist = dot(ecPosition3.xyz, lightplane0.xyz) - lightplane0.w;
@@ -179,6 +197,31 @@ specular = s4j_LightSource[4].specular;
   scolor += shadeFactor * s4j_FrontMaterial.specular.rgb * specular.rgb;
 
   color += ambient.rgb * s4j_FrontMaterial.ambient.rgb;
+
+  sunDirection = normalize(vec3(s4j_LightSource[4].position));
+  g_SunColor = s4j_LightSource[4].diffuse.rgb;
+  g_ShadowViewProjectionMatrix = textureMatrix0;
+  currentPosition = startPosition;
+  accumFog = vec3(0.0f,0.0f,0.0f);
+  for (int i = 0; i < NB_STEPS; i++)
+  {
+    dist = dot(currentPosition.xyz, lightplane0.xyz) - lightplane0.w;
+    pos = cameraTransform * vec4(currentPosition.xyz,1);
+    vec4 worldInShadowCameraSpace = g_ShadowViewProjectionMatrix * pos;
+    coord = 0.5 * (worldInShadowCameraSpace.xyz/worldInShadowCameraSpace.w + vec3(1.0));
+    map = texture2D(shadowMap0, coord.xy);
+    map = (map + vec4(1.0)) * 0.5;
+    map.xy += map.zw / DISTRIBUTE_FACTOR;
+    shadeFactor = ((map.x < 0.9999) && (worldInShadowCameraSpace.z > -1.0 && coord.x >= 0.0 && coord.x <= 1.0 && coord.y >= 0.0 && coord.y <= 1.0)) ? VsmLookup(map, (dist - nearval0) / (farval0 - nearval0), EPSILON, THRESHOLD) : 1.0;
+    {
+      float scatter = ComputeScattering(dot(rayDirection, sunDirection));
+      scatter = scatter * shadeFactor;
+      accumFog += vec3(scatter,scatter,scatter) * g_SunColor * 2.2;
+    }
+    currentPosition += step;
+  }
+  accumFog /= NB_STEPS;
+  colorFog += accumFog * rayLength * s4j_Fog.density;
 
   // ____________________ End ShadowLight
 
@@ -238,9 +281,8 @@ specular = s4j_LightSource[3].specular;
 else color = mydiffuse.rgb * texcolor.rgb;
 
   float fog = exp(-s4j_Fog.density * abs(ecPosition3.z));
-
   color = mix(s4j_Fog.color.rgb, color, clamp(fog, 0.0, 1.0));
-
+  color += colorFog;
   float noise1 = fract((gl_FragCoord.x*2+gl_FragCoord.y)*0.125f)/256.0f;
 
   float noise2 = fract((3+gl_FragCoord.x*2+gl_FragCoord.y)*0.125f)/256.0f;
