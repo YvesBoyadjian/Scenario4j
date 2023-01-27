@@ -330,6 +330,8 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 
 	private Future<SoSeparator> enemiesSeparatorFuture;
 
+	private float overallContrast = 2.0f;
+
     public SceneGraphIndexedFaceSetShader(
 			RasterProvider rwp,
 			RasterProvider rep,
@@ -711,19 +713,19 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 	    sky = new SoDirectionalLight[4];
 	    sky[0] = new SoNoSpecularDirectionalLight();
 	    sky[0].color.setValue(SKY_COLOR);
-	    sky[0].intensity.setValue(SKY_INTENSITY);
+	    sky[0].intensity.setValue(SKY_INTENSITY*overallContrast);
 	    sky[0].direction.setValue(0, 1, -1);
 	    sky[1] = new SoNoSpecularDirectionalLight();
 	    sky[1].color.setValue(SKY_COLOR);
-	    sky[1].intensity.setValue(SKY_INTENSITY);
+	    sky[1].intensity.setValue(SKY_INTENSITY*overallContrast);
 	    sky[1].direction.setValue(0, -1, -1);
 	    sky[2] = new SoNoSpecularDirectionalLight();
 	    sky[2].color.setValue(SKY_COLOR);
-	    sky[2].intensity.setValue(SKY_INTENSITY);
+	    sky[2].intensity.setValue(SKY_INTENSITY*overallContrast);
 	    sky[2].direction.setValue(1, 0, -1);
 	    sky[3] = new SoNoSpecularDirectionalLight();
 	    sky[3].color.setValue(SKY_COLOR);
-	    sky[3].intensity.setValue(SKY_INTENSITY);
+	    sky[3].intensity.setValue(SKY_INTENSITY*overallContrast);
 	    sky[3].direction.setValue(-1, 0, -1);
 	    
 	    sep.addChild(sky[0]);
@@ -764,7 +766,7 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 	    //sun[is].bboxCenter.setValue(10000, 0, 0);
 	    sunLight[is].bboxSize.setValue(5000+is*3000, 5000+is*3000, 1000);
 	    
-	    sunLight[is].intensity.setValue(1.0F/4.0f);
+	    sunLight[is].intensity.setValue(1.0F/4.0f*overallContrast);
 	    
 	    shadowGroup.addChild(sunLight[is]);
 	    sunLight[is].enableNotify(false); // In order not to recompute shaders
@@ -1654,6 +1656,8 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 		lifeBarSeparator.addChild(lifeBar);
 
 		sep.addChild(lifeBarSeparator);
+
+		onContrastChange();
 	}
 
 	private SoNode buildOracle(boolean shadow) {
@@ -3393,5 +3397,28 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 			viewer.toggleFly();
 		}
 		viewer.setAllowToggleFly(false);
+	}
+
+	public void setContrast(float contrast) {
+		if (overallContrast != contrast) {
+			overallContrast = contrast;
+			onContrastChange();
+		}
+	}
+
+	public float getOverallContrast() {
+		return overallContrast;
+	}
+
+	private void onContrastChange() {
+		for(int is=0;is<4;is++) {
+			boolean wasNotified = sunLight[is].enableNotify(true);
+			sunLight[is].intensity.setValue(1.0F/4.0f*overallContrast);
+			sunLight[is].enableNotify(wasNotified); // In order not to recompute shaders
+		}
+		sky[0].intensity.setValue(SKY_INTENSITY*overallContrast);
+		sky[1].intensity.setValue(SKY_INTENSITY*overallContrast);
+		sky[2].intensity.setValue(SKY_INTENSITY*overallContrast);
+		sky[3].intensity.setValue(SKY_INTENSITY*overallContrast);
 	}
 }
