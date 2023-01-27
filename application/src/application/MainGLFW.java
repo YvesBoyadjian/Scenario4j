@@ -1622,13 +1622,13 @@ public class MainGLFW {
 				while(true) {
 					try {
 						Thread.sleep(100);
-						if(System.currentTimeMillis() - lastAliveMillis[0].get()>3000) {
+						if(System.currentTimeMillis() - lastAliveMillis[0].get()>5000) {
 							File graphicsFile = new File("graphics.mri");
 							if (graphicsFile.exists()) {
 								Toolkit.getDefaultToolkit().beep();
 								graphicsFile.delete();
 							}
-							System.exit(-2);
+//							System.exit(-2);
 						}
 					} catch (InterruptedException e) {
 						throw new RuntimeException(e);

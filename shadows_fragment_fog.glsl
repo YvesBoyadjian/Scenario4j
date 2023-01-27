@@ -1,41 +1,46 @@
-#version 120
+#version 400 core
+struct LightSource {
+    vec4 ambient;
+    vec4 diffuse;
+    vec4 specular;
+    vec4 position;
+};
+struct Fog {
+    vec4 color;
+    float density;
+};
+struct FrontMaterial {
+    vec4 specular;
+    vec4 ambient;
+    float shininess;
+};
+uniform Fog s4j_Fog;
+uniform FrontMaterial s4j_FrontMaterial;
+layout(location = 0) out vec4 s4j_FragColor;
+uniform LightSource s4j_LightSource[5];
 const float EPSILON = 3.0E-6;
 const float THRESHOLD = 0.9;
-const int NB_STEPS = 32;
+const int NB_STEPS = 12;
 uniform mat4 cameraTransform;
 // ____________________ Begin ShadowLight 0
 uniform sampler2D shadowMap0;
+uniform sampler2D nearShadowMap0;
 uniform float farval0;
 uniform float nearval0;
-varying vec4 shadowCoord0;
+uniform float farvalnear0;
+uniform float nearvalnear0;
+in vec4 shadowCoord0;
+in vec4 nearShadowCoord0;
 uniform vec4 lightplane0;
-// ____________________ End ShadowLight
-// ____________________ Begin ShadowLight 1
-uniform sampler2D shadowMap1;
-uniform float farval1;
-uniform float nearval1;
-varying vec4 shadowCoord1;
-uniform vec4 lightplane1;
-// ____________________ End ShadowLight
-// ____________________ Begin ShadowLight 2
-uniform sampler2D shadowMap2;
-uniform float farval2;
-uniform float nearval2;
-varying vec4 shadowCoord2;
-uniform vec4 lightplane2;
-// ____________________ End ShadowLight
-// ____________________ Begin ShadowLight 3
-uniform sampler2D shadowMap3;
-uniform float farval3;
-uniform float nearval3;
-varying vec4 shadowCoord3;
-uniform vec4 lightplane3;
+uniform vec4 lightnearplane0;
 // ____________________ End ShadowLight
 const float DISTRIBUTE_FACTOR = 64.0;
 
-varying vec3 ecPosition3;
-varying vec3 fragmentNormal;
-varying vec3 perVertexColor;
+in vec3 ecPosition3;
+in vec3 fragmentNormal;
+in vec3 perVertexColor;
+in vec2 texCoord;
+in vec4 frontColor;
 uniform sampler2D textureMap0;
 
 uniform int coin_texunit0_model;
@@ -45,12 +50,6 @@ uniform int coin_light_model;
 uniform int coin_two_sided_lighting;
 
 uniform float maxshadowdistance0;
-
-uniform float maxshadowdistance1;
-
-uniform float maxshadowdistance2;
-
-uniform float maxshadowdistance3;
 
 float VsmLookup(in vec4 map, in float dist, in float epsilon, float bleedthreshold)
 {
@@ -99,7 +98,7 @@ void DirectionalLight(in vec3 light_vector,
   nDotVP = max(0.0, dot(normal, light_vector));
   nDotHV = max(0.0, dot(normal, light_halfVector));
 
-  float shininess = gl_FrontMaterial.shininess;
+  float shininess = s4j_FrontMaterial.shininess;
   if (nDotVP == 0.0)
     pf = 0.0;
   else
@@ -121,52 +120,54 @@ void main(void) {
   vec4 ambient = vec4(0.0);
 vec4 diffuse = vec4(0.0);
 vec4 specular = vec4(0.0);
-vec4 mydiffuse = gl_Color;
-vec4 texcolor = (coin_texunit0_model != 0) ? texture2D(textureMap0, gl_TexCoord[0].xy) : vec4(1.0);
+vec4 mydiffuse = frontColor;
+vec4 texcolor = (coin_texunit0_model != 0) ? texture2D(textureMap0, texCoord) : vec4(1.0);
 
   vec3 color = perVertexColor;
 vec3 scolor = vec3(0.0);
 float dist;
+float neardist;
 float shadeFactor;
 vec3 coord;
+vec3 nearcoord;
 vec4 map;
+vec4 nearmap;
 mydiffuse.a *= texcolor.a;
 
-  vec3 g_CameraPosition = vec3(0.0f,0.0f,0.0f);
-  vec3 endRayPosition = ecPosition3;
-  mat4 g_ShadowViewProjectionMatrix;
-  vec3 sunDirection;
-  vec3 g_SunColor;
-  vec3 startPosition = g_CameraPosition;
-  vec3 rayVector = endRayPosition.xyz - startPosition;
-  float rayLength = length(rayVector);
-  rayLength = min(rayLength,20000);
-  vec3 rayDirection = rayVector / rayLength;
-  rayDirection = normalize(rayDirection);
-  float stepLength = rayLength / NB_STEPS;
-  vec3 step = rayDirection * stepLength;
-  vec3 currentPosition;
-  vec3 accumFog;
-  vec3 colorFog = vec3(0.0f,0.0f,0.0f);
-  vec4 pos;
   // _______________________ Begin ShadowLight 0
 
   dist = dot(ecPosition3.xyz, lightplane0.xyz) - lightplane0.w;
 
-  ambient = gl_LightSource[4].ambient;
-diffuse = gl_LightSource[4].diffuse;
-specular = gl_LightSource[4].specular;
+  neardist = dot(ecPosition3.xyz, lightnearplane0.xyz) - lightnearplane0.w;
 
-  DirectionalLight(normalize(vec3(gl_LightSource[4].position)),normalize(eye),normalize(normalize(vec3(gl_LightSource[4].position))+normalize(eye)), normal, diffuse, specular);
+  ambient = s4j_LightSource[4].ambient;
+diffuse = s4j_LightSource[4].diffuse;
+specular = s4j_LightSource[4].specular;
+
+  DirectionalLight(normalize(vec3(s4j_LightSource[4].position)),normalize(eye),normalize(normalize(vec3(s4j_LightSource[4].position))+normalize(eye)), normal, diffuse, specular);
   coord = 0.5 * (shadowCoord0.xyz / shadowCoord0.w + vec3(1.0));
+
+  nearcoord = 0.5 * (nearShadowCoord0.xyz / nearShadowCoord0.w + vec3(1.0));
 
   map = texture2D(shadowMap0, coord.xy);
 
+  nearmap = texture2D(nearShadowMap0, nearcoord.xy);
+
   map = (map + vec4(1.0)) * 0.5;
+
+  nearmap = (nearmap + vec4(1.0)) * 0.5;
 
   map.xy += map.zw / DISTRIBUTE_FACTOR;
 
+  nearmap.xy += nearmap.zw / DISTRIBUTE_FACTOR;
+
+  if(nearcoord.x >= 0.0 && nearcoord.x <= 1.0 && nearcoord.y >= 0.0 && nearcoord.y <= 1.0){
+
+  shadeFactor = ((nearmap.x < 0.9999) && (nearShadowCoord0.z > -1.0 && nearcoord.x >= 0.0 && nearcoord.x <= 1.0 && nearcoord.y >= 0.0 && nearcoord.y <= 1.0)) ? VsmLookup(nearmap, (neardist - nearvalnear0) / (farvalnear0 - nearvalnear0), EPSILON, THRESHOLD) : 1.0;
+}else{
+
   shadeFactor = ((map.x < 0.9999) && (shadowCoord0.z > -1.0 && coord.x >= 0.0 && coord.x <= 1.0 && coord.y >= 0.0 && coord.y <= 1.0)) ? VsmLookup(map, (dist - nearval0) / (farval0 - nearval0), EPSILON, THRESHOLD) : 1.0;
+}
 
   shadeFactor = 1.0 - shadeFactor;
 
@@ -175,257 +176,61 @@ specular = gl_LightSource[4].specular;
   shadeFactor = 1.0 - shadeFactor;
 
   color += shadeFactor * diffuse.rgb * mydiffuse.rgb;
-  scolor += shadeFactor * gl_FrontMaterial.specular.rgb * specular.rgb;
+  scolor += shadeFactor * s4j_FrontMaterial.specular.rgb * specular.rgb;
 
-  color += ambient.rgb * gl_FrontMaterial.ambient.rgb;
-
-  sunDirection = normalize(vec3(gl_LightSource[4].position));
-  g_SunColor = gl_LightSource[4].diffuse.rgb;
-  g_ShadowViewProjectionMatrix = gl_TextureMatrix[15];
-  currentPosition = startPosition;
-  accumFog = vec3(0.0f,0.0f,0.0f);
-  for (int i = 0; i < NB_STEPS; i++)
-  {
-    dist = dot(currentPosition.xyz, lightplane0.xyz) - lightplane0.w;
-    pos = cameraTransform * vec4(currentPosition.xyz,1);
-    vec4 worldInShadowCameraSpace = g_ShadowViewProjectionMatrix * pos;
-    coord = 0.5 * (worldInShadowCameraSpace.xyz/worldInShadowCameraSpace.w + vec3(1.0));
-    map = texture2D(shadowMap0, coord.xy);
-    map = (map + vec4(1.0)) * 0.5;
-    map.xy += map.zw / DISTRIBUTE_FACTOR;
-    shadeFactor = ((map.x < 0.9999) && (worldInShadowCameraSpace.z > -1.0 && coord.x >= 0.0 && coord.x <= 1.0 && coord.y >= 0.0 && coord.y <= 1.0)) ? VsmLookup(map, (dist - nearval0) / (farval0 - nearval0), EPSILON, THRESHOLD) : 0.0;
-    {
-      float scatter = ComputeScattering(dot(rayDirection, sunDirection));
-      scatter = scatter * shadeFactor;
-      accumFog += vec3(scatter,scatter,scatter) * g_SunColor;
-    }
-    currentPosition += step;
-  }
-  accumFog /= NB_STEPS;
-  colorFog += accumFog * rayLength * gl_Fog.density;
-
-  // ____________________ End ShadowLight
-
-  // _______________________ Begin ShadowLight 1
-
-  dist = dot(ecPosition3.xyz, lightplane1.xyz) - lightplane1.w;
-
-  ambient = gl_LightSource[5].ambient;
-diffuse = gl_LightSource[5].diffuse;
-specular = gl_LightSource[5].specular;
-
-  DirectionalLight(normalize(vec3(gl_LightSource[5].position)),normalize(eye),normalize(normalize(vec3(gl_LightSource[5].position))+normalize(eye)), normal, diffuse, specular);
-  coord = 0.5 * (shadowCoord1.xyz / shadowCoord1.w + vec3(1.0));
-
-  map = texture2D(shadowMap1, coord.xy);
-
-  map = (map + vec4(1.0)) * 0.5;
-
-  map.xy += map.zw / DISTRIBUTE_FACTOR;
-
-  shadeFactor = ((map.x < 0.9999) && (shadowCoord1.z > -1.0 && coord.x >= 0.0 && coord.x <= 1.0 && coord.y >= 0.0 && coord.y <= 1.0)) ? VsmLookup(map, (dist - nearval1) / (farval1 - nearval1), EPSILON, THRESHOLD) : 1.0;
-
-  shadeFactor = 1.0 - shadeFactor;
-
-  shadeFactor *= min(1.0, exp(2.35*ecPosition3.z*abs(ecPosition3.z)/(maxshadowdistance1*maxshadowdistance1)));
-
-  shadeFactor = 1.0 - shadeFactor;
-
-  color += shadeFactor * diffuse.rgb * mydiffuse.rgb;
-  scolor += shadeFactor * gl_FrontMaterial.specular.rgb * specular.rgb;
-
-  color += ambient.rgb * gl_FrontMaterial.ambient.rgb;
-
-  sunDirection = normalize(vec3(gl_LightSource[5].position));
-  g_SunColor = gl_LightSource[5].diffuse.rgb;
-  g_ShadowViewProjectionMatrix = gl_TextureMatrix[14];
-  currentPosition = startPosition;
-  accumFog = vec3(0.0f,0.0f,0.0f);
-  for (int i = 0; i < NB_STEPS; i++)
-  {
-    dist = dot(currentPosition.xyz, lightplane1.xyz) - lightplane1.w;
-    pos = cameraTransform * vec4(currentPosition.xyz,1);
-    vec4 worldInShadowCameraSpace = g_ShadowViewProjectionMatrix * pos;
-    coord = 0.5 * (worldInShadowCameraSpace.xyz/worldInShadowCameraSpace.w + vec3(1.0));
-    map = texture2D(shadowMap1, coord.xy);
-    map = (map + vec4(1.0)) * 0.5;
-    map.xy += map.zw / DISTRIBUTE_FACTOR;
-    shadeFactor = ((map.x < 0.9999) && (worldInShadowCameraSpace.z > -1.0 && coord.x >= 0.0 && coord.x <= 1.0 && coord.y >= 0.0 && coord.y <= 1.0)) ? VsmLookup(map, (dist - nearval1) / (farval1 - nearval1), EPSILON, THRESHOLD) : 0.0;
-    {
-      float scatter = ComputeScattering(dot(rayDirection, sunDirection));
-      scatter = scatter * shadeFactor;
-      accumFog += vec3(scatter,scatter,scatter) * g_SunColor;
-    }
-    currentPosition += step;
-  }
-  accumFog /= NB_STEPS;
-  colorFog += accumFog * rayLength * gl_Fog.density;
-
-  // ____________________ End ShadowLight
-
-  // _______________________ Begin ShadowLight 2
-
-  dist = dot(ecPosition3.xyz, lightplane2.xyz) - lightplane2.w;
-
-  ambient = gl_LightSource[6].ambient;
-diffuse = gl_LightSource[6].diffuse;
-specular = gl_LightSource[6].specular;
-
-  DirectionalLight(normalize(vec3(gl_LightSource[6].position)),normalize(eye),normalize(normalize(vec3(gl_LightSource[6].position))+normalize(eye)), normal, diffuse, specular);
-  coord = 0.5 * (shadowCoord2.xyz / shadowCoord2.w + vec3(1.0));
-
-  map = texture2D(shadowMap2, coord.xy);
-
-  map = (map + vec4(1.0)) * 0.5;
-
-  map.xy += map.zw / DISTRIBUTE_FACTOR;
-
-  shadeFactor = ((map.x < 0.9999) && (shadowCoord2.z > -1.0 && coord.x >= 0.0 && coord.x <= 1.0 && coord.y >= 0.0 && coord.y <= 1.0)) ? VsmLookup(map, (dist - nearval2) / (farval2 - nearval2), EPSILON, THRESHOLD) : 1.0;
-
-  shadeFactor = 1.0 - shadeFactor;
-
-  shadeFactor *= min(1.0, exp(2.35*ecPosition3.z*abs(ecPosition3.z)/(maxshadowdistance2*maxshadowdistance2)));
-
-  shadeFactor = 1.0 - shadeFactor;
-
-  color += shadeFactor * diffuse.rgb * mydiffuse.rgb;
-  scolor += shadeFactor * gl_FrontMaterial.specular.rgb * specular.rgb;
-
-  color += ambient.rgb * gl_FrontMaterial.ambient.rgb;
-
-  sunDirection = normalize(vec3(gl_LightSource[6].position));
-  g_SunColor = gl_LightSource[6].diffuse.rgb;
-  g_ShadowViewProjectionMatrix = gl_TextureMatrix[13];
-  currentPosition = startPosition;
-  accumFog = vec3(0.0f,0.0f,0.0f);
-  for (int i = 0; i < NB_STEPS; i++)
-  {
-    dist = dot(currentPosition.xyz, lightplane2.xyz) - lightplane2.w;
-    pos = cameraTransform * vec4(currentPosition.xyz,1);
-    vec4 worldInShadowCameraSpace = g_ShadowViewProjectionMatrix * pos;
-    coord = 0.5 * (worldInShadowCameraSpace.xyz/worldInShadowCameraSpace.w + vec3(1.0));
-    map = texture2D(shadowMap2, coord.xy);
-    map = (map + vec4(1.0)) * 0.5;
-    map.xy += map.zw / DISTRIBUTE_FACTOR;
-    shadeFactor = ((map.x < 0.9999) && (worldInShadowCameraSpace.z > -1.0 && coord.x >= 0.0 && coord.x <= 1.0 && coord.y >= 0.0 && coord.y <= 1.0)) ? VsmLookup(map, (dist - nearval2) / (farval2 - nearval2), EPSILON, THRESHOLD) : 0.0;
-    {
-      float scatter = ComputeScattering(dot(rayDirection, sunDirection));
-      scatter = scatter * shadeFactor;
-      accumFog += vec3(scatter,scatter,scatter) * g_SunColor;
-    }
-    currentPosition += step;
-  }
-  accumFog /= NB_STEPS;
-  colorFog += accumFog * rayLength * gl_Fog.density;
-
-  // ____________________ End ShadowLight
-
-  // _______________________ Begin ShadowLight 3
-
-  dist = dot(ecPosition3.xyz, lightplane3.xyz) - lightplane3.w;
-
-  ambient = gl_LightSource[7].ambient;
-diffuse = gl_LightSource[7].diffuse;
-specular = gl_LightSource[7].specular;
-
-  DirectionalLight(normalize(vec3(gl_LightSource[7].position)),normalize(eye),normalize(normalize(vec3(gl_LightSource[7].position))+normalize(eye)), normal, diffuse, specular);
-  coord = 0.5 * (shadowCoord3.xyz / shadowCoord3.w + vec3(1.0));
-
-  map = texture2D(shadowMap3, coord.xy);
-
-  map = (map + vec4(1.0)) * 0.5;
-
-  map.xy += map.zw / DISTRIBUTE_FACTOR;
-
-  shadeFactor = ((map.x < 0.9999) && (shadowCoord3.z > -1.0 && coord.x >= 0.0 && coord.x <= 1.0 && coord.y >= 0.0 && coord.y <= 1.0)) ? VsmLookup(map, (dist - nearval3) / (farval3 - nearval3), EPSILON, THRESHOLD) : 1.0;
-
-  shadeFactor = 1.0 - shadeFactor;
-
-  shadeFactor *= min(1.0, exp(2.35*ecPosition3.z*abs(ecPosition3.z)/(maxshadowdistance3*maxshadowdistance3)));
-
-  shadeFactor = 1.0 - shadeFactor;
-
-  color += shadeFactor * diffuse.rgb * mydiffuse.rgb;
-  scolor += shadeFactor * gl_FrontMaterial.specular.rgb * specular.rgb;
-
-  color += ambient.rgb * gl_FrontMaterial.ambient.rgb;
-
-  sunDirection = normalize(vec3(gl_LightSource[7].position));
-  g_SunColor = gl_LightSource[7].diffuse.rgb;
-  g_ShadowViewProjectionMatrix = gl_TextureMatrix[12];
-  currentPosition = startPosition;
-  accumFog = vec3(0.0f,0.0f,0.0f);
-  for (int i = 0; i < NB_STEPS; i++)
-  {
-    dist = dot(currentPosition.xyz, lightplane3.xyz) - lightplane3.w;
-    pos = cameraTransform * vec4(currentPosition.xyz,1);
-    vec4 worldInShadowCameraSpace = g_ShadowViewProjectionMatrix * pos;
-    coord = 0.5 * (worldInShadowCameraSpace.xyz/worldInShadowCameraSpace.w + vec3(1.0));
-    map = texture2D(shadowMap3, coord.xy);
-    map = (map + vec4(1.0)) * 0.5;
-    map.xy += map.zw / DISTRIBUTE_FACTOR;
-    shadeFactor = ((map.x < 0.9999) && (worldInShadowCameraSpace.z > -1.0 && coord.x >= 0.0 && coord.x <= 1.0 && coord.y >= 0.0 && coord.y <= 1.0)) ? VsmLookup(map, (dist - nearval3) / (farval3 - nearval3), EPSILON, THRESHOLD) : 0.0;
-    {
-      float scatter = ComputeScattering(dot(rayDirection, sunDirection));
-      scatter = scatter * shadeFactor;
-      accumFog += vec3(scatter,scatter,scatter) * g_SunColor;
-    }
-    currentPosition += step;
-  }
-  accumFog /= NB_STEPS;
-  colorFog += accumFog * rayLength * gl_Fog.density;
+  color += ambient.rgb * s4j_FrontMaterial.ambient.rgb;
 
   // ____________________ End ShadowLight
 
   // _______________________ Begin Light 0
 
-  ambient = gl_LightSource[0].ambient;
-diffuse = gl_LightSource[0].diffuse;
-specular = gl_LightSource[0].specular;
+  ambient = s4j_LightSource[0].ambient;
+diffuse = s4j_LightSource[0].diffuse;
+specular = s4j_LightSource[0].specular;
 
-  DirectionalLight(normalize(vec3(gl_LightSource[0].position)),normalize(eye),normalize(normalize(vec3(gl_LightSource[0].position))+normalize(eye)), normal, diffuse, specular);
-  color += ambient.rgb * gl_FrontMaterial.ambient.rgb + diffuse.rgb * mydiffuse.rgb;
+  DirectionalLight(normalize(vec3(s4j_LightSource[0].position)),normalize(eye),normalize(normalize(vec3(s4j_LightSource[0].position))+normalize(eye)), normal, diffuse, specular);
+  color += ambient.rgb * s4j_FrontMaterial.ambient.rgb + diffuse.rgb * mydiffuse.rgb;
 
-  scolor += specular.rgb * gl_FrontMaterial.specular.rgb;
+  scolor += specular.rgb * s4j_FrontMaterial.specular.rgb;
 
   // _______________________ End Light
 
   // _______________________ Begin Light 1
 
-  ambient = gl_LightSource[1].ambient;
-diffuse = gl_LightSource[1].diffuse;
-specular = gl_LightSource[1].specular;
+  ambient = s4j_LightSource[1].ambient;
+diffuse = s4j_LightSource[1].diffuse;
+specular = s4j_LightSource[1].specular;
 
-  DirectionalLight(normalize(vec3(gl_LightSource[1].position)),normalize(eye),normalize(normalize(vec3(gl_LightSource[1].position))+normalize(eye)), normal, diffuse, specular);
-  color += ambient.rgb * gl_FrontMaterial.ambient.rgb + diffuse.rgb * mydiffuse.rgb;
+  DirectionalLight(normalize(vec3(s4j_LightSource[1].position)),normalize(eye),normalize(normalize(vec3(s4j_LightSource[1].position))+normalize(eye)), normal, diffuse, specular);
+  color += ambient.rgb * s4j_FrontMaterial.ambient.rgb + diffuse.rgb * mydiffuse.rgb;
 
-  scolor += specular.rgb * gl_FrontMaterial.specular.rgb;
+  scolor += specular.rgb * s4j_FrontMaterial.specular.rgb;
 
   // _______________________ End Light
 
   // _______________________ Begin Light 2
 
-  ambient = gl_LightSource[2].ambient;
-diffuse = gl_LightSource[2].diffuse;
-specular = gl_LightSource[2].specular;
+  ambient = s4j_LightSource[2].ambient;
+diffuse = s4j_LightSource[2].diffuse;
+specular = s4j_LightSource[2].specular;
 
-  DirectionalLight(normalize(vec3(gl_LightSource[2].position)),normalize(eye),normalize(normalize(vec3(gl_LightSource[2].position))+normalize(eye)), normal, diffuse, specular);
-  color += ambient.rgb * gl_FrontMaterial.ambient.rgb + diffuse.rgb * mydiffuse.rgb;
+  DirectionalLight(normalize(vec3(s4j_LightSource[2].position)),normalize(eye),normalize(normalize(vec3(s4j_LightSource[2].position))+normalize(eye)), normal, diffuse, specular);
+  color += ambient.rgb * s4j_FrontMaterial.ambient.rgb + diffuse.rgb * mydiffuse.rgb;
 
-  scolor += specular.rgb * gl_FrontMaterial.specular.rgb;
+  scolor += specular.rgb * s4j_FrontMaterial.specular.rgb;
 
   // _______________________ End Light
 
   // _______________________ Begin Light 3
 
-  ambient = gl_LightSource[3].ambient;
-diffuse = gl_LightSource[3].diffuse;
-specular = gl_LightSource[3].specular;
+  ambient = s4j_LightSource[3].ambient;
+diffuse = s4j_LightSource[3].diffuse;
+specular = s4j_LightSource[3].specular;
 
-  DirectionalLight(normalize(vec3(gl_LightSource[3].position)),normalize(eye),normalize(normalize(vec3(gl_LightSource[3].position))+normalize(eye)), normal, diffuse, specular);
-  color += ambient.rgb * gl_FrontMaterial.ambient.rgb + diffuse.rgb * mydiffuse.rgb;
+  DirectionalLight(normalize(vec3(s4j_LightSource[3].position)),normalize(eye),normalize(normalize(vec3(s4j_LightSource[3].position))+normalize(eye)), normal, diffuse, specular);
+  color += ambient.rgb * s4j_FrontMaterial.ambient.rgb + diffuse.rgb * mydiffuse.rgb;
 
-  scolor += specular.rgb * gl_FrontMaterial.specular.rgb;
+  scolor += specular.rgb * s4j_FrontMaterial.specular.rgb;
 
   // _______________________ End Light
 
@@ -433,9 +238,10 @@ specular = gl_LightSource[3].specular;
   if (coin_light_model != 0) { color *= texcolor.rgb; color += scolor; }
 else color = mydiffuse.rgb * texcolor.rgb;
 
-  float fog = exp(-gl_Fog.density * abs(ecPosition3.z));
-  color = color * clamp(fog, 0.0, 1.0);
-  color += colorFog;
+  float fog = exp(-s4j_Fog.density * abs(ecPosition3.z));
+
+  color = mix(s4j_Fog.color.rgb, color, clamp(fog, 0.0, 1.0));
+
   float noise1 = fract((gl_FragCoord.x*2+gl_FragCoord.y)*0.125f)/256.0f;
 
   float noise2 = fract((3+gl_FragCoord.x*2+gl_FragCoord.y)*0.125f)/256.0f;
@@ -444,5 +250,5 @@ else color = mydiffuse.rgb * texcolor.rgb;
 
   color = pow(color,vec3(0.47f))+vec3(noise1,noise2,noise3);
 
-  gl_FragColor = vec4(color, mydiffuse.a);
+  s4j_FragColor = vec4(color, mydiffuse.a);
 }
