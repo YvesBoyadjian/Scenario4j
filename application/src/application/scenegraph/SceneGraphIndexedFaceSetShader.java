@@ -765,8 +765,13 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 	    sunLight[is].maxShadowDistance.setValue(2e4f);
 	    //sun[is].bboxCenter.setValue(10000, 0, 0);
 	    sunLight[is].bboxSize.setValue(5000+is*3000, 5000+is*3000, 1000);
-	    
-	    sunLight[is].intensity.setValue(1.0F/4.0f*overallContrast);
+
+		if (is==0) {
+			sunLight[0].intensity.setValue((softShadows ? 1.0f / 4.0f : 1.0f) * overallContrast);
+		}
+		else {
+			sunLight[is].intensity.setValue(1.0F / 4.0f * overallContrast);
+		}
 	    
 	    shadowGroup.addChild(sunLight[is]);
 	    sunLight[is].enableNotify(false); // In order not to recompute shaders
@@ -3297,7 +3302,7 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 		sunLight[2].enableNotify(true); // In order not to recompute shaders
 		sunLight[3].enableNotify(true); // In order not to recompute shaders
 
-		sunLight[0].intensity.setValue(softShadows ? 1.0f/4.0f : 1.0f);
+		sunLight[0].intensity.setValue((softShadows ? 1.0f/4.0f : 1.0f) * overallContrast);
 		sunLight[1].on.setValue(softShadows);
 		sunLight[2].on.setValue(softShadows);
 		sunLight[3].on.setValue(softShadows);
@@ -3413,7 +3418,12 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 	private void onContrastChange() {
 		for(int is=0;is<4;is++) {
 			boolean wasNotified = sunLight[is].enableNotify(true);
-			sunLight[is].intensity.setValue(1.0F/4.0f*overallContrast);
+			if (is == 0) {
+				sunLight[0].intensity.setValue((softShadows ? 1.0f / 4.0f : 1.0f) * overallContrast);
+			}
+			else {
+				sunLight[is].intensity.setValue(1.0F / 4.0f * overallContrast);
+			}
 			sunLight[is].enableNotify(wasNotified); // In order not to recompute shaders
 		}
 		sky[0].intensity.setValue(SKY_INTENSITY*overallContrast);
