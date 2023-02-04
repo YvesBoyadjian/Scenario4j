@@ -589,7 +589,7 @@ public class MainGLFW {
 //				error = glGetError();
 //				glDebugMessageCallback(new GLDebugMessageCallback() {
 //					@Override
-//					public void invoke(int i, int i1, int i2, int i3, int length, long message, long l1) {
+//					public void invoke(int source, int type, int id, int severity, int length, long message, long userParam) {
 //						String messageStr = getMessage(length,message);
 //						System.err.println("OpenGL Error : "+ messageStr);
 //					}
