@@ -330,7 +330,7 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 
 	private Future<SoSeparator> enemiesSeparatorFuture;
 
-	private float overallContrast = 2.0f;
+	private float overallContrast = 1.6f;
 
     public SceneGraphIndexedFaceSetShader(
 			RasterProvider rwp,
