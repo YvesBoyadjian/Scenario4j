@@ -97,8 +97,10 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 	
 	private static final Color STONE = new Color(139,141,122); //http://www.colourlovers.com/color/8B8D7A/stone_gray
 
-	private static final Color TRAIL = new Color(200,140,50); // Color of trail
-	
+	private static final Color SNAIL_TRAIL = new Color(200,194,151); //https://www.colourlovers.com/color/C8C297/Snail_Trail
+
+	private static final Color TRAIL = new Color(200,150,80); // Color of trail
+
 	private static final float GRASS_LUMINOSITY = 0.6f;
 	
 	public static boolean FLY = false;
