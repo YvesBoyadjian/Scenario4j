@@ -942,6 +942,7 @@ setFragmentShader(SoState state)
   if (numshadowlights != 0) {
     gen.addNamedFunction("vsm/VsmLookup", false);
     gen.addNamedFunction("scattering/ComputeScattering",false);
+	gen.addNamedFunction("scattering/ComputeRayleighScattering",false);
   }
   gen.addMainStatement("vec3 normal = normalize(fragmentNormal);\n");
   if (twosidetest) {

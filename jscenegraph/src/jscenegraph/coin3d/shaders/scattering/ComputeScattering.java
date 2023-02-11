@@ -8,7 +8,7 @@ public class ComputeScattering {
     public ComputeScattering() {
     }
 
-    public static final String COMPUTESCATTERING_shadersource =
+    public static final String COMPUTE_MIE_SCATTERING_shadersource =
         "// Mie scaterring approximated with Henyey-Greenstein phase function.\n"+
         "float ComputeScattering(float lightDotView)\n"+
         "{\n"+
@@ -23,4 +23,10 @@ public class ComputeScattering {
         "    return F1_SCATTERING * result1 + (1 - F1_SCATTERING) * result2;\n"+
         "}\n";
 
+    public static final String COMPUTE_RAYLEIGH_SCATTERING_shadersource =
+            "// Rayleigh scattering\n"+
+            "float ComputeRayleighScattering(float lightDotView)\n"+
+            "{\n"+
+                    "    return 0.75 * ( 1.0 + lightDotView * lightDotView);\n"+
+            "}\n";
 }

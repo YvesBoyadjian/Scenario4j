@@ -241,6 +241,7 @@ setupBuiltinShaders()
   shader_builtin_dict.put("lights/DirectionalLight", DirectionalLight.DIRECTIONALLIGHT_shadersource);
   shader_builtin_dict.put("lights/DirSpotLight", DirSpotLight.DIRSPOTLIGHT_shadersource);
   shader_builtin_dict.put("vsm/VsmLookup", VsmLookup.VSMLOOKUP_shadersource);
-  shader_builtin_dict.put("scattering/ComputeScattering", ComputeScattering.COMPUTESCATTERING_shadersource);
+  shader_builtin_dict.put("scattering/ComputeScattering", ComputeScattering.COMPUTE_MIE_SCATTERING_shadersource);
+  shader_builtin_dict.put("scattering/ComputeRayleighScattering", ComputeScattering.COMPUTE_RAYLEIGH_SCATTERING_shadersource);
 }
 }
