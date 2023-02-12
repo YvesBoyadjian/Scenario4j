@@ -73,7 +73,7 @@ public class SoVolumetricShadowGroupP extends SoShadowGroupP {
         //gen.addMainStatement("  shadeFactor *= min(1.0, exp(2.35*currentPosition.z*abs(currentPosition.z)/(maxshadowdistance"+shadowlightnumber+"*maxshadowdistance"+shadowlightnumber+")));");
         //gen.addMainStatement("  shadeFactor = 1.0 - shadeFactor;");
         //https://www.youtube.com/watch?v=DxfEbulyFcY
-        final float RED_WAVELENGTH = 680;
+        final float RED_WAVELENGTH = 650;
         final float GREEN_WAVELENGTH = 550;
         final float BLUE_WAVELENGTH = 440;
         final float SCATTER_R = (float)Math.pow(420.0/RED_WAVELENGTH,4.0);
@@ -88,7 +88,7 @@ public class SoVolumetricShadowGroupP extends SoShadowGroupP {
         gen.addMainStatement("    scatter = scatter * shadeFactor;");
         gen.addMainStatement("    accumFog += vec3(scatter,scatter,scatter) * g_SunColor * 2.4;");
         gen.addMainStatement("    scatter = ComputeRayleighScattering(cosinusRaySun);");
-        gen.addMainStatement("    accumFog += vec3("+RED_FACTOR+","+GREEN_FACTOR+","+BLUE_FACTOR+") * g_SunColor * shadeFactor;");
+        gen.addMainStatement("    accumFog += vec3("+RED_FACTOR+","+GREEN_FACTOR+","+BLUE_FACTOR+") * g_SunColor * shadeFactor * 0.65;");
         gen.addMainStatement("  }");
         gen.addMainStatement("  currentPosition += step;");
         gen.addMainStatement("}");

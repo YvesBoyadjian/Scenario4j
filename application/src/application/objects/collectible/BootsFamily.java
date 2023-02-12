@@ -141,7 +141,7 @@ public class BootsFamily extends CollectibleBase implements Collectible {
 
     @Override
     public float getViewDistance() {
-        return 99;
+        return 150.0f;
     }
 
     float getRandomX(Random randomPlacementTrees) {
