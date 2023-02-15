@@ -31,4 +31,30 @@ public class ComputeScattering {
             "{\n"+
                     "    return 0.75 * ( 1.0 + lightDotView * lightDotView);\n"+
             "}\n";
+
+    //https://www.youtube.com/watch?v=DxfEbulyFcY
+    public static final String RAY_SPHERE_shadersource =
+    "// Returns vector (dstToSphere, dstThroughSphere)\n"+
+    "// If ray origin is inside sphere, dstToSphere = 0\n"+
+    "// If ray misses sphere, dstToSphere = maxValue; dstThroughSphere = 0\n"+
+    "vec2 raySphere(vec3 sphereCentre, float sphereRadius, vec3 rayOrigin, vec3 rayDir) {\n"+
+    "  vec3 offset = rayOrigin - sphereCentre;\n"+
+    "  float a = 1; // Set to dot(rayDir, rayDir) if rayDir might not be mormalized\n"+
+    "  float b = 2 * dot(offset, rayDir);\n"+
+    "  float c = dot (offset, offset) - sphereRadius * sphereRadius;\n"+
+    "  float d = b * b - 4 * a * c; // Discriminant from quadratic formula\n"+
+    "  // Number of intersections: 0 when d < 0; 1 when d = 0; 2 when d > 0\n"+
+    "  if (d > 0) {\n"+
+            "    float s = sqrt(d);\n"+
+            "    float dstToSphereNear = max(0, (-b - s) / (2 * a));\n"+
+            "    float dstToSphereFar = (-b + s) / (2 * a);\n"+
+            "    // Ignore intersections that occur behind the ray\n"+
+            "    if (dstToSphereFar >= 0) {\n"+
+            "      return vec2(dstToSphereNear, dstToSphereFar - dstToSphereNear);\n"+
+            "    }\n"+
+    "  }\n"+
+            "  //Ray did not instersect sphere\n"+
+            "  return vec2(3.4e38, 0);\n"+
+    "}\n"
+    ;
 }
