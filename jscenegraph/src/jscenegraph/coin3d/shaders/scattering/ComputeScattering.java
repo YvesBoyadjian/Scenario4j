@@ -55,6 +55,56 @@ public class ComputeScattering {
     "  }\n"+
             "  //Ray did not instersect sphere\n"+
             "  return vec2(3.4e38, 0);\n"+
-    "}\n"
-    ;
+    "}\n";
+
+    public static final String DENSITY_AT_POINT_shadersource =
+            "float densityAtPoint(vec3 densitySamplePoint) {\n"+
+                    "  vec3 planetCentre = vec3(0,0,-6371e3);\n"+
+                    "  float planetRadius = 6371e3;\n"+
+                    "  float atmosphereRadius = 1e4;\n"+
+                    "  float densityFalloff = 1;\n"+
+                    "  float heightAboveSurface = length(densitySamplePoint - planetCentre) - planetRadius;\n"+
+                    "  float height01 = heightAboveSurface / (atmosphereRadius - planetRadius);\n"+
+                    "  float localDensity = exp(-height01 * densityFalloff) * (1 - height01);\n"+
+                    "  return localDensity;\n"+
+                    "}\n"
+            ;
+
+    public static final String OPTICAL_DEPTH_shadersource =
+            "float opticalDepth(vec3 rayOrigin, vec3 rayDir, float rayLength) {\n"+
+                    "  int numOpticalDepthPoints = 10;\n"+
+                    "  vec3 densitySamplePoint = rayOrigin;\n"+
+                    "  float stepSize = rayLength / (numOpticalDepthPoints - 1);\n"+
+                    "  float opticalDepth = 0;\n"+
+                    "  for (int i = 0; i < numOpticalDepthPoints; i ++) {\n"+
+                    "    float localDensity = densityAtPoint(densitySamplePoint);\n"+
+                    "    opticalDepth += localDensity * stepSize;\n"+
+                    "    densitySamplePoint += rayDir * stepSize;\n"+
+                    "  }\n"+
+                    "  return opticalDepth;\n"+
+                    "}\n"
+            ;
+
+    public static final String CALCULATE_LIGHT_shadersource =
+            "vec3 calculateLight(vec3 rayOrigin, vec3 rayDir, float rayLength, vec3 originalCol, vec3 dirToSun, vec3 scatteringCoefficients) {\n"+
+                    "  int numInScatteringPoints = 10;\n"+
+                    "  vec3 planetCentre = vec3(0,0,-6371e3);\n"+
+                    "  float atmosphereRadius = 1e4;\n"+
+                    "  vec3 inScatterPoint = rayOrigin;\n"+
+                    "  float stepSize = rayLength / (numInScatteringPoints - 1);\n"+
+                    "  vec3 inScatteredLight = vec3(0,0,0);\n"+
+                    "  float viewRayOpticalDepth = 0;\n"+
+                    "  for (int i = 0; i < numInScatteringPoints; i ++) {\n"+
+                    "    float sunRayLength = raySphere(planetCentre, atmosphereRadius, inScatterPoint, dirToSun).y;\n"+
+                    "    float sunRayOpticalDepth = opticalDepth(inScatterPoint, dirToSun, sunRayLength);\n"+
+                    "    viewRayOpticalDepth = opticalDepth(inScatterPoint, -rayDir, stepSize * i);\n"+
+                    "    vec3 transmittance = exp(-(sunRayOpticalDepth + viewRayOpticalDepth) * scatteringCoefficients);\n"+
+                    "    float localDensity = densityAtPoint(inScatterPoint);\n"+
+                    "    inScatteredLight += localDensity * transmittance * scatteringCoefficients * stepSize;\n"+
+                    "    inScatterPoint += rayDir * stepSize;\n"+
+                    "  }\n"+
+                    "  float originalColTransmittance = exp(-viewRayOpticalDepth);\n"+
+                    "  return originalCol * originalColTransmittance + inScatteredLight;\n"+
+                    "}\n"
+            ;
 }

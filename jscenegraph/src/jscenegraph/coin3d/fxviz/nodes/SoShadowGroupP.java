@@ -944,6 +944,9 @@ setFragmentShader(SoState state)
     gen.addNamedFunction("scattering/ComputeScattering",false);
 	gen.addNamedFunction("scattering/ComputeRayleighScattering",false);
 	gen.addNamedFunction("scattering/RaySphere", false);
+	gen.addNamedFunction("scattering/DensityAtPoint", false);
+	gen.addNamedFunction("scattering/OpticalDepth", false);
+	gen.addNamedFunction("scattering/CalculateLight", false);
   }
   gen.addMainStatement("vec3 normal = normalize(fragmentNormal);\n");
   if (twosidetest) {

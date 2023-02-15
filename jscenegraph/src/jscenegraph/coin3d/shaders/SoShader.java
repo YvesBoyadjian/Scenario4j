@@ -244,5 +244,8 @@ setupBuiltinShaders()
   shader_builtin_dict.put("scattering/ComputeScattering", ComputeScattering.COMPUTE_MIE_SCATTERING_shadersource);
   shader_builtin_dict.put("scattering/ComputeRayleighScattering", ComputeScattering.COMPUTE_RAYLEIGH_SCATTERING_shadersource);
   shader_builtin_dict.put("scattering/RaySphere", ComputeScattering.RAY_SPHERE_shadersource);
+  shader_builtin_dict.put("scattering/DensityAtPoint", ComputeScattering.DENSITY_AT_POINT_shadersource);
+  shader_builtin_dict.put("scattering/OpticalDepth", ComputeScattering.OPTICAL_DEPTH_shadersource);
+  shader_builtin_dict.put("scattering/CalculateLight", ComputeScattering.CALCULATE_LIGHT_shadersource);
 }
 }
