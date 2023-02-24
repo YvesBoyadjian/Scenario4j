@@ -174,7 +174,9 @@ public class MainGLFW {
 	 */
 	public static void main(String[] args) {
 
-		//System.loadLibrary("opengl32");
+		if(args.length == 1 && Objects.equals(args[0],"opengl32")) {
+			System.loadLibrary("opengl32");
+		}
 
 		if(args.length == 1 && Objects.equals(args[0],"god")) {
 			god = true;
