@@ -14,8 +14,8 @@ public class ComputeScattering {
         "// Mie scaterring approximated with Henyey-Greenstein phase function.\n"+
         "float ComputeScattering(float lightDotView)\n"+
         "{\n"+
-                "    float F1_SCATTERING = 0.8;\n"+
-                "    float G1_SCATTERING = 0.6;\n"+
+                "    float F1_SCATTERING = 0.7;\n"+
+                "    float G1_SCATTERING = 0.5;\n"+
                 "    float G2_SCATTERING = -0.2;\n"+
                 "    float PI = 3.14159265359;\n"+
         "    float result1 = 1.0f - G1_SCATTERING * G1_SCATTERING;\n"+

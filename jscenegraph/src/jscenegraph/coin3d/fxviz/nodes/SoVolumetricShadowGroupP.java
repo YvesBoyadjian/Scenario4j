@@ -86,9 +86,10 @@ public class SoVolumetricShadowGroupP extends SoShadowGroupP {
         gen.addMainStatement("    float cosinusRaySun = dot(rayDirection, sunDirection);");
         gen.addMainStatement("    float scatter = ComputeScattering(cosinusRaySun);");
         gen.addMainStatement("    scatter = scatter * shadeFactor;");
-        gen.addMainStatement("    accumFog += vec3(scatter,scatter,scatter) * g_SunColor * 2.4;");
+        gen.addMainStatement("    accumFog += vec3(scatter,scatter,scatter) * g_SunColor * 2.2;");
         gen.addMainStatement("    scatter = ComputeRayleighScattering(cosinusRaySun);");
-        gen.addMainStatement("    accumFog += vec3("+RED_FACTOR+","+GREEN_FACTOR+","+BLUE_FACTOR+") * g_SunColor * shadeFactor;");
+        gen.addMainStatement("    float density = densityAtPoint(pos.xyz);");
+        gen.addMainStatement("    accumFog += vec3("+RED_FACTOR+","+GREEN_FACTOR+","+BLUE_FACTOR+") * g_SunColor * shadeFactor * density * 0.5;");
         gen.addMainStatement("  }");
         gen.addMainStatement("  currentPosition += step;");
         gen.addMainStatement("}");
