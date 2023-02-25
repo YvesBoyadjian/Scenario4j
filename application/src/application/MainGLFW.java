@@ -842,6 +842,12 @@ public class MainGLFW {
 
 		} else {
 			camera.position.setValue(Hero.STARTING_X, Hero.STARTING_Y, Hero.STARTING_Z - SCENE_POSITION.getZ());
+			viewer.addOneShotIdleListener(v->{
+
+				String[] message = new String[2];
+				message[0] = "Go to the oracle."; message[1] = "He is on the right on the path";
+				sg.displayTemporaryMessage(message,30);
+			});
 		}
 		viewer.getCameraController().changeCameraValues(camera);
 

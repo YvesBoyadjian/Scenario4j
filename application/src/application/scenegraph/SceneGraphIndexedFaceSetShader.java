@@ -3404,6 +3404,10 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 			viewer.toggleFly();
 		}
 		viewer.setAllowToggleFly(false);
+
+		String[] message = new String[2];
+		message[0] = "Go to the oracle."; message[1] = "He is on the right on the path";
+		displayTemporaryMessage(message,30);
 	}
 
 	public void setContrast(float contrast) {
