@@ -638,7 +638,7 @@ public class SoSceneTexture2P implements Destroyable {
 		    // create the render buffer
 		    SoGL.cc_glglue_glBindRenderbuffer(glue, GL2.GL_RENDERBUFFER/*_EXT*/, fbodata.fbo_depthBuffer);
 		    SoGL.cc_glglue_glRenderbufferStorage(glue, GL2.GL_RENDERBUFFER/*_EXT*/,
-		                                    GL2.GL_DEPTH_COMPONENT24,
+		                                    GL2.GL_DEPTH_COMPONENT32F,
 		                                    fbodata.fbo_size.getValue()[0], fbodata.fbo_size.getValue()[1]);
 		    // attach renderbuffer to framebuffer
 		    SoGL.cc_glglue_glFramebufferRenderbuffer(glue,
