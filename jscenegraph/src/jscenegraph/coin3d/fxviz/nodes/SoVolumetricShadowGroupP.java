@@ -65,10 +65,10 @@ public class SoVolumetricShadowGroupP extends SoShadowGroupP {
         gen.addMainStatement("  pos = cameraTransform * vec4(currentPosition.xyz,1);");
         gen.addMainStatement("  vec4 worldInShadowCameraSpace = g_ShadowViewProjectionMatrix * pos;");
         gen.addMainStatement("  coord = 0.5 * (worldInShadowCameraSpace.xyz/worldInShadowCameraSpace.w + vec3(1.0));");
-        gen.addMainStatement("  map = texture2D(shadowMap"+shadowlightnumber+", coord.xy);");
-        gen.addMainStatement("  map = (map + vec4(1.0)) * 0.5;");
-        gen.addMainStatement("  map.xy += map.zw / DISTRIBUTE_FACTOR;");
-        gen.addMainStatement("  shadeFactor = ((map.x < 0.9999) && (worldInShadowCameraSpace.z > -1.0 && coord.x >= 0.0 && coord.x <= 1.0 && coord.y >= 0.0 && coord.y <= 1.0)) ? VsmLookup(map, (dist - nearval"+shadowlightnumber+") / (farval"+shadowlightnumber+" - nearval"+shadowlightnumber+"), EPSILON, THRESHOLD) : 1.0;");
+        gen.addMainStatement("  map = float(texture2D(shadowMap"+shadowlightnumber+", coord.xy));");
+        gen.addMainStatement("  map = (map + 1.0) * 0.5;");
+        //gen.addMainStatement("  map.xy += map.zw / DISTRIBUTE_FACTOR;");
+        gen.addMainStatement("  shadeFactor = ((map < 0.9999) && (worldInShadowCameraSpace.z > -1.0 && coord.x >= 0.0 && coord.x <= 1.0 && coord.y >= 0.0 && coord.y <= 1.0)) ? VsmLookup(map, (dist - nearval"+shadowlightnumber+") / (farval"+shadowlightnumber+" - nearval"+shadowlightnumber+"), EPSILON, THRESHOLD) : 1.0;");
         //gen.addMainStatement("  shadeFactor = 1.0 - shadeFactor;");
         //gen.addMainStatement("  shadeFactor *= min(1.0, exp(2.35*currentPosition.z*abs(currentPosition.z)/(maxshadowdistance"+shadowlightnumber+"*maxshadowdistance"+shadowlightnumber+")));");
         //gen.addMainStatement("  shadeFactor = 1.0 - shadeFactor;");

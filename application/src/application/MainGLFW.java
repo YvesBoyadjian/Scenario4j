@@ -412,6 +412,7 @@ public class MainGLFW {
 		re = null; // for garbage collection
 
 		sg.getShadowGroup().precision.setValue(shadow_precision);
+		sg.getShadowGroup().epsilon.setValue(1.0e-5f / shadow_precision);
         sg.setSoftShadows(shadow_precision > 0.05f);
 
 		sg.setLevelOfDetail(level_of_detail);
@@ -586,19 +587,23 @@ public class MainGLFW {
 			public void initializeGL(GL2 gl2) {
 				super.initializeGL(gl2);
 
-//				int error = glGetError();
-//				glEnable(GL_DEBUG_OUTPUT);
-//				error = glGetError();
-//				glDebugMessageCallback(new GLDebugMessageCallback() {
-//					@Override
-//					public void invoke(int source, int type, int id, int severity, int length, long message, long userParam) {
-//						String messageStr = getMessage(length,message);
-//						System.err.println("OpenGL Error : "+ messageStr);
-//					}
-//				}, 0);
-//				error = glGetError();
-//				glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
-//				error = glGetError();
+				if (DEBUG_MODE) {
+					int error = glGetError();
+					glEnable(GL_DEBUG_OUTPUT);
+					error = glGetError();
+					glDebugMessageCallback(new GLDebugMessageCallback() {
+						@Override
+						public void invoke(int source, int type, int id, int severity, int length, long message, long userParam) {
+							if (severity == GL_DEBUG_SEVERITY_HIGH) {
+								String messageStr = getMessage(length, message);
+								System.err.println("OpenGL Error : " + messageStr);
+							}
+						}
+					}, 0);
+					error = glGetError();
+					glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
+					error = glGetError();
+				}
 
 				final int[] vao = new int[1];
 				gl2.glGenVertexArrays(1,vao);

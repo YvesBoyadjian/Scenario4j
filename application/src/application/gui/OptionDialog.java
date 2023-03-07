@@ -199,6 +199,7 @@ public class OptionDialog extends JDialog {
         //sg.enableNotifySun();
         float shadowPrecision = (float)((double)((Double)((SpinnerNumberModel) spinnerShadowgroup.getModel()).getNumber()));
         sg.getShadowGroup().precision.setValue(shadowPrecision);
+        sg.getShadowGroup().epsilon.setValue(1.0e-5f / shadowPrecision);
         sg.setSoftShadows(shadowPrecision > 0.05f);
         sg.setLevelOfDetail((float)((double)((Double)((SpinnerNumberModel)spinnerLODFactor.getModel()).getNumber())));
         //sg.setLevelOfDetailShadow((float)((double)((Double)((SpinnerNumberModel)spinnerLODFactorShadow.getModel()).getNumber())));

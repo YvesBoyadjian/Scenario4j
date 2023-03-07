@@ -235,10 +235,10 @@ public class SoShadowLightCache implements Destroyable {
     this.neardepthmap.wrapT.setValue( SoSceneTexture2.Wrap.CLAMP_TO_BORDER);
 
     if (this.vsm_program != null) {
-      this.depthmap.type.setValue( SoSceneTexture2.Type.RGBA32F);
+      this.depthmap.type.setValue( SoSceneTexture2.Type./*RGBA32F*/DEPTH32);
       this.depthmap.backgroundColor.setValue( new SbVec4f(1.0f, 1.0f, 1.0f, 1.0f));
 
-      this.neardepthmap.type.setValue( SoSceneTexture2.Type.RGBA32F);
+      this.neardepthmap.type.setValue( SoSceneTexture2.Type./*RGBA32F*/DEPTH32);
       this.neardepthmap.backgroundColor.setValue( new SbVec4f(1.0f, 1.0f, 1.0f, 1.0f));
     }
     else {
@@ -440,7 +440,7 @@ createVSMProgram()
   fgen.reset(false);
   fgen.setVersion("#version 400 core"); // YB : necessary for Intel Graphics HD 630
 
-  fgen.addDeclaration("layout(location = 0) out vec4 s4j_FragColor;",false);
+  fgen.addDeclaration("layout(location = 0) out float s4j_FragColor;",false);
   
 //#ifdef DISTRIBUTE_FACTOR
   String str;
@@ -461,27 +461,28 @@ createVSMProgram()
     fgen.addMainStatement("float lfar = (-light_vec.z - nearval) / (farval-nearval);\n");
     fgen.addMainStatement("float lnear = (-light_vec.z - nearvalnear) / (farvalnear-nearvalnear);\n");
   }
-  fgen.addMainStatement( "float l = lfar*(1-nearflag)+ nearflag*lnear;");
-  fgen.addMainStatement(
-//#ifdef DISTRIBUTE_FACTOR
-                        "vec2 m = vec2(l, l*l);\n"+
-                        "vec2 f = fract(m * DISTRIBUTE_FACTOR);\n"+
-
-//#ifdef USE_NEGATIVE
-                        "s4j_FragColor.rg = (m - (f / DISTRIBUTE_FACTOR)) * 2.0 - vec2(1.0, 1.0);\n"+
-                        "s4j_FragColor.ba = f * 2.0 - vec2(1.0, 1.0);\n"
-//#else // USE_NEGATIVE
-//                        "gl_FragColor.rg = m - (f / DISTRIBUTE_FACTOR);\n"
-//                        "gl_FragColor.ba = f;\n"
-//#endif // ! USE_NEGATIVE
-//#else // DISTRIBUTE_FACTOR
-//#ifdef USE_NEGATIVE
-//                        "gl_FragColor = vec4(l*2.0 - 1.0, l*l*2.0 - 1.0, 0.0, 0.0);"
-//#else // USE_NEGATIVE
-//                        "gl_FragColor = vec4(l, l*l, 0.0, 0.0);"
-//#endif // !USE_NEGATIVE
-//#endif // !DISTRIBUTE_FACTOR
-                        );
+  fgen.addMainStatement( "float l = lfar*(1-nearflag)+ nearflag*lnear;\n");
+  fgen.addMainStatement("s4j_FragColor = l * 2.0 - 1.0;\n");
+//  fgen.addMainStatement(
+////#ifdef DISTRIBUTE_FACTOR
+//                        "vec2 m = vec2(l, l*l);\n"+
+//                        "vec2 f = fract(m * DISTRIBUTE_FACTOR);\n"+
+//
+////#ifdef USE_NEGATIVE
+//                        "s4j_FragColor.rg = (m - (f / DISTRIBUTE_FACTOR)) * 2.0 - vec2(1.0, 1.0);\n"+
+//                        "s4j_FragColor.ba = f * 2.0 - vec2(1.0, 1.0);\n"
+////#else // USE_NEGATIVE
+////                        "gl_FragColor.rg = m - (f / DISTRIBUTE_FACTOR);\n"
+////                        "gl_FragColor.ba = f;\n"
+////#endif // ! USE_NEGATIVE
+////#else // DISTRIBUTE_FACTOR
+////#ifdef USE_NEGATIVE
+////                        "gl_FragColor = vec4(l*2.0 - 1.0, l*l*2.0 - 1.0, 0.0, 0.0);"
+////#else // USE_NEGATIVE
+////                        "gl_FragColor = vec4(l, l*l, 0.0, 0.0);"
+////#endif // !USE_NEGATIVE
+////#endif // !DISTRIBUTE_FACTOR
+//                        );
   fshader.sourceProgram.setValue( fgen.getShaderProgram());
   fshader.sourceType.setValue( SoShaderObject.SourceType.GLSL_PROGRAM);
 

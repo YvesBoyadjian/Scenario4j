@@ -969,8 +969,8 @@ setFragmentShader(SoState state)
                        "float shadeFactor;\n"+
                        "vec3 coord;\n"+
 		  "vec3 nearcoord;\n"+
-                       "vec4 map;\n"+
-		  "vec4 nearmap;\n"+
+                       "float map;\n"+
+		  "float nearmap;\n"+
                        "mydiffuse.a *= texcolor.a;\n");
 
   startFragmentShader(gen);
@@ -1026,27 +1026,27 @@ setFragmentShader(SoState state)
       gen.addMainStatement(str);
 		str = "nearcoord = 0.5 * (nearShadowCoord"+i+".xyz / nearShadowCoord"+i+".w + vec3(1.0));\n";
 		gen.addMainStatement(str);
-      str = "map = texture2D(shadowMap"+i+", coord.xy);\n";
+      str = "map = float(texture2D(shadowMap"+i+", coord.xy));\n";
       gen.addMainStatement(str);
-		str = "nearmap = texture2D(nearShadowMap"+i+", nearcoord.xy);\n";
+		str = "nearmap = float(texture2D(nearShadowMap"+i+", nearcoord.xy));\n";
 		gen.addMainStatement(str);
 //#ifdef USE_NEGATIVE
-      gen.addMainStatement("map = (map + vec4(1.0)) * 0.5;\n");
-		gen.addMainStatement("nearmap = (nearmap + vec4(1.0)) * 0.5;\n");
+      gen.addMainStatement("map = (map + 1.0) * 0.5;\n");
+		gen.addMainStatement("nearmap = (nearmap + 1.0) * 0.5;\n");
 //#endif // USE_NEGATIVE
 //#ifdef DISTRIBUTE_FACTOR
-      gen.addMainStatement("map.xy += map.zw / DISTRIBUTE_FACTOR;\n");
-		gen.addMainStatement("nearmap.xy += nearmap.zw / DISTRIBUTE_FACTOR;\n");
+      //gen.addMainStatement("map.xy += map.zw / DISTRIBUTE_FACTOR;\n");
+		//gen.addMainStatement("nearmap.xy += nearmap.zw / DISTRIBUTE_FACTOR;\n");
 //#endif
 		str = "if("+nearinsidetest2+"){\n";
 		gen.addMainStatement(str);
-		str = "shadeFactor = ((nearmap.x < 0.9999) && (nearShadowCoord"+i+".z > -1.0 && "+nearinsidetest+")) "+
+		str = "shadeFactor = ((nearmap < 0.9999) && (nearShadowCoord"+i+".z > -1.0 && "+nearinsidetest+")) "+
 				"? VsmLookup(nearmap, (neardist - nearvalnear"+i+") / (farvalnear"+i+" - nearvalnear"+i+"), EPSILON, THRESHOLD) : 1.0;\n}else{\n";
 		gen.addMainStatement(str);
 
 
 
-      str = "shadeFactor = ((map.x < 0.9999) && (shadowCoord"+i+".z > -1.0 && "+insidetest+")) "+
+      str = "shadeFactor = ((map < 0.9999) && (shadowCoord"+i+".z > -1.0 && "+insidetest+")) "+
                   "? VsmLookup(map, (dist - nearval"+i+") / (farval"+i+" - nearval"+i+"), EPSILON, THRESHOLD) : 1.0;\n}\n";
       gen.addMainStatement(str);
 
@@ -1128,12 +1128,12 @@ setFragmentShader(SoState state)
       //String str; java port
       str = "dist = length(vec3(s4j_LightSource["+lights.getLength()+i+"].position) - ecPosition3);\n"+
                   "coord = 0.5 * (shadowCoord"+i+".xyz / shadowCoord"+i+".w + vec3(1.0));\n"+
-                  "map = texture2D(shadowMap"+i+", coord.xy);\n"+
+                  "map = float(texture2D(shadowMap"+i+", coord.xy));\n"+
 //#ifdef USE_NEGATIVE
-                  "map = (map + vec4(1.0)) * 0.5;\n"+
+                  "map = (map + 1.0) * 0.5;\n"+
 //#endif // USE_NEGATIVE
 //#ifdef DISTRIBUTE_FACTOR
-                  "map.xy += map.zw / DISTRIBUTE_FACTOR;\n"+
+//                  "map.xy += map.zw / DISTRIBUTE_FACTOR;\n"+
 //#endif
                   "shadeFactor = (shadowCoord"+i+".z > -1.0"+insidetest/*.getString()*/+" ? VsmLookup(map, (dist - nearval"+i+")/(farval"+i+"-nearval"+i+"), EPSILON, THRESHOLD) : 1.0;\n"+
 

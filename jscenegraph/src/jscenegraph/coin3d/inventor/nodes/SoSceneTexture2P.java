@@ -580,6 +580,10 @@ public class SoSceneTexture2P implements Destroyable {
 
 		    gl2.glTexParameteri(GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_MIN_FILTER, fbodata.fbo_mipmap ? GL2.GL_LINEAR_MIPMAP_LINEAR : GL2.GL_LINEAR);
 		    gl2.glTexParameteri(GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_MAG_FILTER, GL2.GL_LINEAR);
+//			  if (this.api.type.getValue() == SoSceneTexture2.Type.DEPTH32.getValue()) {
+//				  gl2.glTexParameteri(GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_COMPARE_MODE, GL2.GL_COMPARE_REF_TO_TEXTURE);
+//				  gl2.glTexParameteri(GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_COMPARE_FUNC, GL2.GL_LEQUAL);
+//			  }
 		    if (fbodata.fbo_mipmap) {
 		      SoGL.cc_glglue_glGenerateMipmap(glue, GL2.GL_TEXTURE_2D);
 		    }

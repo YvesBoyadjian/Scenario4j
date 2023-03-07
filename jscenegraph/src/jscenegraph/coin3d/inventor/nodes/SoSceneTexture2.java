@@ -401,8 +401,9 @@ public class SoSceneTexture2 extends SoNode {
 		    RGB5_A1,
 		    RGB10_A2,
 		    RGBA12,
-		    RGBA16;
-			  
+		    RGBA16,
+			  DEPTH32;
+
 			  public int getValue() {
 				  return ordinal();
 			  }
@@ -517,6 +518,7 @@ public class SoSceneTexture2 extends SoNode {
 	    nodeHeader.SO_NODE_DEFINE_ENUM_VALUE(Type.RGB10_A2);
 	    nodeHeader.SO_NODE_DEFINE_ENUM_VALUE(Type.RGBA12);
 	    nodeHeader.SO_NODE_DEFINE_ENUM_VALUE(Type.RGBA16);
+		  nodeHeader.SO_NODE_DEFINE_ENUM_VALUE(Type.DEPTH32);
 
 	    nodeHeader.SO_NODE_SET_SF_ENUM_TYPE(type,"type", "Type");
 	  }
@@ -696,6 +698,10 @@ public class SoSceneTexture2 extends SoNode {
 	    internalformat[0] = GL2.GL_RGBA8;
 
 	    switch (type) {
+			case DEPTH32:
+				internalformat[0] = GL2.GL_R32F;//GL2.GL_DEPTH_COMPONENT32F;
+				format[0] = GL2.GL_RED;//GL2.GL_DEPTH_COMPONENT;
+				break;
 	    case DEPTH:
 	    case RGBA8:
 	      internalformat[0] = GL2.GL_RGBA8;
