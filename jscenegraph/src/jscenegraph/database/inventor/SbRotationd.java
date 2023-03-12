@@ -17,6 +17,20 @@ public class SbRotationd implements Mutable { //TODO
 	    public SbRotationd()
         {}
 
+/*!
+  Construct a new SbDPRotation object initialized with the given quaternion
+  components.
+
+  The array must be ordered as follows:
+
+  q[0] = x, q[1] = y, q[2] = z and q[3] = w, where the quaternion is
+  specified by q = w + xi + yj + zk.
+ */
+    public SbRotationd(final double[] q)
+    {
+        this.setValue(q);
+    }
+
 	    public SbRotationd(double q0, double q1, double q2, double q3)
         { 
 	    	setValue(q0, q1, q2, q3); 
@@ -115,6 +129,28 @@ public SbRotationd setValue(double q0, double q1, double q2, double q3)
 
     return (this);
 }
+
+/*!
+  Reset the rotation by the four quaternions in the array.
+
+  \sa getValue().
+ */
+    public SbRotationd
+    setValue(final double[] q)
+    {
+        this.quat[0] = q[0];
+        this.quat[1] = q[1];
+        this.quat[2] = q[2];
+        this.quat[3] = q[3];
+//        if (this.quat.normalize() == 0.0f) {
+////#if COIN_DEBUG
+//        SoDebugError.postWarning("SbRotation::setValue",
+//                "Quarternion has zero length => "+
+//        "undefined rotation.");
+////#endif // COIN_DEBUG
+//    }
+        return this;
+    }
 
 
 ////////////////////////////////////////////////////////////////////////

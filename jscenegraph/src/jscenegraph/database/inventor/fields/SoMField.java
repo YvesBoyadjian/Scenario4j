@@ -363,6 +363,9 @@ public abstract class SoMField<T extends Object, U extends Indexable<T>> extends
 		} else if( newValue instanceof Integer && values.getO(0) instanceof Float){
 			values.setO(0, (T)Float.valueOf(((Integer)newValue).floatValue()));
 		}
+		else if (newValue instanceof Boolean && values.getO(0) instanceof Float) {
+			values.setO(0, (T)Float.valueOf(((Boolean)newValue) ? 1.0f : 0.0f));
+		}
 		else {
 			values.setO(0, newValue);
 		}

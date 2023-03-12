@@ -161,7 +161,12 @@ public abstract class SoSField<T extends Object> extends SoField {
 			mv.copyFrom(newValue);
 		}
 		else { // T is Immutable
-			value = newValue;
+			if(newValue instanceof Float && value instanceof Boolean) {
+				value = (T)(Boolean)((Float)newValue != 0.0f);
+			}
+			else {
+				value = newValue;
+			}
 		}		
 	}
 	

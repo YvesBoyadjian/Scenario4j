@@ -142,9 +142,9 @@ public class SbViewVolume implements Mutable {
 
 	// ! Points on the near clipping plane. Add in the projPoint to
 	// ! figure out where they are in world space:
-	private final SbVec3f llfO = new SbVec3f(); // !< x = -w, y = -w, z = -w
-	private final SbVec3f lrfO = new SbVec3f(); // !< x = w, y = -w, z = -w
-	private final SbVec3f ulfO = new SbVec3f(); // !< x = -w, y = w, z = -w
+	final SbVec3f llfO = new SbVec3f(); // !< x = -w, y = -w, z = -w
+	final SbVec3f lrfO = new SbVec3f(); // !< x = w, y = -w, z = -w
+	final SbVec3f ulfO = new SbVec3f(); // !< x = -w, y = w, z = -w
 
 	////////////////////////////////////////////////////////////////////////
 	//
@@ -330,12 +330,47 @@ public class SbViewVolume implements Mutable {
 	 * 
 	 * @return
 	 */
-	public SbMatrix getMatrix() {
+	public SbMatrix getMatrix1() {
 
 		final SbMatrix affine = new SbMatrix(), proj = new SbMatrix();
 		getMatrices(affine, proj);
 
 		return affine.multRight(proj);
+	}
+
+/*!
+  Returns the combined affine and projection matrix.
+
+  \sa getMatrices(), getCameraSpaceMatrix()
+ */
+	public SbMatrix getMatrix()
+	{
+		this.dpvv.update(this);
+
+		final SbMatrixd dpmatrix = new SbMatrixd(this.dpvv.getMatrix().getValue());
+		final SbMatrix matrix = new SbMatrix();
+		copy_matrix(dpmatrix, matrix);
+		return matrix;
+	}
+
+	private void updateDPVV() {
+
+	}
+
+	//
+// some convenience function for converting between single precision
+// and double precision classes.
+//
+	static void
+	copy_matrix(final SbMatrixd src, final SbMatrix dst)
+	{
+  final double[][] s = src.getValue();
+		final float[][] d = dst.getValue();
+		for (int i = 0; i < 4; i++) {
+			for (int j = 0; j < 4; j++) {
+				d[i][j] = (float) (s[i][j]);
+			}
+		}
 	}
 
 	// ! Maps a 2d point (in 0 <= x,y <= 1) to a 3d line.
@@ -908,6 +943,8 @@ public class SbViewVolume implements Mutable {
 
 		nearDist = nearVal;
 		nearToFar = farVal - nearVal;
+
+		dpvv.update(this); //YB
 	}
 
 	////////////////////////////////////////////////////////////////////////
@@ -927,6 +964,8 @@ public class SbViewVolume implements Mutable {
 		llf.operator_plus_equal(v);
 		lrf.operator_plus_equal(v);
 		ulf.operator_plus_equal(v);
+
+		dpvv.update(this);
 	}
 
 	////////////////////////////////////////////////////////////////////////
@@ -938,7 +977,7 @@ public class SbViewVolume implements Mutable {
 	//
 	// Use: public
 
-	public void rotateCamera(final SbRotation r)
+	public void rotateCamera1(final SbRotation r)
 	//
 	////////////////////////////////////////////////////////////////////////
 	{
@@ -954,6 +993,27 @@ public class SbViewVolume implements Mutable {
 		llf.copyFrom(llfO.operator_add(projPoint)); // For compatibility
 		lrf.copyFrom(lrfO.operator_add(projPoint));
 		ulf.copyFrom(ulfO.operator_add(projPoint));
+	}
+
+/*!
+  Rotate the direction which the camera is pointing in.
+
+  \sa translateCamera().
+ */
+	public void
+	rotateCamera(final SbRotation q)
+	{
+  	float[] quat = q.getValue();
+		final double[] dpquat = new double[4];
+		dpquat[0] = quat[0];
+		dpquat[1] = quat[1];
+		dpquat[2] = quat[2];
+		dpquat[3] = quat[3];
+
+		final SbRotationd dpq = new SbRotationd(dpquat);
+		this.dpvv.update(this); //YB
+		this.dpvv.rotateCamera(dpq);
+		this.dpvv.copyValues(this);
 	}
 
 	@Override

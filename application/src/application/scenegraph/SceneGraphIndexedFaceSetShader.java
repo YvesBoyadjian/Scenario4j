@@ -43,6 +43,8 @@ import jscenegraph.database.inventor.*;
 import jscenegraph.database.inventor.actions.SoGLRenderAction;
 import jscenegraph.database.inventor.actions.SoGetMatrixAction;
 import jscenegraph.database.inventor.actions.SoSearchAction;
+import jscenegraph.database.inventor.elements.SoProjectionMatrixElement;
+import jscenegraph.database.inventor.elements.SoViewingMatrixElement;
 import jscenegraph.database.inventor.misc.SoNotList;
 import jscenegraph.database.inventor.nodes.*;
 import jscenegraph.port.Ctx;
@@ -334,6 +336,14 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 
 	private float overallContrast = 1.6f;
 
+	private final Map<String,SbVec4f> objectives = new HashMap<>();
+
+	private final Map<String,SbVec3f> threeDObjectives = new HashMap<>();
+
+	private SoGroup objectivesGroup;
+
+	private SoMarkerSet objectiveMarkerSet;
+
     public SceneGraphIndexedFaceSetShader(
 			RasterProvider rwp,
 			RasterProvider rep,
@@ -600,6 +610,16 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 	    });
 	    
 	    sep.addChild(callback);
+
+		SoCallback objectivesCallback = new SoCallback();
+		objectivesCallback.setCallback(action->{
+			if(action instanceof SoGLRenderAction) {
+				SoGLRenderAction glRenderAction = (SoGLRenderAction)action;
+				updateObjectives(glRenderAction.getViewportRegion().getViewportAspectRatio());
+			}
+		});
+
+		sep.addChild(objectivesCallback);
 	    
 	    //sep.addChild(new SoAbort());
 	    
@@ -1561,6 +1581,35 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 
 		sep.addChild(viewFinderSeparator);
 
+		//______________________________________________________ Objectives
+
+		addObjective("Oracle",getOracleCoordinates());
+
+		SoSeparator objectivesSeparator = new SoSeparator();
+
+		SoOrthographicCamera objectivesCamera = new SoOrthographicCamera();
+		objectivesSeparator.addChild(objectivesCamera);
+
+		SoBaseColor objectivesColor = new SoBaseColor();
+		objectivesColor.rgb.setValue(1,0,1);
+		objectivesSeparator.addChild(objectivesColor);
+
+		objectiveMarkerSet = new SoMarkerSet();
+		objectiveMarkerSet.markerIndex.setValue(SoMarkerSet.MarkerType.TRIANGLE_FILLED_9_9.getValue());
+
+		vertexProperty = new SoVertexProperty();
+		vertexProperty.vertex.setValue(new SbVec3f());
+
+		objectiveMarkerSet.vertexProperty.setValue(vertexProperty);
+		objectiveMarkerSet.ref();
+
+		objectivesGroup = new SoGroup();
+		objectivesGroup.enableNotify(false); // No need to notify
+
+		objectivesSeparator.addChild(objectivesGroup);
+
+		sep.addChild(objectivesSeparator);
+
 		// _____________________________________________________ OffscreenTargets
 
 		SoSeparator offscreenTargetSeparator = new SoSeparator();
@@ -2504,6 +2553,10 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 		}
 
 		//distanceFromSea = computeDistanceFromBeach();
+
+
+
+		//updateObjectives();
 	}
 
 	synchronized void addIdleCB(Runnable r) {
@@ -3016,6 +3069,10 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 		);
 	}
 
+	public SbVec3f getOracleCoordinates() {
+		return new SbVec3f(ORACLE_X,ORACLE_Y,ORACLE_Z);
+	}
+
 	float getSlope(float x, float y) {
 		float height1 = getInternalZ(x+1,y,new int[4]);
 		float height2 = getInternalZ(x-1,y,new int[4]);
@@ -3436,5 +3493,85 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 		sky[1].intensity.setValue(SKY_INTENSITY*overallContrast);
 		sky[2].intensity.setValue(SKY_INTENSITY*overallContrast);
 		sky[3].intensity.setValue(SKY_INTENSITY*overallContrast);
+	}
+	public static SbViewVolume getViewVolume(SbViewVolume view, SoPerspectiveCamera pcam, float useAspectRatio) {
+		view.constructor();
+
+		float       camAspect = (useAspectRatio != 0.0 ? useAspectRatio :
+				pcam.aspectRatio.getValue());
+
+		// Set up the perspective camera.
+		view.perspective(pcam.heightAngle.getValue(), camAspect,
+				pcam.nearDistance.getValue(), pcam.farDistance.getValue());
+
+		// Note that these move the camera rather than moving objects
+		// relative to the camera.
+		view.rotateCamera(pcam.orientation.getValue());
+		//view.translateCamera(pcam.position.getValue());
+		return view;
+	}
+
+	private void updateObjectives(float viewportAspectRatio) {
+
+		for(Map.Entry<String,SbVec3f> threeDObjective : threeDObjectives.entrySet()) {
+			String name = threeDObjective.getKey();
+			SbVec3f coordinates = threeDObjective.getValue();
+			SbVec3f direction = new SbVec3f(-(current_x - coordinates.getX()),
+					-(current_y - coordinates.getY()),
+					-(current_z - coordinates.getZ() + zTranslation + 0.74f));
+
+			SbViewVolume cameraViewVolume = new SbViewVolume();//camera.getViewVolume();
+			getViewVolume(cameraViewVolume,(SoPerspectiveCamera) camera,0);
+			final SbVec3f screenCoords = new SbVec3f();
+			cameraViewVolume.projectToScreen(direction,screenCoords);
+
+			SbVec4f direction4D = new SbVec4fSingle();
+			direction4D.setValue(direction.getX(),direction.getY(),direction.getZ(),1.0f);
+
+			final SbVec4fSingle screenCoords4D = new SbVec4fSingle();
+			cameraViewVolume.getMatrix().multVecMatrix(direction4D,screenCoords4D);
+
+			objectives.put(name,screenCoords4D);
+		}
+
+		for( Map.Entry<String,SbVec4f> entry : objectives.entrySet()) {
+			String name = entry.getKey();
+			SbVec4f screenCoords4D = entry.getValue();
+
+			SoSeparator foundSep = null;
+			for( int childNo = 0; childNo < objectivesGroup.getNumChildren(); childNo++) {
+				SoNode child = objectivesGroup.getChild(childNo);
+				if (Objects.equals(child.getName().getString(),name)) {
+					foundSep = (SoSeparator) child;
+				}
+			}
+			float w = screenCoords4D.getW();
+			float angle = (float) Math.atan2(screenCoords4D.getY() / w * Math.signum(w), screenCoords4D.getX() / w * Math.signum(w));
+			float norm = (float) Math.sqrt(screenCoords4D.getY() / w * screenCoords4D.getY() / w + screenCoords4D.getX() / w * screenCoords4D.getX() / w);
+			norm = w > 0 ? Math.min(0.9f, norm) : 0.9f;
+			if (foundSep == null) {
+				SoSeparator objectiveSeparator = new SoSeparator();
+				objectiveSeparator.setName(name);
+
+				SoBlinker blinker = new SoBlinker();
+				blinker.whichChild.setValue(SoSwitch.SO_SWITCH_ALL);
+
+				objectiveSeparator.addChild(blinker);
+
+				SoTranslation translation = new SoTranslation();
+				translation.translation.setValue((float) Math.cos(angle) * norm, (float) Math.sin(angle) * norm, 0);
+				blinker.addChild(translation);
+				blinker.addChild(objectiveMarkerSet);
+				objectivesGroup.addChild(objectiveSeparator);
+			}
+			else {
+				SoTranslation translation = (SoTranslation) ((SoBlinker)foundSep.getChild(0)).getChild(0);
+				translation.translation.setValue((float) Math.cos(angle) * norm, (float) Math.sin(angle) * norm, 0);
+			}
+		}
+	}
+
+	private void addObjective(String name, SbVec3f coordinates) {
+		threeDObjectives.put(name,coordinates);
 	}
 }

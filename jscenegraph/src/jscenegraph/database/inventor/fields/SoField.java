@@ -549,6 +549,9 @@ public static final int VALUE_CHUNK_SIZE        =32;
   \sa enableConnection(), isConnectionEnabled(), isConnectedFromField()
   \sa getConnectedField(), appendConnection(SoEngineOutput *)
 */
+public boolean connectFrom(SoEngineOutput engineOutput, boolean notnotify) {
+	return connectFrom(engineOutput,notnotify,false);
+}
 	public boolean connectFrom(SoEngineOutput engineOutput, boolean notnotify, boolean append)
 	//
 	////////////////////////////////////////////////////////////////////////
@@ -2046,5 +2049,14 @@ public boolean getStatus(int bits)
   return (this.statusbits & bits) != 0;
 }
 
-	
+
+/*!
+  Mark field for re-evaluation (upon next read operation), but do not
+  trigger a notification.
+*/
+	public void setDirty(boolean dirty)
+	{
+		flags.dirty = true;//this.changeStatusBits(FieldFlags.FLAG_NEEDEVALUATION, dirty);
+	}
+
 }

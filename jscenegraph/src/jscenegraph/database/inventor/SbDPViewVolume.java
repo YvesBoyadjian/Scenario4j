@@ -25,6 +25,7 @@ package jscenegraph.database.inventor;
 
 import jscenegraph.database.inventor.errors.SoDebugError;
 import jscenegraph.port.Array;
+import jscenegraph.port.Mutable;
 
 /*!
   \class SbDPViewVolume SbLinear.h Inventor/SbLinear.h
@@ -45,7 +46,7 @@ import jscenegraph.port.Array;
  * @author Yves Boyadjian
  *
  */
-public class SbDPViewVolume {
+public class SbDPViewVolume implements Mutable {
 	
 	//public
 		  //enum ProjectionType { ORTHOGRAPHIC, PERSPECTIVE };
@@ -313,4 +314,274 @@ public class SbDPViewVolume {
 		return v;
 	}
 
+/*!
+  Rotate the direction which the camera is pointing in.
+
+  \sa translateCamera().
+ */
+	public void rotateCamera(final SbRotationd q)
+	{
+		final SbMatrixd mat = new SbMatrixd();
+		mat.setRotate(q);
+
+		mat.multDirMatrix(this.projDir, this.projDir);
+		mat.multDirMatrix(this.llf, this.llf);
+		mat.multDirMatrix(this.lrf, this.lrf);
+		mat.multDirMatrix(this.ulf, this.ulf);
+	}
+
+/*!
+  Translate the camera position of the view volume.
+
+  \sa rotateCamera().
+ */
+	public void
+	translateCamera(final SbVec3d v)
+	{
+		this.projPoint.operator_add_equal(v);
+	}
+
+/*!
+  Returns the combined affine and projection matrix.
+
+  \sa getMatrices(), getCameraSpaceMatrix()
+ */
+	public SbMatrixd
+	getMatrix()
+	{
+		final SbMatrixd affine = new SbMatrixd(), proj = new SbMatrixd();
+		this.getMatrices(affine, proj);
+		return affine.multRight(proj);
+	}
+
+	// Perspective projection matrix. From the "OpenGL Programming Guide,
+// release 1", Appendix G (but with row-major mode).
+	public static SbMatrixd
+	get_perspective_projection(final double rightminusleft, final double rightplusleft,
+                           final double topminusbottom, final double topplusbottom,
+                           final double nearval, final double farval)
+	{
+//#if COIN_DEBUG
+		if (nearval * farval <= 0.0) {
+			SoDebugError.postWarning("SbDPViewVolume::get_perspective_projection",
+					"Projection frustum crosses zero. Rendering is unpredictable.");
+		}
+//#endif // COIN_DEBUG
+		final SbMatrixd proj = new SbMatrixd();
+		final double[][] projv = proj.getValue();
+
+		projv[0][0] = 2.0*nearval/rightminusleft;
+		projv[0][1] = 0.0;
+		projv[0][2] = 0.0;
+		projv[0][3] = 0.0;
+		projv[1][0] = 0.0;
+		projv[1][1] = 2.0*nearval/topminusbottom;
+		projv[1][2] = 0.0;
+		projv[1][3] = 0.0;
+		projv[2][0] = rightplusleft/rightminusleft;
+		projv[2][1] = topplusbottom/topminusbottom;
+		projv[2][2] = -(farval+nearval)/(farval-nearval);
+		projv[2][3] = -1.0;
+		projv[3][0] = 0.0;
+		projv[3][1] = 0.0;
+		projv[3][2] = -2.0*farval*nearval/(farval-nearval);
+		projv[3][3] = 0.0;
+
+		// special handling for reverse perspective projection (see SoPerspectiveCamera documentation)
+		if (nearval < 0.0) {
+			// OpenGL performs clipping in homogeneous space (before computing the perspective division).
+			// i.e. instead of testing for -1 <= z/w <= +1, it checks for -w <= z <= +w. Both conditions
+			// are only equivalent if w > 0.
+			// In the reverse perspective case the projection matrix above leads to negative w values,
+			// but this can be compensated by multiplying the whole matrix by -1.
+			projv[0][0] *= -1.0;
+			projv[1][1] *= -1.0;
+			projv[2][0] *= -1.0;
+			projv[2][1] *= -1.0;
+			projv[2][2] *= -1.0;
+			projv[2][3] *= -1.0;
+			projv[3][2] *= -1.0;
+		}
+
+		return proj;
+	}
+
+
+	// Orthographic projection matrix. From the "OpenGL Programming Guide,
+// release 1", Appendix G (but with row-major mode).
+	public static SbMatrixd
+	get_ortho_projection(final double rightminusleft, final double rightplusleft,
+                     final double topminusbottom, final double topplusbottom,
+                     final double nearval, final double farval)
+	{
+		final SbMatrixd proj = new SbMatrixd();
+		double[][] projv = proj.getValue();
+		projv[0][0] = 2.0/rightminusleft;
+		projv[0][1] = 0.0;
+		projv[0][2] = 0.0;
+		projv[0][3] = 0.0;
+		projv[1][0] = 0.0;
+		projv[1][1] = 2.0/topminusbottom;
+		projv[1][2] = 0.0;
+		projv[1][3] = 0.0;
+		projv[2][0] = 0.0;
+		projv[2][1] = 0.0;
+		projv[2][2] = -2.0/(farval-nearval);
+		projv[2][3] = 0.0;
+		projv[3][0] = -rightplusleft/rightminusleft;
+		projv[3][1] = -topplusbottom/topminusbottom;
+		projv[3][2] = -(farval+nearval)/(farval-nearval);
+		projv[3][3] = 1.0;
+
+		return proj;
+
+	}
+
+/*!
+  Returns the view volume's affine matrix and projection matrix.
+
+  \sa getMatrix(), getCameraSpaceMatrix()
+ */
+	public void getMatrices(final SbMatrixd affine, final SbMatrixd proj)
+	{
+		SbVec3d upvec = this.ulf.operator_minus(this.llf);
+//#if COIN_DEBUG
+		if (upvec.operator_equal_equal(new SbVec3d(0.0, 0.0, 0.0))) {
+			SoDebugError.postWarning("SbDPViewVolume::getMatrices",
+					"empty frustum!");
+			affine.copyFrom(SbMatrixd.identity());
+			proj.copyFrom(SbMatrixd.identity());
+			return;
+		}
+//#endif // COIN_DEBUG
+		SbVec3d rightvec = this.lrf.operator_minus(this.llf);
+
+//#if COIN_DEBUG
+		if (rightvec.operator_equal_equal(new SbVec3d(0.0, 0.0, 0.0))) {
+			SoDebugError.postWarning("SbDPViewVolume::getMatrices",
+					"empty frustum!");
+			affine.copyFrom(SbMatrixd.identity());
+			proj.copyFrom(SbMatrixd.identity());
+			return;
+		}
+//#endif // COIN_DEBUG
+
+			// we test vectors above, just normalize
+					upvec.normalize();
+		rightvec.normalize();
+
+		// build matrix that will transform into camera coordinate system
+		final SbMatrixd mat = new SbMatrixd();
+		double[][] matval = mat.getValue();
+		matval[0][0] = rightvec.g(0);
+		matval[0][1] = rightvec.g(1);
+		matval[0][2] = rightvec.g(2);
+		matval[0][3] = 0.0f;
+
+		matval[1][0] = upvec.g(0);
+		matval[1][1] = upvec.g(1);
+		matval[1][2] = upvec.g(2);
+		matval[1][3] = 0.0f;
+
+		matval[2][0] = -this.projDir.g(0);
+		matval[2][1] = -this.projDir.g(1);
+		matval[2][2] = -this.projDir.g(2);
+		matval[2][3] = 0.0f;
+
+		matval[3][0] = this.projPoint.g(0);
+		matval[3][1] = this.projPoint.g(1);
+		matval[3][2] = this.projPoint.g(2);
+		matval[3][3] = 1.0f;
+
+		// the affine matrix is the inverse of the camera coordinate system
+		affine.copyFrom(mat.inverse());
+
+		// rotate frustum points back to an axis-aligned view volume to
+		// calculate parameters for the projection matrix
+		final SbVec3d nlrf = new SbVec3d(), nllf = new SbVec3d(), nulf = new SbVec3d();
+
+		affine.multDirMatrix(this.lrf, nlrf);
+		affine.multDirMatrix(this.llf, nllf);
+		affine.multDirMatrix(this.ulf, nulf);
+
+		double rml = nlrf.g(0) - nllf.g(0);
+		double rpl = nlrf.g(0) + nllf.g(0);
+		double tmb = nulf.g(1) - nllf.g(1);
+		double tpb = nulf.g(1) + nllf.g(1);
+		double n = this.getNearDist();
+		double f = n + this.getDepth();
+
+//#if COIN_DEBUG
+		if (rml <= 0.0f || tmb <= 0.0f || n >= f) {
+			SoDebugError.postWarning("SbDPViewVolume::getMatrices",
+					"invalid frustum");
+			proj.copyFrom(SbMatrixd.identity());
+			return;
+		}
+//#endif // COIN_DEBUG
+
+
+		if(this.type == SbViewVolume.ProjectionType.ORTHOGRAPHIC)
+		proj.copyFrom(get_ortho_projection(rml, rpl, tmb, tpb, n, f));
+  else
+		proj.copyFrom(get_perspective_projection(rml, rpl, tmb, tpb, n, f));
+	}
+
+/*!
+  Returns distance from projection plane to near clipping plane.
+
+  \sa getProjectionDirection().
+ */
+	public double
+	getNearDist()
+	{
+		return this.nearDist;
+	}
+
+/*!
+  Returns depth of viewing frustum, i.e. the distance from the near clipping
+  plane to the far clipping plane.
+
+  \sa getWidth(), getHeight().
+ */
+	public double
+	getDepth()
+	{
+		return this.nearToFar;
+	}
+
+	@Override
+	public void copyFrom(Object other) {
+		SbDPViewVolume otherVV = (SbDPViewVolume)other;
+
+		type = otherVV.type;
+		projPoint.copyFrom(otherVV.projPoint);
+		projDir.copyFrom(otherVV.projDir);
+		nearDist = otherVV.nearDist;
+		nearToFar = otherVV.nearToFar;
+		llf.copyFrom(otherVV.llf);
+		lrf.copyFrom(otherVV.lrf);
+		ulf.copyFrom(otherVV.ulf);
+
+	}
+
+/*!
+  Copies all values of a single precision SbViewVolume \a vv
+  to the current double precision instance.
+*/
+	public void copyValues(final SbViewVolume vv)
+	{
+		vv.type = /*SbViewVolume.ProjectionType)*/this.type;
+		vv.projPoint.copyFrom(dp_to_sbvec3f(this.projPoint));
+		vv.projDir.copyFrom(dp_to_sbvec3f(this.projDir));
+		vv.nearDist = (float)(this.nearDist);
+		vv.nearToFar = (float)(this.nearToFar);
+		vv.llf.copyFrom(dp_to_sbvec3f(this.llf.operator_add(this.projPoint)));
+		vv.lrf.copyFrom(dp_to_sbvec3f(this.lrf.operator_add(this.projPoint)));
+		vv.ulf.copyFrom(dp_to_sbvec3f(this.ulf.operator_add(this.projPoint)));
+
+		vv.llfO.copyFrom(dp_to_sbvec3f(llf)); // For compatibility
+		vv.lrfO.copyFrom(dp_to_sbvec3f(lrf));
+		vv.ulfO.copyFrom(dp_to_sbvec3f(ulf));
+	}
 }

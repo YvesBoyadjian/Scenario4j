@@ -138,7 +138,16 @@ public class SoNotList implements Mutable {
 		    if (t == SoNotRec.Type.FIELD || t == SoNotRec.Type.ENGINE)
 		    firstAtNode = null;
 		   	 }
-	 
+
+/*!
+  Returns the first record in the list.
+*/
+	public SoNotRec
+	getFirstRec()
+	{
+		return first;//this.head;
+	}
+
 	 public SoNotRec getLastRec() {
 		return last;
 	}
