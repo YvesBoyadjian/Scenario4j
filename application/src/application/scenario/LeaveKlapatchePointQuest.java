@@ -23,6 +23,7 @@ public class LeaveKlapatchePointQuest implements Quest {
         }
         else {
             sceneGraph.setMessage("You are at Klapatche Point. Your fate is on the trail");
+            sceneGraph.showOracleObjective(true);
         }
         return achieved;
     }
@@ -31,6 +32,7 @@ public class LeaveKlapatchePointQuest implements Quest {
     public void actionIfNextNotAchieved(SoQtWalkViewer viewer) {
         String[] speech ={""};
         sceneGraph.talk(speech);
+        sceneGraph.showOracleObjective(true);
     }
 
     double getDistanceFromKlapatche(SoQtWalkViewer viewer) {

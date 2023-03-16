@@ -344,6 +344,8 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 
 	private SoMarkerSet objectiveMarkerSet;
 
+	private boolean showOracleObjective;
+
     public SceneGraphIndexedFaceSetShader(
 			RasterProvider rwp,
 			RasterProvider rep,
@@ -3513,6 +3515,13 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 
 	private void updateObjectives(float viewportAspectRatio) {
 
+		if (!showOracleObjective) {
+			if (objectivesGroup.getNumChildren() > 0) {
+				objectivesGroup.removeAllChildren();
+			}
+			return;
+		}
+
 		for(Map.Entry<String,SbVec3f> threeDObjective : threeDObjectives.entrySet()) {
 			String name = threeDObjective.getKey();
 			SbVec3f coordinates = threeDObjective.getValue();
@@ -3573,5 +3582,9 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 
 	private void addObjective(String name, SbVec3f coordinates) {
 		threeDObjectives.put(name,coordinates);
+	}
+
+	public void showOracleObjective(boolean show) {
+		showOracleObjective = show;
 	}
 }

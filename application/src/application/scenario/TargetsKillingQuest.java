@@ -58,6 +58,7 @@ public class TargetsKillingQuest implements Quest {
                     sceneGraph.setMessage("Go back to the oracle by taking the trail, he has a present for you");
                     String[] speech ={""};
                     sceneGraph.talk(speech);
+                    sceneGraph.showOracleObjective(true);
                 }
                 else {
                     if (speciesToHunt <= 2 && !sceneGraph.haveShot(BigFoots.BIGFOOT_NAME)) {
@@ -66,6 +67,7 @@ public class TargetsKillingQuest implements Quest {
                     else {
                         sceneGraph.setMessage(speciesToHunt + " species left to hunt");
                     }
+                    sceneGraph.showOracleObjective(false);
                 }
             }
             sceneGraph.setSearchForSea(onlyMissingSeal);
@@ -80,6 +82,7 @@ public class TargetsKillingQuest implements Quest {
         sceneGraph.talk(speech);
         sceneGraph.stopBody();
         sceneGraph.setMessage("'F' key to toggle fly mode On or Off");
+        sceneGraph.showOracleObjective(false);
     }
 
     double getDistanceFromOracle(SoQtWalkViewer viewer) {

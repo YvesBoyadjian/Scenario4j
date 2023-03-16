@@ -31,6 +31,7 @@ public class FirstApproachQuest implements Quest {
         String[] speech = {"Hello, I am the Oracle. I am hungry.","Get me a squirrel, a marmot, a seal, a goat,", "a spotted owl, a barred owl, and of course, a big foot." };
         sceneGraph.talk(speech);
         sceneGraph.stopBody();
+        sceneGraph.showOracleObjective(false);
     }
 
     double getDistanceFromOracle(SoQtWalkViewer viewer) {
