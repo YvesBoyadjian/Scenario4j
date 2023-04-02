@@ -2,17 +2,29 @@
 <project version="4">
   <component name="Encoding">
     <file url="file://$PROJECT_DIR$/JglTF/jgltf-impl-v1/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/JglTF/jgltf-impl-v1/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/JglTF/jgltf-impl-v2-technique-webgl/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/JglTF/jgltf-impl-v2-technique-webgl/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/JglTF/jgltf-impl-v2/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/JglTF/jgltf-impl-v2/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/JglTF/jgltf-model-builder/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/JglTF/jgltf-model-builder/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/JglTF/jgltf-model/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/JglTF/jgltf-model/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/JglTF/jgltf-obj/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/JglTF/jgltf-obj/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/JglTF/jgltf-validator/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/JglTF/jgltf-validator/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/JglTF/jgltf-viewer-jogl/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/JglTF/jgltf-viewer-jogl/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/JglTF/jgltf-viewer-lwjgl/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/JglTF/jgltf-viewer-lwjgl/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/JglTF/jgltf-viewer/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/JglTF/jgltf-viewer/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/JglTF/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/JglTF/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/Obj/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/Obj/src/main/resources" charset="UTF-8" />
+    <file url="PROJECT" charset="windows-1252" />
   </component>
 </project>
