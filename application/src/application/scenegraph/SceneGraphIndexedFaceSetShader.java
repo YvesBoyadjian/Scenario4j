@@ -346,6 +346,8 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 
 	private boolean showOracleObjective;
 
+	private SoBaseColor lifeBarColor;
+
     public SceneGraphIndexedFaceSetShader(
 			RasterProvider rwp,
 			RasterProvider rep,
@@ -1656,6 +1658,10 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 		SoCallback lifeBarCallback = new SoCallback();
 
 		lifeBarSeparator.addChild(lifeBarCallback);
+
+		lifeBarColor = new SoBaseColor();
+
+		lifeBarSeparator.addChild(lifeBarColor);
 
 		SoIndexedFaceSet lifeBar = new SoIndexedFaceSet();
 
@@ -3469,7 +3475,7 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 		displayTemporaryMessage(message,30);
 	}
 
-	public void setContrast(float contrast) {
+	public void setOverallContrast(float contrast) {
 		if (overallContrast != contrast) {
 			overallContrast = contrast;
 			onContrastChange();
@@ -3491,11 +3497,14 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 			}
 			sunLight[is].enableNotify(wasNotified); // In order not to recompute shaders
 		}
+		environment.fogColor.setValue(new SbColor(SKY_COLOR.darker().operator_mul(overallContrast)));
 		sky[0].intensity.setValue(SKY_INTENSITY*overallContrast);
 		sky[1].intensity.setValue(SKY_INTENSITY*overallContrast);
 		sky[2].intensity.setValue(SKY_INTENSITY*overallContrast);
 		sky[3].intensity.setValue(SKY_INTENSITY*overallContrast);
+		lifeBarColor.rgb.setValue((float)Math.min(1.0,overallContrast*1.5),(float)Math.min(1.0,overallContrast*1.5),(float)Math.min(1.0,overallContrast*1.5));
 	}
+
 	public static SbViewVolume getViewVolume(SbViewVolume view, SoPerspectiveCamera pcam, float useAspectRatio) {
 		view.constructor();
 

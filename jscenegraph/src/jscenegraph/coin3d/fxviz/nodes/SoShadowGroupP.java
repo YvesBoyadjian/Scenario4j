@@ -1162,7 +1162,7 @@ setFragmentShader(SoState state)
   gen.addMainStatement("float noise3 = fract((5+gl_FragCoord.x*2+gl_FragCoord.y)*0.125f)/256.0f;\n");
 
   gen.addMainStatement("color = vec3(clamp(color.r, 0.0, 1.0), clamp(color.g, 0.0, 1.0), clamp(color.b, 0.0, 1.0));");
-  gen.addMainStatement("color = pow(color,vec3(0.47f))+vec3(noise1,noise2,noise3);\n"); // YB CHANGE GAMMA CORRECTION
+  gen.addMainStatement("color = pow(color,vec3(0.46f))+vec3(noise1,noise2,noise3);\n"); // YB CHANGE GAMMA CORRECTION
 
   gen.addMainStatement("s4j_FragColor = vec4(color, mydiffuse.a);");
   gen.addDeclaration("uniform sampler2D textureMap0;\n", false);

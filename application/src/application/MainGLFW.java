@@ -149,6 +149,8 @@ public class MainGLFW {
 
 	public static final String MAX_I = "max_i";
 
+	public static final String OVERALL_CONTRAST = "overall_contrast";
+
 	public static final String VOLUMETRIC_SKY = "volumetric_sky";
 
 	public static final String DISPLAY_FPS = "display_fps";
@@ -343,6 +345,7 @@ public class MainGLFW {
 		float tree_distance = (float)OptionDialog.DEFAULT_TREE_DISTANCE;
 		float tree_shadow_distance = (float)OptionDialog.DEFAULT_TREE_SHADOW_DISTANCE;
 		int max_i = OptionDialog.DEFAULT_ISLAND_DEPTH;
+		float overall_contrast = (float)OptionDialog.DEFAULT_OVERALL_CONTRAST;
 		boolean volumetric_sky = OptionDialog.DEFAULT_VOLUMETRIC_SKY;
 		boolean display_fps = false;
 
@@ -366,6 +369,8 @@ public class MainGLFW {
 				tree_shadow_distance = Float.valueOf(graphicsProperties.getProperty(TREE_SHADOW_DISTANCE,"3000"));
 
 				max_i = Integer.valueOf(graphicsProperties.getProperty(MAX_I,"14000"));
+
+				overall_contrast = Float.valueOf(graphicsProperties.getProperty(OVERALL_CONTRAST,"1.6"));
 
 				volumetric_sky = "true".equals(graphicsProperties.getProperty(VOLUMETRIC_SKY,"true"));
 
@@ -422,6 +427,8 @@ public class MainGLFW {
 		sg.setTreeDistance(tree_distance);
 
 		sg.setTreeShadowDistance(tree_shadow_distance);
+
+		sg.setOverallContrast(overall_contrast);
 
 		sg.getShadowGroup().isVolumetricActive.setValue(volumetric_sky);
 		sg.getEnvironment().fogColor.setValue(volumetric_sky ? new SbColor(sg.SKY_COLOR.darker().darker().darker().darker().darker().darker().operator_mul(sg.getOverallContrast())) : new SbColor(sg.SKY_COLOR.darker().operator_mul(sg.getOverallContrast())));
@@ -507,6 +514,8 @@ public class MainGLFW {
 					graphicsProperties.setProperty(TREE_SHADOW_DISTANCE,String.valueOf(sg.getTreeShadowDistance()));
 
 					graphicsProperties.setProperty(MAX_I,String.valueOf(sg.getMaxI()));
+
+					graphicsProperties.setProperty(OVERALL_CONTRAST,String.valueOf(sg.getOverallContrast()));
 
 					graphicsProperties.setProperty(VOLUMETRIC_SKY,sg.getShadowGroup().isVolumetricActive.getValue() ? "true":"false" );
 
