@@ -1,5 +1,7 @@
 package application.objects;
 
+import jscenegraph.database.inventor.SbVec3f;
+import org.ode4j.math.DVector3C;
 import org.ode4j.ode.DBody;
 
 public class Hero {
@@ -29,4 +31,9 @@ public class Hero {
 
     public float life = 1; // From 0 to 1
     public boolean hurting;
+
+    public SbVec3f getPosition() {
+        DVector3C bodyPostion = body.getPosition();
+        return new SbVec3f((float)bodyPostion.get0(),(float)bodyPostion.get1(),(float)bodyPostion.get2());
+    }
 }

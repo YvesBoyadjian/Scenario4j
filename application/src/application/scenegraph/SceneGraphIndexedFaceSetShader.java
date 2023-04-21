@@ -348,6 +348,8 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 
 	private SoBaseColor lifeBarColor;
 
+	private SoCat cat;
+
     public SceneGraphIndexedFaceSetShader(
 			RasterProvider rwp,
 			RasterProvider rep,
@@ -1272,6 +1274,10 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 		}
 
 		shadowGroup.addChild(mainEnemySep);
+
+		cat = new SoCat();
+
+		shadowGroup.addChild(cat);
 
 		sep.addChild(shadowGroup);
 
@@ -2506,6 +2512,7 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 		setBBoxCenter();
 		hideOracleIfTooFar();
 		setNearDistance();
+		updateCatPosition();
 
 		runIdleCB();
 
@@ -3286,7 +3293,8 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 	private void setNearDistance() {
 		float nearestCollectible = getNearestCollectibleDistance();
 		float nearestEnemy = getNearestEnemyDistance();
-		float nearest = Math.min(nearestCollectible,nearestEnemy);
+		float catDistance = getCatDistance();
+		float nearest = Math.min(nearestCollectible,Math.min(nearestEnemy,catDistance));
 		float minViewDistance = Math.min(nearest/2.0f, MINIMUM_VIEW_DISTANCE);
 		minViewDistance = Math.max(0.5f, minViewDistance);
 		camera.nearDistance.setValue(minViewDistance);
@@ -3595,5 +3603,19 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 
 	public void showOracleObjective(boolean show) {
 		showOracleObjective = show;
+	}
+
+	public void setCatPosition(SbVec3f catPosition) {
+		cat.setPosition(catPosition);
+	}
+
+	private void updateCatPosition() {
+		if (hero != null) {
+			setCatPosition(hero.getPosition().operator_add(new SbVec3f(1.0f,0,-0.2f)));
+		}
+	}
+
+	private float getCatDistance() {
+		return 0.1f; //TODO
 	}
 }
