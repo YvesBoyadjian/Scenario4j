@@ -6,7 +6,7 @@ import jscenegraph.database.inventor.nodes.*;
 
 public class SoCat extends SoSeparator {
 
-    private final float CAT_SCALE = 0.002f;
+    private final float CAT_SCALE = 0.005f;
 
     private SoTranslation position;
 

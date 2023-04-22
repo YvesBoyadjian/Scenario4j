@@ -2363,10 +2363,10 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 		int index2 = indices[2]; // imax, jmax
 		int index3 = indices[3]; // imin, jmax
 		
-		float z0 = chunks.verticesGetZ(index0) - zTranslation;
-		float z1 = chunks.verticesGetZ(index1) - zTranslation;
-		float z2 = chunks.verticesGetZ(index2) - zTranslation;
-		float z3 = chunks.verticesGetZ(index3) - zTranslation;
+		float z0 = chunks.verticesGetZ(index0) - zTranslation; // imin, jmin
+		float z1 = chunks.verticesGetZ(index1) - zTranslation; // imax, jmin
+		float z2 = chunks.verticesGetZ(index2) - zTranslation; // imax, jmax
+		float z3 = chunks.verticesGetZ(index3) - zTranslation; // imin, jmax
 		
 		float alpha = ifloat - imin;
 		float beta = jfloat - jmin;
@@ -2378,6 +2378,10 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 
 		float za = 0;
 
+		float a1 = alpha + beta;
+		float a2 = (1-alpha) + (1-beta);
+		float a = Math.min(a1,a2);
+
 		if(alpha + beta < 1) { // imin, jmin
 			za = z0 + (z1 - z0)*alpha + (z3 - z0)*beta;
 		}
@@ -2387,6 +2391,11 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 
 		float zb = 0;
 
+		float b1 = alpha + (1-beta);
+		float b2 = (1-alpha) + beta;
+
+		float b = Math.min(b1,b2);
+
 		if(alpha + (1-beta) < 1) { // imin, jmax
 			zb = z3 + (z2 - z3)*alpha + (z0 - z3)*(1-beta);
 		}
@@ -2394,7 +2403,7 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 			zb = z1 + (z0 - z1)*(1-alpha) + (z2 - z1)*beta;
 		}
 
-		float z = Math.min(za,zb);
+		float z = a < b ? za : zb;
 
 		//z/= 2.0f;
 		
@@ -3613,9 +3622,9 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 
 	private void updateCatPosition() {
 		if (hero != null) {
-			SbVec3f catPosition = hero.getPosition().operator_add(new SbVec3f(1.0f,0.0f,0.0f));
+			SbVec3f catPosition = hero.getPosition().operator_add(new SbVec3f(2.0f,0.0f,0.0f));
 			catPosition.setZ(getInternalZ(catPosition.getX(), catPosition.getY(),catPositionIndices,false));
-			setCatPosition(catPosition.operator_add(new SbVec3f(0,0,2.0f)));
+			setCatPosition(catPosition.operator_add(new SbVec3f(0,0,0.1f)));
 		}
 	}
 
