@@ -3609,13 +3609,17 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 		cat.setPosition(catPosition);
 	}
 
+	private final int[] catPositionIndices = new int[4];
+
 	private void updateCatPosition() {
 		if (hero != null) {
-			setCatPosition(hero.getPosition().operator_add(new SbVec3f(1.0f,0,-0.2f)));
+			SbVec3f catPosition = hero.getPosition().operator_add(new SbVec3f(1.0f,0.0f,0.0f));
+			catPosition.setZ(getInternalZ(catPosition.getX(), catPosition.getY(),catPositionIndices,false));
+			setCatPosition(catPosition.operator_add(new SbVec3f(0,0,2.0f)));
 		}
 	}
 
 	private float getCatDistance() {
-		return 0.1f; //TODO
+		return 1.0f; //TODO
 	}
 }
