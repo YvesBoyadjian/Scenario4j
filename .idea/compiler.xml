@@ -34,7 +34,7 @@
       <module name="jgltf-viewer-jogl" target="1.8" />
       <module name="jgltf-viewer-lwjgl" target="1.8" />
       <module name="lwjgl-opengl" target="11" />
-      <module name="obj" target="1.8" />
+      <module name="obj" target="11" />
       <module name="vk-bootstrap" target="11" />
     </bytecodeTargetLevel>
   </component>

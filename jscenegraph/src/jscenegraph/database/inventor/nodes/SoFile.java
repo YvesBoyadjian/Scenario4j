@@ -529,6 +529,10 @@ private static Path findFileWithExtension(Path parentPath, String extension, boo
                 if (!mtls.isEmpty()) {
                     Mtl mtl = mtls.get(0);
                     String imageName = mtl.getMapKd();
+                    if (imageName.indexOf(" ") != -1) {
+                        imageName = imageName.substring(imageName.indexOf(" ")+1);
+                    }
+                    System.out.println("Texture File : "+imageName);
                     Path imagePath = objPath.getParent().resolve(imageName);
                     SoTexture2 texture = textureFromPath(imagePath,true);
                     f.children.append(texture);
