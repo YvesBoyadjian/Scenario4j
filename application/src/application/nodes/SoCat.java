@@ -35,7 +35,7 @@ public class SoCat extends SoSeparator {
 
         String filePath = "./application/ressource/Cat_v1_L3.123cb1b1943a-2f48-4e44-8f71-6bbe19a3ab64/12221_Cat_v1_l3.obj";
         if(!new File(filePath).exists()) {
-            filePath = "./ressource/Cat_v1_L3.123cb1b1943a-2f48-4e44-8f71-6bbe19a3ab64/12221_Cat_v1_l3.obj";
+            filePath = "ressource/Cat_v1_L3.123cb1b1943a-2f48-4e44-8f71-6bbe19a3ab64/12221_Cat_v1_l3.obj";
         }
 
         objFile.name.setValue(filePath);
