@@ -10,10 +10,15 @@ public class SoCat extends SoSeparator {
 
     private SoTranslation position;
 
+    private SoRotation rotation;
+
     public SoCat() {
         super();
         position = new SoTranslation();
         addChild(position);
+
+        rotation = new SoRotation();
+        addChild(rotation);
 
         SoScale scale = new SoScale(){
             public void GLRender(SoGLRenderAction action) {
@@ -33,5 +38,14 @@ public class SoCat extends SoSeparator {
 
     public void setPosition(SbVec3f positionValue) {
         position.translation.setValue(positionValue);
+    }
+
+    public void setOrientation(SbVec3f orientation) {
+        float angle = (float)Math.atan2(orientation.getY(),orientation.getX()) + (float)Math.PI/2.0f;
+        rotation.rotation.setValue(new SbVec3f(0,0,1), angle);
+    }
+
+    public SbVec3f getPosition() {
+        return new SbVec3f(position.translation.getValue());
     }
 }

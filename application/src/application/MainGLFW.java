@@ -171,6 +171,8 @@ public class MainGLFW {
 
 	public static final int MAX_PROGRESS = 99999;
 
+	public static boolean newGameAtStart = false;
+
 	/**
 	 * @param args
 	 */
@@ -856,12 +858,7 @@ public class MainGLFW {
 
 		} else {
 			camera.position.setValue(Hero.STARTING_X, Hero.STARTING_Y, Hero.STARTING_Z - SCENE_POSITION.getZ());
-			viewer.addOneShotIdleListener(v->{
-
-				String[] message = new String[2];
-				message[0] = "Go to the oracle."; message[1] = "He is on the right on the path";
-				sg.displayTemporaryMessage(message,30);
-			});
+			newGameAtStart = true;
 		}
 		viewer.getCameraController().changeCameraValues(camera);
 
@@ -1695,6 +1692,18 @@ public class MainGLFW {
 				try {
 					loop();
 					lastAliveMillis[0].set(System.currentTimeMillis());
+
+					if (newGameAtStart) {
+						newGameAtStart = false;
+						viewer.addOneShotIdleListener(v -> {
+
+							sg.newGame(v);
+
+//				String[] message = new String[2];
+//				message[0] = "Go to the oracle."; message[1] = "He is on the right on the path";
+//				sg.displayTemporaryMessage(message,30);
+						});
+					}
 				} catch (Exception e) {
 					e.printStackTrace();
 					viewer.setVisible(false);

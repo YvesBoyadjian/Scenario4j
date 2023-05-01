@@ -20,16 +20,16 @@ public class EnemyFamily {
 
     SoSeparator node = new SoSeparator();
 
-    public float[] getEnemy(int sealIndex, float[] vector) {
+    public float[] getEnemy(int enemyIndex, float[] vector) {
 
         if(nbEnemies == 0) {
             compute();
         }
 
-        SbVec3f bootPairCoords = enemiesInitialCoords.getValueAt(sealIndex);
-        vector[0] = bootPairCoords.getX();
-        vector[1] = bootPairCoords.getY();
-        vector[2] = bootPairCoords.getZ();
+        SbVec3f enemyCoords = enemiesInitialCoords.getValueAt(enemyIndex);
+        vector[0] = enemyCoords.getX();
+        vector[1] = enemyCoords.getY();
+        vector[2] = enemyCoords.getZ();
         return vector;
     }
 

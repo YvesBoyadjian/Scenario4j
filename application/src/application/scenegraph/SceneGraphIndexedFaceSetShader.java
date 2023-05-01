@@ -2516,12 +2516,22 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 		//RecursiveChunk.setCamera(shadowTree, camera);
 	}
 
+
+	private double lastIdleTimeSec;
 	@Override
 	public void idle() {
+
+		double currentTimeSec = System.nanoTime()/1.0e9;
+		float delta_t = (float)(currentTimeSec - lastIdleTimeSec);
+		if (Math.abs(delta_t) > 1.0f) {
+			delta_t = 0;
+		}
+		lastIdleTimeSec = currentTimeSec;
+
 		setBBoxCenter();
 		hideOracleIfTooFar();
 		setNearDistance();
-		updateCatPosition();
+		updateCatPosition(delta_t);
 
 		runIdleCB();
 
@@ -3478,8 +3488,14 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 			viewer.toggleTimeStop();
 		}
 		setHeroPosition(Hero.STARTING_X,Hero.STARTING_Y,Hero.STARTING_Z);
+
+		SbVec3f newCatPosition = hero.getPosition().operator_add(new SbVec3f(30.0f, 0.0f, 0.0f));
+		newCatPosition.setZ(getInternalZ(newCatPosition.getX(), newCatPosition.getY(),catPositionIndices,false));
+		setCatPosition(newCatPosition.operator_add(new SbVec3f(0,0,0.1f)));
+
 		getHero().life = 1.0f;
 		resurrectTheAnimals();
+		enemiesSeparator.removeAllEnemies();
 		resetScenario(viewer);
 		SwingUtilities.invokeLater(()->setBoots(false));
 		if(viewer.isFlying()) {
@@ -3618,17 +3634,35 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 		cat.setPosition(catPosition);
 	}
 
+	public SbVec3f getCatPosition() {
+		return cat.getPosition();
+	}
+
 	private final int[] catPositionIndices = new int[4];
 
-	private void updateCatPosition() {
+	private final static float catSpeed = 2.5f;
+
+	private void updateCatPosition(float delta_t) {
+
 		if (hero != null) {
-			SbVec3f catPosition = hero.getPosition().operator_add(new SbVec3f(2.0f,0.0f,0.0f));
-			catPosition.setZ(getInternalZ(catPosition.getX(), catPosition.getY(),catPositionIndices,false));
-			setCatPosition(catPosition.operator_add(new SbVec3f(0,0,0.1f)));
+			SbVec3f catToHero = hero.getPosition().operator_minus(getCatPosition());
+			if (catToHero.length() > 999) {
+				SbVec3f newCatPosition = hero.getPosition().operator_add(new SbVec3f(2.0f, 0.0f, 0.0f));
+				newCatPosition.setZ(getInternalZ(newCatPosition.getX(), newCatPosition.getY(),catPositionIndices,false));
+				setCatPosition(newCatPosition.operator_add(new SbVec3f(0,0,0.1f)));
+			}
+			else if (catToHero.length() > 2.0f) {
+				catToHero.normalize();
+				SbVec3f catMovement = catToHero.operator_mul(catSpeed);
+				SbVec3f newCatPosition = getCatPosition().operator_add(catMovement.operator_mul(delta_t));
+				cat.setOrientation(catToHero);
+				newCatPosition.setZ(getInternalZ(newCatPosition.getX(), newCatPosition.getY(), catPositionIndices, false));
+				setCatPosition(newCatPosition.operator_add(new SbVec3f(0, 0, 0.1f)));
+			}
 		}
 	}
 
 	private float getCatDistance() {
-		return 1.0f; //TODO
+		return 3.0f;
 	}
 }

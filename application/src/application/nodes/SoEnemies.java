@@ -143,6 +143,13 @@ public class SoEnemies extends SoSeparator {
 //        target.unref();
         //System.out.println("Add enemy "+actualChildren.size());
     }
+
+    public void removeAllEnemies() {
+        actualChildrenInstances.clear();
+        instancesToCollectibles.clear();
+        super.removeAllChildren();
+    }
+
     void removeEnemy(SoPill target, int instance) {
         actualChildrenInstances.remove(instance);
         instancesToCollectibles.remove(instance);
