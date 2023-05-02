@@ -3663,6 +3663,6 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 	}
 
 	private float getCatDistance() {
-		return 3.0f;
+		return 2.5f;
 	}
 }

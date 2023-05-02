@@ -470,6 +470,10 @@ public class MainGLFW {
 
 						saveGameProperties.setProperty(HERO_Z, String.valueOf(camera.position.getValue().getZ() + Z_TRANSLATION));
 
+						saveGameProperties.setProperty(CAT_X, String.valueOf(sg.getCatPosition().getX()));
+						saveGameProperties.setProperty(CAT_Y, String.valueOf(sg.getCatPosition().getY()));
+						saveGameProperties.setProperty(CAT_Z, String.valueOf(sg.getCatPosition().getZ() + Z_TRANSLATION));
+
 						saveGameProperties.setProperty(TIME, String.valueOf(getNow()));
 
 						saveGameProperties.setProperty(TIME_STOP, isTimeStop() ? "true" : "false");
@@ -828,6 +832,12 @@ public class MainGLFW {
 
 				float z = Float.valueOf(saveGameProperties.getProperty(HERO_Z, String.valueOf(Hero.STARTING_Z/* - SCENE_POSITION.getZ()*/)));
 
+				float cat_x = Float.valueOf(saveGameProperties.getProperty(CAT_X,String.valueOf(Hero.STARTING_X)));
+
+				float cat_y = Float.valueOf(saveGameProperties.getProperty(CAT_Y,String.valueOf(Hero.STARTING_Y)));
+
+				float cat_z = Float.valueOf(saveGameProperties.getProperty(CAT_Z,String.valueOf(Hero.STARTING_Z)));
+
 				hero.life = Float.valueOf(saveGameProperties.getProperty(LIFE, String.valueOf(1.0f)));
 
 				previousTimeSec = Double.valueOf(saveGameProperties.getProperty(TIME, "0"));
@@ -847,6 +857,8 @@ public class MainGLFW {
 				sg.setBoots("true".equals(saveGameProperties.getProperty(BOOTS,"false")));
 
 				sg.loadEnemiesKills(saveGameProperties);
+
+				sg.setCatPosition(new SbVec3f(cat_x,cat_y,cat_z - SCENE_POSITION.getZ()));
 
 				in.close();
 			} catch (FileNotFoundException e) {

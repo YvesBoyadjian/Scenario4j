@@ -18,6 +18,12 @@ public class Hero {
 
     public static final String HERO_Z = "hero_z";
 
+    public static final String CAT_X = "cat_x";
+
+    public static final String CAT_Y = "cat_y";
+
+    public static final String CAT_Z = "cat_z";
+
     public static final String FLY = "fly";
 
     public static final String BOOTS = "boots";
