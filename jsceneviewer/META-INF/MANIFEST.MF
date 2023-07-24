@@ -4,13 +4,13 @@ Bundle-Name: JViewer
 Bundle-SymbolicName: jsceneviewer
 Bundle-Version: 1.0.0.qualifier
 Bundle-Activator: jsceneviewer.Activator
-Require-Bundle: lwjgl,
- org.eclipse.ui,
+Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
  jscenegraph,
  org.eclipse.swt,
- lwjgl-glfw;bundle-version="1.0.0",
- lwjgl3-swt;bundle-version="1.0.0"
+ lwjgl3-swt;bundle-version="1.0.0",
+ lwjgl-opengl;bundle-version="1.0.0",
+ vk-bootstrap;bundle-version="1.0.0"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-ActivationPolicy: lazy
 Export-Package: jsceneviewer.inventor.qt,

@@ -12,11 +12,11 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/lwjgl3-swt"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/jsceneviewer-glfw"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/lwjgl-utils"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/lwjgl-glfw"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/geotools"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/gdx"/>
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/ode4j"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/sl4j"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/vk-bootstrap"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

@@ -12,9 +12,10 @@ Require-Bundle: org.eclipse.ui,
  lwjgl3-swt,
  jsceneviewer-glfw;bundle-version="1.0.0",
  lwjgl-utils,
- lwjgl-glfw,
  geotools;bundle-version="1.0.0",
- gdx;bundle-version="1.0.0"
+ gdx;bundle-version="1.0.0",
+ vk-bootstrap;bundle-version="1.0.0",
+ lwjgl-opengl;bundle-version="1.0.0"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Automatic-Module-Name: application
 Bundle-ActivationPolicy: lazy

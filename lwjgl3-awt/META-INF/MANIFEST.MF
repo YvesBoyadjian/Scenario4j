@@ -1,0 +1,11 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: lwjgl3-awt
+Bundle-SymbolicName: lwjgl3-awt
+Bundle-Version: 1.0.0.qualifier
+Bundle-RequiredExecutionEnvironment: JavaSE-17
+Automatic-Module-Name: lwjgl3.awt
+Export-Package: org.lwjgl.awthacks,
+ org.lwjgl.opengl.awt,
+ org.lwjgl.vulkan.awt
+Require-Bundle: vk-bootstrap;bundle-version="1.0.0"

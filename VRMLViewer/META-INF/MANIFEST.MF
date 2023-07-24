@@ -1,0 +1,10 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: VRMLViewer
+Bundle-SymbolicName: VRMLViewer
+Bundle-Version: 1.0.0.qualifier
+Bundle-RequiredExecutionEnvironment: JavaSE-17
+Automatic-Module-Name: VRMLViewer
+Export-Package: vrmlviewer
+Require-Bundle: vk-bootstrap;bundle-version="1.0.0",
+ lwjgl-opengl;bundle-version="1.0.0"

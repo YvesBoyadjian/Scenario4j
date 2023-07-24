@@ -664,7 +664,7 @@ class PlatformWin32GLCanvas extends AbstractPlatformGLCanvas {
             effective.majorVersion = version.major;
             effective.minorVersion = version.minor;
         } else if (attribs.api == API.GLES) {
-            APIVersion version = APIUtil.apiParseVersion(MemoryUtil.memUTF8(Checks.check(JNI.callP(GL11.GL_VERSION, getString))), "OpenGL ES");
+            APIVersion version = APIUtil.apiParseVersion(MemoryUtil.memUTF8(Checks.check(JNI.callP(GL11.GL_VERSION, getString)))+ "OpenGL ES");
             effective.majorVersion = version.major;
             effective.minorVersion = version.minor;
         }

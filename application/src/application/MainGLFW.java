@@ -95,7 +95,6 @@ import org.ode4j.ode.internal.DxHashSpace;
 import org.ode4j.ode.internal.ErrorHandler;
 import org.ode4j.ode.internal.ErrorHdl;
 import org.ode4j.ode.internal.Rotation;
-import util.IOUtils;
 
 import static application.objects.Hero.*;
 import static com.badlogic.gdx.physics.bullet.collision.CollisionConstants.DISABLE_DEACTIVATION;

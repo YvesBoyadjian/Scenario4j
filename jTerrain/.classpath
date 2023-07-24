@@ -8,9 +8,9 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/jsceneviewer"/>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/jscenegraph"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/lwjgl"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/lwjgl3-swt"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/lwjgl-glfw"/>
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/lwjgl-opengl"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/vk-bootstrap"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

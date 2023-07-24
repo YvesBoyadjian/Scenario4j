@@ -1,0 +1,12 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: jsceneviewer-awt
+Bundle-SymbolicName: jsceneviewer-awt
+Bundle-Version: 1.0.0.qualifier
+Bundle-RequiredExecutionEnvironment: JavaSE-17
+Automatic-Module-Name: jsceneviewer.awt
+Export-Package: jsceneviewerawt,
+ jsceneviewerawt.inventor.qt,
+ jsceneviewerawt.inventor.qt.devices,
+ jsceneviewerawt.inventor.qt.viewers
+Require-Bundle: vk-bootstrap;bundle-version="1.0.0"
