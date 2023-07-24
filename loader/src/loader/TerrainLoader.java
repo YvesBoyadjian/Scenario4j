@@ -42,6 +42,15 @@ public class TerrainLoader {
             	tiffFile = new File("ressource/"+fileName);
             	if(!tiffFile.exists()) {
 					tiffFile = new File("../ressource/"+fileName);
+	            	if(!tiffFile.exists()) {
+						tiffFile = new File("../../ressource/"+fileName);
+		            	if(!tiffFile.exists()) {
+							tiffFile = new File("../../../ressource/"+fileName);
+			            	if(!tiffFile.exists()) {
+								tiffFile = new File("../../../../ressource/"+fileName);
+							}
+						}
+					}
 				}
             }
         }
