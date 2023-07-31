@@ -3,7 +3,8 @@
   <children xsi:type="basic:TrimmedWindow" xmi:id="_6wlLccgZEeSyMNYR5xypkQ" elementId="MRIEditor.window.main" label="MRI Editor" width="500" height="400">
     <children xsi:type="basic:PartSashContainer" xmi:id="_6wlLksgZEeSyMNYR5xypkQ" elementId="MRIEditor.partsashcontainer.sample">
       <children xsi:type="basic:PartStack" xmi:id="_6wlLk8gZEeSyMNYR5xypkQ" elementId="MRIEditor.partstack.sample">
-        <children xsi:type="basic:Part" xmi:id="_6wlLlMgZEeSyMNYR5xypkQ" elementId="MRIEditor.part.sample" contributionURI="bundleclass://MRIEditor/mrieditor.parts.SamplePart" iconURI="platform:/plugin/MRIEditor/icons/home.png" label="Sample Part"/>
+        <children xsi:type="basic:Part" xmi:id="_6wlLlMgZEeSyMNYR5xypkQ" elementId="MRIEditor.part.sample" contributionURI="bundleclass://MRIEditor/mrieditor.parts.SamplePart" label="Sample Part" iconURI="platform:/plugin/MRIEditor/icons/home.png"/>
+        <children xsi:type="basic:Part" xmi:id="_OZeOUC7rEe6aJ4bblPr9UQ" elementId="mrieditor.part.view3d" contributionURI="bundleclass://MRIEditor/mrieditor.parts.View3DPart" label="3D View" iconURI="platform:/plugin/MRIEditor/icons/home.png"/>
       </children>
     </children>
     <mainMenu xmi:id="_6wlLicgZEeSyMNYR5xypkQ" elementId="org.eclipse.ui.main.menu">

@@ -1,7 +1,8 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
+Bundle-ActivationPolicy: lazy
 Bundle-Name: Jscenegraph
-Bundle-SymbolicName: jscenegraph
+Bundle-SymbolicName: jscenegraph;singleton:=true
 Bundle-Version: 1.0.0.qualifier
 Require-Bundle: org.lwjglx;bundle-version="1.0.0",
  lwjgl-opengl;bundle-version="1.0.0",

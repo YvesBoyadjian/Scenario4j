@@ -6,8 +6,8 @@
 			<attribute name="module" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry combineaccessrules="false" kind="src" path="/org.lwjglx"/>
-	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/lwjgl-opengl"/>
+	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/org.lwjglx"/>
+	<classpathentry exported="true" kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
+	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/lwjgl-opengl"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

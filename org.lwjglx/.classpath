@@ -8,5 +8,6 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/lwjgl-opengl"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/vk-bootstrap"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
