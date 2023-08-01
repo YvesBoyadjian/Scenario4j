@@ -300,7 +300,7 @@ public class MainGLFW {
 
 	static boolean timeStop = false;
 
-	static final Hero hero = new Hero();
+	static public final Hero hero = new Hero();
 	static boolean allowFly = false;
 
 	static DWorld world;

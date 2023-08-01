@@ -5,6 +5,10 @@ Bundle-SymbolicName: jgltf-model
 Bundle-Version: 1.0.0.qualifier
 Bundle-RequiredExecutionEnvironment: JavaSE-17
 Automatic-Module-Name: jgltf.model
+Bundle-ClassPath: lib/jackson-annotations-2.13.1.jar,
+ lib/jackson-core-2.13.1.jar,
+ lib/jackson-databind-2.13.1.jar,
+ .
 Export-Package: de.javagl.jgltf.model,
  de.javagl.jgltf.model.animation,
  de.javagl.jgltf.model.extensions,
@@ -19,3 +23,5 @@ Export-Package: de.javagl.jgltf.model,
  de.javagl.jgltf.model.v1.gl,
  de.javagl.jgltf.model.v2,
  de.javagl.jgltf.model.v2.gl
+Require-Bundle: jgltf-impl-v1;bundle-version="1.0.0",
+ jgltf-impl-v2;bundle-version="1.0.0"

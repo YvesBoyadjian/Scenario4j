@@ -1,0 +1,10 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: jgltf-impl-v1
+Bundle-SymbolicName: jgltf-impl-v1
+Bundle-Version: 1.0.0.qualifier
+Bundle-RequiredExecutionEnvironment: JavaSE-17
+Automatic-Module-Name: jgltf.impl.v1
+Bundle-ClassPath: src/main/java/,
+ .
+Export-Package: de.javagl.jgltf.impl.v1

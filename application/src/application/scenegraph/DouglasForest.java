@@ -161,11 +161,11 @@ public class DouglasForest {
 
 			final SbVec3f xyz = new SbVec3f();
 
-			final int progressBarInitialValue = progressBar.getValue();
+			final int progressBarInitialValue = progressBar != null? progressBar.getValue():0;
 			
 			for( int i = 0; i < NB_DOUGLAS_SEEDS; i++) {
 
-				if(0 == i%999) {
+				if(0 == i%999 && progressBar != null) {
 					progressBar.setValue((int)((long)progressBarInitialValue+((long)MainGLFW.MAX_PROGRESS*.9-progressBarInitialValue)*i/NB_DOUGLAS_SEEDS));
 				}
 

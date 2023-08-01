@@ -663,10 +663,12 @@ public class RecursiveChunk {
 	}
 
 	synchronized void updateProgressBar(Lock lock,final JProgressBar progressBar) {
+		if (progressBar != null) {
 		lock.lock();
 		int progress = progressBar.getValue();
 		progressBar.setValue(progress+1);
 		lock.unlock();
+		}
 	}
 	
 	public boolean isInside(float x, float y) {

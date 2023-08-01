@@ -8,6 +8,7 @@ import java.util.List;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
+import javax.swing.JProgressBar;
 
 import org.eclipse.e4.ui.di.Focus;
 import org.eclipse.e4.ui.di.Persist;
@@ -25,12 +26,18 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 
+import application.MainGLFW;
 import application.RasterProvider;
+import application.gui.OptionDialog;
+import application.scenegraph.SceneGraphIndexedFaceSetShader;
 import application.swt.SoQtWalkViewer;
 import application.terrain.IslandLoader;
 import application.trails.TrailsLoader;
 import jscenegraph.database.inventor.SbTime;
+import jscenegraph.database.inventor.SbVec3f;
 import jscenegraph.database.inventor.SoDB;
+import jscenegraph.database.inventor.actions.SoGLRenderAction.TransparencyType;
+import jscenegraph.database.inventor.nodes.SoCamera;
 import jsceneviewer.inventor.qt.SoQt;
 import jsceneviewer.inventor.qt.SoQtCameraController.Type;
 import jsceneviewer.inventor.qt.viewers.SoQtFullViewer.BuildFlag;
@@ -109,6 +116,39 @@ public class View3DPart {
 		// _______________________________________________________ trails
 
 		long[] trails = TrailsLoader.loadTrails();
+
+		final int overlap = 13;
+		final int max_i = OptionDialog.DEFAULT_ISLAND_DEPTH;
+		
+		SceneGraphIndexedFaceSetShader sg = new SceneGraphIndexedFaceSetShader(
+				rw, 
+				re, 
+				overlap, 
+				MainGLFW.Z_TRANSLATION, 
+				max_i, 
+				trails, 
+				null);
+
+		walkViewer.setHeadlight(false);
+
+
+		walkViewer.setSceneGraph(sg.getSceneGraph());
+
+		walkViewer.setUpDirection(new SbVec3f(0, 0, 1));
+
+
+		SoCamera camera = walkViewer.getCameraController().getCamera();
+
+		sg.setCamera(camera);
+
+		walkViewer.getSceneHandler().setTransparencyType(TransparencyType.BLEND/*SORTED_LAYERS_BLEND*/);
+
+
+		MainGLFW.SCENE_POSITION = new SbVec3f(/*sg.getCenterX()/2*/0, sg.getCenterY(), MainGLFW.Z_TRANSLATION);
+		
+		sg.setPosition(MainGLFW.SCENE_POSITION.getX(), MainGLFW.SCENE_POSITION.getY()/*,SCENE_POSITION.getZ()*/);
+
+		sg.setHero(MainGLFW.hero);
 		
 		System.out.println("Load 3D Model");		
 		

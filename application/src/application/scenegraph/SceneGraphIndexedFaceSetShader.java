@@ -535,7 +535,9 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 					
 					chunks.colorsPut(index, red, green, blue, alpha);
 				}
+				if(progressBar != null) {
 				progressBar.setValue((int)((long)MAX_PROGRESS*i*LOADING_HEIGHMAP_TIME_PERCENTAGE/100/w));
+				}
 			}
 
 			if(SAVE_CHUNK_MRI) {
@@ -583,7 +585,9 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 						chunks.stonePut(index);				
 					}
 				}
+				if (progressBar != null) {
 				progressBar.setValue((int)((long)MAX_PROGRESS*LOADING_HEIGHMAP_TIME_PERCENTAGE/100 + (long)MAX_PROGRESS*i*LOADING_NORMALS_TIME_PERCENTAGE/100/w));
+				}
 			}
 			if ( need_to_save_colors ) {
 				if(SAVE_CHUNK_MRI) {
@@ -2449,10 +2453,10 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 
 		final SbVec3fSingle treePoint = new SbVec3fSingle();
 
-		int progressBarInitialValue = progressBar.getValue();
+		int progressBarInitialValue = progressBar != null ? progressBar.getValue() : 0;
 
 		for( int i=0; i< forest.getNumIndexDouglas()/*NB_DOUGLAS_SEEDS*/; i++) {
-			if( 0 == i%999 ) {
+			if( 0 == i%999 && progressBar != null) {
 				progressBar.setValue((int)(progressBarInitialValue + (MAX_PROGRESS - progressBarInitialValue)*(long)i/forest.getNumIndexDouglas()));
 			}
 
@@ -2467,7 +2471,9 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 			treePoint.setValue(x,y,z);
 			treesBSPTree.addPoint(treePoint,i);
 		}
+		if (progressBar != null) {
 		progressBar.setValue(MAX_PROGRESS);
+		}
 	}
 		
 	SoGroup getDouglasTreesT(SbVec3f refPoint,SbVec3f refPoint2, final float[] distance,final JProgressBar progressBar,final Counter douglasLoadCount) {
