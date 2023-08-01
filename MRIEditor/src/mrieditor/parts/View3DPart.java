@@ -28,6 +28,7 @@ import org.eclipse.swt.widgets.Composite;
 import application.RasterProvider;
 import application.swt.SoQtWalkViewer;
 import application.terrain.IslandLoader;
+import application.trails.TrailsLoader;
 import jscenegraph.database.inventor.SbTime;
 import jscenegraph.database.inventor.SoDB;
 import jsceneviewer.inventor.qt.SoQt;
@@ -104,6 +105,10 @@ public class View3DPart {
 	private void load3DModel() {
 		RasterProvider rw = IslandLoader.loadWest();
 		RasterProvider re = IslandLoader.loadEast();
+
+		// _______________________________________________________ trails
+
+		long[] trails = TrailsLoader.loadTrails();
 		
 		System.out.println("Load 3D Model");		
 		

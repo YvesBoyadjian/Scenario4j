@@ -31,4 +31,5 @@ Export-Package: application,
  application.scenegraph.douglas,
  application.targets,
  application.terrain,
+ application.trails,
  application.viewer.glfw
