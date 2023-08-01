@@ -19,4 +19,16 @@ Require-Bundle: org.eclipse.ui,
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Automatic-Module-Name: application
 Bundle-ActivationPolicy: lazy
-Export-Package: application
+Export-Package: application,
+ application.gui,
+ application.nodes,
+ application.objects,
+ application.objects.collectible,
+ application.objects.enemy,
+ application.physics,
+ application.scenario,
+ application.scenegraph,
+ application.scenegraph.douglas,
+ application.targets,
+ application.terrain,
+ application.viewer.glfw

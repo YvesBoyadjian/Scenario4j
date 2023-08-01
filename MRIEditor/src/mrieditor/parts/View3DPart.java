@@ -16,12 +16,20 @@ import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.widgets.TextFactory;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 
+import application.RasterProvider;
 import application.swt.SoQtWalkViewer;
+import application.terrain.IslandLoader;
+import jscenegraph.database.inventor.SbTime;
+import jscenegraph.database.inventor.SoDB;
 import jsceneviewer.inventor.qt.SoQt;
 import jsceneviewer.inventor.qt.SoQtCameraController.Type;
 import jsceneviewer.inventor.qt.viewers.SoQtFullViewer.BuildFlag;
@@ -40,8 +48,22 @@ public class View3DPart {
 
 	@PostConstruct
 	public void createComposite(Composite parent) {
-//		parent.setLayout(new GridLayout(1, false));
-		parent.setLayout(new FillLayout());
+		parent.setLayout(new GridLayout(1, false));
+		
+		Button button = new Button(parent, SWT.PUSH);
+		button.setText("Load 3D Model");
+		
+		button.addSelectionListener(new SelectionAdapter() {
+
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				load3DModel();				
+			}
+		});
+		
+		Composite intermediate = new Composite(parent,SWT.NONE);
+		intermediate.setLayout(new FillLayout());
+		intermediate.setLayoutData(new GridData(GridData.FILL_BOTH));
 
 //		TextFactory.newText(SWT.BORDER) //
 //				.message("Enter text to mark part as dirty") //
@@ -56,11 +78,12 @@ public class View3DPart {
 //		tableViewer.getTable().setLayoutData(new GridData(GridData.FILL_BOTH));
 
         SoQt.init("MRIEditor");
+
+		SoDB.setDelaySensorTimeout(SbTime.zero()); // Necessary to avoid bug in Display
 		
 		int style = SWT.NO_BACKGROUND;
-		walkViewer = new SoQtWalkViewer(BuildFlag.BUILD_ALL,Type.BROWSER,parent,style);
+		walkViewer = new SoQtWalkViewer(BuildFlag.BUILD_ALL,Type.BROWSER,intermediate,style);
         walkViewer.buildWidget(style);
-//		walkViewer.setLayoutData(new GridData(GridData.FILL_BOTH));
 	}
 
 	@Focus
@@ -78,4 +101,11 @@ public class View3DPart {
 		return Arrays.asList("Sample item 1", "Sample item 2", "Sample item 3", "Sample item 4", "Sample item 5");
 	}
 
+	private void load3DModel() {
+		RasterProvider rw = IslandLoader.loadWest();
+		RasterProvider re = IslandLoader.loadEast();
+		
+		System.out.println("Load 3D Model");		
+		
+	}
 }

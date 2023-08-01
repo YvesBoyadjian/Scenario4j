@@ -63,6 +63,7 @@ import application.scenegraph.SceneGraphIndexedFaceSet;
 import application.scenegraph.SceneGraphIndexedFaceSetShader;
 import application.scenegraph.ShadowTestSceneGraph;
 import application.scenegraph.Soleil;
+import application.terrain.IslandLoader;
 import application.viewer.glfw.SoQtWalkViewer;
 import jscenegraph.database.inventor.*;
 import jscenegraph.database.inventor.actions.SoGLRenderAction.TransparencyType;
@@ -318,20 +319,9 @@ public class MainGLFW {
 		display = new Display();
 		//Shell shell = new Shell(display);
 		//shell.setLayout(new FillLayout());
-
-		TerrainLoader l = new TerrainLoader();
-		RasterProvider rw = new RasterProvider() {
-			@Override
-			public Raster provide() {
-				return l.load("ned19_n47x00_w122x00_wa_mounttrainier_2008/ned19_n47x00_w122x00_wa_mounttrainier_2008.tif");
-			}
-		};
-		RasterProvider re = new RasterProvider() {
-			@Override
-			public Raster provide() {
-				return l.load("ned19_n47x00_w121x75_wa_mounttrainier_2008/ned19_n47x00_w121x75_wa_mounttrainier_2008.tif");
-			}
-		};
+		
+		RasterProvider rw = IslandLoader.loadWest();
+		RasterProvider re = IslandLoader.loadEast();
 
 		SoQt.init("demo");
 
