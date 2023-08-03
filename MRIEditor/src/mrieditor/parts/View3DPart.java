@@ -29,6 +29,7 @@ import org.eclipse.swt.widgets.Composite;
 import application.MainGLFW;
 import application.RasterProvider;
 import application.gui.OptionDialog;
+import application.objects.Hero;
 import application.scenegraph.SceneGraphIndexedFaceSetShader;
 import application.swt.SoQtWalkViewer;
 import application.terrain.IslandLoader;
@@ -134,6 +135,8 @@ public class View3DPart {
 
 		walkViewer.setSceneGraph(sg.getSceneGraph());
 
+		walkViewer.setHeightProvider(sg);
+
 		walkViewer.setUpDirection(new SbVec3f(0, 0, 1));
 
 
@@ -143,12 +146,17 @@ public class View3DPart {
 
 		walkViewer.getSceneHandler().setTransparencyType(TransparencyType.BLEND/*SORTED_LAYERS_BLEND*/);
 
-
 		MainGLFW.SCENE_POSITION = new SbVec3f(/*sg.getCenterX()/2*/0, sg.getCenterY(), MainGLFW.Z_TRANSLATION);
+
+		camera.position.setValue(Hero.STARTING_X, Hero.STARTING_Y, Hero.STARTING_Z - MainGLFW.SCENE_POSITION.getZ());
+		
+		walkViewer.getCameraController().changeCameraValues(camera);
 		
 		sg.setPosition(MainGLFW.SCENE_POSITION.getX(), MainGLFW.SCENE_POSITION.getY()/*,SCENE_POSITION.getZ()*/);
 
 		sg.setHero(MainGLFW.hero);
+
+        walkViewer.start();
 		
 		System.out.println("Load 3D Model");		
 		

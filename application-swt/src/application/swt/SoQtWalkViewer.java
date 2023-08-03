@@ -18,6 +18,7 @@ import org.eclipse.swt.widgets.Display;
 import org.lwjgl.opengl.swt.GLCanvas;
 import com.jogamp.opengl.GL2;
 
+import application.scenegraph.HeightProvider;
 import jscenegraph.coin3d.inventor.SbVec2i32;
 import jscenegraph.database.inventor.SbRotation;
 import jscenegraph.database.inventor.SbVec2s;
@@ -61,6 +62,8 @@ public class SoQtWalkViewer extends SoQtConstrainedViewer {
     private List<Consumer<application.swt.SoQtWalkViewer>> idleListeners = new ArrayList<>();
 
     private SoIdleSensor idleSensor = new SoIdleSensor(application.swt.SoQtWalkViewer::idleCB,this);
+    
+    private HeightProvider heightProvider;
 
     public SoQtWalkViewer(SoQtFullViewer.BuildFlag flag, SoQtCameraController.Type type, Composite parent, int f) {
         super(flag, type, parent, f);
@@ -369,5 +372,9 @@ public class SoQtWalkViewer extends SoQtConstrainedViewer {
 
     public void start() {
         idleSensor.schedule();
+    }
+    
+    public void setHeightProvider(HeightProvider hp) {
+    	this.heightProvider = hp;
     }
 }
