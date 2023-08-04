@@ -17,9 +17,11 @@ import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.widgets.TextFactory;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.events.TypedEvent;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -34,6 +36,7 @@ import application.scenegraph.SceneGraphIndexedFaceSetShader;
 import application.swt.SoQtWalkViewer;
 import application.terrain.IslandLoader;
 import application.trails.TrailsLoader;
+import jscenegraph.coin3d.inventor.SbVec2i32;
 import jscenegraph.database.inventor.SbTime;
 import jscenegraph.database.inventor.SbVec3f;
 import jscenegraph.database.inventor.SoDB;
@@ -41,6 +44,9 @@ import jscenegraph.database.inventor.actions.SoGLRenderAction.TransparencyType;
 import jscenegraph.database.inventor.nodes.SoCamera;
 import jsceneviewer.inventor.qt.SoQt;
 import jsceneviewer.inventor.qt.SoQtCameraController.Type;
+import jsceneviewer.inventor.qt.SoQtGLWidget;
+import jsceneviewer.inventor.qt.SoQtGLWidget.EventType;
+import jsceneviewer.inventor.qt.SoQtGLWidget.eventCBType;
 import jsceneviewer.inventor.qt.viewers.SoQtFullViewer.BuildFlag;
 
 /**
@@ -51,6 +57,8 @@ public class View3DPart {
 	private TableViewer tableViewer;
 	
 	private SoQtWalkViewer walkViewer;
+	
+	private boolean mouseDown;
 
 	@Inject
 	private MPart part;
@@ -91,7 +99,20 @@ public class View3DPart {
 		SoDB.setDelaySensorTimeout(SbTime.zero()); // Necessary to avoid bug in Display
 		
 		int style = SWT.NO_BACKGROUND;
-		walkViewer = new SoQtWalkViewer(BuildFlag.BUILD_ALL,Type.BROWSER,intermediate,style);
+		walkViewer = new SoQtWalkViewer(BuildFlag.BUILD_ALL,Type.BROWSER,intermediate,style) {
+
+		    protected void processMouseMoveEvent(/*MouseEvent e*/) {
+		    	if (mouseDown) {
+		    		super.processMouseMoveEvent();
+		    	}
+		    	else {
+		            /* Zjisteni zmeny pozice kurzoru. */
+		            final SbVec2i32 position = getCursorPosition();
+		            old_position.copyFrom( position );
+
+		    	}
+		    }
+		};
         walkViewer.buildWidget(style);
 	}
 
@@ -157,6 +178,30 @@ public class View3DPart {
 		sg.setHero(MainGLFW.hero);
 
         walkViewer.start();
+        
+        walkViewer.setEventCallback(new SoQtGLWidget.eventCBType() {
+
+			@Override
+			public boolean run(Object userData, TypedEvent anyevent, EventType type) {
+				if( anyevent instanceof MouseEvent) {
+					MouseEvent me = (MouseEvent)anyevent;
+					if (me.button == 1) {
+						
+						if( type == EventType.MOUSE_EVENT_MOUSE_DOWN) {
+							mouseDown = true;
+						}
+						else if (type == EventType.MOUSE_EVENT_MOUSE_UP) {
+							mouseDown = false;
+						}
+					}
+					else if (type == EventType.MOUSE_EVENT_MOUSE_MOVE) {
+						return !mouseDown;
+					}
+				}
+				return false;
+			}
+        	
+        }, null);
 		
 		System.out.println("Load 3D Model");		
 		

@@ -50,7 +50,7 @@ public class SoQtWalkViewer extends SoQtConstrainedViewer {
 
     private final static float SPEED = GOD;
 
-    final SbVec2i32 old_position = new SbVec2i32();
+    protected final SbVec2i32 old_position = new SbVec2i32();
 
     protected float sensitivity = 1;
     protected boolean invert = false;
@@ -151,7 +151,7 @@ public class SoQtWalkViewer extends SoQtConstrainedViewer {
 
     }
 
-    private SbVec2i32 getCursorPosition()
+    protected SbVec2i32 getCursorPosition()
     {
         /* Ziskani absolutni pozice kurzoru. */
         //QPoint position = QCursor.pos();

@@ -119,8 +119,8 @@ public class SoQtGLWidget extends Composite implements Destroyable {
 	
 	private boolean paintAsked; // java port
 	
-    private interface eventCBType {
-    	boolean run(Object userData, TypedEvent anyevent);
+    public interface eventCBType {
+    	boolean run(Object userData, TypedEvent anyevent, EventType type);
     }
     
 	public SoQtGLWidget(Composite parent, int style) {
@@ -292,6 +292,13 @@ public GLData format()
       return (mainWidget != null) ? /*mainWidget.devicePixelRatio()*/1.0 : 1.0;
   }
 
+
+public void setEventCallback (eventCBType cb, Object data)
+{
+    // event callback handled in RealGLWidget
+    eventCBData = data;
+    eventCB = cb;
+}
     
     protected
         //! handles events from the real QGLWidget, mostly mouse events
@@ -531,7 +538,7 @@ public GLData format()
 //        }
 
         // first give event to external callback:
-        if (eventCB != null && eventCB.run(eventCBData, e)) {
+        if (eventCB != null && eventCB.run(eventCBData, e, type)) {
             // consume event if it was handled
             //e.setAccepted (true);
         } else {
