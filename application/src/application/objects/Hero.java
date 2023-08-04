@@ -53,4 +53,17 @@ public class Hero {
 	public void setPosition(DVector3 saved_pos) {
 		body.setPosition(saved_pos);		
 	}
+
+	public boolean hasPosition() {
+		return body != null;
+	}
+
+	public void setPosition(float x, float y, float z) {
+		body.setPosition(x,y,z);
+		
+	}
+
+	public void stop() {
+		body.setLinearVel(0,0,0);		
+	}
 }

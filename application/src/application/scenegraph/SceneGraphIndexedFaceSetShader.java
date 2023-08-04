@@ -3046,8 +3046,8 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 
 
 	public void stopBody() {
-		if(null != hero.body) {
-			hero.body.setLinearVel(0,0,0);
+		if(hero.hasPosition()) {
+			hero.stop();
 		}
 		if(null != hero.ballBody) {
 			hero.ballBody.setLinearVel(0,0,0);
@@ -3064,13 +3064,13 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 		final float above_ground = //4.5f; // Necessary for planks
 				0.2f; // Necessary when respawning on water
 
-		hero.body.setPosition(cameraPositionValue.getX(), cameraPositionValue.getY(), cameraPositionValue.getZ() - /*1.75f / 2*/0.4f + 0.13f + above_ground);
-		hero.body.setLinearVel(0,0,0);
+		hero.setPosition(cameraPositionValue.getX(), cameraPositionValue.getY(), cameraPositionValue.getZ() - /*1.75f / 2*/0.4f + 0.13f + above_ground);
+		hero.stop();
 
 		hero.ballBody.setPosition(
-				hero.body.getPosition().get0()/*cameraPositionValue.getX()*/,
-				hero.body.getPosition().get1()/*cameraPositionValue.getY()*/,
-				hero.body.getPosition().get2() /*cameraPositionValue.getZ() - 0.4f + 0.13f + above_ground*/ - 1.75f+ 2*0.4f);
+				hero.getPosition().getX()/*cameraPositionValue.getX()*/,
+				hero.getPosition().getY()/*cameraPositionValue.getY()*/,
+				hero.getPosition().getZ() /*cameraPositionValue.getZ() - 0.4f + 0.13f + above_ground*/ - 1.75f+ 2*0.4f);
 
 		hero.ballBody.setLinearVel(0,0,0);
 		hero.ballBody.setAngularVel(0,0,0);
@@ -3650,7 +3650,7 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 
 	private void updateCatPosition(float delta_t) {
 
-		if (hero != null) {
+		if (hero != null && hero.hasPosition()) {
 			SbVec3f catToHero = hero.getPosition().operator_minus(getCatPosition());
 			if (catToHero.length() > 999) {
 				SbVec3f newCatPosition = hero.getPosition().operator_add(new SbVec3f(2.0f, 0.0f, 0.0f));
