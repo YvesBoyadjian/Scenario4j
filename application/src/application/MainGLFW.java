@@ -1016,7 +1016,7 @@ public class MainGLFW {
 		m.setBox(1000.0f, 0.25, 0.25, 1.312);
 		body.setMass(m);
 		body.setMaxAngularSpeed(0);
-		hero.body = body;
+		hero.setBody(body);
 
 		sg.setHero(hero);
 
@@ -1270,13 +1270,13 @@ public class MainGLFW {
 				saved_pos.set0(camera.position.getValue().getX());
 				saved_pos.set1(camera.position.getValue().getY());
 				saved_pos.set2(camera.position.getValue().getZ()/*zref + 1.0f*/ - /*1.75f / 2*/0.4f + 0.13f + above_ground);
-				hero.body.setPosition(saved_pos);
+				hero.setPosition(saved_pos);
 				//body.setLinearVel(0,0,0);
 				//ballBody.setPosition(camera.position.getValue().getX(), camera.position.getValue().getY(), camera.position.getValue().getZ() - /*1.75f / 2*/0.4f + 0.13f - 1.75f+ 2*0.4f + above_ground);
 				ballBody.setPosition(
-						hero.body.getPosition().get0()/*cameraPositionValue.getX()*/,
-						hero.body.getPosition().get1()/*cameraPositionValue.getY()*/,
-						hero.body.getPosition().get2() /*cameraPositionValue.getZ() - 0.4f + 0.13f + above_ground*/ - 1.75f+ 2*0.4f);
+						hero.getPosition().getX()/*cameraPositionValue.getX()*/,
+						hero.getPosition().getY()/*cameraPositionValue.getY()*/,
+						hero.getPosition().getZ() /*cameraPositionValue.getZ() - 0.4f + 0.13f + above_ground*/ - 1.75f+ 2*0.4f);
 				return;
 			}
 
@@ -1296,21 +1296,21 @@ public class MainGLFW {
 				contactGroup.empty();
 				if(physics_error) {
 					saved_pos.add2(0.1);
-					hero.body.setPosition(saved_pos);
+					hero.setPosition(saved_pos);
 					ballBody.setPosition(
-							hero.body.getPosition().get0()/*cameraPositionValue.getX()*/,
-							hero.body.getPosition().get1()/*cameraPositionValue.getY()*/,
-							hero.body.getPosition().get2() /*cameraPositionValue.getZ() - 0.4f + 0.13f + above_ground*/ - 1.75f+ 2*0.4f);
+							hero.getPosition().getX()/*cameraPositionValue.getX()*/,
+							hero.getPosition().getY()/*cameraPositionValue.getY()*/,
+							hero.getPosition().getZ() /*cameraPositionValue.getZ() - 0.4f + 0.13f + above_ground*/ - 1.75f+ 2*0.4f);
 				}
 			}
-			if(hero.body.getPosition().get2() < zref - 1.9f) {
+			if(hero.getPosition().getZ() < zref - 1.9f) {
 				System.err.println("Error in placement, too low");
 				saved_pos.set2(zref + 1.0f);
-				hero.body.setPosition(saved_pos);
+				hero.setPosition(saved_pos);
 				ballBody.setPosition(
-						hero.body.getPosition().get0()/*cameraPositionValue.getX()*/,
-						hero.body.getPosition().get1()/*cameraPositionValue.getY()*/,
-						hero.body.getPosition().get2() /*cameraPositionValue.getZ() - 0.4f + 0.13f + above_ground*/ - 1.75f+ 2*0.4f);
+						hero.getPosition().getX()/*cameraPositionValue.getX()*/,
+						hero.getPosition().getY()/*cameraPositionValue.getY()*/,
+						hero.getPosition().getZ() /*cameraPositionValue.getZ() - 0.4f + 0.13f + above_ground*/ - 1.75f+ 2*0.4f);
 			}
 			sg.updateTargetPositions(dt);
 		});
@@ -1328,13 +1328,13 @@ public class MainGLFW {
 		viewer.setPositionProvider(new PositionProvider() {
 			@Override
 			public SbVec3f getPosition() {
-				DVector3C position = hero.body.getPosition();
+				SbVec3f position = hero.getPosition();
 
-				if(Double.isNaN(position.get0())) {
+				if(Double.isNaN(position.getX())) {
 					return null;
 				}
 
-				return new SbVec3f((float) position.get0(), (float) position.get1(), (float) position.get2() + /*1.75f / 2*/0.4f - 0.13f);
+				return new SbVec3f((float) position.getX(), (float) position.getY(), (float) position.getZ() + /*1.75f / 2*/0.4f - 0.13f);
 			}
 		});
 

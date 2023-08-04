@@ -176,6 +176,14 @@ public class View3DPart {
 		sg.setPosition(MainGLFW.SCENE_POSITION.getX(), MainGLFW.SCENE_POSITION.getY()/*,SCENE_POSITION.getZ()*/);
 
 		sg.setHero(MainGLFW.hero);
+		
+		sg.setLevelOfDetail((float)OptionDialog.DEFAULT_LOD_FACTOR);
+		sg.setLevelOfDetailShadow((float) OptionDialog.DEFAULT_LOD_FACTOR_SHADOW);
+		sg.setTreeDistance((float)OptionDialog.DEFAULT_TREE_DISTANCE);
+
+		walkViewer.addIdleListener((viewer1) -> {
+			sg.idle();
+		});
 
         walkViewer.start();
         
