@@ -160,9 +160,14 @@ public class View3DPart {
 
 		walkViewer.setUpDirection(new SbVec3f(0, 0, 1));
 
+		walkViewer.getCameraController().setAutoClipping(false);
+
 
 		SoCamera camera = walkViewer.getCameraController().getCamera();
 
+		camera.nearDistance.setValue(MainGLFW.MINIMUM_VIEW_DISTANCE);
+		camera.farDistance.setValue(MainGLFW.MAXIMUM_VIEW_DISTANCE);
+		
 		sg.setCamera(camera);
 
 		walkViewer.getSceneHandler().setTransparencyType(TransparencyType.BLEND/*SORTED_LAYERS_BLEND*/);
