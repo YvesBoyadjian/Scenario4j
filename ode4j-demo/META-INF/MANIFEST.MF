@@ -1,0 +1,14 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: ode4j-demo
+Bundle-SymbolicName: ode4j-demo
+Bundle-Version: 1.0.0.qualifier
+Bundle-RequiredExecutionEnvironment: JavaSE-17
+Automatic-Module-Name: ode4j.demo
+Export-Package: org.ode4j.demo,
+ org.ode4j.demo.drawstuff.textures,
+ org.ode4j.demo.ragdoll,
+ org.ode4j.drawstuff,
+ org.ode4j.drawstuff.internal
+Require-Bundle: jscenegraph;bundle-version="1.0.0",
+ jsceneviewer-awt;bundle-version="1.0.0"

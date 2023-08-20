@@ -4,7 +4,7 @@ Bundle-Name: Lwjgl3-swt
 Bundle-SymbolicName: lwjgl3-swt
 Bundle-Version: 1.0.0.qualifier
 Automatic-Module-Name: lwjgl3-swt
-Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Bundle-RequiredExecutionEnvironment: JavaSE-17
 Require-Bundle: org.eclipse.swt,
  vk-bootstrap;bundle-version="1.0.0",
  lwjgl-opengl;bundle-version="1.0.0"

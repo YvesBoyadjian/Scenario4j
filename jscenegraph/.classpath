@@ -9,5 +9,6 @@
 	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/org.lwjglx"/>
 	<classpathentry exported="true" kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
 	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/lwjgl-opengl"/>
+	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/vk-bootstrap"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

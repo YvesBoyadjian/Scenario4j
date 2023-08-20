@@ -4,7 +4,6 @@ Bundle-Name: lwjgl-opengl
 Bundle-SymbolicName: lwjgl-opengl;singleton:=true
 Bundle-Version: 1.0.0.qualifier
 Export-Package: .,
- org.lwjgl,
  org.lwjgl.opengl
 Require-Bundle: vk-bootstrap;bundle-version="1.0.0"
 Bundle-RequiredExecutionEnvironment: JavaSE-17

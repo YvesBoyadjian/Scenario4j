@@ -19,6 +19,14 @@ public class TrailsLoader {
 
 	// ______________________________________________________________________________________________________ trails
 	File trailsFile = new File("trails.mri");
+	
+	if (!trailsFile.exists()) {
+		trailsFile = new File("../trails.mri");
+		
+		if (!trailsFile.exists()) {
+			trailsFile = new File("../../trails.mri");
+		}
+	}
 
 	long[] trails = null;
 

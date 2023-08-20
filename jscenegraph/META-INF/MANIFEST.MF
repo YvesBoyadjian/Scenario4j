@@ -55,4 +55,4 @@ Export-Package: com.jogamp.common.nio,
  jscenegraph.port,
  jscenegraph.port.memorybuffer,
  net.sourceforge.jpcap.util
-Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Bundle-RequiredExecutionEnvironment: JavaSE-17

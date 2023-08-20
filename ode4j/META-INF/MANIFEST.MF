@@ -3,7 +3,7 @@ Bundle-ManifestVersion: 2
 Bundle-Name: ode4j
 Bundle-SymbolicName: ode4j
 Bundle-Version: 1.0.0.qualifier
-Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Bundle-RequiredExecutionEnvironment: JavaSE-17
 Automatic-Module-Name: application
 Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: src/

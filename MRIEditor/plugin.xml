@@ -9,12 +9,12 @@
             application="org.eclipse.e4.ui.workbench.swt.E4Application"
             name="MRIEditor">
          <property
-               name="applicationCSS"
-               value="platform:/plugin/MRIEditor/css/default.css">
-         </property>
-         <property
                name="appName"
                value="MRIEditor">
+         </property>
+         <property
+               name="applicationCSS"
+               value="platform:/plugin/MRIEditor/css/default.css">
          </property>
       </product>
    </extension>

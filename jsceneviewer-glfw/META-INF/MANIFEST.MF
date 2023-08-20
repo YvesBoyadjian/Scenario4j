@@ -4,7 +4,7 @@ Bundle-Name: Jsceneviewer-glfw
 Bundle-SymbolicName: jsceneviewer-glfw
 Bundle-Version: 1.0.0.qualifier
 Automatic-Module-Name: jsceneviewer-glfw
-Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Bundle-RequiredExecutionEnvironment: JavaSE-17
 Require-Bundle: jscenegraph,
  lwjgl-utils;bundle-version="1.0.0",
  lwjgl-opengl;bundle-version="1.0.0",

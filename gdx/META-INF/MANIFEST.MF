@@ -4,7 +4,7 @@ Bundle-Name: Gdx
 Bundle-SymbolicName: gdx
 Bundle-Version: 1.0.0.qualifier
 Automatic-Module-Name: gdx
-Bundle-RequiredExecutionEnvironment: JavaSE-11
+Bundle-RequiredExecutionEnvironment: JavaSE-17
 Export-Package: com.badlogic.gdx,
  com.badlogic.gdx.assets,
  com.badlogic.gdx.assets.loaders,
