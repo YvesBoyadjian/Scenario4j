@@ -14,5 +14,6 @@
     <orderEntry type="module" module-name="lwjgl-opengl" />
     <orderEntry type="module" module-name="jgltf-model" />
     <orderEntry type="module" module-name="obj" />
+    <orderEntry type="module" module-name="maventest" />
   </component>
 </module>

@@ -22,5 +22,6 @@
     <orderEntry type="module" module-name="ode4j" exported="" />
     <orderEntry type="module" module-name="vk-bootstrap" exported="" />
     <orderEntry type="module" module-name="lwjgl-opengl" exported="" />
+    <orderEntry type="module" module-name="maventest" />
   </component>
 </module>
