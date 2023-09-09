@@ -3430,7 +3430,7 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 	private void computeEnemies() {
 		enemiesSeparatorFuture = es.submit(()->{
 
-			final int NB_ENEMIES = 100000;
+			final int NB_ENEMIES = 20000;
 			final int ENEMIES_SEED = 58;
 
 			Random randomPlacementEnemies = new Random(ENEMIES_SEED);
