@@ -386,6 +386,7 @@ public class DouglasChunk {
 		final float zDeltaBaseBranch = 1.5f;
 		final boolean branchExtremityOn = false;
 
+		// _____________________________________________________________________ For each tree
 		for( int tree = groupIndex; tree< nbDouglas; tree += NUM_NEAR_FOLIAGE) {
 
 			float height = getHeight(tree);
@@ -420,7 +421,10 @@ public class DouglasChunk {
 			Random nearFoliageRandom = new Random(treeIndex);
 
 			float zStartBranch = zTopF;
-			final float zDeltaBranch = .2f;
+			final float zDeltaBranch = .3f;
+
+			final float zDeltaBranchRandom = zDeltaBranch *(1.0f + (float)Math.pow(nearFoliageRandom.nextFloat(),2.0f)*10.0f);
+
 			float azimuth;
 			float azimuth2;
 			float branchHoriLength;
@@ -493,7 +497,7 @@ public class DouglasChunk {
 				}
 
 				colors.add(colorMultiplierTree);
-				zStartBranch -= zDeltaBranch;
+				zStartBranch -= zDeltaBranchRandom;
 			}
 		}
 
