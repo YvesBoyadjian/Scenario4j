@@ -3652,14 +3652,17 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 
 		if (hero != null && hero.hasPosition()) {
 			SbVec3f catToHero = hero.getPosition().operator_minus(getCatPosition());
-			if (catToHero.length() > 999) {
+
+			final float catToHeroLength = catToHero.length();
+
+			if (catToHeroLength > 999.0f) {
 				SbVec3f newCatPosition = hero.getPosition().operator_add(new SbVec3f(2.0f, 0.0f, 0.0f));
 				newCatPosition.setZ(getInternalZ(newCatPosition.getX(), newCatPosition.getY(),catPositionIndices,false));
 				setCatPosition(newCatPosition.operator_add(new SbVec3f(0,0,0.1f)));
 			}
-			else if (catToHero.length() > 2.0f) {
+			else if (catToHeroLength > 2.0f) {
 				catToHero.normalize();
-				SbVec3f catMovement = catToHero.operator_mul(catSpeed);
+				SbVec3f catMovement = catToHero.operator_mul(catToHeroLength > 80.0f ? catSpeed * 4 : catSpeed);
 				SbVec3f newCatPosition = getCatPosition().operator_add(catMovement.operator_mul(delta_t));
 				cat.setOrientation(catToHero);
 				newCatPosition.setZ(getInternalZ(newCatPosition.getX(), newCatPosition.getY(), catPositionIndices, false));
