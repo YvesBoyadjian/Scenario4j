@@ -2380,34 +2380,31 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 		
 		//z = chunks.verticesGet(index*3+2) - zTranslation;
 
-		float za = 0;
+		float za;
 
-		float a1 = alpha + beta;
-		float a2 = (1-alpha) + (1-beta);
-		float a = Math.min(a1,a2);
+		float a1 = alpha + beta; // imin, jmin
+		float a2 = (1-alpha) + (1-beta); // imax, jmax
 
-		if(alpha + beta < 1) { // imin, jmin
+		if(a1 < 1) { // imin, jmin
 			za = z0 + (z1 - z0)*alpha + (z3 - z0)*beta;
 		}
 		else { // imax, jmax
 			za = z2 + (z3 - z2)*(1-alpha) + (z1 - z2)*(1-beta);
 		}
 
-		float zb = 0;
+		float zb;
 
-		float b1 = alpha + (1-beta);
-		float b2 = (1-alpha) + beta;
+		float b1 = alpha + (1-beta); // imin, jmax
+		float b2 = (1-alpha) + beta; // imax, jmin
 
-		float b = Math.min(b1,b2);
-
-		if(alpha + (1-beta) < 1) { // imin, jmax
+		if(b1 < 1) { // imin, jmax
 			zb = z3 + (z2 - z3)*alpha + (z0 - z3)*(1-beta);
 		}
 		else { // imax, jmin
 			zb = z1 + (z0 - z1)*(1-alpha) + (z2 - z1)*beta;
 		}
 
-		float z = a < b ? za : zb;
+		float z = (za + zb)/2.0f; // Avoid discontinuity
 
 		//z/= 2.0f;
 		
