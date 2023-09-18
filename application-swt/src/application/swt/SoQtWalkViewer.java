@@ -50,6 +50,8 @@ public class SoQtWalkViewer extends SoQtConstrainedViewer {
 
     private final static float SPEED = GOD;
 
+	public final static float EYES_HEIGHT = 1.65f;    
+    
     protected final SbVec2i32 old_position = new SbVec2i32();
 
     protected float sensitivity = 1;

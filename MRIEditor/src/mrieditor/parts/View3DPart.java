@@ -187,6 +187,10 @@ public class View3DPart {
 		sg.setTreeDistance((float)OptionDialog.DEFAULT_TREE_DISTANCE);
 
 		walkViewer.addIdleListener((viewer1) -> {
+			sg.getZ(
+					camera.position.getValue().getX(),
+					camera.position.getValue().getY(),
+					camera.position.getValue().getZ() - walkViewer.EYES_HEIGHT);
 			sg.idle();
 		});
 
