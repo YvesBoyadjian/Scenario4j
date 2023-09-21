@@ -8,6 +8,7 @@ import java.awt.image.Raster;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.function.Supplier;
 
 import com.jogamp.opengl.GL2;
 
@@ -653,7 +654,7 @@ for(int is=0;is<4;is++) {
 	}
 
 	@Override
-	public void setCamera(SoCamera camera) {
+	public void setCamera(Supplier<SoCamera> camera) {
 		// TODO Auto-generated method stub
 	    master.setCamera(camera);	
 	}

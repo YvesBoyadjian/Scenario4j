@@ -10,6 +10,7 @@ import jscenegraph.database.inventor.nodes.SoNode;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Supplier;
 
 /**
  * @author Yves Boyadjian
@@ -21,7 +22,7 @@ public class SoTouchLODMaster extends SoNode {
 	
 	private int counter;
 	
-	private SoCamera camera;
+	private Supplier<SoCamera> camera;
 	
 	private boolean firstRender = true;
 	
@@ -80,12 +81,12 @@ public class SoTouchLODMaster extends SoNode {
 			firstRender = false;
 		}
 	}
-	public void setCamera(SoCamera camera) {
+	public void setCamera(Supplier<SoCamera> camera) {
 		this.camera = camera;
 	}
 
 	public SoCamera getCamera() {
-		return camera;
+		return camera.get();
 	}
 
 	public void setLodFactor(float lodFactor) {

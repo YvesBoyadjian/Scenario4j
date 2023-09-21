@@ -3,6 +3,8 @@
  */
 package application.scenegraph;
 
+import java.util.function.Supplier;
+
 import jscenegraph.database.inventor.SbVec3f;
 import jscenegraph.database.inventor.nodes.SoCamera;
 import jscenegraph.database.inventor.nodes.SoNode;
@@ -25,7 +27,7 @@ public interface SceneGraph extends HeightProvider {
 	
 	void preDestroy();
 
-	void setCamera(SoCamera camera);
+	void setCamera(Supplier<SoCamera> camera);
 
 	void idle();
 }

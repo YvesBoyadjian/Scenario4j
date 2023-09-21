@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
 import java.util.concurrent.*;
+import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 import javax.imageio.ImageIO;
@@ -191,7 +192,7 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 	SoVolumetricShadowGroup shadowGroup;
 	//SoNode shadowTree;
 	SoNode chunkTree;
-	SoCamera camera;
+	Supplier<SoCamera> camera;
 
 	SoTexture2 gigaTexture;
 	
@@ -2155,6 +2156,13 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 	}
 	
 	private void setBBoxCenter() {
+		
+		SoCamera camera = this.camera.get();
+		
+		if (camera == null) {
+			return;
+		}
+		
 		  SbVec3f world_camera_direction = camera.orientation.getValue().multVec(new SbVec3f(0,0,-1)); 
 		  
 		  world_camera_direction.normalize();
@@ -2511,7 +2519,7 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 	}
 
 	@Override
-	public void setCamera(SoCamera camera) {
+	public void setCamera(Supplier<SoCamera> camera) {
 		this.camera = camera;
 	    master.setCamera(camera);	
 	    //masterS.setCamera(camera);
@@ -3053,10 +3061,10 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 	}
 
 	public void setHeroPosition(float x, float y, float z) {
-		camera.position.setValue(x,y,z - SCENE_POSITION.getZ());
-		camera.orientation.setValue(new SbVec3f(0, 1, 0), -(float) Math.PI / 2.0f);
+		camera.get().position.setValue(x,y,z - SCENE_POSITION.getZ());
+		camera.get().orientation.setValue(new SbVec3f(0, 1, 0), -(float) Math.PI / 2.0f);
 
-		SbVec3f cameraPositionValue = camera.position.getValue();
+		SbVec3f cameraPositionValue = camera.get().position.getValue();
 
 		final float above_ground = //4.5f; // Necessary for planks
 				0.2f; // Necessary when respawning on water
@@ -3313,6 +3321,12 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 	}
 
 	private void setNearDistance() {
+		
+		SoCamera camera = this.camera.get();
+		if (camera == null) {
+			return;
+		}
+		
 		float nearestCollectible = getNearestCollectibleDistance();
 		float nearestEnemy = getNearestEnemyDistance();
 		float catDistance = getCatDistance();

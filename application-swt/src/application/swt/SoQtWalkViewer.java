@@ -108,6 +108,10 @@ public class SoQtWalkViewer extends SoQtConstrainedViewer {
     protected void moveCamera() {
 
         SoCamera  camera = getCameraController().getCamera();
+        
+        if (camera == null) {
+        	return;
+        }
 
         float rotation_x = sensitivity * 0.001f * diff.getValue()[1];
         rotation_x = invert ? -rotation_x : rotation_x;

@@ -3,6 +3,8 @@
  */
 package application.scenegraph;
 
+import java.util.function.Supplier;
+
 import jscenegraph.coin3d.fxviz.nodes.SoShadowDirectionalLight;
 import jscenegraph.coin3d.fxviz.nodes.SoShadowGroup;
 import jscenegraph.coin3d.fxviz.nodes.SoShadowStyle;
@@ -206,7 +208,7 @@ public class ShadowTestSceneGraph implements SceneGraph {
 		
 	}
 	@Override
-	public void setCamera(SoCamera camera) {
+	public void setCamera(Supplier<SoCamera> camera) {
 		// TODO Auto-generated method stub
 		
 	}

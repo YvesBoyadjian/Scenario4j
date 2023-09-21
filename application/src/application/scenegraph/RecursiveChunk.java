@@ -18,6 +18,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.locks.Lock;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -196,7 +197,7 @@ public class RecursiveChunk {
 		}
 	}
 	
-	public static void setCamera(SoNode node, SoCamera camera) {
+	public static void setCamera(SoNode node, Supplier<SoCamera> camera) {
 		if( node instanceof SoCameraLOD) {
 			SoCameraLOD cnode = (SoCameraLOD) node;			
 			cnode.setCamera(camera);

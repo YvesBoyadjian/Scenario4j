@@ -3,6 +3,8 @@
  */
 package application.scenegraph;
 
+import java.util.function.Supplier;
+
 import jscenegraph.coin3d.inventor.nodes.SoLOD;
 import jscenegraph.database.inventor.SbMatrix;
 import jscenegraph.database.inventor.SbVec3f;
@@ -71,7 +73,7 @@ public void destructor() {
 }
 };
 
-public SoCamera camera; // ptr
+public Supplier<SoCamera> camera; // ptr
 
 //SO_NODE_SOURCE(SoLOD);
 
@@ -133,7 +135,7 @@ initClass()
   //SO_NODE_INTERNAL_INIT_CLASS(SoLOD, SO_FROM_INVENTOR_2_1|SoNode::VRML1);
 }
 
-public void setCamera(SoCamera camera) {
+public void setCamera(Supplier<SoCamera> camera) {
 	this.camera = camera;
 }
 
@@ -309,7 +311,7 @@ whichToTraverse(SoAction action)
   final SbVec3f worldcenter = new SbVec3f();
   mat.multVecMatrix(this.center.getValue(), worldcenter);
   
-  SbVec3f world_camera_position = camera.position.getValue();
+  SbVec3f world_camera_position = camera.get().position.getValue();
 
   float dist = (/*vv.getProjectionPoint()*/world_camera_position.operator_minus( worldcenter)).length();
   
@@ -325,7 +327,7 @@ whichToTraverse(SoAction action)
   
   SbVec3f model_xyz = new SbVec3f();
   
-  SbVec3f world_camera_direction = camera.orientation.getValue().multVec(new SbVec3f(0,0,-1)); 
+  SbVec3f world_camera_direction = camera.get().orientation.getValue().multVec(new SbVec3f(0,0,-1)); 
   
   mat.inverse().multVecMatrix(world_camera_position, model_xyz);
   

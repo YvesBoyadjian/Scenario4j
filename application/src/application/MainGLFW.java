@@ -628,7 +628,7 @@ public class MainGLFW {
 
 		SoCamera camera = viewer.getCameraController().getCamera();
 
-		sg.setCamera(camera);
+		sg.setCamera(()->viewer.getCameraController().getCamera());
 
 		camera.nearDistance.setValue(MINIMUM_VIEW_DISTANCE);
 		camera.farDistance.setValue(MAXIMUM_VIEW_DISTANCE);

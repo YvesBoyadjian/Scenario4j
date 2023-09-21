@@ -25,6 +25,7 @@ import org.eclipse.swt.events.TypedEvent;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 
@@ -42,6 +43,7 @@ import jscenegraph.database.inventor.SbVec3f;
 import jscenegraph.database.inventor.SoDB;
 import jscenegraph.database.inventor.actions.SoGLRenderAction.TransparencyType;
 import jscenegraph.database.inventor.nodes.SoCamera;
+import jscenegraph.database.inventor.nodes.SoOrthographicCamera;
 import jsceneviewer.inventor.qt.SoQt;
 import jsceneviewer.inventor.qt.SoQtCameraController.Type;
 import jsceneviewer.inventor.qt.SoQtGLWidget;
@@ -67,7 +69,10 @@ public class View3DPart {
 	public void createComposite(Composite parent) {
 		parent.setLayout(new GridLayout(1, false));
 		
-		Button button = new Button(parent, SWT.PUSH);
+		Composite upperToolBar = new Composite(parent,SWT.NONE);
+		upperToolBar.setLayout(new RowLayout());
+		
+		Button button = new Button(upperToolBar, SWT.PUSH);
 		button.setText("Load 3D Model");
 		
 		button.addSelectionListener(new SelectionAdapter() {
@@ -75,6 +80,17 @@ public class View3DPart {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				load3DModel();				
+			}
+		});
+		
+		Button button2 = new Button(upperToolBar, SWT.PUSH);
+		button2.setText("Upper View");
+		
+		button2.addSelectionListener(new SelectionAdapter() {
+			
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				upperView();
 			}
 		});
 		
@@ -168,7 +184,7 @@ public class View3DPart {
 		camera.nearDistance.setValue(MainGLFW.MINIMUM_VIEW_DISTANCE);
 		camera.farDistance.setValue(MainGLFW.MAXIMUM_VIEW_DISTANCE);
 		
-		sg.setCamera(camera);
+		sg.setCamera(()->walkViewer.getCameraController().getCamera());
 
 		walkViewer.getSceneHandler().setTransparencyType(TransparencyType.BLEND/*SORTED_LAYERS_BLEND*/);
 
@@ -222,5 +238,17 @@ public class View3DPart {
 		
 		System.out.println("Load 3D Model");		
 		
+	}
+	
+	private void upperView() {
+		
+		walkViewer.getCameraController().toggleCameraType();//setCamera(new SoOrthographicCamera(), true);
+
+		SoCamera camera = walkViewer.getCameraController().getCamera();
+
+		camera.nearDistance.setValue(MainGLFW.MINIMUM_VIEW_DISTANCE);
+		camera.farDistance.setValue(MainGLFW.MAXIMUM_VIEW_DISTANCE);
+		
+		System.out.println("Upper View");
 	}
 }

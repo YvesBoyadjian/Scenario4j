@@ -4,6 +4,7 @@
 package application.scenegraph;
 
 import java.awt.image.Raster;
+import java.util.function.Supplier;
 
 import jscenegraph.coin3d.inventor.nodes.SoVertexProperty;
 import jscenegraph.database.inventor.SbVec3f;
@@ -111,7 +112,7 @@ public class SceneGraphQuadMesh implements SceneGraph {
 	}
 
 	@Override
-	public void setCamera(SoCamera camera) {
+	public void setCamera(Supplier<SoCamera> camera) {
 		// TODO Auto-generated method stub
 		
 	}
