@@ -90,7 +90,7 @@ public class SoQtWalkViewer extends SoQtConstrainedViewer {
 
     }
 
-    final SbVec2i32 diff = new SbVec2i32();
+    protected final SbVec2i32 diff = new SbVec2i32();
 
     protected void processMouseMoveEvent(/*MouseEvent e*/) {
 
