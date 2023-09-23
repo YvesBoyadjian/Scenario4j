@@ -3685,4 +3685,8 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 	private float getCatDistance() {
 		return 2.5f;
 	}
+
+	public SoCamera getCamera() {
+		return camera.get();
+	}
 }

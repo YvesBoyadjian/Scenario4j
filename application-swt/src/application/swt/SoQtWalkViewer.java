@@ -48,7 +48,7 @@ public class SoQtWalkViewer extends SoQtConstrainedViewer {
 
     private final static float USAIN_BOLT_RUN = 10;
 
-    private final static float SPEED = GOD;
+    protected final static float SPEED = GOD;
 
 	public final static float EYES_HEIGHT = 1.65f;    
     
@@ -57,11 +57,11 @@ public class SoQtWalkViewer extends SoQtConstrainedViewer {
     protected float sensitivity = 1;
     protected boolean invert = false;
 
-    private double lastTimeSec = System.nanoTime()/1.0e9;
+    protected double lastTimeSec = System.nanoTime()/1.0e9;
 
-    private Set<SoKeyboardEvent.Key> keysDown = new HashSet<>();
+    protected Set<SoKeyboardEvent.Key> keysDown = new HashSet<>();
 
-    private List<Consumer<application.swt.SoQtWalkViewer>> idleListeners = new ArrayList<>();
+    protected List<Consumer<application.swt.SoQtWalkViewer>> idleListeners = new ArrayList<>();
 
     private SoIdleSensor idleSensor = new SoIdleSensor(application.swt.SoQtWalkViewer::idleCB,this);
     
@@ -246,7 +246,7 @@ public class SoQtWalkViewer extends SoQtConstrainedViewer {
         return false;
     }
 
-    private void updateLocation(SbVec3f diff_position) {
+    protected void updateLocation(SbVec3f diff_position) {
 
         double currentTimeSec = System.nanoTime()/1.0e9;
 

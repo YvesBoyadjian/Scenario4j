@@ -38,12 +38,20 @@ import application.swt.SoQtWalkViewer;
 import application.terrain.IslandLoader;
 import application.trails.TrailsLoader;
 import jscenegraph.coin3d.inventor.SbVec2i32;
+import jscenegraph.database.inventor.SbBasic;
 import jscenegraph.database.inventor.SbTime;
 import jscenegraph.database.inventor.SbVec3f;
 import jscenegraph.database.inventor.SoDB;
 import jscenegraph.database.inventor.actions.SoGLRenderAction.TransparencyType;
+import jscenegraph.database.inventor.events.SoKeyboardEvent;
+import jscenegraph.database.inventor.misc.SoNotRec;
 import jscenegraph.database.inventor.nodes.SoCamera;
 import jscenegraph.database.inventor.nodes.SoOrthographicCamera;
+import jscenegraph.database.inventor.nodes.SoPerspectiveCamera;
+import jscenegraph.database.inventor.sensors.SoDataSensor;
+import jscenegraph.database.inventor.sensors.SoFieldSensor;
+import jscenegraph.database.inventor.sensors.SoSensor;
+import jscenegraph.database.inventor.sensors.SoSensorCB;
 import jsceneviewer.inventor.qt.SoQt;
 import jsceneviewer.inventor.qt.SoQtCameraController.Type;
 import jsceneviewer.inventor.qt.SoQtGLWidget;
@@ -61,6 +69,8 @@ public class View3DPart {
 	private SoQtWalkViewer walkViewer;
 	
 	private boolean mouseDown;
+	
+	private SceneGraphIndexedFaceSetShader sg;
 
 	@Inject
 	private MPart part;
@@ -128,6 +138,58 @@ public class View3DPart {
 
 		    	}
 		    }
+		    
+		    public void idle() {
+		    	SoCamera camera = getCameraController().getCamera();
+		    	
+		    	if (camera instanceof SoPerspectiveCamera) {
+		    		super.idle();
+		    	}
+		    	else if (camera != null) {
+
+		            double currentTimeSec = System.nanoTime()/1.0e9;
+
+		            float deltaT = (float)(currentTimeSec - lastTimeSec);
+		            if(deltaT > 1.0f) {
+		                deltaT = 1.0f;
+		            }
+
+		            if (
+		                    keysDown.contains(SoKeyboardEvent.Key.Z)) {
+
+		                //lastTimeSec = System.nanoTime()/1.0e9;
+
+
+		                updateLocation(new SbVec3f(0.0f, -SPEED* deltaT, 0.0f));
+		            }
+		            if (
+
+		                    keysDown.contains(SoKeyboardEvent.Key.S)) {
+
+		                //  lastTimeSec = System.nanoTime()/1.0e9;
+
+		                updateLocation(new SbVec3f(0.0f, SPEED* deltaT, 0.0f));
+
+		            }
+		            if (  keysDown.contains(SoKeyboardEvent.Key.Q)) {
+
+		                //lastTimeSec = System.nanoTime()/1.0e9;
+
+		                updateLocation(new SbVec3f(- SPEED* deltaT, 0.0f, 0.0f));
+
+		            }
+		            if (  keysDown.contains(SoKeyboardEvent.Key.D)) {
+
+		                //lastTimeSec = System.nanoTime()/1.0e9;
+
+		                updateLocation( new SbVec3f(SPEED* deltaT, 0.0f, 0.0f));
+
+		            }
+
+		            idleListeners.forEach((item)->item.accept(this));
+		    		
+		    	}
+		    }
 		};
         walkViewer.buildWidget(style);
 	}
@@ -158,7 +220,7 @@ public class View3DPart {
 		final int overlap = 13;
 		final int max_i = OptionDialog.DEFAULT_ISLAND_DEPTH;
 		
-		SceneGraphIndexedFaceSetShader sg = new SceneGraphIndexedFaceSetShader(
+		sg = new SceneGraphIndexedFaceSetShader(
 				rw, 
 				re, 
 				overlap, 
@@ -180,7 +242,18 @@ public class View3DPart {
 
 
 		SoCamera camera = walkViewer.getCameraController().getCamera();
+		
+		SoFieldSensor auditor = new SoFieldSensor(new SoSensorCB() {
 
+			@Override
+			public void run(Object data, SoSensor sensor) {
+				System.out.println("position changed");
+			}
+			
+		}, null);
+		
+//		auditor.attach(camera.position);
+		
 		camera.nearDistance.setValue(MainGLFW.MINIMUM_VIEW_DISTANCE);
 		camera.farDistance.setValue(MainGLFW.MAXIMUM_VIEW_DISTANCE);
 		
@@ -203,10 +276,11 @@ public class View3DPart {
 		sg.setTreeDistance((float)OptionDialog.DEFAULT_TREE_DISTANCE);
 
 		walkViewer.addIdleListener((viewer1) -> {
+			SoCamera sceneGraphCamera = sg.getCamera();
 			sg.getZ(
-					camera.position.getValue().getX(),
-					camera.position.getValue().getY(),
-					camera.position.getValue().getZ() - walkViewer.EYES_HEIGHT);
+					sceneGraphCamera.position.getValue().getX(),
+					sceneGraphCamera.position.getValue().getY(),
+					sceneGraphCamera.position.getValue().getZ() - walkViewer.EYES_HEIGHT);
 			sg.idle();
 		});
 
@@ -242,12 +316,32 @@ public class View3DPart {
 	
 	private void upperView() {
 		
-		walkViewer.getCameraController().toggleCameraType();//setCamera(new SoOrthographicCamera(), true);
+		walkViewer.getCameraController().toggleCameraType();
 
 		SoCamera camera = walkViewer.getCameraController().getCamera();
 
 		camera.nearDistance.setValue(MainGLFW.MINIMUM_VIEW_DISTANCE);
 		camera.farDistance.setValue(MainGLFW.MAXIMUM_VIEW_DISTANCE);
+		
+		if (camera instanceof SoPerspectiveCamera) {
+			camera.orientation.setValue(new SbVec3f(1,0,0), (float)SbBasic.M_PI_2);
+			SoPerspectiveCamera perspectiveCamera = (SoPerspectiveCamera)camera;
+			perspectiveCamera.heightAngle.setValue((float)SbBasic.M_PI_4);
+			if (sg != null) {
+				float z = sg.getGroundZ();
+				SbVec3f cameraPosition = camera.position.getValue();
+				camera.position.setValue(cameraPosition.getX(), cameraPosition.getY(), z+1.65f);
+			}
+		}
+		else {
+			camera.orientation.setValue(new SbVec3f(0,0,1), 0);
+    		
+    		SoOrthographicCamera orthoCamera = (SoOrthographicCamera) camera;
+    		orthoCamera.height.setValue(100);
+    		
+    		SbVec3f position = camera.position.getValue();
+    		camera.position.setValue(position.getX(), position.getY(), 4500);
+		}
 		
 		System.out.println("Upper View");
 	}
