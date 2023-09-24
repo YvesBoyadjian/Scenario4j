@@ -161,12 +161,18 @@ public class View3DPart {
 		    	}
 		    	else if (camera != null) {
 
+		    		SoOrthographicCamera orthoCamera = (SoOrthographicCamera)camera;
+		    		
+		    		float cameraHeight = orthoCamera.height.getValue();
+		    		
+		    		float screenHeight =getGLWidget().getSize().y;
+
 		            float rotation_x = diff.getValue()[1];
 		            rotation_x = invert ? -rotation_x : rotation_x;
 		            float rotation_z = diff.getValue()[0];
 
-	                updateLocation(new SbVec3f(0.0f, -rotation_x, 0.0f));
-	                updateLocation(new SbVec3f(rotation_z, 0.0f, 0.0f));
+	                updateLocation(new SbVec3f(0.0f, -rotation_x * cameraHeight/screenHeight, 0.0f));
+	                updateLocation(new SbVec3f(rotation_z*cameraHeight/screenHeight, 0.0f, 0.0f));
 		            
 		            diff.setValue((int)0, (int)0);
 		    		
