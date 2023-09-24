@@ -63,3 +63,5 @@ Credits :
 - Obj reader : https://github.com/javagl/Obj
 
 - Beach sound : https://lasonotheque.org/detail-2572-falaise-2.html
+
+- Cat : https://free3d.com/3d-model/cat-v1--522281.html
