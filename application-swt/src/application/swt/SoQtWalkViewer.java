@@ -11,6 +11,7 @@ import java.util.function.Consumer;
 
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseMoveListener;
+import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.graphics.Cursor;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Composite;
@@ -87,10 +88,22 @@ public class SoQtWalkViewer extends SoQtConstrainedViewer {
                 });
         old_position.copyFrom(getCursorPosition());
 
+        getDeviceWidget().addMouseWheelListener(new MouseWheelListener() {
 
+			@Override
+			public void mouseScrolled(MouseEvent e) {
+                if(focus)
+                    processMouseScrollEvent(e.count);
+			}
+        	
+        });
     }
 
-    protected final SbVec2i32 diff = new SbVec2i32();
+    protected void processMouseScrollEvent(int count) {
+    	// do nothing
+	}
+
+	protected final SbVec2i32 diff = new SbVec2i32();
 
     protected void processMouseMoveEvent(/*MouseEvent e*/) {
 

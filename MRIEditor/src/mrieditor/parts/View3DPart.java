@@ -138,6 +138,20 @@ public class View3DPart {
 
 		    	}
 		    }
+
+		    protected void processMouseScrollEvent(int count) {
+		    	SoCamera camera = getCameraController().getCamera();
+		    	
+		    	if (camera instanceof SoPerspectiveCamera) {
+		    		// do nothing
+		    	}
+		    	else {
+		    		
+		    		SoOrthographicCamera orthoCamera = (SoOrthographicCamera) camera;
+		    		orthoCamera.height.setValue(orthoCamera.height.getValue()*(100.0f - 5.0f * count)/100.0f);
+		    		
+		    	}
+			}
 		    
 		    public void idle() {
 		    	SoCamera camera = getCameraController().getCamera();
@@ -349,7 +363,7 @@ public class View3DPart {
     		orthoCamera.height.setValue(100);
     		
     		SbVec3f position = camera.position.getValue();
-    		camera.position.setValue(position.getX(), position.getY(), 4500);
+    		camera.position.setValue(position.getX(), position.getY(), 2000);
 		}
 		
 		System.out.println("Upper View");
