@@ -361,6 +361,7 @@ public class View3DPart {
 				SbVec3f cameraPosition = camera.position.getValue();
 				camera.position.setValue(cameraPosition.getX(), cameraPosition.getY(), z+1.65f);
 			}
+			sg.center(false);
 		}
 		else {
 			camera.orientation.setValue(new SbVec3f(0,0,1), 0);
@@ -370,6 +371,7 @@ public class View3DPart {
     		
     		SbVec3f position = camera.position.getValue();
     		camera.position.setValue(position.getX(), position.getY(), 2000);
+    		sg.center(true);
 		}
 		
 		System.out.println("Upper View");

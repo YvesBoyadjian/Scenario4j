@@ -259,6 +259,8 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 
 	final SoSwitch aimSwitch = new SoSwitch();
 
+	final SoSwitch centerSwitch = new SoSwitch();
+
 	final SoText3 oracleSpeech = new SoText3();
 
 	final SoRotation oracleSpeechRotation = new SoRotation();
@@ -1593,6 +1595,30 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 		aimSwitch.addChild(markerSet);
 
 		viewFinderSeparator.addChild(aimSwitch);
+		
+		// ____________________________________________________ Center
+		billboardFinderCamera = new SoOrthographicCamera();
+
+		centerSwitch.addChild(billboardFinderCamera);
+		
+		color = new SoBaseColor();
+
+		color.rgb.setValue(0,0,0);
+
+		centerSwitch.addChild(color);
+
+		markerSet = new SoMarkerSet();
+
+		markerSet.markerIndex.setValue(SoMarkerSet.MarkerType.PLUS_9_9.getValue());
+
+		vertexProperty = new SoVertexProperty();
+		vertexProperty.vertex.setValue(new SbVec3f());
+
+		markerSet.vertexProperty.setValue(vertexProperty);
+
+		centerSwitch.addChild(markerSet);
+
+		viewFinderSeparator.addChild(centerSwitch);
 
 		sep.addChild(viewFinderSeparator);
 
@@ -2823,6 +2849,10 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 		if( AIM ) {
 			aimSwitch.whichChild.setValue(aim ? SoSwitch.SO_SWITCH_ALL : SoSwitch.SO_SWITCH_NONE);
 		}
+	}
+	
+	public void center(boolean center) {
+		centerSwitch.whichChild.setValue(center ? SoSwitch.SO_SWITCH_ALL : SoSwitch.SO_SWITCH_NONE);
 	}
 
 	public void addPlank(SoQtConstrainedViewer viewer, SbVec3f translation, SbRotation rotation) {
