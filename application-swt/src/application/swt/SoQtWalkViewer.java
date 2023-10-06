@@ -103,7 +103,7 @@ public class SoQtWalkViewer extends SoQtConstrainedViewer {
     	// do nothing
 	}
 
-	protected final SbVec2i32 diff = new SbVec2i32();
+	private final SbVec2i32 diff = new SbVec2i32();
 
     protected void processMouseMoveEvent(/*MouseEvent e*/) {
 
@@ -274,6 +274,21 @@ public class SoQtWalkViewer extends SoQtConstrainedViewer {
 
     }
 
+    protected SbVec3f updateRulerLocation(SbVec3f diff_position, SbVec3f previousRulerPosition) {
+
+        double currentTimeSec = System.nanoTime()/1.0e9;
+
+        SoCamera camera = getCameraController().getCamera();
+        SbVec3f old_position = previousRulerPosition;
+        SbRotation orientation = camera.orientation.getValue();
+        orientation.multVec(diff_position, diff_position);
+        SbVec3f rulerPosition = old_position.operator_add( diff_position);
+
+        lastTimeSec = currentTimeSec;
+
+        return rulerPosition;
+    }
+
     protected boolean processSoLocation2Event( SoLocation2Event _event)
     {
         focus = true;
@@ -396,4 +411,11 @@ public class SoQtWalkViewer extends SoQtConstrainedViewer {
     public void setHeightProvider(HeightProvider hp) {
     	this.heightProvider = hp;
     }
+
+	/**
+	 * @return the diff
+	 */
+	public SbVec2i32 getDiff() {
+		return diff;
+	}
 }

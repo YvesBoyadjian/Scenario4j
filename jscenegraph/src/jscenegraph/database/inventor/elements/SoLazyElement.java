@@ -1768,7 +1768,7 @@ setTransparencyType(SoState state, int type)
 public static boolean shouldUseVertexAttributes( SoState state )
 {
   SoLazyElement curElt = SoLazyElement.getInstance(state);
-  return false;//curElt.ivState.useVertexAttributes;
+  return true;//curElt.ivState.useVertexAttributes;
 }
 
 //public void setDrawArraysCallback( SoState state, SoDrawArraysCallback cb, Object userData )

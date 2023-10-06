@@ -309,7 +309,7 @@ public abstract class SoShape extends SoNode implements Destroyable {
     } else {
       // we need to send the single color on the correct vertex attribute...
       SbColor color = SoGLLazyElement.getDiffuse(state, 0);
-      gl2.glVertexAttrib4fv(SoLazyElement.VertexAttribs.ATTRIB_COLOR.getValue(), color.getValueRead(),0); // FIXME
+      gl2.glVertexAttrib4fv(SoLazyElement.VertexAttribs.ATTRIB_COLOR.getValue(), color.getValueReadRGBA(1.0f),0);
     }
   } else {
 	  gl2.glVertexPointer(3, GL_FLOAT, 0, vertexOffset);

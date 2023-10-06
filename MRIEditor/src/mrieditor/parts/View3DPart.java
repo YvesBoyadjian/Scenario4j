@@ -46,6 +46,7 @@ import jscenegraph.database.inventor.actions.SoGLRenderAction.TransparencyType;
 import jscenegraph.database.inventor.events.SoKeyboardEvent;
 import jscenegraph.database.inventor.misc.SoNotRec;
 import jscenegraph.database.inventor.nodes.SoCamera;
+import jscenegraph.database.inventor.nodes.SoLineSet;
 import jscenegraph.database.inventor.nodes.SoOrthographicCamera;
 import jscenegraph.database.inventor.nodes.SoPerspectiveCamera;
 import jscenegraph.database.inventor.sensors.SoDataSensor;
@@ -71,6 +72,10 @@ public class View3DPart {
 	private boolean mouseDown;
 	
 	private SceneGraphIndexedFaceSetShader sg;
+	
+	private boolean ruler;
+	
+	private SbVec3f previousRulerPosition = new SbVec3f();
 
 	@Inject
 	private MPart part;
@@ -102,6 +107,18 @@ public class View3DPart {
 			public void widgetSelected(SelectionEvent e) {
 				upperView();
 			}
+		});
+		
+		Button button3 = new Button(upperToolBar, SWT.TOGGLE);
+		button3.setText("Ruler");
+		
+		button3.addSelectionListener(new SelectionAdapter() {
+			
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				toggleRuler();
+			}
+			
 		});
 		
 		Composite intermediate = new Composite(parent,SWT.NONE);
@@ -160,21 +177,29 @@ public class View3DPart {
 		    		super.idle();
 		    	}
 		    	else if (camera != null) {
-
 		    		SoOrthographicCamera orthoCamera = (SoOrthographicCamera)camera;
 		    		
 		    		float cameraHeight = orthoCamera.height.getValue();
 		    		
 		    		float screenHeight =getGLWidget().getSize().y;
 
-		            float rotation_x = diff.getValue()[1];
+		            float rotation_x = getDiff().getValue()[1];
 		            rotation_x = invert ? -rotation_x : rotation_x;
-		            float rotation_z = diff.getValue()[0];
+		            float rotation_z = getDiff().getValue()[0];
 
-	                updateLocation(new SbVec3f(0.0f, -rotation_x * cameraHeight/screenHeight, 0.0f));
-	                updateLocation(new SbVec3f(rotation_z*cameraHeight/screenHeight, 0.0f, 0.0f));
-		            
-		            diff.setValue((int)0, (int)0);
+		    		if (!ruler){
+		                updateLocation(new SbVec3f(0.0f, -rotation_x * cameraHeight/screenHeight, 0.0f));
+		                updateLocation(new SbVec3f(rotation_z*cameraHeight/screenHeight, 0.0f, 0.0f));
+		                
+			    		getDiff().setValue((int)0, (int)0);
+		    		}
+		    		else {
+		    			previousRulerPosition = updateRulerLocation(new SbVec3f(0.0f, rotation_x * cameraHeight/screenHeight, 0.0f), previousRulerPosition);
+		    			previousRulerPosition = updateRulerLocation(new SbVec3f(- rotation_z*cameraHeight/screenHeight, 0.0f, 0.0f), previousRulerPosition);
+		    			sg.setRuler(previousRulerPosition);
+		                
+			    		getDiff().setValue((int)0, (int)0);
+		    		}
 		    		
 		            double currentTimeSec = System.nanoTime()/1.0e9;
 
@@ -375,5 +400,16 @@ public class View3DPart {
 		}
 		
 		System.out.println("Upper View");
+	}
+	
+	private void toggleRuler() {
+		ruler = !ruler;
+		
+		if (!ruler) {
+			walkViewer.getDiff().setValue((int)0, (int)0);
+			sg.setRuler(null);
+		} else {
+			previousRulerPosition.copyFrom(walkViewer.getCameraController().getCamera().position.getValue());
+		}
 	}
 }

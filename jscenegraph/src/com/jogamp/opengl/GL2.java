@@ -2944,11 +2944,21 @@ public interface GL2 extends GL2ES1, GL2GL3 {
 	}
 
 	default void glVertexAttribPointer(int arg1, int arg2, int arg3, boolean arg4, int arg5, IntBuffer arg6) {
-		org.lwjgl.opengl.GL20.glVertexAttribPointer(arg1, arg2, arg3, arg4, arg5, arg6);		
+		if (arg6 == null) {
+			org.lwjgl.opengl.GL20.glVertexAttribPointer(arg1, arg2, arg3, arg4, arg5, 0);
+		}
+		else {
+			org.lwjgl.opengl.GL20.glVertexAttribPointer(arg1, arg2, arg3, arg4, arg5, arg6);
+		}
 	}
 
 	default void glVertexAttribPointer(int arg1, int arg2, int arg3, boolean arg4, int arg5, FloatBuffer arg6) {
-		org.lwjgl.opengl.GL20.glVertexAttribPointer(arg1, arg2, arg3, arg4, arg5, arg6);				
+		if (arg6 == null) {
+			org.lwjgl.opengl.GL20.glVertexAttribPointer(arg1, arg2, arg3, arg4, arg5, 0);
+		}
+		else {
+			org.lwjgl.opengl.GL20.glVertexAttribPointer(arg1, arg2, arg3, arg4, arg5, arg6);
+		}
 	}
 
 	
@@ -3315,7 +3325,7 @@ ByteBuffer data ) {
 	}
 
 	default void glTexCoordPointer(int arg1, int glFloat, int arg3, FloatBuffer dataPtr) {
-		org.lwjgl.opengl.GL11.glTexCoordPointer(arg1, glFloat, arg3, dataPtr);
+		// org.lwjgl.opengl.GL11.glTexCoordPointer(arg1, glFloat, arg3, dataPtr); CORE
 	}
 
 	default void glTexCoordPointer(int arg1, int glFloat, int arg3, ByteBuffer dataPtr) {

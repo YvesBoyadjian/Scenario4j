@@ -24,7 +24,7 @@
 *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 *
 *  Contact information: MeVis, Center for Medical Diagnostic Systems and
-*  Visualization GmbH, Universitätsallee 29, D-28359 Bremen, GERMANY, or:
+*  Visualization GmbH, Universitï¿½tsallee 29, D-28359 Bremen, GERMANY, or:
 *
 *  http://www.mevis.de
 *
@@ -176,7 +176,12 @@ case NORMAL_VBO:
 	  element.pimpl.normalvbo = vbo[0];
 	break;
 case TEXCOORD_VBO:
+	if (element.pimpl.texcoordvbo.getLength() == 0) {
+		element.pimpl.texcoordvbo.append(vbo[0]);
+	}
+	else {
 	  element.pimpl.texcoordvbo.operator_square_bracket(0, vbo[0]);
+	}
 	break;
 case VERTEX_VBO:
 	  element.pimpl.vertexvbo = vbo[0];

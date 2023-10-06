@@ -18,6 +18,7 @@ import java.util.stream.Stream;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 
+import application.MainGLFW;
 import application.RasterProvider;
 import application.nodes.*;
 import application.objects.Hero;
@@ -352,6 +353,16 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 	private SoBaseColor lifeBarColor;
 
 	private SoCat cat;
+	
+	private final SoSwitch rulerSwitch = new SoSwitch();
+	
+	private final SoLineSet rulerLineSet = new SoLineSet() {
+		public void
+		GLRender(SoGLRenderAction action) {
+			super.GLRender(action);
+		}
+		
+	};
 
     public SceneGraphIndexedFaceSetShader(
 			RasterProvider rwp,
@@ -1368,6 +1379,56 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 		
 		//sep.ref();
 		//forest = null; // for garbage collection : no, we need forest
+		
+
+	    SoShaderProgram program2 = new SoShaderProgram();
+	    
+	    SoVertexShader vs = new SoVertexShader();
+
+	    vs.sourceType.setValue(SoShaderObject.SourceType.GLSL_PROGRAM);
+	    vs.sourceProgram.setValue(
+	            "#version 330 core\n"+
+	                    "layout (location = 0) in vec3 aPos;\n"+
+	                    "uniform mat4 s4j_ModelViewMatrix;\n"+
+	                    "uniform mat4 s4j_ProjectionMatrix;\n"+
+	                    "void main()\n"+
+	                    "{\n"+
+	                    "gl_Position = s4j_ProjectionMatrix * s4j_ModelViewMatrix * vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"+
+	                    "}\n");
+
+	    final SoShaderStateMatrixParameter mvs2 = new SoShaderStateMatrixParameter();
+	    mvs2.name.setValue("s4j_ModelViewMatrix");
+	    mvs2.matrixType.setValue(SoShaderStateMatrixParameter.MatrixType.MODELVIEW);
+
+	    final SoShaderStateMatrixParameter ps2 = new SoShaderStateMatrixParameter();
+	    ps2.name.setValue("s4j_ProjectionMatrix");
+	    ps2.matrixType.setValue(SoShaderStateMatrixParameter.MatrixType.PROJECTION);
+
+	    vs.parameter.set1Value(0, mvs2);
+	    vs.parameter.set1Value(1, ps2);
+
+	    program2.shaderObject.set1Value(0, vs);
+
+	    SoFragmentShader fs = new SoFragmentShader();
+
+	    fs.sourceType.setValue(SoShaderObject.SourceType.GLSL_PROGRAM);
+	    fs.sourceProgram.setValue(
+	            "#version 330 core\n"+
+	                    "out vec4 FragColor;\n"+
+	                    "void main()\n"+
+	                    "{\n"+
+	                    "FragColor = vec4(0.0f, 0.0f, 0.0f, 1.0f);\n"+
+	                    "}\n"
+	    );
+
+	    program2.shaderObject.set1Value(1, fs);
+	    
+	    rulerSwitch.addChild(program2);
+		
+		rulerSwitch.addChild(rulerLineSet);
+		
+		sep.addChild(rulerSwitch);
+		
 
 		// ____________________________________________________________ Shader for screen display
 		SoShaderProgram onScreenShaderProgram = new SoShaderProgram();
@@ -3718,5 +3779,35 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 
 	public SoCamera getCamera() {
 		return camera.get();
+	}
+
+	public void setRuler(SbVec3f previousRulerPosition) {
+		if (previousRulerPosition == null) {
+			rulerSwitch.whichChild.setValue(SoSwitch.SO_SWITCH_NONE);
+		}
+		else {
+			rulerSwitch.whichChild.setValue(SoSwitch.SO_SWITCH_ALL);
+			
+			SoVertexProperty vertexProperty = new SoVertexProperty();
+			
+			SbVec3f start = new SbVec3f(-4000,-4000,-2000);
+			
+			start.copyFrom(getCamera().position.getValue());
+			
+			start.setZ(start.getZ() - 100);
+			
+			SbVec3f end = new SbVec3f(4000,4000,4000);
+			
+			end.copyFrom(previousRulerPosition);
+			
+			//end.setZ(start.getZ() + MainGLFW.SCENE_POSITION.getZ());
+			
+			vertexProperty.vertex.set1Value(0, start);
+			
+			vertexProperty.vertex.set1Value(1, end);
+			
+			rulerLineSet.numVertices.set1Value(0, 2);
+			rulerLineSet.vertexProperty.setValue(vertexProperty);
+		}
 	}
 }

@@ -166,5 +166,15 @@ setPackedValue(int orderedRGBA, float[] transparency)
 	public SbColor darker() {
 		return new SbColor(getX()*.707f,getY()*.707f,getZ()*.707f);
 	}
+	
+	// Returns vector components for reading only. 
+    public final float[] getValueReadRGBA(float opacity) {
+    	float[] vecRead = new float[4];
+    	vecRead[0] = g(0); 
+    	vecRead[1] = g(1); 
+    	vecRead[2] = g(2); 
+    	vecRead[3] = opacity;
+    	return vecRead; 
+    }
 }
 
