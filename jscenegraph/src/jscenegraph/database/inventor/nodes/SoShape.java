@@ -368,11 +368,11 @@ public abstract class SoShape extends SoNode implements Destroyable {
     }
     if (useTexCoords) {
     	gl2.glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-        gl2.glDisableVertexAttribArray(2);
+        gl2.glDisableVertexAttribArray(3);
     }
     if (useColors) {
     	gl2.glDisableClientState(GL_COLOR_ARRAY);
-        gl2.glDisableVertexAttribArray(3);
+        gl2.glDisableVertexAttribArray(2);
     }
   }      
       }
@@ -2325,14 +2325,14 @@ startVertexArray(SoGLRenderAction action,
     if (colorvbo != null) {
       SoGL.cc_glglue_glColorPointer(glue, 4, GL_UNSIGNED_BYTE, 0, dataptr);
 
-      glue.glVertexAttribPointerARB(3,4, GL_UNSIGNED_BYTE,true, 0, dataptr);
+      glue.glVertexAttribPointerARB(2,4, GL_UNSIGNED_BYTE,true, 0, dataptr);
     }
     else {
       SoGL.cc_glglue_glColorPointer(glue, 3, GL_FLOAT, 0, dataptr);
     }
     SoGL.cc_glglue_glEnableClientState(glue, GL_COLOR_ARRAY);
 
-    glue.glEnableVertexAttribArrayARB(3);
+    glue.glEnableVertexAttribArrayARB(2);
 
     int pHandle = SoGLShaderProgramElement.get(state).getGLSLShaderProgramHandle(state);
     if(pHandle >0 ) {
@@ -2392,11 +2392,11 @@ startVertexArray(SoGLRenderAction action,
         }
         SoGL.cc_glglue_glTexCoordPointer(glue, dim, GL_FLOAT, 0, tptr);
 
-        glue.glVertexAttribPointerARB(2,2,GL_FLOAT,GL_FALSE != 0,0,tptr);
+        glue.glVertexAttribPointerARB(3,2,GL_FLOAT,GL_FALSE != 0,0,tptr);
 
         SoGL.cc_glglue_glEnableClientState(glue, GL_TEXTURE_COORD_ARRAY);
 
-        glue.glEnableVertexAttribArrayARB(2);
+        glue.glEnableVertexAttribArrayARB(3);
       }
     }
   }
@@ -2518,7 +2518,7 @@ finishVertexArray(SoGLRenderAction action,
 	}
         SoGL.cc_glglue_glDisableClientState(glue, GL_TEXTURE_COORD_ARRAY);
 
-          glue.glDisableVertexAttribArrayARB(2);
+          glue.glDisableVertexAttribArrayARB(3);
       }
     }
     SoGL.cc_glglue_glClientActiveTexture(glue, GL2.GL_TEXTURE0);
@@ -2529,7 +2529,7 @@ finishVertexArray(SoGLRenderAction action,
 
     SoGL.cc_glglue_glDisableClientState(glue, GL_COLOR_ARRAY);
 
-      glue.glDisableVertexAttribArrayARB(3);
+      glue.glDisableVertexAttribArrayARB(2);
 
       int pHandle = SoGLShaderProgramElement.get(state).getGLSLShaderProgramHandle(state);
       if(pHandle >0 ) {
