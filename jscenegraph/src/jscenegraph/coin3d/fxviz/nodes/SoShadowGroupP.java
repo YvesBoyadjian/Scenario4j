@@ -532,8 +532,8 @@ setVertexShader(SoState state)
 
 	gen.addDeclaration("layout (location = 0) in vec3 s4j_Vertex;",false);
 	gen.addDeclaration("layout (location = 1) in vec3 s4j_Normal;",false);
-	gen.addDeclaration("layout (location = 2) in vec2 s4j_MultiTexCoord0;",false);
-	gen.addDeclaration("layout (location = 3) in vec4 s4j_Color;",false);
+	gen.addDeclaration("layout (location = 2) in vec4 s4j_Color;",false);
+	gen.addDeclaration("layout (location = 3) in vec2 s4j_MultiTexCoord0;",false);
 
 	gen.addDeclaration("uniform mat4 s4j_ModelViewMatrix;",false);
 	gen.addDeclaration("uniform mat4 s4j_ProjectionMatrix;",false);
