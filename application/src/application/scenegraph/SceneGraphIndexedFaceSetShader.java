@@ -3703,7 +3703,7 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 					-(current_z - coordinates.getZ() + zTranslation + 0.74f));
 
 			SbViewVolume cameraViewVolume = new SbViewVolume();//camera.getViewVolume();
-			getViewVolume(cameraViewVolume,(SoPerspectiveCamera) camera,0);
+			getViewVolume(cameraViewVolume,(SoPerspectiveCamera) camera.get(),0);
 			final SbVec3f screenCoords = new SbVec3f();
 			cameraViewVolume.projectToScreen(direction,screenCoords);
 
