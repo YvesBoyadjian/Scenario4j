@@ -5,6 +5,8 @@ package application.scenegraph;
 
 import java.awt.Color;
 import java.awt.image.BufferedImage;
+import java.awt.image.DataBuffer;
+import java.awt.image.DataBufferFloat;
 import java.awt.image.Raster;
 import java.io.File;
 import java.io.FileInputStream;
@@ -13,6 +15,7 @@ import java.io.InputStream;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.function.Supplier;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import javax.imageio.ImageIO;
@@ -364,6 +367,18 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 		
 	};
 
+	private final int indice(int i, int j, int width) {
+		return i + j*width;
+	}
+
+	float zmin = Float.MAX_VALUE;
+	float zmax = -Float.MAX_VALUE;
+
+	private synchronized void updateZMinMax(float z) {
+		zmin = Math.min(zmin, z);
+		zmax = Math.max(zmax, z);
+	}
+
     public SceneGraphIndexedFaceSetShader(
 			RasterProvider rwp,
 			RasterProvider rep,
@@ -450,31 +465,38 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 		
 		//SbBox3f sceneBox = new SbBox3f();
 		//SbVec3f sceneCenter = new SbVec3f();
-		SbVec3f ptV = new SbVec3f();
-		
-		float zmin = Float.MAX_VALUE;
-		float zmax = -Float.MAX_VALUE;
 		//Random random = new Random();
 		
 		chunks.initXY(delta_x,delta_y);
 		
 		jstart = (int)(Math.ceil((float)(h-1)/(Chunk.CHUNK_WIDTH-1)))*(Chunk.CHUNK_WIDTH-1) - h + 1;
-		
+
+		DataBuffer rwDataBuffer = rw.getDataBuffer();
+		DataBuffer reDataBuffer = (re != null ? re.getDataBuffer() : null);
+
+		int rwWidth = rw.getWidth();
+		int reWidth = re != null ? re.getWidth() : 0;
+
 		boolean need_to_save_colors = false;
 		boolean load_z_and_color_was_successfull = chunks.loadZAndColors(); 
 		if( ! load_z_and_color_was_successfull )
 		{
-		
-			int red_,green_,blue_;
-			
-			float[] xyz = new float[3];
 
 			float sharp = 0.06f;
 			float sharp2 = 0.05f;
 
 			float zWater =  - 150 + getzTranslation() - CUBE_DEPTH /2;
 
-			for(int i=0;i<w;i++) {
+			IntStream.range(0,w).forEach((i)-> {
+
+				final Random randomForI = new Random(i);
+				float[] xyz = new float[3];
+
+				SbVec3f ptV = new SbVec3f();
+
+				int red_,green_,blue_;
+
+			//for(int i=0;i<w;i++) {
 				for(int j=0; j<h;j++) {
 					int index = i*h+j;
 					//chunks.verticesPut(index*3+0, i * delta_x);
@@ -484,17 +506,17 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 					int j0 = Math.max(j-1,0);
 					int j1 = Math.min(j+1,h-1);
 
-					float zi0 = ((i0+I_START) >= wImageW ? re.getPixel(i0+I_START-wImageW+overlap, j, fArray)[0] - delta : rw.getPixel(i0+I_START, j, fArray)[0]);
-					float zi1 = ((i1+I_START) >= wImageW ? re.getPixel(i1+I_START-wImageW+overlap, j, fArray)[0] - delta : rw.getPixel(i1+I_START, j, fArray)[0]);
-					float zj0 = ((i+I_START) >= wImageW ? re.getPixel(i+I_START-wImageW+overlap, j0, fArray)[0] - delta : rw.getPixel(i+I_START, j0, fArray)[0]);
-					float zj1 = ((i+I_START) >= wImageW ? re.getPixel(i+I_START-wImageW+overlap, j1, fArray)[0] - delta : rw.getPixel(i+I_START, j1, fArray)[0]);
+					float zi0 = ((i0+I_START) >= wImageW ? reDataBuffer.getElemFloat(indice(i0+I_START-wImageW+overlap, j, reWidth)) - delta : rwDataBuffer.getElemFloat(indice(i0+I_START, j, rwWidth)));
+					float zi1 = ((i1+I_START) >= wImageW ? reDataBuffer.getElemFloat(indice(i1+I_START-wImageW+overlap, j, reWidth)) - delta : rwDataBuffer.getElemFloat(indice(i1+I_START, j, rwWidth)));
+					float zj0 = ((i+I_START) >= wImageW ? reDataBuffer.getElemFloat(indice(i+I_START-wImageW+overlap, j0, reWidth)) - delta : rwDataBuffer.getElemFloat(indice(i+I_START, j0, rwWidth)));
+					float zj1 = ((i+I_START) >= wImageW ? reDataBuffer.getElemFloat(indice(i+I_START-wImageW+overlap, j1, reWidth)) - delta : rwDataBuffer.getElemFloat(indice(i+I_START, j1, rwWidth)));
 
-					float zi0j0 = ((i0+I_START) >= wImageW ? re.getPixel(i0+I_START-wImageW+overlap, j0, fArray)[0] - delta : rw.getPixel(i0+I_START, j0, fArray)[0]);
-					float zi1j1 = ((i1+I_START) >= wImageW ? re.getPixel(i1+I_START-wImageW+overlap, j1, fArray)[0] - delta : rw.getPixel(i1+I_START, j1, fArray)[0]);
-					float zi1j0 = ((i1+I_START) >= wImageW ? re.getPixel(i1+I_START-wImageW+overlap, j0, fArray)[0] - delta : rw.getPixel(i1+I_START, j0, fArray)[0]);
-					float zi0j1 = ((i0+I_START) >= wImageW ? re.getPixel(i0+I_START-wImageW+overlap, j1, fArray)[0] - delta : rw.getPixel(i0+I_START, j1, fArray)[0]);
+					float zi0j0 = ((i0+I_START) >= wImageW ? reDataBuffer.getElemFloat(indice(i0+I_START-wImageW+overlap, j0, reWidth)) - delta : rwDataBuffer.getElemFloat(indice(i0+I_START, j0, rwWidth)));
+					float zi1j1 = ((i1+I_START) >= wImageW ? reDataBuffer.getElemFloat(indice(i1+I_START-wImageW+overlap, j1, reWidth)) - delta : rwDataBuffer.getElemFloat(indice(i1+I_START, j1, rwWidth)));
+					float zi1j0 = ((i1+I_START) >= wImageW ? reDataBuffer.getElemFloat(indice(i1+I_START-wImageW+overlap, j0, reWidth)) - delta : rwDataBuffer.getElemFloat(indice(i1+I_START, j0, rwWidth)));
+					float zi0j1 = ((i0+I_START) >= wImageW ? reDataBuffer.getElemFloat(indice(i0+I_START-wImageW+overlap, j1, reWidth)) - delta : rwDataBuffer.getElemFloat(indice(i0+I_START, j1, rwWidth)));
 
-					float zc = ((i+I_START) >= wImageW ? re.getPixel(i+I_START-wImageW+overlap, j, fArray)[0] - delta : rw.getPixel(i+I_START, j, fArray)[0]);
+					float zc = ((i+I_START) >= wImageW ? reDataBuffer.getElemFloat(indice(i+I_START-wImageW+overlap, j, reWidth)) - delta : rwDataBuffer.getElemFloat(indice(i+I_START, j, rwWidth)));
 
 					float z = zc*(1 + 4*sharp + 4*sharp2) - sharp *( zi0 + zi1 + zj0 + zj1 ) - sharp2 * ( zi0j0 + zi1j1 + zi1j0 + zi0j1 );
 
@@ -512,8 +534,9 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 						z= ZMIN;
 					}
 					else {
-						zmin = Math.min(zmin, z);
-						zmax = Math.max(zmax, z);
+						updateZMinMax(z);
+						//zmin = Math.min(zmin, z);
+						//zmax = Math.max(zmax, z);
 					}
 					chunks.verticesPut(index, z);
 
@@ -529,12 +552,12 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 					
 					//Color color = snow;
 					
-					if(z < ALPINE_HEIGHT + 400 * (random.nextDouble()-0.3)) {
+					if(z < ALPINE_HEIGHT + 400 * (randomForI.nextDouble()-0.3)) {
 						//color = new Color((float)random.nextDouble()*GRASS_LUMINOSITY, 1.0f*GRASS_LUMINOSITY, (float)random.nextDouble()*0.75f*GRASS_LUMINOSITY);
 						
-						red_ = (int)(255.99f * (float)random.nextDouble()*GRASS_LUMINOSITY);
+						red_ = (int)(255.99f * (float)randomForI.nextDouble()*GRASS_LUMINOSITY);
 						green_ = (int)(255.99f *  1.0f*GRASS_LUMINOSITY);
-						blue_ = (int)(255.99f * (float)random.nextDouble()*/*0.75f*/0.7f*GRASS_LUMINOSITY); // Adapted to 6500 K display
+						blue_ = (int)(255.99f * (float)randomForI.nextDouble()*/*0.75f*/0.7f*GRASS_LUMINOSITY); // Adapted to 6500 K display
 					}
 					else {					
 						red_ = snow.getRed();
@@ -552,7 +575,7 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 				if(progressBar != null) {
 				progressBar.setValue((int)((long)MAX_PROGRESS*i*LOADING_HEIGHMAP_TIME_PERCENTAGE/100/w));
 				}
-			}
+			});
 
 			if(SAVE_CHUNK_MRI) {
 				chunks.saveZ();

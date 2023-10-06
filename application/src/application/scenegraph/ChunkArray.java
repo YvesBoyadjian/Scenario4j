@@ -173,6 +173,19 @@ public class ChunkArray {
 //			}
 //		}
 	}
+
+	private interface VerticesConsumerInterface {
+		void accept(Chunk c, int i, int j, float value);
+	}
+
+	private class VerticesConsumerClass {
+		public void accept(Chunk c, int i, int j, float value) {
+			int chunkIndice = getInChunkIndice(c, i,j);
+			c.verticesZ[chunkIndice] = value;
+		}
+	}
+
+	private final VerticesConsumerClass verticesConsumer = new VerticesConsumerClass();
 	
 	public void verticesPut(int vertexIndex, float value) {
 		int i = vertexIndex/h;
@@ -185,10 +198,10 @@ public class ChunkArray {
 //			c.vertices[chunkIndice*3+coord] = value;
 //		});
 		
-		chunksForEach(i,j,(c)-> {
+		chunksForEachVertices(i,j,value, verticesConsumer/*(c)-> {
 			int chunkIndice = getInChunkIndice(c, i,j);
 			c.verticesZ[chunkIndice] = value;
-		});
+		}*/);
 	}
 	
 	private int getInChunkIndice(Chunk c, int i, int j) {
@@ -251,6 +264,52 @@ public class ChunkArray {
 		ic = highChunkFromIndice(i); jc = highChunkFromIndice(j);
 		if(isInside(ic,jc)) {
 			consumer.accept(chunks[ic-1][jc-1]);
+		}
+	}
+
+	private void chunksForEachVertices(int i, int j,float value, VerticesConsumerClass consumer) {
+
+		int ic = lowChunkFromIndice(i); int jc = lowChunkFromIndice(j);
+		if(isInside(ic,jc)) {
+			consumer.accept(chunks[ic-1][jc-1],i,j,value);
+		}
+
+		ic = lowChunkFromIndice(i); jc = highChunkFromIndice(j);
+		if(isInside(ic,jc)) {
+			consumer.accept(chunks[ic-1][jc-1],i,j,value);
+		}
+
+		ic = highChunkFromIndice(i); jc = lowChunkFromIndice(j);
+		if(isInside(ic,jc)) {
+			consumer.accept(chunks[ic-1][jc-1],i,j,value);
+		}
+
+		ic = highChunkFromIndice(i); jc = highChunkFromIndice(j);
+		if(isInside(ic,jc)) {
+			consumer.accept(chunks[ic-1][jc-1],i,j,value);
+		}
+	}
+
+	private void chunksForEachColor(int i, int j, int r, int g, int b, int a, ColorConsumerClass consumer) {
+
+		int ic = lowChunkFromIndice(i); int jc = lowChunkFromIndice(j);
+		if(isInside(ic,jc)) {
+			consumer.accept(chunks[ic-1][jc-1],i,j, r,g,b,a);
+		}
+
+		ic = lowChunkFromIndice(i); jc = highChunkFromIndice(j);
+		if(isInside(ic,jc)) {
+			consumer.accept(chunks[ic-1][jc-1],i,j, r,g,b,a);
+		}
+
+		ic = highChunkFromIndice(i); jc = lowChunkFromIndice(j);
+		if(isInside(ic,jc)) {
+			consumer.accept(chunks[ic-1][jc-1],i,j, r,g,b,a);
+		}
+
+		ic = highChunkFromIndice(i); jc = highChunkFromIndice(j);
+		if(isInside(ic,jc)) {
+			consumer.accept(chunks[ic-1][jc-1],i,j, r,g,b,a);
 		}
 	}
 
@@ -374,20 +433,39 @@ public class ChunkArray {
 		}
 		
 		return null;
-	}	
-	
-	public void colorsPut(int index, int r, int g, int b, int a) {
-		int vertexIndex = index;
-		int i = vertexIndex/h;
-		int j = vertexIndex - i*h;
-		
-		chunksForEach(i,j,(c)-> {
+	}
+
+	private interface ColorConsumerInterface {
+
+		void accept(Chunk c, int i, int j, int r, int g, int b, int a);
+	}
+
+	private class ColorConsumerClass implements ColorConsumerInterface {
+
+		@Override
+		public void accept(Chunk c, int i, int j, int r, int g, int b, int a) {
 			int chunkIndice = getInChunkIndice(c, i,j);
 			c.colors[chunkIndice*4] = (byte)r;
 			c.colors[chunkIndice*4+1] = (byte)g;
 			c.colors[chunkIndice*4+2] = (byte)b;
 			c.colors[chunkIndice*4+3] = (byte)a;
-		});
+		}
+	}
+
+	private final ColorConsumerClass colorConsumer = new ColorConsumerClass();
+
+	public void colorsPut(int index, int r, int g, int b, int a) {
+		int vertexIndex = index;
+		int i = vertexIndex/h;
+		int j = vertexIndex - i*h;
+		
+		chunksForEachColor(i,j, r, g, b, a,colorConsumer/*(c)-> {
+			int chunkIndice = getInChunkIndice(c, i,j);
+			c.colors[chunkIndice*4] = (byte)r;
+			c.colors[chunkIndice*4+1] = (byte)g;
+			c.colors[chunkIndice*4+2] = (byte)b;
+			c.colors[chunkIndice*4+3] = (byte)a;
+		}*/);
 	}
 
 	public void stonePut(int index) {

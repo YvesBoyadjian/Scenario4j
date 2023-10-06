@@ -90,13 +90,13 @@ public class SbBSPTree implements Destroyable {
 		public boolean
 		leftOf(final SbVec3f pt) 
 		{
-		  return (double)(pt.getValueRead()[this.dimension]) < this.position;
+		  return (double)(pt.getValueAt(this.dimension)) < this.position;
 		}
 
 		public boolean
 		leftOf(final SbVec3fSingle pt)
 		{
-			return (double)(pt.getValue()[this.dimension]) < this.position;
+			return (double)(pt.getValueAt(this.dimension)) < this.position;
 		}
 
 public int addPoint(final SbVec3f pt, final int maxpts)
@@ -143,12 +143,12 @@ split()
   int dim;
   double pos;
 
-  if (diag.getValueRead()[0] > diag.getValueRead()[1]) {
-    if (diag.getValueRead()[0] > diag.getValueRead()[2]) dim = Dimension.DIM_YZ.ordinal();
+  if (diag.getValueAt(0) > diag.getValueAt(1)) {
+    if (diag.getValueAt(0) > diag.getValueAt(2)) dim = Dimension.DIM_YZ.ordinal();
     else dim = Dimension.DIM_XY.ordinal();
   }
   else {
-    if (diag.getValueRead()[1] > diag.getValueRead()[2]) dim = Dimension.DIM_XZ.ordinal();
+    if (diag.getValueAt(1) > diag.getValueAt(2)) dim = Dimension.DIM_XZ.ordinal();
     else dim = Dimension.DIM_XY.ordinal();
   }
 
@@ -168,7 +168,7 @@ split()
 //  }
 //
 //#else
-  pos = ((double)(box.getMin().getValueRead()[this.dimension])+(double)(box.getMax().getValueRead()[this.dimension])) / 2.0;
+  pos = ((double)(box.getMin().getValueAt(this.dimension))+(double)(box.getMax().getValueAt(this.dimension))) / 2.0;
 //#endif // BSP_SORTED_SPLIT
 
   this.position = pos;
@@ -298,7 +298,7 @@ findPoints(final SbSphere sphere, final SbListInt array)
 
 	  \sa SbBSPTree::findPoint()
 	*/
-	public int
+	public synchronized int
 	addPoint(final SbVec3f pt, Object data)
 	{
 	  this.boundingBox.extendBy(pt);
