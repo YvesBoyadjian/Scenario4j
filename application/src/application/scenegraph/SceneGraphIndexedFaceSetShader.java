@@ -374,9 +374,9 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 	float zmin = Float.MAX_VALUE;
 	float zmax = -Float.MAX_VALUE;
 
-	private synchronized void updateZMinMax(float z) {
-		zmin = Math.min(zmin, z);
-		zmax = Math.max(zmax, z);
+	private synchronized void updateZMinMax(float zMin, float zMax) {
+		zmin = Math.min(zmin, zMin);
+		zmax = Math.max(zmax, zMax);
 	}
 
     public SceneGraphIndexedFaceSetShader(
@@ -487,7 +487,10 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 
 			float zWater =  - 150 + getzTranslation() - CUBE_DEPTH /2;
 
-			IntStream.range(0,w).forEach((i)-> {
+			IntStream.range(0,w).parallel().forEach((i)-> {
+
+				float zMinForI = Float.MAX_VALUE;
+				float zMaxForI = -Float.MAX_VALUE;
 
 				final Random randomForI = new Random(i);
 				float[] xyz = new float[3];
@@ -534,7 +537,9 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 						z= ZMIN;
 					}
 					else {
-						updateZMinMax(z);
+						zMinForI = Math.min(zMinForI, z);
+						zMaxForI = Math.max(zMaxForI, z);
+
 						//zmin = Math.min(zmin, z);
 						//zmax = Math.max(zmax, z);
 					}
@@ -572,17 +577,26 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 					
 					chunks.colorsPut(index, red, green, blue, alpha);
 				}
+				updateZMinMax(zMinForI, zMaxForI);
+
 				if(progressBar != null) {
-				progressBar.setValue((int)((long)MAX_PROGRESS*i*LOADING_HEIGHMAP_TIME_PERCENTAGE/100/w));
+				//progressBar.setValue((int)((long)MAX_PROGRESS*i*LOADING_HEIGHMAP_TIME_PERCENTAGE/100/w));
 				}
 			});
+
+			if(progressBar != null) {
+				progressBar.setValue((int)((long)MAX_PROGRESS*w*LOADING_HEIGHMAP_TIME_PERCENTAGE/100/w));
+			}
 
 			if(SAVE_CHUNK_MRI) {
 				chunks.saveZ();
 			}
 			need_to_save_colors = true;
 		}
-		
+
+		System.out.println("z_min = "+zmin);
+		System.out.println("z_max = "+zmax);
+
 		//sceneCenter.setValue(sceneBox.getCenter());
 		
 		boolean load_normals_and_stone_was_successfull = chunks.loadNormalsAndStones(); 
