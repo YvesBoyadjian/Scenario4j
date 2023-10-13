@@ -185,7 +185,9 @@ public interface DWorld {
 	 */
 	double getCFM() ;
 
-	public static int dWORLDSTEP_THREADCOUNT_UNLIMITED = 0;
+	// TZ: This should be in threading.h
+	static int dTHREADING_THREAD_COUNT_UNLIMITED = 0;
+	public static int dWORLDSTEP_THREADCOUNT_UNLIMITED = dTHREADING_THREAD_COUNT_UNLIMITED;
 
 	/**
 	 * Set maximum threads to be used for island stepping
@@ -221,28 +223,28 @@ public interface DWorld {
 	int getStepIslandsProcessingMaxThreadCount();
 
 
-	public static final double dWORLDSTEP_RESERVEFACTOR_DEFAULT = 1.2f;
-	public static final int dWORLDSTEP_RESERVESIZE_DEFAULT = 65536;
-
-	/**
-	 * Memory reservation policy descriptor structure for world stepping functions.
-	 *
-	 * <code>struct_size</code> should be assigned the size of the structure.
-	 *
-	 * <code>reserve_factor</code> is a quotient that is multiplied by required memory size
-	 *  to allocate extra reserve whenever reallocation is needed.
-	 *
-	 * <code>reserve_minimum</code> is a minimum size that is checked against whenever reallocation 
-	 * is needed to allocate expected working memory minimum at once without extra 
-	 * reallocations as number of bodies/joints grows.
-	 *
-	 * See DxWorld.setStepMemoryReservationPolicy(DWorldStepReserveInfo)
-	 */
-	public class DWorldStepReserveInfo	{
-	    public int struct_size;
-	    public double reserve_factor; // Use float as precision does not matter here
-	    public int reserve_minimum;
-	};
+	//	final double dWORLDSTEP_RESERVEFACTOR_DEFAULT = 1.2f;
+	//	final int dWORLDSTEP_RESERVESIZE_DEFAULT = 65536;
+	//
+	//	/**
+	//	 * Memory reservation policy descriptor structure for world stepping functions.
+	//	 *
+	//	 * <code>struct_size</code> should be assigned the size of the structure.
+	//	 *
+	//	 * <code>reserve_factor</code> is a quotient that is multiplied by required memory size
+	//	 *  to allocate extra reserve whenever reallocation is needed.
+	//	 *
+	//	 * <code>reserve_minimum</code> is a minimum size that is checked against whenever reallocation
+	//	 * is needed to allocate expected working memory minimum at once without extra
+	//	 * reallocations as number of bodies/joints grows.
+	//	 *
+	//	 * See DxWorld.setStepMemoryReservationPolicy(DWorldStepReserveInfo)
+	//	 */
+	//	class DWorldStepReserveInfo	{
+	//	    public int struct_size;
+	//	    public double reserve_factor; // Use float as precision does not matter here
+	//	    public int reserve_minimum;
+	//	}
 
 
 	/**
@@ -362,65 +364,37 @@ public interface DWorld {
 	 */
 	double getQuickStepW();
 
-	
+
 	/**
-	 * Set auto disable linear threshold for newly created bodies.
+	 * Set auto disable linear average threshold for newly created bodies.
+	 *
 	 * @param threshold default is 0.01
 	 */
-	void  setAutoDisableLinearThreshold (double threshold);
-	
-	
+	void setAutoDisableLinearThreshold(double threshold);
+
+
 	/**
-	 * Get auto disable linear threshold for newly created bodies.
+	 * Get auto disable linear average threshold for newly created bodies.
+	 *
 	 * @return the threshold
 	 */
 	double getAutoDisableLinearThreshold();
-	
-	
+
+
 	/**
-	 * Set auto disable angular threshold for newly created bodies.
+	 * Set auto disable angular average threshold for newly created bodies.
+	 *
 	 * @param threshold default is 0.01
 	 */
-	void setAutoDisableAngularThreshold (double threshold);
+	void setAutoDisableAngularThreshold(double threshold);
 
-	
+
 	/**
-	 * Get auto disable angular threshold for newly created bodies.
+	 * Get auto disable angular average threshold for newly created bodies.
+	 *
 	 * @return the threshold
 	 */
 	double getAutoDisableAngularThreshold();
-
-
-//	/**
-//	 * Get auto disable linear average threshold for newly created bodies.
-//	 * @return the threshold
-//	 * @deprecated Not implemented in ODE.
-//	 */
-//	double getAutoDisableLinearAverageThreshold ();
-//
-//
-//	/**
-//	 * Set auto disable linear average threshold for newly created bodies.
-//	 * @param linear_average_threshold default is 0.01
-//	 * @deprecated Not implemented in ODE.
-//	 */
-//	void setAutoDisableLinearAverageThreshold (double linear_average_threshold);
-//
-//
-//	/**
-//	 * Get auto disable angular average threshold for newly created bodies.
-//	 * @return the threshold
-//	 * @deprecated Not implemented in ODE.
-//	 */
-//	double getAutoDisableAngularAverageThreshold ();
-//
-//
-//	/**
-//	 * Set auto disable angular average threshold for newly created bodies.
-//	 * @param angular_average_threshold default is 0.01
-//	 * @deprecated Not implemented in ODE.
-//	 */
-//	void setAutoDisableAngularAverageThreshold (double angular_average_threshold);
 
 
 	/**

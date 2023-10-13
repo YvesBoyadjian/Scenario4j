@@ -357,6 +357,8 @@ class DemoHeightfield extends dsFunctions {
 				DTriMeshData new_tmdata = OdeHelper.createTriMeshData();
 				new_tmdata.build(Vertices, Indices);
 
+				new_tmdata.preprocess2((1 << DTriMeshData.dTRIDATAPREPROCESS_BUILD.FACE_ANGLES), null);
+
 				obj[i].geom[0] = OdeHelper.createTriMesh(space, new_tmdata, null, null, null);
 
 				m.setTrimesh( DENSITY, (DTriMesh)obj[i].geom[0] );
@@ -673,7 +675,7 @@ class DemoHeightfield extends dsFunctions {
 //	    world.setStepThreadingImplementation(threading.dThreadingImplementationGetFunctions(), threading);
 
 		// run simulation
-		dsSimulationLoop (args,352,288,this);
+		dsSimulationLoop (args,640,480,this);
 
 //	    threading.shutdownProcessing();//dThreadingImplementationShutdownProcessing(threading);
 //	    pool.freeThreadPool();

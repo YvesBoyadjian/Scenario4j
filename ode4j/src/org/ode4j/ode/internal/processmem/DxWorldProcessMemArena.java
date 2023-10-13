@@ -29,18 +29,20 @@ import org.ode4j.ode.internal.DxBody;
 import org.ode4j.ode.internal.joints.DxJoint;
 import org.ode4j.ode.internal.processmem.DxUtil.BlockPointer;
 
+import java.util.concurrent.atomic.AtomicIntegerArray;
+
 public final class DxWorldProcessMemArena {
 	
     //   public:
-        //TODO        #define BUFFER_TO_ARENA_EXTRA (EFFICIENT_ALIGNMENT + dEFFICIENT_SIZE(sizeof(dxWorldProcessMemArena)))
+    // #define BUFFER_TO_ARENA_EXTRA (EFFICIENT_ALIGNMENT + dEFFICIENT_SIZE(sizeof(dxWorldProcessMemArena)))
     private final static int BUFFER_TO_ARENA_EXTRA () {
-        return (DxUtil.EFFICIENT_ALIGNMENT + DxUtil.dEFFICIENT_SIZE(
-                DxUtil.sizeof(DxWorldProcessMemArena.class)));
+        return 0; //(DxUtil.EFFICIENT_ALIGNMENT + DxUtil.dEFFICIENT_SIZE(
+                //DxUtil.sizeof(DxWorldProcessMemArena.class)));
     }
 
     static boolean IsArenaPossible(int nBufferSize)
     {
-        return DxUtil.SIZE_MAX - BUFFER_TO_ARENA_EXTRA() >= nBufferSize; // This ensures there will be no overflow
+        return Common.SIZE_MAX - BUFFER_TO_ARENA_EXTRA() >= nBufferSize; // This ensures there will be no overflow
     }
 
     static int MakeArenaSize(int nBufferSize)
@@ -48,6 +50,8 @@ public final class DxWorldProcessMemArena {
         return BUFFER_TO_ARENA_EXTRA() + nBufferSize;
     }
     //     #undef BUFFER_TO_ARENA_EXTRA
+
+    public DxWorldProcessMemArena() {}
 
     boolean IsStructureValid() //const
     {
@@ -74,7 +78,7 @@ public final class DxWorldProcessMemArena {
     	m_pAllocCurrentOrNextArena = state;
     }
 
-    void ResetState()
+    public void ResetState()
     {
     	m_pAllocCurrentOrNextArena = m_pAllocBegin;
     }
@@ -187,7 +191,7 @@ public final class DxWorldProcessMemArena {
             int rsrvminimum)
     {
         double scaledarena = arenareq * rsrvfactor;
-        int adjustedarena = (scaledarena < DxUtil.SIZE_MAX) ? (int)scaledarena : DxUtil.SIZE_MAX;
+        int adjustedarena = (scaledarena < Common.SIZE_MAX) ? (int)scaledarena : Common.SIZE_MAX;
         int boundedarena = (adjustedarena > rsrvminimum) ? adjustedarena : rsrvminimum;
         return DxUtil.dEFFICIENT_SIZE(boundedarena);
     }
@@ -204,8 +208,16 @@ public final class DxWorldProcessMemArena {
         return new int[size];
     }
 
-    public final double[] AllocateOveralignedArrayDReal(int size, int alignment) {
-        return new double[size];
+    public double[] AllocateOveralignedArrayDReal(int count, int alignment)
+    {
+        //return (ElementType *)AllocateOveralignedBlock(count * sizeof(ElementType), alignment);
+        // TZ: we assume that alignment is for the whole block so it can be safely ignored.
+        //     Do we have to make sure to have size be a multiple of alignment?
+        return new double[count];
+    }
+
+    public final AtomicIntegerArray AllocateArrayAtomicord32(int size) {
+        return new AtomicIntegerArray(size);
     }
 
     /**

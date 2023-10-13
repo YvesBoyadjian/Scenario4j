@@ -528,12 +528,12 @@ public class DemoMotion extends dsFunctions {
 		platform.setCollideBits(~1l);
 
 		// run simulation
-		dsSimulationLoop (args,352,288,this);
+		dsSimulationLoop (args,640,480,this);
 
-//		contactgroup.destroy ();
-//		space.destroy ();
-//		world.destroy ();
-//		OdeHelper.closeODE();
+		contactgroup.destroy ();
+		space.destroy ();
+		world.destroy ();
+		OdeHelper.closeODE();
 	}
 
 
@@ -545,9 +545,5 @@ public class DemoMotion extends dsFunctions {
 	@Override
 	public void stop() {
 		//Nothing
-		contactgroup.destroy ();
-		space.destroy ();
-		world.destroy ();
-		OdeHelper.closeODE();
 	}
 }

@@ -64,7 +64,16 @@ public interface DMatrix3C {
 	public double get22();
 	public float[] toFloatArray();
 	public float[] toFloatArray12();
-	public DMatrix3 clone();
+	/**
+	 * Please use @see #copy() instead. This is deprecated because we don't implement Cloneable.
+	 * @return A clone() of this object.
+	 */
+	@Deprecated // TODO deprecated. Should be removed. Plese use copy() instead. To be removed in 0.6.0.
+	DMatrix3 clone();
+	/**
+	 * @return A mutable copy of this object.
+	 */
+	DMatrix3 copy();
 	public DVector3ColView viewCol(int _col);
 	public double dotCol(int col, DVector3C b);
 	public double dotRow(int row, DVector3C b);
@@ -73,6 +82,8 @@ public interface DMatrix3C {
 	public double dotRowCol(int row, DMatrix3C m2, int col2);
 	public double dotRowRow(int row, DMatrix3C m2, int row2);
 	public DVector3 columnAsNewVector(int column);
+	public boolean isEq(DMatrix3C m, double epsilon);
+	@Deprecated // float is generally not comparable. To be removed in 0.6.0. TODO deprecated
 	public boolean isEq(DMatrix3C m);
 	public DMatrix3 reTranspose();
 	public void getColumn0(DVector3 result);

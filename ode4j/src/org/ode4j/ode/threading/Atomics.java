@@ -22,6 +22,7 @@
 package org.ode4j.ode.threading;
 
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicIntegerArray;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class Atomics {
@@ -29,6 +30,11 @@ public class Atomics {
 	public static boolean ThrsafeCompareExchange(AtomicInteger paoDestination, int aoComparand, int aoExchange)
 	{
 	    return paoDestination.compareAndSet(aoComparand, aoExchange);
+	}
+
+	public static boolean ThrsafeCompareExchange(AtomicIntegerArray paoDestination, int arrayOffset, int aoComparand, int aoExchange)
+	{
+		return paoDestination.compareAndSet(arrayOffset, aoComparand, aoExchange);
 	}
 
 	public static int ThrsafeExchange(AtomicInteger paoDestination, int aoExchange)
@@ -51,7 +57,10 @@ public class Atomics {
 	    int resultValue;
 	    while (true) {
 	        resultValue = storagePointer.get();
-	        if (resultValue == limitValue) {
+			// The ">=" comparison is used here to allow continuing incrementing the destination
+			// without waiting for all the threads to pass the barrier of checking its value
+			if (resultValue >= limitValue) {
+				resultValue = limitValue;
 	            break;
 	        }
 	        if (ThrsafeCompareExchange(storagePointer, resultValue, resultValue + 1)) {
@@ -66,7 +75,10 @@ public class Atomics {
 	    int resultValue;
 	    while (true) {
 	        resultValue = storagePointer.get();
-	        if (resultValue == limitValue) {
+			// The ">=" comparison is not required here at present ("==" could be used).
+			// It is just used this way to match the other function above.
+			if (resultValue >= limitValue) {
+				resultValue = limitValue;
 	            break;
 	        }
 	        //if (ThrsafeCompareExchangePointer((volatile atomicptr *)storagePointer, (atomicptr)resultValue, (atomicptr)(resultValue + 1))) {
@@ -88,4 +100,5 @@ public class Atomics {
         return paoDestination.getAndAdd(aoAddend);
     }
 
+	private Atomics() {}
 }

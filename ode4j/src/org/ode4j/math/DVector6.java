@@ -114,15 +114,25 @@ public class DVector6 {
 		return v[i];
 	}
 
+	public boolean isEq(DVector6 v2, double epsilon) {
+		for (int i = 0; i < v.length; ++i) {
+			if (Math.abs(v[i] - v2.v[i]) > epsilon) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	@Deprecated // float is generally not comparable. To be removed in 0.6.0. TODO deprecated
 	public boolean isEq(DVector6 v2) {
 		return Arrays.equals(v, v2.v);
 	}
-	
+
 	/**
-	 * Do not use. This can be slow, use isEq() instead.
+	 * Do not use. This can be slow, use ::isEq() instead.
 	 */
 	@Override
-	@Deprecated
+	@Deprecated // float is generally not comparable. To be removed in 0.6.0. TODO deprecated
 	public boolean equals(Object obj) {
 		if (this == obj) return true;
 		if (obj == null) return false;
@@ -131,6 +141,7 @@ public class DVector6 {
 	}
 
 	@Override
+	@Deprecated // float is generally not comparable. To be removed in 0.6.0. TODO deprecated
 	public int hashCode() {
 		int h = 0;
 		for (double d: v) {
@@ -230,6 +241,7 @@ public class DVector6 {
 		}
 		return true;
 	}
+
 	/**
 	 * this may be called for vectors `a' with extremely small magnitude, for
 	 * example the result of a cross product on two nearly perpendicular vectors.
@@ -238,10 +250,11 @@ public class DVector6 {
 	 * all the components by 1/a[i]. then we can compute the length of `a' and
 	 * scale the components by 1/l. this has been verified to work with vectors
 	 * containing the smallest representable numbers.
+	 * @return This vector.
 	 */
-	public void normalize()
-	{
+	public DVector6 normalize()	{
 		if (!safeNormalize6()) throw new IllegalStateException(
 				"Normalization failed: " + this);
+		return this;
 	}
 }

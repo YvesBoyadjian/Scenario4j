@@ -31,16 +31,7 @@ import static org.ode4j.ode.OdeMath.dMultiply1_331;
 import static org.ode4j.ode.OdeMath.dNormalize3;
 import static org.ode4j.ode.OdeMath.dNormalize4;
 import static org.ode4j.ode.OdeMath.dOrthogonalizeR;
-import static org.ode4j.ode.internal.Common.DBL_EPSILON;
-import static org.ode4j.ode.internal.Common.dAASSERT;
-import static org.ode4j.ode.internal.Common.dCos;
-import static org.ode4j.ode.internal.Common.dDEBUGMSG;
-import static org.ode4j.ode.internal.Common.dFabs;
-import static org.ode4j.ode.internal.Common.dIASSERT;
-import static org.ode4j.ode.internal.Common.dRecip;
-import static org.ode4j.ode.internal.Common.dSin;
-import static org.ode4j.ode.internal.Common.dSqrt;
-import static org.ode4j.ode.internal.Common.dUASSERT;
+import static org.ode4j.ode.internal.Common.*;
 import static org.ode4j.ode.internal.Matrix.dInvertPDMatrix;
 import static org.ode4j.ode.internal.Rotation.dDQfromW;
 import static org.ode4j.ode.internal.Rotation.dQMultiply0;
@@ -53,11 +44,7 @@ import org.ode4j.math.DQuaternion;
 import org.ode4j.math.DQuaternionC;
 import org.ode4j.math.DVector3;
 import org.ode4j.math.DVector3C;
-import org.ode4j.ode.DBody;
-import org.ode4j.ode.DGeom;
-import org.ode4j.ode.DJoint;
-import org.ode4j.ode.DMass;
-import org.ode4j.ode.DMassC;
+import org.ode4j.ode.*;
 import org.ode4j.ode.internal.Objects_H.DxPosR;
 import org.ode4j.ode.internal.Objects_H.DxPosRC;
 import org.ode4j.ode.internal.Objects_H.dxAutoDisable;
@@ -65,13 +52,14 @@ import org.ode4j.ode.internal.Objects_H.dxDampingParameters;
 import org.ode4j.ode.internal.cpp4j.java.Ref;
 import org.ode4j.ode.internal.joints.DxJoint;
 import org.ode4j.ode.internal.joints.DxJointNode;
-import org.ode4j.ode.internal.joints.OdeJointsFactoryImpl;
 import org.ode4j.ode.internal.processmem.DxWorldProcessContext;
+
+import java.util.Iterator;
 
 /**
  * rigid body (dynamics object).
  */
-public class DxBody extends DObject implements DBody, Cloneable {
+public class DxBody extends DObject implements DBody {
 
 	// some body flags
 
@@ -102,7 +90,7 @@ public class DxBody extends DObject implements DBody, Cloneable {
 
 	//	  public dxJointNode firstjoint;	// list of attached joints
 	//TODO
-	public final Ref<DxJointNode> firstjoint = new Ref<DxJointNode>();	// list of attached joints
+	public final Ref<DxJointNode> firstjoint = new Ref<>();	// list of attached joints
 	//unsigned
 	int flags;			// some dxBodyFlagXXX flags
 	//  public dGeom geom;			// first collision geom associated with body
@@ -118,7 +106,7 @@ public class DxBody extends DObject implements DBody, Cloneable {
 	DVector3 finite_rot_axis;	// finite rotation axis, unit length or 0=none
 
 	// auto-disable information
-	dxAutoDisable adis;		// auto-disable parameters
+	final dxAutoDisable adis = new dxAutoDisable();		// auto-disable parameters
 	double adis_timeleft;		// time left to be idle
 	int adis_stepsleft;		// steps left to be idle
 	//  dVector3* average_lvel_buffer;      // buffer for the linear average velocity calculation
@@ -131,7 +119,7 @@ public class DxBody extends DObject implements DBody, Cloneable {
 	int average_ready;            // indicates ( with = 1 ), if the Body's buffers are ready for average-calculations
 
 	BodyMoveCallBack moved_callback; // let the user know the body moved
-	private dxDampingParameters dampingp; // damping parameters, depends on flags
+	private final dxDampingParameters dampingp = new dxDampingParameters(); // damping parameters, depends on flags
 	double max_angular_speed;      // limit the angular velocity to this magnitude
 
 	protected DxBody(DxWorld w)
@@ -291,9 +279,12 @@ public class DxBody extends DObject implements DBody, Cloneable {
 	{
 		//memcpy(b->posr.R, R, sizeof(dMatrix3));
 		_posr.Rw().set(R);
-		 dOrthogonalizeR(_posr.Rw());
-		 dQfromR (_q, R);
-		 dNormalize4 (_q);
+
+		boolean bOrthogonalizeResult = dOrthogonalizeR(_posr.Rw());
+		dAVERIFY(bOrthogonalizeResult);
+
+		dQfromR(_q, R);
+		dNormalize4(_q);
 		  
 		// notify all attached geoms that this body has moved
 		for (DxGeom geom2 = geom; geom2 != null; geom2 = geom2.dGeomGetBodyNext ()) {
@@ -886,7 +877,7 @@ public class DxBody extends DObject implements DBody, Cloneable {
 	void dBodySetAutoDisableDefaults ()
 	{
 		DxWorld w = world;
-		adis = w.adis.clone();
+		adis.set(w.adis);
 		dBodySetAutoDisableFlag ( (w.body_flags & dxBodyAutoDisable)!=0);
 	}
 
@@ -951,7 +942,7 @@ public class DxBody extends DObject implements DBody, Cloneable {
 	void dBodySetDampingDefaults()
 	{
 		DxWorld w = world;
-		dampingp = w.dampingp.clone();
+		dampingp.set(w.dampingp);
 		//unsigned
 		final int mask = dxBodyLinearDamping | dxBodyAngularDamping;
 		flags &= ~mask; // zero them
@@ -1146,16 +1137,6 @@ public class DxBody extends DObject implements DBody, Cloneable {
 	}
 
 	@Override
-	public Object clone() {
-		try {
-			return super.clone();
-		} catch (CloneNotSupportedException e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-
-	@Override
 	public String toString() {
 		return super.toString();  
 	}
@@ -1173,7 +1154,7 @@ public class DxBody extends DObject implements DBody, Cloneable {
 	@Override
 	//	  public void DESTRUCTOR()
 	//	    { dBodyDestroy (); super.DESTRUCTOR(); }
-	public void DESTRUCTOR() { super.DESTRUCTOR(); };
+	public void DESTRUCTOR() { super.DESTRUCTOR(); }
 
 	//void setData (void *data)
 	@Override
@@ -1203,6 +1184,13 @@ public class DxBody extends DObject implements DBody, Cloneable {
 	@Override
 	public void setLinearVel (DVector3C v)
 	{ dBodySetLinearVel(v); }
+	@Override
+	public void addLinearVel (double x, double y, double z)	{
+		lvel.add(x, y, z);
+	}
+	@Override
+	public void addLinearVel (DVector3C v)
+	{ lvel.add(v); }
 	@Override
 	public void setAngularVel (double x, double y, double z)
 	{ dBodySetAngularVel (x,y,z); }
@@ -1423,7 +1411,7 @@ public class DxBody extends DObject implements DBody, Cloneable {
 
 	@Override
 	public boolean isConnectedTo (DBody body) //const
-	{ return OdeJointsFactoryImpl.areConnected (this, body); }
+	{ return OdeHelper.areConnected (this, body); }
 
 	@Override
 	public void  setAutoDisableLinearThreshold (double threshold)
@@ -1517,8 +1505,6 @@ public class DxBody extends DObject implements DBody, Cloneable {
 		dBodySetAutoDisableDefaults();
 	}
 
-	/** @deprecated */
-	@Deprecated
     @Override
 	public DGeom getFirstGeom() {
 		return dBodyGetFirstGeom();
@@ -1533,8 +1519,32 @@ public class DxBody extends DObject implements DBody, Cloneable {
 	}
 
 	@Override
+	public Iterator<DGeom> getGeomIterator() {
+		return new GeomIterator(geom);
+	}
+
+	@Override
 	public void setMovedCallback(BodyMoveCallBack callback) {
 		dBodySetMovedCallback(callback);
 	}
 
+	private static class GeomIterator implements Iterator<DGeom> {
+		DxGeom current;
+
+		GeomIterator(DxGeom start) {
+			current = start;
+		}
+
+		@Override
+		public boolean hasNext() {
+			return current != null;
+		}
+
+		@Override
+		public DGeom next() {
+			DGeom ret = current;
+			current = current.body_next;
+			return ret;
+		}
+	}
 }

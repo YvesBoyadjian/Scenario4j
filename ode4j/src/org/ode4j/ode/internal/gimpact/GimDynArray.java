@@ -31,6 +31,7 @@
  */
 package org.ode4j.ode.internal.gimpact;
 
+import java.lang.reflect.Array;
 import java.util.Arrays;
 
 import org.ode4j.ode.internal.cpp4j.java.ObjArray;
@@ -72,11 +73,11 @@ public class GimDynArray<T> {//extends GimBufferArray<T> {
 	//! Creates a dynamic array zero sized
 	//#define GIM_DYNARRAY_CREATE(type, array_data, reserve_size) \
 	@SuppressWarnings("unchecked")
-	static <T> GimDynArray<T> GIM_DYNARRAY_CREATE(int reserve_size) 
+	static <T> GimDynArray<T> GIM_DYNARRAY_CREATE(Class<T> clazz, int reserve_size)
 	{ 
 		GimDynArray<T> a = new GimDynArray<T>();
 	    //(array_data).m_pdata = (char *)gim_alloc((reserve_size) * sizeof(type));
-		a.m_pdata = (T[]) new Object[reserve_size];//gim_alloc((reserve_size));// * sizeof(type));
+		a.m_pdata = (T[]) Array.newInstance(clazz, reserve_size); //gim_alloc((reserve_size));// * sizeof(type));
 	    a.m_size = 0; 
 	    a.m_reserve_size = reserve_size;
 	    return a;
@@ -125,6 +126,7 @@ public class GimDynArray<T> {//extends GimBufferArray<T> {
 	//! Gets a pointer from the beginning of the array
 	//#define GIM_DYNARRAY_POINTER(type, array_data) ((type *)((array_data).m_pdata))
 	public T[] GIM_DYNARRAY_POINTER() { return m_pdata; }
+	public static <T> T[] GIM_DYNARRAY_POINTER(GimDynArray<T> array) { return array.m_pdata; }
 	public ObjArray<T> GIM_DYNARRAY_POINTER_V() { return new ObjArray<T>(m_pdata); }
 
 	//! Gets a pointer from the last elemento of the array
@@ -185,6 +187,14 @@ public class GimDynArray<T> {//extends GimBufferArray<T> {
 //	    } 
 //	    m_size--; 
 //	} 
+	public void GIM_DYNARRAY_DELETE_ITEM(int index)
+	{
+	    if (index < m_size - 1) {
+	        T[] _pt = GIM_DYNARRAY_POINTER();
+			System.arraycopy(_pt, index + 1, _pt, index, m_size - index - 1);
+	    }
+	    m_size--;
+	}
 
 	//! Removes an element at the last position
 	//#define GIM_DYNARRAY_POP_ITEM(array_data) \

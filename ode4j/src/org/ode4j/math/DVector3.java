@@ -22,6 +22,7 @@
 package org.ode4j.math;
 
 import org.ode4j.math.DMatrix3.DVector3ColView;
+import org.ode4j.ode.OdeMath;
 
 /**
  * This class provides functionality for DVector3 math.
@@ -42,11 +43,10 @@ import org.ode4j.math.DMatrix3.DVector3ColView;
  * @author Tilmann Zaeschke
  *
  */
-public class DVector3 implements DVector3I, DVector3C {
+public class DVector3 implements DVector3C {
 
 	private double d0, d1, d2;
     public static final DVector3C ZERO = new DVector3();
-	public static final int CURRENT_LENGTH = 4;
 
 	/**
 	 * Creates a (0,0,0) vector.
@@ -85,14 +85,23 @@ public class DVector3 implements DVector3I, DVector3C {
 		this();
 		set(i, j, k);
 	}
-	
+
+	public static DVector3 fromDoubleArray(double[] a) {
+		return new DVector3(a);
+	}
+
+	public static DVector3 fromFloatArray(float[] a) {
+		return new DVector3(a[0], a[1], a[2]);
+	}
+
 	public final DVector3 set(double[] v2) {
 		set(v2[0], v2[1], v2[2]);
 		return this;
 	}
 
-	public void set(float[] v2) {
+	public DVector3 set(float[] v2) {
 		set(v2[0], v2[1], v2[2]);
+		return this;
 	}
 	
 	public final DVector3 set(double x, double y, double z) {
@@ -110,46 +119,39 @@ public class DVector3 implements DVector3I, DVector3C {
 		set0( v2.get0() ); set1( v2.get1() ); set2( v2.get2() );
 		return this;
 	}
-	
+
 	@Override
+	@Deprecated // See interface
 	public DVector3 clone() {
 		return new DVector3(this);
 	}
-	
+
 	@Override
-	public String toString() {
-		StringBuffer b = new StringBuffer();
-		b.append("DVector3[ ");
-		b.append(get0()).append(", ");
-		b.append(get1()).append(", ");
-		b.append(get2()).append(" ]");
-//		for (int i = 0; i < v.length-1; i++) {
-//			b.append(v[i]).append(", ");
-//		}
-//		b.append(v[v.length-1]).append("]");
-		return b.toString();
+	public DVector3 copy() {
+		return new DVector3(this);
 	}
 
-//	@Override
-//	public void assertLen(int n) {
-//		if (n!=LEN) {
-//			throw new IllegalStateException("LEN is " + LEN + ", not " + n);
-//		}		
-//	}
-	
 	@Override
-	public final void set0(double d) {
+	public String toString() {
+		return "DVector3[ " +
+				get0() + ", " +
+				get1() + ", " +
+				get2() + " ]";
+	}
+
+	public final DVector3 set0(double d) {
 		d0 = d;
+		return this;
 	}
 	
-	@Override
-	public final void set1(double d) {
+	public final DVector3 set1(double d) {
 		d1 = d;
+		return this;
 	}
 	
-	@Override
-	public final void set2(double d) {
+	public final DVector3 set2(double d) {
 		d2 = d;
+		return this;
 	}
 	
 	@Override
@@ -378,47 +380,14 @@ public class DVector3 implements DVector3I, DVector3C {
 	 * all the components by 1/a[i]. then we can compute the length of `a' and
 	 * scale the components by 1/l. this has been verified to work with vectors
 	 * containing the smallest representable numbers.
-	 * 
-	 * This method returns (1,0,0) if no normal can be determined.
+	 * <p>
+	 * This method does not modify the vector if no normal can be determined.
 	 * @return 'false' if no normal could be determined
 	 */
-	public final boolean safeNormalize ()
-	{
-		double s;
-
-		double aa0 = Math.abs(get0());
-		double aa1 = Math.abs(get1());
-		double aa2 = Math.abs(get2());
-		if (aa1 > aa0) {
-			if (aa2 > aa1) { // aa[2] is largest
-				s = aa2;
-			}
-			else {              // aa[1] is largest
-				s = aa1;
-			}
-		}
-		else {
-			if (aa2 > aa0) {// aa[2] is largest
-				s = aa2;
-			}
-			else {              // aa[0] might be the largest
-				if (aa0 <= 0) { // aa[0] might is largest
-//					a.d0 = 1;	// if all a's are zero, this is where we'll end up.
-//					a.d1 = 0;	// return a default unit length vector.
-//					a.d2 = 0;
-					set(1, 0, 0);
-					return false;
-				}
-				else {
-					s = aa0;
-				}
-			}
-		}
-
-		scale(1./s);
-		scale(1./length());
-		return true;
+	public final boolean safeNormalize () {
+		return OdeMath.dxSafeNormalize3(this);
 	}
+
 	/**
 	 * this may be called for vectors `a' with extremely small magnitude, for
 	 * example the result of a cross product on two nearly perpendicular vectors.
@@ -427,13 +396,13 @@ public class DVector3 implements DVector3I, DVector3C {
 	 * all the components by 1/a[i]. then we can compute the length of `a' and
 	 * scale the components by 1/l. this has been verified to work with vectors
 	 * containing the smallest representable numbers.
-	 * 
-	 * This method throws an IllegalArgumentEception if no normal can be determined.
+	 * <p>
+	 * This method throws an IllegalArgumentException if no normal can be determined.
+	 * @return This vector.
 	 */
-	public final void normalize()
-	{
-		if (!safeNormalize()) throw new IllegalStateException(
-				"Normalization failed: " + this);
+	public final DVector3 normalize() {
+		OdeMath.dNormalize3(this);
+		return this;
 	}
 
 	/**
@@ -448,7 +417,37 @@ public class DVector3 implements DVector3I, DVector3C {
 	    double r3 = get2()-a.get2();
 	    return Math.sqrt(r1*r1 + r2*r2 + r3*r3);
 	}
-	
+
+	/**
+	 * Check whether two vectors contains the same values.
+	 * Due to Java's polymorphism handling, this method can be much faster than
+	 * v.equals(a).
+	 * @param a other vector
+	 * @param eps maximum allowed difference per value
+	 * @return equality
+	 */
+	@Override
+	public final boolean isEq(DVector3C a, double eps) {
+		return Math.abs(get0() - a.get0()) <= eps
+				&& Math.abs(get1() - a.get1()) <= eps
+				&& Math.abs(get2() - a.get2()) <= eps;
+	}
+
+	/**
+	 * Check whether two vectors contains the same values.
+	 * Due to Java's polymorphism handling, this method can be much faster than
+	 * v.equals(a).
+	 * @param x other vector x
+	 * @param y other vector y
+	 * @param z other vector z
+	 * @param eps maximum allowed difference per value
+	 * @return quality
+	 */
+	@Override
+	public final boolean isEq(double x, double y, double z, double eps) {
+		return Math.abs(get0() - x) <= eps && Math.abs(get1() - y) <= eps && Math.abs(get2() - z) <= eps;
+	}
+
 	/**
 	 * Check whether two vectors contains the same values.
 	 * Due to Java's polymorphism handling, this method can be much faster than
@@ -457,54 +456,35 @@ public class DVector3 implements DVector3I, DVector3C {
 	 * @return quality
 	 */
 	@Override
+	@Deprecated // float is generally not comparable. To be removed in 0.6.0. TODO deprecated
 	public final boolean isEq(DVector3C a) {
 		return get0()==a.get0() && get1()==a.get1() && get2()==a.get2();
 	}
 
 	/**
 	 * Set this vector equal to abs(this).
+	 * @return This vector.
 	 */
-	public final void eqAbs() {
+	public final DVector3 eqAbs() {
 		set0( Math.abs(get0()));
 		set1( Math.abs(get1()));
 		set2( Math.abs(get2()));
+		return this;
 	}
-	
-//	public void dMultiply0 (final dMatrix3C B, final dVector3C C)
-//	{
-//		eqMul(B, C);
-//	}
-//	
-//	public void eqMul (final dMatrix3C B, final dVector3C c)
-//	{
-////		double[] B2 = ((dMatrix3) B).v;
-////		double[] C2 = ((dVector3) C).v;
-////		double sum;
-////		int aPos = 0;
-////		int bPos, bbPos =0, cPos;
-////		for (int i=3; i > 0; i--) {
-////			cPos = 0;
-////			bPos = bbPos;
-////			sum = 0;
-////			for (int k=3; k > 0; k--) sum += B2[bPos++] * C2[cPos++];
-////			v[aPos++] = sum;
-////			bbPos += 4;
-////		}
-//		d0 = B.get00()*c.get0() + B.get01()*c.get1() + B.get02()*c.get2();
-//		d1 = B.get10()*c.get0() + B.get11()*c.get1() + B.get12()*c.get2();
-//		d2 = B.get20()*c.get0() + B.get21()*c.get1() + B.get22()*c.get2();
-//	}
 
-	public final void add0(double d) {
+	public final DVector3 add0(double d) {
 		d0 += d;
+		return this;
 	}
 
-	public final void add1(double d) {
+	public final DVector3 add1(double d) {
 		d1 += d;
+		return this;
 	}
 
-	public final void add2(double d) {
+	public final DVector3 add2(double d) {
 		d2 += d;
+		return this;
 	}
 
 	/**
@@ -512,8 +492,6 @@ public class DVector3 implements DVector3I, DVector3C {
 	 * @return '3'.
 	 */
 	public final int dim() {
-		//return LEN;
-		//TODO
 		return 3;
 	}
 
@@ -522,10 +500,13 @@ public class DVector3 implements DVector3I, DVector3C {
 	 * @param c c
 	 * @return new vector
 	 */
-	public final DVector3C reAdd(DVector3C c) {
+	public final DVector3 reAdd(DVector3C c) {
 		return new DVector3(this).add(c);
 	}
-	
+	public final DVector3 reAdd(double x, double y, double z) {
+		return new DVector3(this).add(x, y, z);
+	}
+
     /**
      * Returns a new vector which equals (this)*d.
      * @param d d
@@ -536,20 +517,24 @@ public class DVector3 implements DVector3I, DVector3C {
 		return new DVector3(this).scale(d);
 	}
 
-	public final void eqZero() {
+	public final DVector3 eqZero() {
 		set(0, 0, 0);
+		return this;
 	}
 
-	public final void setZero() {
+	public final DVector3 setZero() {
 		eqZero();
+		return this;
 	}
 	
-	public final void eqIdentity() {
+	public final DVector3 eqIdentity() {
 		set(1, 0, 0);
+		return this;
 	}
 
-	public final void setIdentity() {
+	public final DVector3 setIdentity() {
 		eqIdentity();
+		return this;
 	}
 
 	@Override
@@ -581,35 +566,43 @@ public class DVector3 implements DVector3I, DVector3C {
 	}
 
 	@Override
+	public final double[] toDoubleArray() {
+		return new double[]{get0(), get1(), get2()};
+	}
+
+	@Override
 	public final float[] toFloatArray() {
 		return new float[]{(float) get0(), (float) get1(), (float) get2()};
 	}
-	
-	public final void set(int i, double d) {
+
+	public final DVector3 set(int i, double d) {
         switch (i) {
         case 0: d0 = d; break;
         case 1: d1 = d; break;
         case 2: d2 = d; break;
         default: throw new IllegalArgumentException("i=" + i);
         }
+		return this;
 	}
 
-	public final void scale(int i, double d) {
+	public final DVector3 scale(int i, double d) {
         switch (i) {
         case 0: d0 *= d; break;
         case 1: d1 *= d; break;
         case 2: d2 *= d; break;
         default: throw new IllegalArgumentException("i=" + i);
         }
+		return this;
 	}
 
-	public final void add(int i, double d) {
+	public final DVector3 add(int i, double d) {
         switch (i) {
         case 0: d0 += d; break;
         case 1: d1 += d; break;
         case 2: d2 += d; break;
         default: throw new IllegalArgumentException("i=" + i);
         }
+		return this;
 	}
 	
 	/**
@@ -634,12 +627,12 @@ public class DVector3 implements DVector3I, DVector3C {
 	
 	/**
 	 * Do not use. This can be slow, use isEq() instead.
-	 * 
+	 * <p>
 	 * Any implementation of DVector3I will return true if get0(), get1()
 	 * and get2() return the same values.
 	 */
 	@Override
-	@Deprecated
+	@Deprecated // float is generally not comparable. To be removed in 0.6.0. TODO deprecated
 	public boolean equals(Object obj) {
 		if (this == obj) return true;
 		if (obj == null) return false;
@@ -649,6 +642,7 @@ public class DVector3 implements DVector3I, DVector3C {
 	}
 	
 	@Override
+	@Deprecated // float is generally not comparable. To be removed in 0.6.0. TODO deprecated
 	public int hashCode() {
 		return (int) (Double.doubleToRawLongBits(get0())  * 
 		Double.doubleToRawLongBits(get1()) * 
@@ -671,11 +665,28 @@ public class DVector3 implements DVector3I, DVector3C {
 	 * Set this vector = b x c.
 	 * @param b b
 	 * @param c c
+	 * @return This vector.
 	 */
-	public final void eqCross(DVector3C b, DVector3C c) {
-		set0( b.get1()*c.get2() - b.get2()*c.get1() ); 
-		set1( b.get2()*c.get0() - b.get0()*c.get2() ); 
+	public final DVector3 eqCross(DVector3C b, DVector3C c) {
+		set0( b.get1()*c.get2() - b.get2()*c.get1() );
+		set1( b.get2()*c.get0() - b.get0()*c.get2() );
 		set2( b.get0()*c.get1() - b.get1()*c.get0() );
+		return this;
+	}
+
+	/**
+	 * Create new vector v = (this) x b.
+	 * @param b Other vector
+	 * @return cross product of (this) and b
+	 * @see DVector3#cross(DVector3C)
+	 */
+	@Override
+	public final DVector3 cross(DVector3C b) {
+		DVector3 a = new DVector3();
+		a.set0( get1()*b.get2() - get2()*b.get1() );
+		a.set1( get2()*b.get0() - get0()*b.get2() );
+		a.set2( get0()*b.get1() - get1()*b.get0() );
+		return a;
 	}
 
 	/** 
@@ -687,19 +698,43 @@ public class DVector3 implements DVector3I, DVector3C {
 	 * </pre> 
 	 * @param m matrix m
 	 * @param v2 vector v
+	 * @return This vector.
 	 */
-	public final void eqProd(DMatrix3C m, DVector3C v2) {
+	public final DVector3 eqProd(DMatrix3C m, DVector3C v2) {
 	    set0( m.get00()*v2.get0()+  m.get01()*v2.get1()+  m.get02()*v2.get2() );
 	    set1( m.get10()*v2.get0()+  m.get11()*v2.get1()+  m.get12()*v2.get2() );
 	    set2( m.get20()*v2.get0()+  m.get21()*v2.get1()+  m.get22()*v2.get2() );
+		return this;
 	}
-	
+
+	/**
+	 * Convert radians to degrees.
+	 * @return (this) vector
+	 */
+	public DVector3 eqToDegrees() {
+		set0( Math.toDegrees(get0()));
+		set1( Math.toDegrees(get1()));
+		set2( Math.toDegrees(get2()));
+		return this;
+	}
+
+	/**
+	 * Convert degrees to radians.
+	 * @return (this) vector
+	 */
+	public DVector3 eqToRadians() {
+		set0( Math.toRadians( get0() ) );
+		set1( Math.toRadians( get1() ) );
+		set2( Math.toRadians( get2() ) );
+		return this;
+	}
+
 	/**
 	 * Create an array of DVector instances.
 	 * @param size size of new array
 	 * @return AN array of DVector
 	 */
-	public final static DVector3[] newArray(int size) {
+	public static DVector3[] newArray(int size) {
 		DVector3[] a = new DVector3[size];
 		for (int i = 0; i < size; i++) {
 			a[i] = new DVector3();

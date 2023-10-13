@@ -11,22 +11,17 @@ import org.ode4j.ode.internal.gimpact.GimDynArrayInt;
 import org.ode4j.ode.internal.gimpact.GimGeometry.aabb3f;
 import org.ode4j.ode.internal.gimpact.GimTrimesh;
 
-public class CollideConvexTrimesh implements DColliderFn {
+class CollideConvexTrimesh implements DColliderFn {
 
 	@Override
 	public int dColliderFn(DGeom o1, DGeom o2, int flags, DContactGeomBuffer contacts) {
 
 		DxGimpact trimesh = (DxGimpact) o2; 
-		GimTrimesh ptrimesh = trimesh.m_collision_trimesh;
+		GimTrimesh ptrimesh = trimesh.m_collision_trimesh();
 		aabb3f test_aabb = new aabb3f();
 
 		DAABBC aabb = o1.getAABB();
-		test_aabb.minX = (float) aabb.getMin0();
-		test_aabb.maxX = (float) aabb.getMax0();
-		test_aabb.minY = (float) aabb.getMin1();
-		test_aabb.maxY = (float) aabb.getMax1();
-		test_aabb.minZ = (float) aabb.getMin2();
-		test_aabb.maxZ = (float) aabb.getMax2();
+		test_aabb.set(aabb.getMin0(), aabb.getMax0(), aabb.getMin1(), aabb.getMax1(), aabb.getMin2(), aabb.getMax2());
 
 		GimDynArrayInt collision_result = GimDynArrayInt.GIM_CREATE_BOXQUERY_LIST();
 		ptrimesh.getAabbSet().gim_aabbset_box_collision(test_aabb, collision_result);

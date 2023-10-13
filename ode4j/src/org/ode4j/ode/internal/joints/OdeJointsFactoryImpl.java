@@ -29,7 +29,6 @@ import static org.ode4j.ode.internal.Common.*;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.ode4j.ode.OdeHelper;
 import org.ode4j.ode.DBody;
 import org.ode4j.ode.DContact;
 import org.ode4j.ode.DJoint;
@@ -42,7 +41,7 @@ import org.ode4j.ode.internal.DxWorld;
 /**
  * Factory for Joints.
  */
-public class OdeJointsFactoryImpl extends OdeHelper {
+public class OdeJointsFactoryImpl {
 
 
 	//****************************************************************************
@@ -78,6 +77,13 @@ public class OdeJointsFactoryImpl extends OdeHelper {
 	}
 
 
+	public DxJointConstrainedBall dJointCreateConstrainedBall (DWorld w, DJointGroup group)
+	{
+		dAASSERT (w);
+		return createJoint( new DxJointConstrainedBall(w),group);
+	}
+
+
 	public DxJointHinge dJointCreateHinge (DWorld w, DJointGroup group)
 	{
 		dAASSERT (w);
@@ -99,7 +105,7 @@ public class OdeJointsFactoryImpl extends OdeHelper {
 	{
 		dAASSERT (w, c);
 		DxJointContact j = createJoint(new DxJointContact((DxWorld) w), group);
-		j.contact = c;
+		j.setContact(c);
 		return j;
 	}
 
@@ -402,7 +408,7 @@ public class OdeJointsFactoryImpl extends OdeHelper {
 	{
 		dAASSERT (in_b1!=null || in_b2!=null);
 
-		List<DJoint> out_list = new LinkedList<DJoint>();
+		List<DJoint> out_list = new LinkedList<>();
 		
 		DxBody b1, b2;
 
@@ -438,7 +444,8 @@ public class OdeJointsFactoryImpl extends OdeHelper {
 	}
 
 
-	public boolean _dAreConnectedExcluding (DBody b1, DBody b2, Class<? extends DJoint> [] jointType)
+	@SafeVarargs
+	public final boolean _dAreConnectedExcluding(DBody b1, DBody b2, Class<? extends DJoint>... jointTypes)
 	{
 		//dAASSERT (b1!=null);// b2 can be null
 		// look through b1's neighbour list for b2
@@ -446,7 +453,7 @@ public class OdeJointsFactoryImpl extends OdeHelper {
 			if ( n.body == b2) {
 				boolean found = false;
 				Class<?> clsJoint = n.joint.getClass();
-				for (Class<?> cls: jointType) {
+				for (Class<?> cls: jointTypes) {
 					if ( cls == clsJoint )  {
 						found = true;
 						break;
@@ -457,4 +464,6 @@ public class OdeJointsFactoryImpl extends OdeHelper {
 		}
 		return false;
 	}
+
+	protected OdeJointsFactoryImpl() {}
 }

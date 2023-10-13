@@ -35,6 +35,7 @@ import org.ode4j.ode.DHeightfieldData;
 import org.ode4j.ode.DHeightfield.DHeightfieldGetHeight;
 import org.ode4j.ode.internal.DxHeightfield.HeightFieldVertex;
 
+//<<<<<<< HEAD
 import static org.ode4j.ode.DGeom.dRayClass;
 import static org.ode4j.ode.DGeom.dSphereClass;
 import static org.ode4j.ode.OdeMath.*;
@@ -42,6 +43,10 @@ import static org.ode4j.ode.internal.DxCollisionUtil.dVector3Copy;
 import static org.ode4j.ode.internal.DxCollisionUtil.dVector3Length;
 import static org.ode4j.ode.internal.DxCollisionUtil.dVector3Scale;
 import static org.ode4j.ode.internal.DxGeom.NUMC_MASK;
+//=======
+import static org.ode4j.ode.OdeConstants.dInfinity;
+import static org.ode4j.ode.internal.Common.dIASSERT;
+//>>>>>>> 070265e1142882e877fdf4d56a0db374a523006b
 
 /**
  * dHeightfield Collider

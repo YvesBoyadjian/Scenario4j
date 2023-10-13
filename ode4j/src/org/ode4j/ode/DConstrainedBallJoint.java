@@ -22,73 +22,24 @@
  * details.                                                              *
  *                                                                       *
  *************************************************************************/
-package org.ode4j.ode.internal;
+package org.ode4j.ode;
 
-import org.ode4j.math.DVector3;
-import org.ode4j.ode.DTriMesh;
-import org.ode4j.ode.OdeConfig;
+import org.ode4j.math.DVector3C;
 
-public abstract class DxTriMesh extends DxGeom implements DTriMesh {
+public interface DConstrainedBallJoint extends DBallJoint {
 
-	//TZ from "collision_trimesh_internal.h":
-	// Callbacks
-	DTriCallback Callback;
-	DTriArrayCallback ArrayCallback;
-	DTriRayCallback RayCallback;
-	DTriTriMergeCallback TriMergeCallback;
-	
-	// Data types
-	//DxTriMeshData _Data;
-
-	boolean doSphereTC;
-	boolean doBoxTC;
-	boolean doCapsuleTC;
-
-	abstract void ClearTCCache();
-
-	@Override
-	abstract void computeAABB();
-
-
-	//dxTriMesh::dxTriMesh(dSpaceID Space, dTriMeshDataID Data) : dxGeom(Space, 1){ type = dTriMeshClass; }
-	public DxTriMesh(DxSpace space) //: dxGeom(Space, 1)
-	{ 
-		super(space, true);
-		type = dTriMeshClass;
-//		_Data = data;
-	}
-	//dxTriMesh::~dxTriMesh(){}
-
-	public static DxTriMesh dCreateTriMesh(DxSpace space, 
-			DxTriMeshData Data,
-			DTriCallback Callback,
-			DTriArrayCallback ArrayCallback,
-			DTriRayCallback RayCallback)
-	{
-		DxTriMesh Geom;
-		switch (OdeConfig.dTRIMESH_TYPE) {
-		case DISABLED: Geom = new DxTriMeshDisabled(space, Data); break;
-		case GIMPACT: Geom = new DxGimpact(space, (DxGimpactData) Data); break;
-		default: throw new IllegalArgumentException(OdeConfig.dTRIMESH_TYPE.name());
-		}
-		Geom.Callback = Callback;
-		Geom.ArrayCallback = ArrayCallback;
-		Geom.RayCallback = RayCallback;
-
-		return Geom;
-	}
-
-	abstract public int FetchTriangleCount();
-
-	abstract public void FetchTransformedTriangle(int i, DVector3[] v);
-
-	/*
-	 * Returns the following values:
-	 * between -PI and 0 for concave edges
-	 * 0 for flat edges
-	 * between 0 and PI for convex edges 
-	 * > PI for boundary edges
+	/**
+	 * @param baseAxis - base axis for constraints
+	 * @param body2Axis - main axis of the 2nd body
 	 */
-	abstract public float getEdgeAngle(int triangle, int edge);
-}
+	void setAxes(DVector3C baseAxis, DVector3C body2Axis);
 
+	DVector3C getBaseAxis();
+	DVector3C getSecondBodyAxis();
+
+
+	void setLimits(double flexLimit, double twistLimit);
+
+	double getFlexLimit();
+	double getTwistLimit();
+}

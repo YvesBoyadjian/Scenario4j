@@ -53,4 +53,44 @@ public class DContactGeom {
 	/** (to be documented) */
 	public int side1;       
 	public int side2;
+
+	public boolean normal_needs_normalizing;
+
+	public DContactGeom() {}
+
+	/**
+	 * pos[3] is assigned in several places but never ysed. This is a dummy functioon to track this fact.
+	 * @param d d
+	 */
+	public void pos3(double d) {
+		// nothing
+	}
+
+	/**
+	 * normal[3] is assigned in several places but never ysed. This is a dummy functioon to track this fact.
+	 * @param d d
+	 */
+	public void normal3(double d) {
+		// nothing
+	}
+
+	public void nullify() {
+		 pos.setZero();
+		 normal.setZero();
+		 depth = 0;
+		 DGeom g1 = null;
+		 DGeom g2 = null;
+		 side1 = 0;
+		 side2 = 0;
+	}
+
+	public void set(DContactGeom other) {
+		pos.set(other.pos);
+		normal.set(other.normal);
+		depth = other.depth;
+		DGeom g1 = other.g1;
+		DGeom g2 = other.g2;
+		side1 = other.side1;
+		side2 = other.side2;
+	}
 }

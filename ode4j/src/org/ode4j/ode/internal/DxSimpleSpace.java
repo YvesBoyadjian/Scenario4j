@@ -59,15 +59,18 @@ public class DxSimpleSpace extends DxSpace implements DSimpleSpace {
 	{
 		// compute the AABBs of all dirty geoms, and clear the dirty flags
 		lock_count++;
-		for (DxGeom g : getGeoms()) {
+		for (DxGeom g : getGeomsDx()) {
 			//if ((g._gflags & GEOM_DIRTY) == 0) break;
 			if (!g.hasFlagDirty()) break;
 			if (g instanceof DxSpace) {
 				((DxSpace)g).cleanGeoms();
 			}
+
 			g.recomputeAABB();
-			//g._gflags &= (~(GEOM_DIRTY|GEOM_AABB_BAD));
-			g.unsetFlagDirtyAndBad();
+			// dIASSERT((g->gflags & GEOM_AABB_BAD) == 0);
+			// g->gflags &= ~GEOM_DIRTY;
+			dIASSERT(!g.hasFlagAabbBad());
+			g.unsetFlagDirty();
 		}
 		lock_count--;
 	}
@@ -81,7 +84,7 @@ public class DxSimpleSpace extends DxSpace implements DSimpleSpace {
 		cleanGeoms();
 
 		// intersect all bounding boxes
-		for (DxGeom g1 : getGeoms()) {
+		for (DxGeom g1 : getGeomsDx()) {
 			if (GEOM_ENABLED(g1)){
 				for (DxGeom g2=g1.getNext(); g2!=null; g2=g2.getNext()) {
 					if (GEOM_ENABLED(g2)){
@@ -105,7 +108,7 @@ public class DxSimpleSpace extends DxSpace implements DSimpleSpace {
 		geom.recomputeAABB();
 
 		// intersect bounding boxes
-		for (DxGeom g : getGeoms()) {
+		for (DxGeom g : getGeomsDx()) {
 			if (GEOM_ENABLED(g)){
 				collideAABBs (g,geom,data,callback);
 			}

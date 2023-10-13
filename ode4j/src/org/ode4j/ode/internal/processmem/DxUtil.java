@@ -36,8 +36,8 @@ public class DxUtil {
 
 	//#define dMIN(A,B)  ((A)>(B) ? (B) : (A))
 	//#define dMAX(A,B)  ((B)>(A) ? (B) : (A))
-	public static final int dMIN(int A, int B) { return A > B ? B : A; }
-	public static final int dMAX(int B, int A) { return A > B ? B : A; }
+	public static int dMIN(int A, int B) { return Math.min(A, B); }
+	public static int dMAX(int B, int A) { return Math.min(A, B); }
 	
 	
     //****************************************************************************
@@ -58,57 +58,57 @@ public class DxUtil {
                 1.2f, //dWORLDSTEP_RESERVEFACTOR_DEFAULT, 
                 65536);// dWORLDSTEP_RESERVESIZE_DEFAULT);
 
-    
-    static final int sizeof(Class<?> cls) {
-        if (cls == DxWorldProcessMemArena.class) {
-            return -1;
-        }
-        return -1;
-    }
-    
-    public static final int sizeof(Object o) {
-        if (o instanceof Class) {
-            return sizeof((Class<?>)o);
-        }
-        return sizeof(o.getClass());
-    }
-    
+
+    /* the efficient alignment. most platforms align data structures to some
+     * number of bytes, but this is not always the most efficient alignment.
+     * for example, many x86 compilers align to 4 bytes, but on a pentium it
+     * is important to align doubles to 8 byte boundaries (for speed), and
+     * the 4 floats in a SIMD register to 16 byte boundaries. many other
+     * platforms have similar behavior. setting a larger alignment can waste
+     * a (very) small amount of memory. NOTE: this number must be a power of
+     * two. this is set to 16 by default.
+     */
     public static final int EFFICIENT_ALIGNMENT = 16;
-    
+
+    /* ********************************************************************************************************* */
+    /* ************************* TZ: This has been move here from Common because it is mostly required here **** */
+    /* ********************************************************************************************************* */
+
 //  #define dEFFICIENT_SIZE(x) (((x)+(EFFICIENT_ALIGNMENT-1)) & ~((size_t)(EFFICIENT_ALIGNMENT-1)))
-    static final int dEFFICIENT_SIZE(int x) {
+    static int dEFFICIENT_SIZE(int x) {
         return x;
         //return (((x)+(EFFICIENT_ALIGNMENT-1)) & ~((int)(EFFICIENT_ALIGNMENT-1)));
     }
 //  #define dEFFICIENT_PTR(p) ((void *)dEFFICIENT_SIZE((size_t)(p)))
-    static final BlockPointer dEFFICIENT_PTR(BlockPointer p) {
+    static BlockPointer dEFFICIENT_PTR(BlockPointer p) {
     	//return new BlockPointer(dEFFICIENT_SIZE(p.toInt()));
     	//TZ reallocation not possible --> just return it
     	return p;
     }
-    static final BlockPointer dEFFICIENT_PTR(DxWorldProcessMemArena obj, int i) {
+    static BlockPointer dEFFICIENT_PTR(DxWorldProcessMemArena obj, int i) {
         //System.out.println("dEFFICIENT_PTR(Object obj, int i)");
     	//TODO arghhh!!!
     	//return NULL_BP;
         return new BlockPointer(obj, i);
     }
 //  #define dOFFSET_EFFICIENTLY(p, b) ((void *)((size_t)(p) + dEFFICIENT_SIZE(b)))
-    static final BlockPointer dOFFSET_EFFICIENTLY(BlockPointer p, int b) {
+    static BlockPointer dOFFSET_EFFICIENTLY(BlockPointer p, int b) {
         //return new BlockPointer((p.toInt() + dEFFICIENT_SIZE(b)));
     	//TZ reallocation not possible --> just return it
     	return p;
     }
 
+
+    // #define dOVERALIGNED_SIZE(size, alignment) dEFFICIENT_SIZE((size) + ((alignment) - EFFICIENT_ALIGNMENT))
+    //int dOVERALIGNED_SIZE(int size, int alignment) { return dEFFICIENT_SIZE(size + (alignment - EFFICIENT_ALIGNMENT)); }
+    // #define dOVERALIGNED_PTR(buf_ptr, alignment) ((void *)(((uintptr_t)(buf_ptr) + ((alignment) - 1)) & (int)(~(alignment - 1)))) // Casting the mask to int ensures sign-extension to larger integer sizes
+    // #define dOFFSET_OVERALIGNEDLY(buf_ptr, size, alignment) ((void *)((uintptr_t)(buf_ptr) + dOVERALIGNED_SIZE(size, alignment)))
+
+
     /* alloca aligned to the EFFICIENT_ALIGNMENT. note that this can waste
      * up to 15 bytes per allocation, depending on what alloca() returns.
      */
     //#define dALLOCA16(n) dEFFICIENT_PTR(alloca((n)+(EFFICIENT_ALIGNMENT)))
-
-
-//    #ifndef SIZE_MAX
-//    #define SIZE_MAX  ((size_t)(-1))
-//    #endif
-    static final int SIZE_MAX = Integer.MAX_VALUE; //TODO correct?
 
     //typedef void *(*alloc_block_fn_t)(size_t block_size);
     public interface alloc_block_fn_t {
@@ -149,5 +149,5 @@ public class DxUtil {
         }
     }
 
-    
+    private DxUtil() {}
 }

@@ -267,7 +267,7 @@ public class DemoKinematic extends dsFunctions {
 	    
 	    dsSimulationLoop (args, 640, 480, this);
 	    
-	    //OdeHelper.closeODE();
+	    OdeHelper.closeODE();
 	}
 
 	@Override
@@ -283,7 +283,6 @@ public class DemoKinematic extends dsFunctions {
 	@Override
 	public void stop() {
 		// Nothing
-		OdeHelper.closeODE();
 	}
 
 }

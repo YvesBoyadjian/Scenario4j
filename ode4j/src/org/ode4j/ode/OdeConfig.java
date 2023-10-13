@@ -32,6 +32,7 @@ package org.ode4j.ode;
  */
 public class OdeConfig {
 
+	public static boolean dDEBUG = Boolean.parseBoolean(System.getProperty("dDEBUG", "false"));
 	private static final boolean dDOUBLE = true;
 	private static boolean dLIBCCD = true;
 	
@@ -46,11 +47,13 @@ public class OdeConfig {
 	 * 
 	 * WARNING This is likely to be removed at some point.
 	 */
-	public static boolean ENABLE_CONTACT_SORTING = true;
+	// TODO TZ remove with 0.6.0 (deprecated in 0.5.0)
+	@Deprecated() // This is deprecated. THe underlying issue has been resolved, see issue #22.
+	public static boolean ENABLE_CONTACT_SORTING = false;
 	
-	public static enum TRIMESH {
+	public enum TRIMESH {
 		DISABLED,
-		GIMPACT;
+		GIMPACT
 	}
 	
 	
@@ -167,4 +170,6 @@ public class OdeConfig {
 //  #endif
 //#endif
 
+	@Deprecated // Make this "private" in 0.6.0
+	protected OdeConfig() {}
 }

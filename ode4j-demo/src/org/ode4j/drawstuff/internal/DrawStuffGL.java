@@ -36,9 +36,11 @@ import java.nio.IntBuffer;
 
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
-import org.lwjglx.util.glu.GLU;
+import org.lwjgl.opengl.GL30;
 import org.ode4j.drawstuff.DrawStuff.dsFunctions;
+import org.ode4j.math.DMatrix3;
 import org.ode4j.math.DMatrix3C;
+import org.ode4j.math.DVector3;
 import org.ode4j.math.DVector3C;
 
 import static org.ode4j.drawstuff.DrawStuff.*;
@@ -301,15 +303,23 @@ public class DrawStuffGL extends LwJGL implements DrawStuffApi {
 			GL11.glPixelStorei (GL11.GL_UNPACK_SKIP_ROWS, 0);
 			GL11.glPixelStorei (GL11.GL_UNPACK_SKIP_PIXELS, 0);
 
+			//GL11.glTexStorage2D(GL_TEXTURE_2D, 1, GL_RGBA8, width, height);
+			//GL11.glTexSubImage2D(GL11.GL_TEXTURE_2D, 0​, 0, 0, image.width(), image.height(), GL11.GL_BGRA, GL11.GL_UNSIGNED_BYTE, image.data());
+
 //			glTexImage2D (GL11.GL_TEXTURE_2D, 0, 3, image->width(), image->height(), 0,
 //					   GL_RGB, GL_UNSIGNED_BYTE, image->data());
-//			GL11.glTexImage2D (GL11.GL_TEXTURE_2D, 0, 3, image.width(), image.height(), 0,
-//					GL11.GL_RGB, GL11.GL_UNSIGNED_BYTE, ByteBuffer.wrap(image.data()));
+			// TODO CHECK-TZ
+			// GL11.GL_RGBA8
+			GL11.glTexImage2D (GL11.GL_TEXTURE_2D, 0, 3, image.width(), image.height(), 0,
+					GL11.GL_RGB, GL11.GL_UNSIGNED_BYTE, image.data());//ByteBuffer.wrap(image.data().array()));
 			//TZ this is the original:
 //			GLX.gluBuild2DMipmaps (GL11.GL_TEXTURE_2D, 3, image.width(), image.height(),
 //			GL11.GL_RGB, GL11.GL_UNSIGNED_BYTE, image.data());
-			GLU.gluBuild2DMipmaps (GL11.GL_TEXTURE_2D, 3, image.width(), image.height(),
-			GL11.GL_RGB, GL11.GL_UNSIGNED_BYTE, image.data());
+//			GLU.gluBuild2DMipmaps (GL11.GL_TEXTURE_2D, 3, image.width(), image.height(),
+//			GL11.GL_RGB, GL11.GL_UNSIGNED_BYTE, image.data());
+			// TZ Please comment this out if it doesn´t work for you.
+			//  The demos will still work, albeit without textures.
+			GL30.glGenerateMipmap(GL30.GL_TEXTURE_2D);
 			
 			// set texture parameters - will these also be bound to the texture???
 			GL11.glTexParameterf (GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_S, GL11.GL_REPEAT);
@@ -328,13 +338,13 @@ public class DrawStuffGL extends LwJGL implements DrawStuffApi {
 		//  delete image;
 		//  glDeleteTextures (1,&name);
 		//}
-		@Override
-		protected void finalize() throws Throwable {
-			image = null;
-//			GL11.glDeleteTextures (1, name));
-			GL11.glDeleteTextures (IntBuffer.wrap(new int[]{name}));
-			super.finalize();
-		}
+		//		@Override
+		//		protected void finalize() throws Throwable {
+		//			image = null;
+		////			GL11.glDeleteTextures (1, name));
+		//			GL11.glDeleteTextures (IntBuffer.wrap(new int[]{name}));
+		//			super.finalize();
+		//		}
 
 		public void bind (boolean modulate)
 		{
@@ -1069,8 +1079,6 @@ public class DrawStuffGL extends LwJGL implements DrawStuffApi {
 	@Override
 	void dsStopGraphics()
 	{
-		current_state = 0;
-
 //		delete sky_texture;
 //		delete ground_texture;
 //		delete wood_texture;
@@ -1464,6 +1472,8 @@ public class DrawStuffGL extends LwJGL implements DrawStuffApi {
 
 		initMotionModel();
 		dsPlatformSimLoop (window_width,window_height,fn,initial_pause);
+
+		current_state = 0;
 	}
 
 
@@ -1701,7 +1711,22 @@ public class DrawStuffGL extends LwJGL implements DrawStuffApi {
 		GL11.glPopMatrix();
 	}
 
-	
+	//	extern "C" void dsDrawTriangles (const float pos[3], const float R[12],
+//				const float *v, int n, int solid)
+	@Override
+	public void dsDrawTriangles(final float[] pos, final float[] R,
+								final float[][] v, boolean solid) {
+		if (current_state != 2) dsError("drawing function called outside simulation loop");
+		setupDrawingMode();
+		GL11.glShadeModel(GL11.GL_FLAT);
+		setTransform(pos, R);
+		int n = v.length / 3;
+		for (int i = 0; i < n; ++i) {
+			drawTriangle(v[3 * i], v[3 * i + 1], v[3 * i + 2], solid);
+		}
+		GL11.glPopMatrix();
+	}
+
 	//extern "C" 
 //	void dsDrawCylinder (final float pos[3], final float R[12],
 //			float length, float radius)
@@ -1868,6 +1893,25 @@ public class DrawStuffGL extends LwJGL implements DrawStuffApi {
 		GL11.glShadeModel (GL11.GL_FLAT);
 		setTransform (pos,R);
 		drawTriangle (v0, v1, v2, solid);
+		GL11.glPopMatrix();
+	}
+
+	//	extern "C" void dsDrawTrianglesD (const double pos[3], const double R[12],
+//				const double *v, int n, int solid)
+	public void dsDrawTriangles(final DVector3C pos, final DMatrix3C R,
+								final DVector3C[] v, boolean solid) {
+		int i;
+		DVector3C pos2 = new DVector3(pos);
+		DMatrix3C R2 = new DMatrix3(R);
+//		for (i=0; i<3; i++) pos2[i]=(float)pos[i];
+//		for (i=0; i<12; i++) R2[i]=(float)R[i];
+
+		if (current_state != 2) dsError("drawing function called outside simulation loop");
+		setupDrawingMode();
+		GL11.glShadeModel(GL11.GL_FLAT);
+		setTransform(pos2, R2);
+		for (i = 0; i < v.length; ++i)
+			drawTriangle(v[3 * i], v[3 * i + 1], v[3 * i + 2], solid);
 		GL11.glPopMatrix();
 	}
 

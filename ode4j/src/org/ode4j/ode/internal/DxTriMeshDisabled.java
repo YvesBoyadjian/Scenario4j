@@ -26,19 +26,27 @@ package org.ode4j.ode.internal;
 
 import org.ode4j.math.DVector3;
 import org.ode4j.ode.DGeom;
-import org.ode4j.ode.DTriMesh;
 import org.ode4j.ode.DTriMeshData;
+import org.ode4j.ode.internal.gimpact.GimGeometry;
+import org.ode4j.ode.internal.trimesh.DxTriMesh;
+import org.ode4j.ode.internal.trimesh.DxTriMeshData;
 
-class DxTriMeshDisabled extends DxTriMesh {
+public class DxTriMeshDisabled extends DxTriMesh {
 
-	static class dxTriMeshDisabledData extends DxTriMeshData {
+	public static class dxTriMeshDisabledData extends DxTriMeshData {
+		public dxTriMeshDisabledData() {}
 		@Override
-		public void preprocess() {
-			throw new UnsupportedOperationException();
+		public boolean preprocess() {
+			return true;
 		}
 
 		@Override
-		void UpdateData() {
+		public void update() {
+
+		}
+
+		@Override
+		public void updateData() {
 			throw new UnsupportedOperationException();
 		}
 
@@ -69,6 +77,11 @@ class DxTriMeshDisabled extends DxTriMesh {
 		}
 
 		@Override
+		public boolean preprocess2(int buildRequestFlags, long[] requestExtraData) {
+			return true;
+		}
+
+		@Override
 		public void build(float[] Vertices, int[] Indices) {
 			//dGeomTriMeshDataBuildSingle(Vertices, Indices);
 		}
@@ -82,7 +95,7 @@ class DxTriMeshDisabled extends DxTriMesh {
 	//dxTriMesh::dxTriMesh(dSpaceID Space, dTriMeshDataID Data) : dxGeom(Space, 1){ type = dTriMeshClass; }
 	public DxTriMeshDisabled(DxSpace space, DxTriMeshData data) //: dxGeom(Space, 1)
 	{ 
-		super(space);
+		super(space, data, null, null, null);
 		type = dTriMeshClass;
 	}
 	//dxTriMesh::~dxTriMesh(){}
@@ -94,7 +107,7 @@ class DxTriMeshDisabled extends DxTriMesh {
 
 	//void dxTriMesh::computeAABB() { dSetZero (aabb,6); }
 	@Override
-	void computeAABB() {
+    protected void computeAABB() {
 		_aabb.setZero();
 	}
 
@@ -110,8 +123,8 @@ class DxTriMeshDisabled extends DxTriMesh {
 	DTriMeshData dGeomTriMeshDataCreate() { return null; }
 	void dGeomTriMeshDataDestroy() {}
 
-	public void dGeomTriMeshDataSet(DTriMeshData g, int data_id, Object in_data) {}
-	public Object dGeomTriMeshDataGet(DTriMeshData g, int data_id) { return null; }
+	//	public void dGeomTriMeshDataSet(DTriMeshData g, int data_id, Object in_data) {}
+	//	public Object dGeomTriMeshDataGet(DTriMeshData g, int data_id) { return null; }
 
 	//ODE_API 
 	//void dGeomTriMeshSetLastTransform( DGeom g, DMatrix4 last_trans ) {}
@@ -119,14 +132,20 @@ class DxTriMeshDisabled extends DxTriMesh {
 	//dReal* dGeomTriMeshGetLastTransform( dGeom g ) { return identity; }
 	//DMatrix4 dGeomTriMeshGetLastTransform( DGeom g ) { return null; } //TZ TODO?: return identity; }
 
-	void dGeomTriMeshSetData(DGeom g, DTriMeshData Data) {}
-	DTriMeshData dGeomTriMeshGetData(DGeom g) { return null; }
+	@Override
+	//void dGeomTriMeshSetData(DGeom g, DTriMeshData Data) {}
+	public void setTrimeshData(DTriMeshData Data) {}
+	@Override
+	//DTriMeshData dGeomTriMeshGetData(DGeom g) { return null; }
+	public DTriMeshData getTrimeshData() { return null; }
 
 
 	void dGeomTriMeshSetCallback(DGeom g, DTriCallback Callback) { }
 	DTriCallback dGeomTriMeshGetCallback(DGeom g) { return null; }
 
+	@Deprecated
 	void dGeomTriMeshSetArrayCallback(DGeom g, DTriArrayCallback ArrayCallback) { }
+	@Deprecated
 	DTriArrayCallback dGeomTriMeshGetArrayCallback(DGeom g) { return null; }
 
 	void dGeomTriMeshSetRayCallback(DGeom g, DTriRayCallback Callback) { }
@@ -139,26 +158,10 @@ class DxTriMeshDisabled extends DxTriMesh {
 
 	DTriMeshData dGeomTriMeshGetTriMeshDataID(DGeom g) { return null; }
 
+	public void dGeomTriMeshGetTriangle(int Index, DVector3 v0, DVector3 v1, DVector3 v2) {}
+
 	int dGeomTriMeshGetTriangleCount (DGeom g) { return 0; }
 	void dGeomTriMeshDataUpdate(DTriMeshData g) {}
-
-	@Override
-	void ClearTCCache() {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void FetchTransformedTriangle(int i, DVector3[] v) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public int FetchTriangleCount() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
 
 	@Override
 	public void enableTC(Class<? extends DGeom> cls, boolean b) {
@@ -172,9 +175,24 @@ class DxTriMeshDisabled extends DxTriMesh {
 	}
 
 	@Override
-	public void clearTCCache(DTriMesh g) {
+	public void clearTCCache() {
 		// TODO Auto-generated method stub
 		
+	}
+
+	@Override
+	public DTriMeshData getTriMeshData() {
+		return null;
+	}
+
+	@Override
+	public void getTriangle(int Index, DVector3 v0, DVector3 v1, DVector3 v2) {
+
+	}
+
+	@Override
+	public int getTriangleCount() {
+		return 0;
 	}
 
 	@Override
@@ -195,5 +213,10 @@ class DxTriMeshDisabled extends DxTriMesh {
 	}
 
 	//#endif // !dTRIMESH_ENABLED
+
+	@Override
+	protected void MakeMatrix(GimGeometry.mat4f transform) {
+		CollisionTrimeshGimpact.MakeMatrix(this, transform);
+	}
 }
 

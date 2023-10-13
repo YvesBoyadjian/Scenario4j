@@ -32,6 +32,8 @@ import org.ode4j.math.DVector3;
 import org.ode4j.math.DVector3C;
 import org.ode4j.ode.OdeMath;
 
+import static org.ode4j.ode.internal.Common.*;
+
 
 /**
  * Quaternions have the format: (s,vx,vy,vz) where (vx,vy,vz) is the
@@ -109,9 +111,7 @@ public class Rotation extends Matrix {
 	 * @param bx bx
 	 * @param by by
 	 * @param bz bz
-	 * @deprecated (TZ) 
 	 */
-	@Deprecated
     public static void dRFrom2Axes (DMatrix3 R, double ax, double ay, double az,
                                     double bx, double by, double bz)
 	{
@@ -427,4 +427,6 @@ public class Rotation extends Matrix {
 		dq.set(2, 0.5*(- w.get0()*q.get3() + w.get1()*q.get0() + w.get2()*q.get1()) );
 		dq.set(3, 0.5*(  w.get0()*q.get2() - w.get1()*q.get1() + w.get2()*q.get0()) );
 	}
+
+	private Rotation() {}
 }

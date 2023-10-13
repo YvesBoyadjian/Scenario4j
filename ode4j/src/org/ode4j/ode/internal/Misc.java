@@ -34,6 +34,8 @@ import org.ode4j.math.DVector3;
 import org.ode4j.math.DVector3C;
 import org.ode4j.ode.internal.cpp4j.FILE;
 
+import static org.ode4j.ode.internal.Common.dFabs;
+import static org.ode4j.ode.internal.Common.dPAD;
 import static org.ode4j.ode.internal.cpp4j.Cstdio.*;
 
 
@@ -41,7 +43,7 @@ import static org.ode4j.ode.internal.cpp4j.Cstdio.*;
 /** ****************************************************************************
  * random numbers
  */
-public class Misc extends Common {
+public class Misc {
 
 	//	static unsigned long seed = 0;  //32bit unsigned
 	private static final AtomicLong seed = new AtomicLong(0);
@@ -116,7 +118,6 @@ public class Misc extends Common {
 	 * as n approaches 2^32.
 	 * <p>
 	 *  adam's all-int straightforward(?) dRandInt (0..n-1)
-	 * TODO TZ Check whether this is ported correctly from unsigned long.
 	 * @param n max value
 	 * @return random value
 	 */

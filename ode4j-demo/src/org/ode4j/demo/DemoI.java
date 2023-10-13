@@ -87,8 +87,8 @@ class DemoI extends dsFunctions {
 	{
 		double pmi, q0, q1, q2;
 		m.setZero ();
-		DVector3 C = m.getC().clone();
-		DMatrix3 I = m.getI().clone();
+		DVector3 C = m.getC().copy();
+		DMatrix3 I = m.getI().copy();
 		for (int i=0; i<NUM; i++) {
 			pmi = pm.get(i);
 			m.setMass(m.getMass() + pmi);// += pmi;
@@ -170,7 +170,7 @@ class DemoI extends dsFunctions {
 		computeMassParams (m,q,pm);
 		m.setMass( m.getMass() + anchor_m.getMass()); //+= anchor_m._mass;
 		//for (i=0; i<12; i++) m.I.v[i] = m.I.v[i] + anchor_m.I.v[i];
-		m.setI( m.getI().clone().add(anchor_m.getI()) );
+		m.setI( m.getI().copy().add(anchor_m.getI()) );
 		test_body.setMass (m);
 
 		// rotate the test and anchor bodies by a random amount
@@ -239,11 +239,11 @@ class DemoI extends dsFunctions {
 	
 	private void demo(String[] args) {
 		OdeHelper.initODE2(0);
-		dRandSetSeed (System.currentTimeMillis());
+		dRandSetSeed (0); // System.currentTimeMillis());
 		reset_test();
 
 		// run simulation
-		dsSimulationLoop (args,352,288,this);
+		dsSimulationLoop (args,640,480,this);
 
 		world.destroy ();
 		OdeHelper.closeODE();

@@ -29,7 +29,6 @@ import static org.ode4j.drawstuff.DrawStuff.dsSetColor;
 import static org.ode4j.drawstuff.DrawStuff.dsSimulationLoop;
 import static org.ode4j.ode.DRotation.dRFromAxisAndAngle;
 import static org.ode4j.ode.OdeConstants.dContactApprox1;
-import static org.ode4j.ode.internal.Common.M_PI;
 
 import java.util.ArrayList;
 
@@ -37,16 +36,7 @@ import org.ode4j.drawstuff.DrawStuff.dsFunctions;
 import org.ode4j.math.DMatrix3;
 import org.ode4j.math.DVector3;
 import org.ode4j.math.DVector3C;
-import org.ode4j.ode.DBody;
-import org.ode4j.ode.DContactBuffer;
-import org.ode4j.ode.DGeom;
-import org.ode4j.ode.DGeom.DNearCallback;
-import org.ode4j.ode.DJoint;
-import org.ode4j.ode.DJointGroup;
-import org.ode4j.ode.DMass;
-import org.ode4j.ode.DSpace;
-import org.ode4j.ode.DWorld;
-import org.ode4j.ode.OdeHelper;
+import org.ode4j.ode.*;
 
 
 /**
@@ -91,10 +81,10 @@ public class DemoCards extends dsFunctions {
 		{
 			dsDrawBox(body.getPosition(), body.getRotation(), sides);
 		}
-	};
+	}
 
 
-	private final ArrayList<Card> cards = new ArrayList<Card>();
+	private final ArrayList<Card> cards = new ArrayList<>();
 
 	private int getncards(int levels)
 	{
@@ -119,11 +109,11 @@ public class DemoCards extends dsFunctions {
 		// for each level
 		int c = 0;
 		DMatrix3 right = new DMatrix3(), left = new DMatrix3(), hrot = new DMatrix3();
-		double angle = 20*M_PI/180.;
+		double angle = 20*OdeMath.M_PI/180.;
 		dRFromAxisAndAngle(right, 1, 0, 0, -angle);
 		dRFromAxisAndAngle(left, 1, 0, 0, angle);
 
-		dRFromAxisAndAngle(hrot, 1, 0, 0, 91*M_PI/180.);
+		dRFromAxisAndAngle(hrot, 1, 0, 0, 91* OdeMath.M_PI/180.);
 
 		double eps = 0.05;
 		double vstep = Math.cos(angle)*clength + eps;
@@ -171,13 +161,6 @@ public class DemoCards extends dsFunctions {
 		System.out.println("   =     - one more level");
 	}
 
-	private static DNearCallback nearCallback = new DNearCallback() {
-		@Override
-		public void call(Object data, DGeom o1, DGeom o2) {
-			nearCallback(data, o1, o2);
-		}
-	};
-	
 	private static void nearCallback (Object data, DGeom o1, DGeom o2)
 	{
 		// exit without doing anything if the two bodies are connected by a joint
@@ -203,7 +186,7 @@ public class DemoCards extends dsFunctions {
 	public void step(boolean pause)
 	{
 		if (!pause) {
-			space.collide(null, nearCallback);
+			space.collide(null, DemoCards::nearCallback);
 			world.quickStep(0.01);
 			contactgroup.empty();
 		}

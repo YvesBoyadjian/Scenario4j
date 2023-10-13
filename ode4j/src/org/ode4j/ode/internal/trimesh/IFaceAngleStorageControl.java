@@ -1,5 +1,7 @@
 /*************************************************************************
  *                                                                       *
+ * Open Dynamics Engine, Copyright (C) 2001,2002 Russell L. Smith.       *
+ * All rights reserved.  Email: russ@q12.org   Web: www.q12.org          *
  * Open Dynamics Engine 4J, Copyright (C) 2009-2014 Tilmann Zaeschke     *
  * All rights reserved.  Email: ode4j@gmx.de   Web: www.ode4j.org        *
  *                                                                       *
@@ -11,49 +13,33 @@
  *       General Public License is included with this library in the     *
  *       file LICENSE.TXT.                                               *
  *   (2) The BSD-style license that is included with this library in     *
- *       the file ODE4J-LICENSE-BSD.TXT.                                 *
+ *       the file ODE-LICENSE-BSD.TXT and ODE4J-LICENSE-BSD.TXT.         *
  *                                                                       *
  * This library is distributed in the hope that it will be useful,       *
  * but WITHOUT ANY WARRANTY; without even the implied warranty of        *
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the files    *
- * LICENSE.TXT and ODE4J-LICENSE-BSD.TXT for more details.               *
+ * LICENSE.TXT, ODE-LICENSE-BSD.TXT and ODE4J-LICENSE-BSD.TXT for more   *
+ * details.                                                              *
  *                                                                       *
  *************************************************************************/
-package org.ode4j.ode.internal.cpp4j;
+package org.ode4j.ode.internal.trimesh;
 
-/**
- * Emulator for stdio.
- *
- * @author Tilmann Zaeschke
- */
-public class Cstdarg extends Cstdio {
+interface IFaceAngleStorageControl {
+    //    class IFaceAngleStorageControl
+    //    {
+    //        public:
+    //        virtual void disposeStorage() = 0;
+    //
+    //        virtual bool areNegativeAnglesStored() const = 0;
+    //
+    //        // This is to store angles between neighbor triangle normals as positive value for convex and negative for concave edges
+    //        virtual void assignFacesAngleIntoStorage(unsigned triangleIndex, dMeshTriangleVertex vertexIndex, dReal dAngleValue) = 0;
+    //    };
+    //
 
-	/**
-	 */
-	public static class va_list {
-		final Object[] l;
-		/**
-		 * @param varArgsOfCallingMethod args
-		 */
-		public va_list(Object[] varArgsOfCallingMethod) {
-			l = varArgsOfCallingMethod;
-		}
-	}
-	
-	/**
-	 * This method does nothing.
-	 * @param ap args
-	 * @param argToStartAfter_isIgnored ...
-	 */
-	public static void va_start(va_list ap, Object argToStartAfter_isIgnored ) {
-		
-	}
-	
-	/**
-	 * This method does nothing.
-	 * @param ap ap
-	 */
-	public static void va_end(va_list ap) {
-		
-	}
+    void disposeStorage();
+    boolean areNegativeAnglesStored();
+
+    // This is to store angles between neighbor triangle normals as positive value for convex and negative for concave edges
+    void assignFacesAngleIntoStorage(int triangleIndex, int vertexIndex, double dAngleValue);
 }

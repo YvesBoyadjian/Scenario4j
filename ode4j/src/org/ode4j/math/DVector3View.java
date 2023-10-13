@@ -30,13 +30,11 @@ public abstract class DVector3View implements DVector3I {
 	public abstract double get2();
 	@Override
 	public abstract double get(int i);
-	@Override
 	public abstract void set0(double d);
-	@Override
 	public abstract void set1(double d);
-	@Override
 	public abstract void set2(double d);
 
+	protected DVector3View() {}
 	public final double length() {
 		return Math.sqrt(get0()*get0() + get1()*get1() + get2()*get2());
 	}
@@ -57,6 +55,22 @@ public abstract class DVector3View implements DVector3I {
 		set2( z );
 	}
 
+	public final void set(int idx, double d) {
+		switch (idx) {
+			case 0:
+				set0(d);
+				break;
+			case 1:
+				set1(d);
+				break;
+			case 2:
+				set2(d);
+				break;
+			default:
+				throw new IllegalStateException();
+		}
+	}
+
 	public final void scale(double s) {
 		set0( get0() * s );
 		set1( get1() * s );
@@ -74,6 +88,7 @@ public abstract class DVector3View implements DVector3I {
 	
 	
 	@Override
+	@Deprecated // float is generally not comparable. To be removed in 0.6.0. TODO deprecated
 	public boolean equals(Object obj) {
 		if (this == obj) return true;
 		if (obj == null) return false;
@@ -83,6 +98,7 @@ public abstract class DVector3View implements DVector3I {
 	}
 	
 	@Override
+	@Deprecated // float is generally not comparable. To be removed in 0.6.0. TODO deprecated
 	public int hashCode() {
 		return (int) (Double.doubleToRawLongBits(get0())  * 
 		Double.doubleToRawLongBits(get1()) * 

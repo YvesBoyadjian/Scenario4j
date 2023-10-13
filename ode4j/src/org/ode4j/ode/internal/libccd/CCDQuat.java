@@ -24,6 +24,7 @@ public class CCDQuat {
 	public static class ccd_quat_t {
 		//TZ: fields are much faster than arrays.
 	    double q0, q1, q2, q3; //!< x, y, z, w
+		public ccd_quat_t() {}
 	    public void set(double x, double y, double z, double w) {
 	    	q0 = x;
 	    	q1 = y;
@@ -46,7 +47,7 @@ public class CCDQuat {
 
 
 	/**** INLINES ****/
-	static final double ccdQuatLen2(final ccd_quat_t q)
+	static double ccdQuatLen2(final ccd_quat_t q)
 	{
 	    double len;
 
@@ -58,12 +59,12 @@ public class CCDQuat {
 	    return len;
 	}
 
-	static final double ccdQuatLen(final ccd_quat_t q)
+	static double ccdQuatLen(final ccd_quat_t q)
 	{
 	    return CCD_SQRT(ccdQuatLen2(q));
 	}
 
-	public static final void ccdQuatSet(ccd_quat_t q, double x, double y, double z, double w)
+	public static void ccdQuatSet(ccd_quat_t q, double x, double y, double z, double w)
 	{
 	    q.q0 = x;
 	    q.q1 = y;
@@ -71,7 +72,7 @@ public class CCDQuat {
 	    q.q3 = w;
 	}
 
-	static final void ccdQuatCopy(ccd_quat_t dest, final ccd_quat_t src)
+	static void ccdQuatCopy(ccd_quat_t dest, final ccd_quat_t src)
 	{
 		//*dest = *src;
 	    dest.q0 = src.q0;
@@ -81,7 +82,7 @@ public class CCDQuat {
 	}
 
 
-	static final int ccdQuatNormalize(ccd_quat_t q)
+	static int ccdQuatNormalize(ccd_quat_t q)
 	{
 	    double len = ccdQuatLen(q);
 	    if (len < CCD_EPS)
@@ -91,8 +92,8 @@ public class CCDQuat {
 	    return 1;
 	}
 
-	public static final void ccdQuatSetAngleAxis(ccd_quat_t q,
-	                                     double angle, final ccd_vec3_t axis)
+	public static void ccdQuatSetAngleAxis(ccd_quat_t q,
+										   double angle, final ccd_vec3_t axis)
 	{
 	    double a, x, y, z, n, s;
 
@@ -119,7 +120,7 @@ public class CCDQuat {
 	}
 
 
-	static final void ccdQuatScale(ccd_quat_t q, double k)
+	static void ccdQuatScale(ccd_quat_t q, double k)
 	{
 		q.q0 *= k;
 		q.q1 *= k;
@@ -133,7 +134,7 @@ public class CCDQuat {
 	 * @param q q
 	 * @param q2 q2
 	 */
-	public static final void ccdQuatMul(ccd_quat_t q, final ccd_quat_t q2)
+	public static void ccdQuatMul(ccd_quat_t q, final ccd_quat_t q2)
 	{
 	    ccd_quat_t a = new ccd_quat_t();
 	    ccdQuatCopy(a, q);
@@ -143,8 +144,8 @@ public class CCDQuat {
 	/**
 	 * q = a * b
 	 */
-	static final void ccdQuatMul2(ccd_quat_t q,
-	                             final ccd_quat_t a, final ccd_quat_t b)
+	static void ccdQuatMul2(ccd_quat_t q,
+							final ccd_quat_t a, final ccd_quat_t b)
 	{
 	    q.q0 = a.q3 * b.q0
 	                + a.q0 * b.q3
@@ -169,7 +170,7 @@ public class CCDQuat {
 	 * Inverts quaternion.
 	 * Returns 0 on success.
 	 */
-	static final int ccdQuatInvert(ccd_quat_t q)
+	static int ccdQuatInvert(ccd_quat_t q)
 	{
 	    double len2 = ccdQuatLen2(q);
 	    if (len2 < CCD_EPS)
@@ -191,7 +192,7 @@ public class CCDQuat {
 	 * @param src src
 	 * @return 0 on success.
 	 */
-	public static final int ccdQuatInvert2(ccd_quat_t dest, final ccd_quat_t src)
+	public static int ccdQuatInvert2(ccd_quat_t dest, final ccd_quat_t src)
 	{
 	    ccdQuatCopy(dest, src);
 	    return ccdQuatInvert(dest);
@@ -202,26 +203,31 @@ public class CCDQuat {
 	 * @param v v
 	 * @param q q
 	 */
-	public static final void ccdQuatRotVec(ccd_vec3_t v, final ccd_quat_t q)
-	{
+	public static void ccdQuatRotVec(ccd_vec3_t v, final ccd_quat_t q) {
 		// original version: 31 mul + 21 add
 		// optimized version: 18 mul + 12 add
 		// formula: v = v + 2 * cross(q.xyz, cross(q.xyz, v) + q.w * v)
-	    double x = q.q0;
-	    double y = q.q1;
-	    double z = q.q2;
-	    double w = q.q3;
-	    double vx = ccdVec3X(v);
-	    double vy = ccdVec3Y(v);
-	    double vz = ccdVec3Z(v);
-	    double cross1_x = y * vz - z * vy + w * vx;
-	    double cross1_y = z * vx - x * vz + w * vy;
-	    double cross1_z = x * vy - y * vx + w * vz;
-	    double cross2_x = y * cross1_z - z * cross1_y;
-	    double cross2_y = z * cross1_x - x * cross1_z;
-	    double cross2_z = x * cross1_y - y * cross1_x;
-        ccdVec3Set(v, vx + 2 * cross2_x, vy + 2 * cross2_y, vz + 2 * cross2_z);
+		double cross1_x, cross1_y, cross1_z, cross2_x, cross2_y, cross2_z;
+		double x, y, z, w;
+		double vx, vy, vz;
+
+		vx = ccdVec3X(v);
+		vy = ccdVec3Y(v);
+		vz = ccdVec3Z(v);
+
+		w = q.q3;
+		x = q.q0;
+		y = q.q1;
+		z = q.q2;
+
+		cross1_x = y * vz - z * vy + w * vx;
+		cross1_y = z * vx - x * vz + w * vy;
+		cross1_z = x * vy - y * vx + w * vz;
+		cross2_x = y * cross1_z - z * cross1_y;
+		cross2_y = z * cross1_x - x * cross1_z;
+		cross2_z = x * cross1_y - y * cross1_x;
+		ccdVec3Set(v, vx + 2 * cross2_x, vy + 2 * cross2_y, vz + 2 * cross2_z);
 	}
 
-
+	private CCDQuat() {}
 }

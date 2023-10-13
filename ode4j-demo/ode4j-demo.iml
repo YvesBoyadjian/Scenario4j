@@ -14,5 +14,6 @@
     <orderEntry type="module" module-name="lwjgl3-awt" />
     <orderEntry type="module" module-name="vk-bootstrap" />
     <orderEntry type="module" module-name="lwjgl-opengl" />
+    <orderEntry type="library" name="Maven: org.lwjgl:lwjgl-glfw:3.3.2" level="project" />
   </component>
 </module>

@@ -24,16 +24,10 @@
  *************************************************************************/
 package org.ode4j.ode.internal;
 
-import java.util.Arrays;
-import java.util.Comparator;
-
 import org.ode4j.math.DVector4;
 import org.ode4j.ode.DColliderFn;
-import org.ode4j.ode.DContactGeom;
 import org.ode4j.ode.DContactGeomBuffer;
 import org.ode4j.ode.DGeom;
-import org.ode4j.ode.OdeConfig;
-import org.ode4j.ode.internal.cpp4j.java.ObjArray;
 import org.ode4j.ode.internal.gimpact.GimDynArray;
 import org.ode4j.ode.internal.gimpact.GimTrimesh;
 import org.ode4j.ode.internal.gimpact.GimGeometry.vec4f;
@@ -42,7 +36,7 @@ import org.ode4j.ode.internal.gimpact.GimGeometry.vec4f;
  * 	TriMesh - Plane collider by David Walters, July 2006
  *  Ported to Java by Tilmann Zaeschke
  */
-public class CollideTrimeshPlane implements DColliderFn {
+class CollideTrimeshPlane implements DColliderFn {
 
 
 	//	#include <ode/collision.h>
@@ -188,7 +182,7 @@ public class CollideTrimeshPlane implements DColliderFn {
 
 		GimDynArray<vec4f> collision_result = GimTrimesh.GIM_CREATE_TRIMESHPLANE_CONTACTS();
 
-		DxGimpactCollision.gim_trimesh_plane_collisionODE(trimesh.m_collision_trimesh, plane, collision_result);
+		CollisionTrimeshGimpact.gim_trimesh_plane_collisionODE(trimesh.m_collision_trimesh(), plane, collision_result);
 
 		if(collision_result.size() == 0 )
 		{
@@ -197,48 +191,11 @@ public class CollideTrimeshPlane implements DColliderFn {
 		}
 
 
+		vec4f[] planecontact_results = collision_result.GIM_DYNARRAY_POINTER();
 		int contactcount = collision_result.size();
-		int contactmax = (flags & DxGeom.NUMC_MASK);
-		if (contactcount > contactmax)
-		{
-			if (OdeConfig.ENABLE_CONTACT_SORTING) {
-				Arrays.sort((Object[])collision_result.GIM_DYNARRAY_POINTER(), 0, contactcount, new Comparator<Object>() {
-					@Override
-					public int compare(Object o1, Object o2) {
-						return Float.compare(((vec4f) o2).f[3], ((vec4f) o1).f[3]);
-					}
-				});
-			}
-			contactcount = contactmax;
-		}
 
-		DContactGeom pcontact;
-		ObjArray<vec4f> planecontact_results = collision_result.GIM_DYNARRAY_POINTER_V();
-
-		for(int i = 0; i < contactcount; i++ )
-		{
-			pcontact = contacts.getSafe(flags, i);//SAFECONTACT(flags, contacts, i, skip);
-
-			//	        pcontact.pos[0] = (*planecontact_results)[0];
-			//	        pcontact.pos[1] = (*planecontact_results)[1];
-			//	        pcontact.pos[2] = (*planecontact_results)[2];
-			//pcontact.pos[3] = REAL(1.0);  TODO ? TZ
-			pcontact.pos.set( planecontact_results.at(i).f );
-
-			//	        pcontact.normal[0] = plane[0];
-			//	        pcontact.normal[1] = plane[1];
-			//	        pcontact.normal[2] = plane[2];
-			//	        pcontact.normal[3] = 0;
-			pcontact.normal.set(plane.get0(), plane.get1(), plane.get2());
-
-			pcontact.depth = planecontact_results.at(i).f[3];//(*planecontact_results)[3];
-			pcontact.g1 = o1; // trimesh geom
-			pcontact.g2 = o2; // plane geom
-			pcontact.side1 = -1; // note: don't have the triangle index, but OPCODE *does* do this properly
-			pcontact.side2 = -1;
-
-			//planecontact_results++;
-		}
+		DxPlaneContactAccessor contactaccessor = new DxPlaneContactAccessor(planecontact_results, plane, o1, o2);
+		contactcount = DxGImpactContactsExportHelper.ExportMaxDepthGImpactContacts(contactaccessor, contactcount, flags, contacts, skip);
 
 		collision_result.GIM_DYNARRAY_DESTROY();
 

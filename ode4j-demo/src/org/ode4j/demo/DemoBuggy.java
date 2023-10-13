@@ -66,6 +66,9 @@ class DemoBuggy extends dsFunctions {
 	private final double CMASS = 1;		// chassis mass
 	private final double WMASS = 0.2;	// wheel mass
 
+	private static final DVector3C yunit = new DVector3(0, 1, 0);
+	private static final DVector3C zunit = new DVector3(0, 0, 1);
+
 
 	// dynamics and collision objects (chassis, 3 wheels, environment)
 
@@ -75,7 +78,7 @@ class DemoBuggy extends dsFunctions {
 	private static DHinge2Joint[] joint = new DHinge2Joint[3];	// joint[0] is the front wheel
 	private static DJointGroup contactgroup;
 	private static DPlane ground;
-	//private static DSpace car_space;
+	private static DSpace car_space;
 	private static DBox[] box = new DBox[1];
 	private static DSphere[] sphere = new DSphere[3];
 	private static DBox ground_box;
@@ -162,7 +165,6 @@ class DemoBuggy extends dsFunctions {
 			steer = 0;
 			break;
 		case '1': {
-			//TODO TZ
 //			FILE f = fopen ("state.dif","wt");
 //			if (f!=null) {
 //				OdeHelper.dWorldExportDIF (world,f,"");
@@ -241,7 +243,7 @@ class DemoBuggy extends dsFunctions {
 		m.setBox(1, LENGTH, WIDTH, HEIGHT);
 		m.adjust(CMASS);
 		body[0].setMass(m);
-		box[0] = OdeHelper.createBox (/*null*/space,LENGTH,WIDTH,HEIGHT);
+		box[0] = OdeHelper.createBox (null,LENGTH,WIDTH,HEIGHT);
 		box[0].setBody(body[0]);
 
 		// wheel bodies
@@ -253,7 +255,7 @@ class DemoBuggy extends dsFunctions {
 			m.setSphere(1,RADIUS);
 			m.adjust(WMASS);
 			body[i].setMass(m);
-			sphere[i-1] = OdeHelper.createSphere (/*null*/space,RADIUS);
+			sphere[i-1] = OdeHelper.createSphere (null,RADIUS);
 			sphere[i-1].setBody(body[i]);
 		}
 		body[1].setPosition(0.5*LENGTH,0,STARTZ-HEIGHT*0.5);
@@ -267,8 +269,7 @@ class DemoBuggy extends dsFunctions {
 			final DVector3C a = body[i+1].getPosition();
 			DHinge2Joint h2 = joint[i];
 			h2.setAnchor (a);
-			h2.setAxis1 (0,0,1);
-			h2.setAxis2 (0,1,0);
+			h2.setAxes (zunit, yunit);
 		}
 
 		// set joint suspension
@@ -289,12 +290,12 @@ class DemoBuggy extends dsFunctions {
 		}
 
 		// create car space and add it to the top level space
-//		car_space = OdeHelper.createSimpleSpace(space);
-//		car_space.setCleanup(false);
-//		car_space.add (box[0]);
-//		car_space.add (sphere[0]);
-//		car_space.add (sphere[1]);
-//		car_space.add (sphere[2]);
+		car_space = OdeHelper.createSimpleSpace(space);
+		car_space.setCleanup(false);
+		car_space.add (box[0]);
+		car_space.add (sphere[0]);
+		car_space.add (sphere[1]);
+		car_space.add (sphere[2]);
 
 		// environment
 		ground_box = OdeHelper.createBox (space,2,1.5,1);
@@ -304,16 +305,16 @@ class DemoBuggy extends dsFunctions {
 		ground_box.setRotation(R);
 
 		// run simulation
-		dsSimulationLoop (args,352,288,this);
+		dsSimulationLoop (args,640,480,this);
 
-//		box[0].destroy();
-//		sphere[0].destroy();
-//		sphere[1].destroy();
-//		sphere[2].destroy();
-//		contactgroup.destroy();
-//		space.destroy();
-//		world.destroy();
-//		OdeHelper.closeODE();
+		box[0].destroy();
+		sphere[0].destroy();
+		sphere[1].destroy();
+		sphere[2].destroy();
+		contactgroup.destroy();
+		space.destroy();
+		world.destroy();
+		OdeHelper.closeODE();
 	}
 
 
@@ -326,13 +327,5 @@ class DemoBuggy extends dsFunctions {
 	@Override
 	public void stop() {
 		// Nothing
-		box[0].destroy();
-		sphere[0].destroy();
-		sphere[1].destroy();
-		sphere[2].destroy();
-		contactgroup.destroy();
-		space.destroy();
-		world.destroy();
-		OdeHelper.closeODE();
 	}
 }

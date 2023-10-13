@@ -26,17 +26,8 @@ package org.ode4j.ode.internal;
 
 import static org.ode4j.ode.OdeConstants.CONTACTS_UNIMPORTANT;
 import static org.ode4j.ode.OdeConstants.dInfinity;
-import static org.ode4j.ode.OdeMath.dCalcVectorCross3;
-import static org.ode4j.ode.OdeMath.dCalcVectorDot3;
-import static org.ode4j.ode.OdeMath.dMultiply0_331;
-import static org.ode4j.ode.OdeMath.dMultiply1_331;
-import static org.ode4j.ode.OdeMath.dNormalize3;
-import static org.ode4j.ode.internal.Common.dAASSERT;
-import static org.ode4j.ode.internal.Common.dEpsilon;
-import static org.ode4j.ode.internal.Common.dFabs;
-import static org.ode4j.ode.internal.Common.dIASSERT;
-import static org.ode4j.ode.internal.Common.dNODEBUG;
-import static org.ode4j.ode.internal.Common.dSqrt;
+import static org.ode4j.ode.OdeMath.*;
+import static org.ode4j.ode.internal.DxCollisionUtil.dVector3Copy;
 import static org.ode4j.ode.internal.cpp4j.Cmath.fabs;
 import static org.ode4j.ode.internal.cpp4j.Cstdio.fprintf;
 import static org.ode4j.ode.internal.cpp4j.Cstdio.stdout;
@@ -109,7 +100,7 @@ public class DxConvex extends DxGeom implements DConvex {
 		int first;
 		//unsigned 
 		int second;
-	};
+	}
 	//edge* edges;
 	private Edge[] edges;
 
@@ -193,10 +184,10 @@ public class DxConvex extends DxGeom implements DConvex {
 	//#define dMIN(A,B)  std::min(A,B)
 	//#define dMAX(A,B)  std::max(A,B)
 	//#endif
-	private static final double dMIN(double a, double b) { return a>b ? b : a; }
-	private static final double dMAX(double a, double b) { return a>b ? a : b; }
-	private static final int dMIN(int a, int b) { return a>b ? b : a; }
-	private static final int dMAX(int a, int b) { return a>b ? a : b; }
+	private static double dMIN(double a, double b) { return Math.min(a, b); }
+	private static double dMAX(double a, double b) { return Math.max(a, b); }
+	private static int dMIN(int a, int b) { return Math.min(a, b); }
+	private static int dMAX(int a, int b) { return Math.max(a, b); }
 
 	//****************************************************************************
 	// Convex public API
@@ -271,7 +262,7 @@ public class DxConvex extends DxGeom implements DConvex {
 
 
 	@Override
-	void computeAABB()
+    protected void computeAABB()
 	{
 		// this can, and should be optimized
 		DVector3 point = new DVector3();
@@ -400,7 +391,7 @@ public class DxConvex extends DxGeom implements DConvex {
 	//		       unsigned int _pointcount,
 	//		       unsigned int *_polygons)
 	public static DConvex dCreateConvex (DxSpace space, double[] planes, int planecount,
-			double[] points, int pointcount, int[] polygons)
+										 double[] points, int pointcount, int[] polygons)
 	{
 		//fprintf(stdout,"dxConvex dCreateConvex\n");
 		return new DxConvex(space, planes, planecount,
@@ -409,12 +400,21 @@ public class DxConvex extends DxGeom implements DConvex {
 				polygons);
 	}
 
+	// Only in ode4j.
+	public static DConvex dCreateConvex (DxSpace space, double[] planes, double[] points, int[] polygons)
+	{
+		//fprintf(stdout,"dxConvex dCreateConvex\n");
+		dUASSERT(planes.length % 4 == 0, "planes are defined by four values: x, y, z, depth");
+		dUASSERT(points.length % 3 == 0, "points are defined by three values: x, y, z");
+		return new DxConvex(space, planes, planes.length / 4, points, points.length / 3, polygons);
+	}
+
 	//void dGeomSetConvex (dGeom g,dReal *_planes,unsigned int _planecount,
 	//		     dReal *_points,
 	//		     unsigned int _pointcount,
 	//		     unsigned int *_polygons)
 	void dGeomSetConvex (double[] planes, int planecount,
-			double[] points, int pointcount, int[] polygons)
+						 double[] points, int pointcount, int[] polygons)
 	{
 		//fprintf(stdout,"dxConvex dGeomSetConvex\n");
 		//dUASSERT (g && g.type == dConvexClass,"argument not a convex shape");
@@ -434,6 +434,7 @@ public class DxConvex extends DxGeom implements DConvex {
 		this.polygons=polygons;
 	}
 
+
 	//****************************************************************************
 	// Helper Inlines
 	//
@@ -442,7 +443,8 @@ public class DxConvex extends DxGeom implements DConvex {
 	 * Returns Whether or not the segment ab intersects plane p.
 	 * @param a origin of the segment
 	 * @param b segment destination
-	 * @param p plane to test for intersection
+	 * @param pV plane to test for intersection - vector
+	 * @param pD plane to test for intersection - depth
 	 * @param t returns the time "t" in the segment ray that gives us the intersecting
 	 * point
 	 * @param q returns the intersection point
@@ -482,16 +484,16 @@ public class DxConvex extends DxGeom implements DConvex {
 		return false;
 	}
 
-	/** 
-	 * Returns the Closest Point in Ray 1 to Ray 2.
-	 * @param Origin1 The origin of Ray 1
-	 * @param Direction1 The direction of Ray 1
-	 * @param Origin1 The origin of Ray 2
-	 * @param Direction1 The direction of Ray 3
-	 * @param t the time "t" in Ray 1 that gives us the closest point
-	 * (closest_point=Origin1+(Direction1*t).
-	 * @return true if there is a closest point, false if the rays are paralell.
-	 */
+	//	/**
+	//	 * Returns the Closest Point in Ray 1 to Ray 2.
+	//	 * @param Origin1 The origin of Ray 1
+	//	 * @param Direction1 The direction of Ray 1
+	//	 * @param Origin1 The origin of Ray 2
+	//	 * @param Direction1 The direction of Ray 3
+	//	 * @param t the time "t" in Ray 1 that gives us the closest point
+	//	 * (closest_point=Origin1+(Direction1*t).
+	//	 * @return true if there is a closest point, false if the rays are paralell.
+	//	 */
 	//inline bool ClosestPointInRay(final dVector3 Origin1,
 	//	      final dVector3 Direction1,
 	//	      final dVector3 Origin2,
@@ -522,23 +524,13 @@ public class DxConvex extends DxGeom implements DConvex {
 //		return true;
 //	}
 
-	/** Clamp n to lie within the range [min, max]. */
-	private static double Clamp(double n, double min, double max)
-	{
-	    if (n < min) return min;
-	    if (n > max) return max;
-	    return n;
-	}
-	/** 
+	/**
 	 * Returns the Closest Points from Segment 1 to Segment 2.
 	 * <p>NOTE: Adapted from Christer Ericson's Real Time Collision Detection Book.
 	 * @param p1 start of segment 1
 	 * @param q1 end of segment 1
 	 * @param p2 start of segment 2
 	 * @param q2 end of segment 2
-	 * @param t the time "t" in Ray 1 that gives us the closest point
-	 * (closest_point=Origin1+(Direction1*t).
-	 * @return true if there is a closest point, false if the rays are paralell.
 	 */
 //	private float ClosestPointBetweenSegments(dVector3& p1,
 //            dVector3& q1,
@@ -552,7 +544,7 @@ public class DxConvex extends DxGeom implements DConvex {
 	    // s & t were originaly part of the output args, but since
 	    // we don't really need them, we'll just declare them in here
 	    double s;
-	    double t;
+	    double t; // TZ: the time "t" in Ray 1 that gives us the closest point (closest_point=Origin1+(Direction1*t) (?)
 	    DVector3 d1 = q1.reSub(p1);//{q1[0] - p1[0],
 	                   //q1[1] - p1[1],
 	                   //q1[2] - p1[2]};
@@ -582,7 +574,7 @@ public class DxConvex extends DxGeom implements DConvex {
 	        // First segment degenerates into a point
 	        s = 0.0f;
 	        t = f / e; // s = 0 => t = (b*s + f) / e = f / e
-	        t = Clamp(t, 0.0f, 1.0f);
+	        t = dxClamp(t, 0.0f, 1.0f);
 	    }
 	    else
 	    {
@@ -591,7 +583,7 @@ public class DxConvex extends DxGeom implements DConvex {
 	        {
 	            // Second segment degenerates into a point
 	            t = 0.0f;
-	            s = Clamp(-c / a, 0.0f, 1.0f); // t = 0 => s = (b*t - c) / a = -c / a
+	            s = dxClamp(-c / a, 0.0f, 1.0f); // t = 0 => s = (b*t - c) / a = -c / a
 	        }
 	        else
 	        {
@@ -603,7 +595,7 @@ public class DxConvex extends DxGeom implements DConvex {
 	            // clamp to segment S1. Else pick arbitrary s (here 0)
 	            if (denom != 0.0f)
 	            {
-	                s = Clamp((b*f - c*e) / denom, 0.0f, 1.0f);
+	                s = dxClamp((b*f - c*e) / denom, 0.0f, 1.0f);
 	            }
 	            else s = 0.0f;
 //	if (false) {//#if 0
@@ -626,12 +618,12 @@ public class DxConvex extends DxGeom implements DConvex {
 	            if (tnom < 0.0f)
 	            {
 	                t = 0.0f;
-	                s = Clamp(-c / a, 0.0f, 1.0f);
+	                s = dxClamp(-c / a, 0.0f, 1.0f);
 	            }
 	            else if (tnom > e)
 	            {
 	                t = 1.0f;
-	                s = Clamp((b - c) / a, 0.0f, 1.0f);
+	                s = dxClamp((b - c) / a, 0.0f, 1.0f);
 	            }
 	            else
 	            {
@@ -735,7 +727,7 @@ public class DxConvex extends DxGeom implements DConvex {
 	/** 
 	 * Finds out if a point lies inside a 2D polygon.
 	 * @param p Point to test
-	 * @param polygon a pointer to the start of the convex polygon index buffer
+	 * @param polygonA a pointer to the start of the convex polygon index buffer
 	 * @param out the closest point in the polygon if the point is not inside
 	 * @return true if the point lies inside of the polygon, false if not.
 	 */
@@ -743,7 +735,7 @@ public class DxConvex extends DxGeom implements DConvex {
 	//			     unsigned int *polygon,
 	//			     dxConvex *convex,
 	//			     dVector3 out)
-	private static final boolean IsPointInPolygon(DVector3C p,
+	private static boolean IsPointInPolygon(DVector3C p,
 			int[] polygonA, int polyPos,
 			DVector3C plane,
 			DxConvex convex,
@@ -1194,7 +1186,7 @@ public class DxConvex extends DxGeom implements DConvex {
 //							(plane[2] * cvx2._final_posr.pos[2]));
 					planeV.dot(cvx2.final_posr().pos());
 				//dContactGeom *target = SAFECONTACT(flags, contact, curc, skip);
-				DContactGeom target = contacts.getSafe(flags, curc.get());;
+				DContactGeom target = contacts.getSafe(flags, curc.get());
 				target.g1=cvx1;//&cvx1; // g1 is the one pushed
 				target.g2=cvx2;//&cvx2;
 				if(IntersectSegmentPlane(e1,e2,planeV, planeD,t,target.pos))
@@ -1250,17 +1242,13 @@ Helper struct
 		 // e1a to e1b = edge in cvx1,e2a to e2b = edge in cvx2.
 		DVector3 e1a = new DVector3(), e1b = new DVector3();
 		DVector3 e2a = new DVector3(), e2b = new DVector3();
-	};
+	}
 
 	/** 
 	 * Does an axis separation test using cvx1 planes on cvx1 and cvx2, 
 	 * returns true for a collision false for no collision.
 	 * @param cvx1 [IN] First Convex object, its planes are used to do the tests
 	 * @param cvx2 [IN] Second Convex object
-	 * @param min_depth [IN/OUT] Used to input as well as output the minimum 
-	 * depth so far, must be set to a huge value such as dInfinity for initialization.
-	 * @param g1 [OUT] Pointer to the convex which should be used in the returned contact as g1
-	 * @param g2 [OUT] Pointer to the convex which should be used in the returned contact as g2
 	 */
 	//inline bool CheckSATConvexFaces(dxConvex& cvx1,
 	//				dxConvex& cvx2,
@@ -1318,10 +1306,6 @@ Helper struct
 	 * returns true for a collision false for no collision.
 	 * @param cvx1 [IN] First Convex object
 	 * @param cvx2 [IN] Second Convex object
-	 * @param min_depth [IN/OUT] Used to input as well as output the minimum 
-	 * depth so far, must be set to a huge value such as dInfinity for initialization.
-	 * @param g1 [OUT] Pointer to the convex which should be used in the returned contact as g1
-	 * @param g2 [OUT] Pointer to the convex which should be used in the returned contact as g2
 	 */
 	//inline bool CheckSATConvexEdges(dxConvex& cvx1,
 	//				dxConvex& cvx2,
@@ -1477,10 +1461,7 @@ Helper struct
 		ccso.min_depth=dInfinity; // Min not min at all
 		ccso.depth_type=0; // no type
 		// precompute distance vector
-//		ccso.dist[0] = cvx2.final_posr.pos[0]-cvx1.final_posr.pos[0];
-//		ccso.dist[1] = cvx2.final_posr.pos[1]-cvx1.final_posr.pos[1];
-//		ccso.dist[2] = cvx2.final_posr.pos[2]-cvx1.final_posr.pos[2];
-		ccso.dist.eqDiff(cvx2.final_posr().pos(), cvx1.final_posr().pos());
+		dSubtractVectors3(ccso.dist, cvx2.final_posr().pos(), cvx1.final_posr().pos());
 		int maxc = flags & NUMC_MASK;
 		dIASSERT(maxc != 0);
 		DVector3 i1 = new DVector3(),i2 = new DVector3(),
@@ -1526,10 +1507,7 @@ Helper struct
 			//CollisionUtil.dVector3Copy(ccso.dist,dist);
 			dist = new DVector3(ccso.dist);
 			reference_side = GetSupportSide(dist,cvx1);
-//			dist[0]=-dist[0];
-//			dist[1]=-dist[1];
-//			dist[2]=-dist[2];
-			dist.scale(-1);
+			dNegateVector3(dist);
 			incident_side = GetSupportSide(dist,cvx2);
 
 			pReferencePolyPos = 0;//cvx1.polygons;
@@ -1603,22 +1581,27 @@ Helper struct
 					d2 = r2.dot(planeV) - planeD;
 					if(d1*d2<0)
 					{
+						out = false;
+
 						// Edge intersects plane
-						IntersectSegmentPlane(r1,r2,planeV, planeD,t,p);
-						// Check the resulting point again to make sure it is inside the reference convex
-						out=false;
-						for(int k=0;k<cvx1.planecount;++k)
+						if (!IntersectSegmentPlane(r1,r2,planeV, planeD,t,p))
 						{
-//							d = p[0]*cvx1.planes[(k*4)+0]+
-//							p[1]*cvx1.planes[(k*4)+1]+
-//							p[2]*cvx1.planes[(k*4)+2]-
-//							cvx1.planes[(k*4)+3];
-							d = p.dot(cvx1.planesV[k]) - cvx1.planesD[k];
-							if(d>0)
-							{
-								out = true;
-								break;
-							};
+							out = true;
+						}
+
+						if (!out) {
+							out = false;
+							for (int k = 0; k < cvx1.planecount; ++k) {
+								//							d = p[0]*cvx1.planes[(k*4)+0]+
+								//							p[1]*cvx1.planes[(k*4)+1]+
+								//							p[2]*cvx1.planes[(k*4)+2]-
+								//							cvx1.planes[(k*4)+3];
+								d = p.dot(cvx1.planesV[k]) - cvx1.planesD[k];
+								if (d > 0) {
+									out = true;
+									break;
+								}
+							}
 						}
 						if(!out)
 						{
@@ -1644,17 +1627,13 @@ Helper struct
 							d = p.dot(rplaneV) - rplaneD;
 							if(d>0)
 							{
-								//dVector3Copy(p,SAFECONTACT(flags, contact, contacts, skip).pos);
-								//dVector3Copy(rplane,SAFECONTACT(flags, contact, contacts, skip).normal);
-								//SAFECONTACT(flags, contact, contacts, skip).g1=cvx1;//&cvx1;
-								//SAFECONTACT(flags, contact, contacts, skip).g2=cvx2;//&cvx2;
-								//SAFECONTACT(flags, contact, contacts, skip).depth=d;
-								DContactGeom contact = contactBuf.getSafe(flags, contacts);
-								contact.pos.set(p);
-								contact.normal.set(rplaneV);
-								contact.g1 = cvx1;
-								contact.g2 = cvx2;
-								contact.depth = d;
+								// SAFECONTACT(flags, contact, contacts, skip);
+								DContactGeom target = contactBuf.getSafe(flags, contacts);
+								dVector3Copy(p, target.pos);
+								dVector3Copy(rplaneV, target.normal);
+								target.g1 = cvx1;
+								target.g2 = cvx2;
+								target.depth = d;
 								++contacts;
 								if (contacts==maxc) return contacts;
 							}
@@ -1673,17 +1652,13 @@ Helper struct
 				d = i1.dot(rplaneV) - rplaneD;
 				if(d>0)
 				{
-					DContactGeom contact = contactBuf.getSafe(flags, contacts);
-					//dVector3Copy(i1,SAFECONTACT(flags, contact, contacts, skip).pos);
-					//dVector3Copy(rplane,SAFECONTACT(flags, contact, contacts, skip).normal);
-					//SAFECONTACT(flags, contact, contacts, skip).g1=cvx1;//&cvx1;
-					//SAFECONTACT(flags, contact, contacts, skip).g2=cvx2;//&cvx2;
-					//SAFECONTACT(flags, contact, contacts, skip).depth=d;
-					contact.pos.set(i1);
-					contact.normal.set(rplaneV);
-					contact.g1 = cvx1;
-					contact.g2 = cvx2;
-					contact.depth = d;
+					// dContactGeom *target = SAFECONTACT(flags, contact, contacts, skip);
+					DContactGeom target = contactBuf.getSafe(flags, contacts);
+					dVector3Copy(i1, target.pos);
+					dVector3Copy(rplaneV, target.normal);
+					target.g1 = cvx1;
+					target.g2 = cvx2;
+					target.depth = d;
 					++contacts;
 					if (contacts==maxc) return contacts;
 				}
@@ -1743,7 +1718,7 @@ Helper struct
 //					r1[2]*cvx2.planes[(j*4)+2]-
 //					cvx2.planes[(j*4)+3];
 					d = r1.dot(cvx2.planesV[j]) - cvx2.planesD[j];
-					if(d>=0){out = true;break;};
+					if(d>=0){out = true;break;}
 				}
 				if(!out)
 				{
@@ -1751,10 +1726,9 @@ Helper struct
 					outside = false;
 					for(int j=0;j<contacts;++j)
 					{
-//						if((SAFECONTACT(flags, contact, j, skip).pos[0]==i1[0])&&
-//								(SAFECONTACT(flags, contact, j, skip).pos[1]==i1[1])&&
-//								(SAFECONTACT(flags, contact, j, skip).pos[2]==i1[2]))
-						if (contactBuf.getSafe(flags, j).pos.isEq(i1))
+						// dContactGeom *cur_contact = SAFECONTACT(flags, contact, j, skip);
+						DContactGeom cur_contact = contactBuf.getSafe(flags, j);
+						if (cur_contact.pos.isEq(i1, 0))
 						{
 							outside=true;
 						}
@@ -1768,17 +1742,13 @@ Helper struct
 						d = i1.dot(rplaneV) - rplaneD;
 						if(d>0)
 						{
-							//dVector3Copy(i1,SAFECONTACT(flags, contact, contacts, skip).pos);
-							//dVector3Copy(rplane,SAFECONTACT(flags, contact, contacts, skip).normal);
-							//SAFECONTACT(flags, contact, contacts, skip).g1=cvx1;//&cvx1;
-							//SAFECONTACT(flags, contact, contacts, skip).g2=cvx2;//&cvx2;
-							//SAFECONTACT(flags, contact, contacts, skip).depth=d;
-							DContactGeom contact = contactBuf.getSafe(flags, contacts);
-							contact.pos.set(i1);
-							contact.normal.set(rplaneV);
-							contact.g1 = cvx1;
-							contact.g2 = cvx2;
-							contact.depth = d;
+							// dContactGeom *target = SAFECONTACT(flags, contact, contacts, skip);
+							DContactGeom target = contactBuf.getSafe(flags, contacts);
+							dVector3Copy(i1, target.pos);
+							dVector3Copy(rplaneV, target.normal);
+							target.g1 = cvx1;
+							target.g2 = cvx2;
+							target.depth = d;
 							++contacts;
 							if (contacts==maxc) return contacts;
 						}
@@ -1786,58 +1756,44 @@ Helper struct
 				}
 			}
 		}
-		else if(ccso.depth_type==2) // edge-edge
+		else if (ccso.depth_type == 2) // edge-edge
 		{
-//			// Some parts borrowed from dBoxBox
-//			DVector3 ua = new DVector3(),ub = new DVector3(),pa = new DVector3(),pb = new DVector3();
-//			RefDouble alpha=new RefDouble(),beta=new RefDouble();
-//			// Get direction of first edge
-//			//for (i=0; i<3; i++) ua[i] = ccso.e1b[i]-ccso.e1a[i];
-//			ua.eqDiff(ccso.e1b, ccso.e1a);
-//			dNormalize3(ua); // normalization shouldn't be necesary but dLineClosestApproach requires it
-//			// Get direction of second edge
-//			//for (i=0; i<3; i++) ub[i] = ccso.e2b[i]-ccso.e2a[i];
-//			ub.eqDiff(ccso.e2b, ccso.e2a);
-//			dNormalize3(ub); // same as with ua normalization
-//			// Get closest points between edges (one at each)
-//			DxCollisionUtil.dLineClosestApproach (ccso.e1a,ua,ccso.e2a,ub,alpha,beta);
-//			//for (i=0; i<3; i++) pa[i] = ccso.e1a[i]+(ua[i]*alpha.get());
-//			pa.eqSum(ccso.e1a, ua, alpha.get());
-//			//for (i=0; i<3; i++) pb[i] = ccso.e2a[i]+(ub[i]*beta.get());
-//			pb.eqSum(ccso.e2a, ub, beta.get());
-//			// Set the contact point as halfway between the 2 closest points
-////			for (i=0; i<3; i++) SAFECONTACT(flags, contact, contacts, skip).pos[i] = REAL(0.5)*(pa[i]+pb[i]);
-////			SAFECONTACT(flags, contact, contacts, skip).g1=cvx1;//&cvx1;
-////			SAFECONTACT(flags, contact, contacts, skip).g2=cvx2;//&cvx2;
-////			dVector3Copy(ccso.plane,SAFECONTACT(flags, contact, contacts, skip).normal);
-////			SAFECONTACT(flags, contact, contacts, skip).depth=ccso.min_depth;
-//			DContactGeom contact = contactBuf.getSafe(flags, contacts);
-//			contact.pos.eqSum(pa, 0.5, pb, 0.5);
-//			contact.g1 = cvx1;
-//			contact.g2 = cvx2;
-//			//TODO TZ optimize with dVector3!
-//			contact.normal.set(ccso.plane.get0(), ccso.plane.get1(), ccso.plane.get2());
-//			contact.depth = ccso.min_depth;
-//			++contacts;
-
 		    DVector3 c1 = new DVector3(), c2 = new DVector3();
-		    //float s,t;
-			DContactGeom contact = contactBuf.getSafe(flags, contacts);
-		    //SAFECONTACT(flags, contact, contacts, skip)->depth = 
-			contact.depth = dSqrt(ClosestPointBetweenSegments(ccso.e1a,ccso.e1b,ccso.e2a,ccso.e2b,c1,c2));
-		    contact.g1=cvx1;
-		    contact.g2=cvx2;
-		    //dVector3Copy(c1,SAFECONTACT(flags, contact, contacts, skip)->pos);
-		    contact.pos.set( c1 );
-		    contact.normal.eqDiff(c2, c1);
-		    contact.normal.normalize();
-		    //dNormalize3(SAFECONTACT(flags, contact, contacts, skip)->normal);
+			ClosestPointBetweenSegments(ccso.e1a, ccso.e1b, ccso.e2a, ccso.e2b, c1, c2);
+
+			// dContactGeom *target = SAFECONTACT(flags, contact, contacts, skip);
+			DContactGeom target = contactBuf.getSafe(flags, contacts);
+			dSubtractVectors3(target.normal, c2, c1);
+			double depth_square = dCalcVectorLengthSquare3(target.normal);
+
+			if (dxSafeNormalize3(target.normal))
+			{
+				target.depth = dSqrt(depth_square);
+			}
+			else
+			{
+				// If edges coincide return direction from one center to the other as the contact normal
+				dVector3Copy(ccso.dist, target.normal);
+
+				if (!dxSafeNormalize3(target.normal))
+				{
+					// If the both centers coincide as well return an arbitrary vector. The depth is going to be zero anyway.
+					// dAssignVector3(target.normal, 1, 0, 0);
+					target.normal.set(1, 0, 0);
+				}
+
+				target.depth = 0; // Since the edges coincide, return a contact of zero depth
+			}
+
+			target.g1 = cvx1;
+			target.g2 = cvx2;
+			dVector3Copy(c1, target.pos);
 		    contacts++;
 		}
 		return contacts;
 	}
 
-	public static class CollideConvexConvex implements DColliderFn {
+	static class CollideConvexConvex implements DColliderFn {
 		//int dCollideConvexConvex (dxGeom *o1, dxGeom *o2, int flags,
 		//			  dContactGeom *contact, int skip)
 		int dCollideConvexConvex (DxConvex Convex1, DxConvex Convex2, int flags,
@@ -1949,17 +1905,31 @@ Helper struct
 			contact.side2 = -1; // TODO: set plane index?
 	
 			double alpha, beta, nsign;
+			boolean flag = false;
 	
 			//
 			// Compute some useful info
 			//
-	
-			DVector3 ray_pos = new DVector3();
-			DVector3 ray_dir = new DVector3();
 
-			dMultiply1_331(ray_pos, convex.final_posr().R(), new DVector3(ray.final_posr().pos()).sub(convex.final_posr().pos()));
-			dMultiply1_331(ray_dir, convex.final_posr().R(), ray.final_posr().R().columnAsNewVector(2));
-			boolean flag = false;
+			//			dVector3 ray_pos = {
+			//					ray->final_posr->pos[0] - convex->final_posr->pos[0],
+			//					ray->final_posr->pos[1] - convex->final_posr->pos[1],
+			//					ray->final_posr->pos[2] - convex->final_posr->pos[2]
+			//			};
+			DVector3 ray_pos = new DVector3(ray.final_posr().pos()).sub(convex.final_posr().pos());
+			//
+			//			dVector3 ray_dir = {
+			//					ray->final_posr->R[0 * 4 + 2],
+			//					ray->final_posr->R[1 * 4 + 2],
+			//					ray->final_posr->R[2 * 4 + 2]
+			//			};
+			DVector3 ray_dir = ray.final_posr().R().columnAsNewVector(2);
+
+			//dMultiply1_331(ray_pos, convex->final_posr->R, ray_pos);
+			//dMultiply1_331(ray_dir, convex->final_posr->R, ray_dir);
+			dMultiply1_331(ray_pos, convex.final_posr().R(), ray_pos);
+			dMultiply1_331(ray_dir, convex.final_posr().R(), ray_dir);
+
 			for ( int i = 0; i < convex.planecount; ++i )
 			{
 				// Alias this plane.
@@ -2074,8 +2044,16 @@ Helper struct
 
 	@Override
 	public void setConvex(double[] planes, int planeCount, double[] points,
-			int pointCount, int[] polygons) {
+						  int pointCount, int[] polygons) {
 		dGeomSetConvex(planes, planeCount, points, pointCount, polygons);
+	}
+
+	// Only in ode4j
+	@Override
+	public void setConvex(double[] planes, double[] points, int[] polygons) {
+		dUASSERT(planes.length % 4 == 0, "planes are defined by four values: x, y, z, depth");
+		dUASSERT(points.length % 3 == 0, "points are defined by three values: x, y, z");
+		dGeomSetConvex(planes, planes.length/4, points, points.length/3, polygons);
 	}
 
 	public double[] getPoints() {

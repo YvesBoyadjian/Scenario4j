@@ -30,13 +30,14 @@ import org.ode4j.ode.DContactGeom;
 import org.ode4j.ode.DContactGeomBuffer;
 import org.ode4j.ode.DGeom;
 import org.ode4j.ode.internal.gimpact.GimTriCollision;
+import org.ode4j.ode.internal.trimesh.DxTriMesh;
 
 /**
  * TriMesh code by Erwin de Vries.
  * Ported to Java by Tilmann Zaeschke
  *
  */
-public class CollideTrimeshRay implements DColliderFn {
+class CollideTrimeshRay implements DColliderFn {
 
 
 
@@ -179,8 +180,11 @@ public class CollideTrimeshRay implements DColliderFn {
 		DxGimpact TriMesh = (DxGimpact) g1;
 
 		double Length = RayGeom.getLength();
-//TODO remove/report?		boolean FirstContact = RayGeom.getFirstContact();
-//TODO remove/report?		boolean BackfaceCull = RayGeom.getBackfaceCull();
+		boolean FirstContact = RayGeom.getFirstContact();
+		boolean BackfaceCull = RayGeom.getBackfaceCull();
+		//TODO CHECK-TZ GimPAct is ignoring first contact AND BackfaceCull
+		//TODO remove/report?		boolean FirstContact = RayGeom.getFirstContact();
+		//TODO remove/report?		boolean BackfaceCull = RayGeom.getBackfaceCull();
 		boolean ClosestHit = RayGeom.getClosestHit();//dGeomRayGetClosestHit(RayGeom);
 		DVector3 Origin = new DVector3(), Direction = new DVector3();
 		RayGeom.get(Origin, Direction);
@@ -190,12 +194,12 @@ public class CollideTrimeshRay implements DColliderFn {
 
 		if(ClosestHit)
 		{
-			intersect = DxGimpactCollision.gim_trimesh_ray_closest_collisionODE(TriMesh.m_collision_trimesh,
+			intersect = CollisionTrimeshGimpact.gim_trimesh_ray_closest_collisionODE(TriMesh.m_collision_trimesh(),
 					Origin,Direction,Length,contact_data);
 		}
 		else
 		{
-			intersect = DxGimpactCollision.gim_trimesh_ray_collisionODE(TriMesh.m_collision_trimesh,
+			intersect = CollisionTrimeshGimpact.gim_trimesh_ray_collisionODE(TriMesh.m_collision_trimesh(),
 					Origin,Direction,Length,contact_data);
 		}
 
@@ -205,10 +209,17 @@ public class CollideTrimeshRay implements DColliderFn {
 		}
 
 
-		if(TriMesh.RayCallback==null || 
-				TriMesh.RayCallback.call(TriMesh, RayGeom, contact_data.getFaceID(), 
-						contact_data.getU() , contact_data.getV()) != 0)
+		if (TriMesh.RayCallback() == null ||
+				TriMesh.RayCallback().call(TriMesh, RayGeom, contact_data.getFaceID(),
+				contact_data.getU(), contact_data.getV()) != 0)
 		{
+			// ode4j fix: see issue #76
+			// TODO TZ this just returns "0" if the callback for the first "hit" returns false.
+			//     It should probably check for other contacts. However, apparently even for closestHit=false,
+			//     there is only ever one contact created.
+			if (!TriMesh.invokeCallback(RayGeom, contact_data.getFaceID())) {
+				return 0;
+			}
 			DContactGeom Contact = Contacts.get();//&( Contacts[ 0 ] );
 			Contact.pos.set(contact_data.getPoint().f);//VEC_COPY(Contact.pos,contact_data.getPoint());
 			Contact.normal.set(contact_data.getNormal().f);//VEC_COPY(Contact.normal,contact_data.getNormal());

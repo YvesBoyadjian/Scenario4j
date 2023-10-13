@@ -408,7 +408,9 @@ public class DemoJointPU extends dsFunctions {
 
 		}
 
-		case 'p' :case 'P' : {
+		break;
+
+		case 'p' : case 'P' : {
 			if (joint instanceof DSliderJoint) {
 				DSliderJoint sj = (DSliderJoint) (joint);
 				System.out.println("Position =" + sj.getPosition());
@@ -741,7 +743,7 @@ public class DemoJointPU extends dsFunctions {
 
 
 		// run simulation
-		dsSimulationLoop (args,400,300,this);
+		dsSimulationLoop (args,640,480,this);
 
 		//delete joint;
 		//joint.DESTRUCTOR();  //TZ, not necessary, is deleted from dWorldDestroy()

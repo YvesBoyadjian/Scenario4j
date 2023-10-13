@@ -38,8 +38,6 @@ import org.ode4j.ode.DSpace;
 import org.ode4j.ode.DWorld;
 import org.ode4j.ode.DGeom.DNearCallback;
 
-import javax.swing.*;
-
 import static org.ode4j.drawstuff.DrawStuff.*;
 
 
@@ -168,9 +166,7 @@ class DemoFriction extends dsFunctions {
 
 
 	public static void main(String[] args) {
-		SwingUtilities.invokeLater(()->{
-			new DemoFriction().demo(args);
-		});
+		new DemoFriction().demo(args);
 	}
 	
 	private void demo(String[] args) {
@@ -200,12 +196,12 @@ class DemoFriction extends dsFunctions {
 		}
 
 		// run simulation
-		dsSimulationLoop (args,352,288,this);
+		dsSimulationLoop (args,640,480,this);
 
-//		contactgroup.destroy();
-//		space.destroy();
-//		world.destroy();
-//		OdeHelper.closeODE();
+		contactgroup.destroy();
+		space.destroy();
+		world.destroy();
+		OdeHelper.closeODE();
 	}
 
 
@@ -223,9 +219,6 @@ class DemoFriction extends dsFunctions {
 
 	@Override
 	public void stop() {
-		contactgroup.destroy();
-		space.destroy();
-		world.destroy();
-		OdeHelper.closeODE();
+		// Nothing
 	}
 }

@@ -30,35 +30,17 @@ import java.util.List;
 import org.ode4j.math.DVector3;
 import org.ode4j.math.DVector3C;
 import org.ode4j.ode.DGeom.DNearCallback;
-import org.ode4j.ode.DTriMesh.DTriArrayCallback;
 import org.ode4j.ode.DTriMesh.DTriCallback;
 import org.ode4j.ode.DTriMesh.DTriRayCallback;
-import org.ode4j.ode.internal.DxBVHSpace;
-import org.ode4j.ode.internal.DxBody;
-import org.ode4j.ode.internal.DxBox;
-import org.ode4j.ode.internal.DxCapsule;
-import org.ode4j.ode.internal.DxConvex;
-import org.ode4j.ode.internal.DxCylinder;
-import org.ode4j.ode.internal.DxGeom;
-import org.ode4j.ode.internal.DxHashSpace;
-import org.ode4j.ode.internal.DxHeightfield;
-import org.ode4j.ode.internal.DxHeightfieldData;
-import org.ode4j.ode.internal.DxMass;
-import org.ode4j.ode.internal.DxPlane;
-import org.ode4j.ode.internal.DxQuadTreeSpace;
-import org.ode4j.ode.internal.DxRay;
-import org.ode4j.ode.internal.DxSAPSpace;
-import org.ode4j.ode.internal.DxSAPSpace2;
-import org.ode4j.ode.internal.DxSimpleSpace;
-import org.ode4j.ode.internal.DxSpace;
-import org.ode4j.ode.internal.DxSphere;
-import org.ode4j.ode.internal.DxTriMesh;
-import org.ode4j.ode.internal.DxTriMeshData;
-import org.ode4j.ode.internal.DxWorld;
-import org.ode4j.ode.internal.OdeFactoryImpl;
-import org.ode4j.ode.internal.OdeInit;
+import org.ode4j.ode.internal.*;
+import org.ode4j.ode.internal.joints.DxJointConstrainedBall;
+import org.ode4j.ode.internal.ragdoll.DxRagdoll;
+import org.ode4j.ode.internal.trimesh.DxTriMesh;
+import org.ode4j.ode.internal.trimesh.DxTriMeshData;
 import org.ode4j.ode.internal.joints.DxJointGroup;
 import org.ode4j.ode.internal.joints.OdeJointsFactoryImpl;
+import org.ode4j.ode.ragdoll.DRagdoll;
+import org.ode4j.ode.ragdoll.DRagdollConfig;
 
 /**
  * This is the general helper class for ode4j.
@@ -157,11 +139,11 @@ public abstract class OdeHelper {
 	// BallJoint
 	/**
 	 * Create a new joint of the ball type.
-	 * 
+	 *
 	 * <p>REMARK:
 	 * The joint is initially in "limbo" (i.e. it has no effect on the simulation)
 	 * because it does not connect to any bodies.
-	 * 
+	 *
 	 * @param world world
 	 * @param group set to null to allocate the joint normally.
 	 * If it is nonzero the joint is allocated in the given joint group.
@@ -172,7 +154,7 @@ public abstract class OdeHelper {
 	}
 	/**
 	 * Create a new joint of the ball type.
-	 * 
+	 *
 	 * <p>REMARK:
 	 * The joint is initially in "limbo" (i.e. it has no effect on the simulation)
 	 * because it does not connect to any bodies.
@@ -181,6 +163,35 @@ public abstract class OdeHelper {
 	 */
 	public static DBallJoint createBallJoint (DWorld world) {
 		return ODE.dJointCreateBall(world, null);
+	}
+
+	// ConstrainedBallJoint
+	/**
+	 * Create a new joint of the constrained ball type. This is a custom extension in ode4j.
+	 *
+	 * <p>REMARK:
+	 * The joint is initially in "limbo" (i.e. it has no effect on the simulation)
+	 * because it does not connect to any bodies.
+	 *
+	 * @param world world
+	 * @param group set to null to allocate the joint normally.
+	 * If it is nonzero the joint is allocated in the given joint group.
+	 * @return new joint
+	 */
+	public static DxJointConstrainedBall createConstrainedBallJoint (DWorld world, DJointGroup group) {
+		return ODE.dJointCreateConstrainedBall(world, group);
+	}
+	/**
+	 * Create a new joint of the constrained ball type. This is a custom extension in ode4j.
+	 *
+	 * <p>REMARK:
+	 * The joint is initially in "limbo" (i.e. it has no effect on the simulation)
+	 * because it does not connect to any bodies.
+	 * @param world world
+	 * @return new joint
+	 */
+	public static DxJointConstrainedBall createConstrainedBallJoint (DWorld world) {
+		return ODE.dJointCreateConstrainedBall(world, null);
 	}
 
 	// ContactJoint
@@ -674,13 +685,58 @@ public abstract class OdeHelper {
 		return DxCapsule.dCreateCapsule((DxSpace) space, radius, length);
 	}
 
-	public static DConvex createConvex(double[] planes,
-			int planecount, double[] points, int pointcount, int[] polygons) {
-		return DxConvex.dCreateConvex(null, planes, planecount, points, pointcount, polygons);
+	/**
+	 * @param planes An array of planes in the form: normal X, normal Y, normal Z,Distance
+	 * @param points An array of points X,Y,Z
+	 * @param polygons An array of indices to the points of each polygon, it should be the
+	 * 	 number of vertices followed by that amount of indices to "points" in
+	 * 	 counter clockwise order
+	 * @return new DConvex instance
+	 */
+	public static DConvex createConvex(double[] planes, double[] points, int[] polygons) {
+		return DxConvex.dCreateConvex(null, planes, points, polygons);
 	}
+	/**
+	 * @param space the space instance
+	 * @param planes An array of planes in the form: normal X, normal Y, normal Z,Distance
+	 * @param points An array of points X,Y,Z
+	 * @param polygons An array of indices to the points of each polygon, it should be the
+	 * 	 number of vertices followed by that amount of indices to "points" in
+	 * 	 counter clockwise order
+	 * @return new DConvex instance
+	 */
+	public static DConvex createConvex(DSpace space, double[] planes, double[] points, int[] polygons) {
+		return DxConvex.dCreateConvex((DxSpace)space, planes, points, polygons);
+	}
+
+	/**
+	 * @param planes An array of planes in the form: normal X, normal Y, normal Z,Distance
+	 * @param planeCount Amount of planes in `planes`
+	 * @param points An array of points X,Y,Z
+	 * @param pointCount Amount of points in `points`
+	 * @param polygons An array of indices to the points of each polygon, it should be the
+	 * 	 number of vertices followed by that amount of indices to "points" in
+	 * 	 counter clockwise order
+	 * @return new DConvex instance
+	 */
+	public static DConvex createConvex(double[] planes,
+									   int planeCount, double[] points, int pointCount, int[] polygons) {
+		return DxConvex.dCreateConvex(null, planes, planeCount, points, pointCount, polygons);
+	}
+	/**
+	 * @param space The space instance
+	 * @param planes An array of planes in the form: normal X, normal Y, normal Z,Distance
+	 * @param planeCount Amount of planes in `planes`
+	 * @param points An array of points X,Y,Z
+	 * @param pointCount Amount of points in `points`
+	 * @param polygons An array of indices to the points of each polygon, it should be the
+	 * 	 number of vertices followed by that amount of indices to "points" in
+	 * 	 counter clockwise order
+	 * @return new DConvex instance
+	 */
 	public static DConvex createConvex(DSpace space, double[] planes,
-			int planecount, double[] points, int pointcount, int[] polygons) {
-		return DxConvex.dCreateConvex((DxSpace)space, planes, planecount, points, pointcount, polygons);
+									   int planeCount, double[] points, int pointCount, int[] polygons) {
+		return DxConvex.dCreateConvex((DxSpace)space, planes, planeCount, points, pointCount, polygons);
 	}
 
 	public static DCylinder createCylinder(double radius, double length) {
@@ -694,13 +750,20 @@ public abstract class OdeHelper {
 		return DxPlane.dCreatePlane((DxSpace) space, a, b, c, d);
 	}
 
+	public static DRagdoll createRagdoll(DWorld world, DRagdollConfig skeleton) {
+		return DxRagdoll.create(world, null, skeleton);
+	}
+	public static DRagdoll createRagdoll(DWorld world, DSpace space, DRagdollConfig skeleton) {
+		return DxRagdoll.create(world, space, skeleton);
+	}
+
 	public static DRay createRay(int length) {
 		return DxRay.dCreateRay(null, length);
 	}
 	public static DRay createRay(DSpace space, double length) {
 		return DxRay.dCreateRay((DxSpace) space, length);
 	}
-	
+
 	/**
 	 * Create a sphere geom of the given radius, and return its ID.
 	 *
@@ -866,7 +929,7 @@ public abstract class OdeHelper {
 	 * Utility function.
 	 * @param body1 A body to check.
 	 * @param body2 A body to check.
-	 * @param jointType is a set of subclasses of DJoint.
+	 * @param jointTypes is a set of subclasses of DJoint.
 	 * This is useful for deciding whether to add contact joints between two bodies:
 	 * if they are already connected by non-contact joints then it may not be
 	 * appropriate to add contacts, however it is okay to add more contact between-
@@ -874,10 +937,10 @@ public abstract class OdeHelper {
 	 * @return true if the two bodies are connected together by
 	 * a joint that does not have type <code>jointType</code>, otherwise return 0.
 	 */
- 	//@SafeVarargs --> Not available in Java 6!
-	public static boolean areConnectedExcluding (DBody body1, DBody body2, 
-            Class<? extends DJoint> ... jointType) {
-        return ODE._dAreConnectedExcluding(body1, body2, jointType);
+ 	@SafeVarargs
+	public static boolean areConnectedExcluding (DBody body1, DBody body2,
+												 Class<? extends DJoint> ... jointTypes) {
+        return ODE._dAreConnectedExcluding(body1, body2, jointTypes);
     }
 	/**
 	 * Utility function.
@@ -891,11 +954,10 @@ public abstract class OdeHelper {
 	 * @return true if the two bodies are connected together by
 	 * a joint that does not have type <code>jointType</code>, otherwise return 0.
 	 */
- 	//@SafeVarargs --> Not available in Java 6!
-	@SuppressWarnings("unchecked")
+ 	@SuppressWarnings("unchecked")
 	public static boolean areConnectedExcluding (DBody body1, DBody body2, 
             Class<? extends DJoint> jointType) {
-        return ODE._dAreConnectedExcluding(body1, body2, new Class[]{jointType});
+        return ODE._dAreConnectedExcluding(body1, body2, jointType);
     }
 	
 	
@@ -941,7 +1003,7 @@ public abstract class OdeHelper {
 	 * @return The version String.
 	 */
 	public static String getVersion() {
-		return "0.4.0";
+		return "0.5.2";
 	}
 	
 	
@@ -1026,18 +1088,88 @@ public abstract class OdeHelper {
 
 
 	/**
+	 * This is custom heightfield based on a trimesh. It is specific to ode4j.
+	 *
+	 * Creates a trimesh heightfield geom.
+	 * <p>
+	 * Uses the information in the given dHeightfieldData to construct
+	 * a geom representing a heightfield in a collision space.
+	 *
+	 * @param space The space to add the geom to.
+	 * @param data The dHeightfieldData created by dGeomHeightfieldDataCreate and
+	 * setup by dGeomHeightfieldDataBuildCallback, dGeomHeightfieldDataBuildByte,
+	 * dGeomHeightfieldDataBuildShort or dGeomHeightfieldDataBuildFloat.
+	 * @param bPlaceable If non-zero this geom can be transformed in the world using the
+	 * usual functions such as dGeomSetPosition and dGeomSetRotation. If the geom is
+	 * not set as placeable, then it uses a fixed orientation where the global y axis
+	 * represents the dynamic 'height' of the heightfield.
+	 *
+	 * @return A geom id to reference this geom in other calls.
+	 */
+	public static DHeightfield createTrimeshHeightfield( DSpace space,
+												  DHeightfieldData data, boolean bPlaceable ) {
+		return DxTrimeshHeightfield.dCreateHeightfield((DxSpace)space, (DxHeightfieldData)data, bPlaceable);
+	}
+
+
+//	/**
+//	 * Creates a new empty dHeightfieldData.
+//	 * <p>
+//	 * Allocates a new dHeightfieldData and returns it. You must call
+//	 * dGeomHeightfieldDataDestroy to destroy it after the geom has been removed.
+//	 * The dHeightfieldData value is used when specifying a data format type.
+//	 *
+//	 * @return A dHeightfieldData for use with dGeomHeightfieldDataBuildCallback,
+//	 * dGeomHeightfieldDataBuildByte, dGeomHeightfieldDataBuildShort or
+//	 * dGeomHeightfieldDataBuildFloat.
+//	 */
+//	public static DHeightfieldData createTrimeshHeightfieldData() {
+//		return DxTrimeshHeightfield.dGeomHeightfieldDataCreate();
+//	}
+
+	/**
 	 * Trimesh class
 	 * Construction. Callbacks are optional.
 	 * @param space space
 	 * @param data user data
-	 * @param callback callback
-	 * @param arrayCallback array callback
-	 * @param rayCallback ray callback
 	 * @return trimesh
 	 */
-	public static DTriMesh createTriMesh(DSpace space, DTriMeshData data, DTriCallback callback, 
-			 DTriArrayCallback arrayCallback, DTriRayCallback rayCallback) {
-		return DxTriMesh.dCreateTriMesh((DxSpace)space, (DxTriMeshData)data, 
+	public static DTriMesh createTriMesh(DSpace space, DTriMeshData data) {
+		return DxTriMesh.dCreateTriMesh((DxSpace)space, (DxTriMeshData)data,null, null, null);
+	}
+
+	/**
+	 * Trimesh class
+	 * Construction. Callbacks are optional.
+	 * @param space space
+	 * @param data user data
+	 * @param callback callback (can be NULL)
+	 *                 NOTE: The callback is only called for Box, Capsule, Ray, Sphere and TriMesh. See issue #76.
+	 * // @param arrayCallback array callback (can be NULL) ---- Not supported in GIMPACT.
+	 * @param rayCallback ray callback (can be NULL)
+	 * @return trimesh
+	 */
+	public static DTriMesh createTriMesh(DSpace space, DTriMeshData data, DTriCallback callback,
+										 DTriRayCallback rayCallback) {
+		return DxTriMesh.dCreateTriMesh((DxSpace)space, (DxTriMeshData)data, callback, null, rayCallback);
+	}
+
+	/**
+	 * Trimesh class
+	 * Construction. Callbacks are optional.
+	 * @param space space
+	 * @param data user data
+	 * @param callback callback (can be NULL)
+	 *                 NOTE: The callback is only called for Box, Capsule, Ray, Sphere and TriMesh. See issue #76.
+	 * @param arrayCallback array callback (can be NULL) ---- Not supported in GIMPACT.
+	 * @param rayCallback ray callback (can be NULL)
+	 * @return trimesh
+	 */
+	@SuppressWarnings("deprecation") // TODO deprecate this method?!?!? 0.6.0 ?
+	public static DTriMesh createTriMesh(DSpace space, DTriMeshData data, DTriCallback callback,
+										 org.ode4j.ode.DTriMesh.DTriArrayCallback arrayCallback,
+										 DTriRayCallback rayCallback) {
+		return DxTriMesh.dCreateTriMesh((DxSpace)space, (DxTriMeshData)data,
 				callback, arrayCallback, rayCallback);
 	}
 
@@ -1159,5 +1291,7 @@ public abstract class OdeHelper {
 	public static List<DJoint> connectingJointList(DBody b1, DBody b2) {
 		return OdeJointsFactoryImpl.dConnectingJointList((DxBody)b1, (DxBody)b2);
 	}
-	
+
+	@Deprecated // Make this "private" in 0.6.0
+	protected OdeHelper() {}
 }

@@ -25,6 +25,8 @@
 package org.ode4j.ode;
 
 
+import org.ode4j.math.DVector3;
+
 /**
  * TriMesh code by Erwin de Vries.
  *
@@ -54,6 +56,7 @@ public interface DTriMesh extends DGeom {
 	 * shot. Maybe we should remove this one.
 	 */
 	//typedef void dTriArrayCallback(dGeom TriMesh, dGeom RefObject, final int* TriIndices, int TriCount);
+	@Deprecated // This is not supported in GIMPACT and neither in ode4j. Moreover, ODE suggests this should be removed.
 	interface DTriArrayCallback {
 		void call(DGeom TriMesh, DGeom RefObject, final int[] TriIndices, int TriCount);
 	}
@@ -67,14 +70,57 @@ public interface DTriMesh extends DGeom {
 	interface DTriCallback {
 		int call(DGeom TriMesh, DGeom RefObject, int TriangleIndex);
 	}
-	
-	
-	
-	
-	
-//	void dGeomTriMeshDataSet(DTriMeshData g, int data_id, Object in_data);
-//	Object dGeomTriMeshDataGet(DTriMeshData g, int data_id);
 
+
+	//	enum dMeshTriangleVertex {
+	//		dMTV__MIN,
+	//		dMTV_FIRST =dMTV__MIN,
+	//		dMTV_SECOND,
+	//		dMTV_THIRD,
+	//		dMTV__MAX,
+	//	}
+	int dMTV__MIN = 0;
+	int dMTV_FIRST = dMTV__MIN;
+	int dMTV_SECOND = 1;
+	int dMTV_THIRD = 2;
+	int dMTV__MAX = 3;
+
+	/*
+	 * The values of data_id that can be used with dGeomTriMeshDataSet/dGeomTriMeshDataGet
+	 */
+	enum dTRIMESHDATA {
+		FACE_NORMALS,
+		USE_FLAGS
+		//public static final dTRIMESHDATA _MIN = 0;
+		//public static final dTRIMESHDATA dTRIMESHDATA__MAX = 2;
+		//#ifndef TRIMESH_FACE_NORMALS // Define this name during the header inclusion if you need it for something else
+		//		// Included for backward compatibility -- please use the corrected name above. Sorry.
+		//		TRIMESH_FACE_NORMALS = dTRIMESHDATA_FACE_NORMALS,
+		//#endif
+	}
+
+	/*
+	 * The flags of the dTRIMESHDATA_USE_FLAGS data elements
+	 */
+	class dMESHDATAUSE
+	{
+		public static final int dMESHDATAUSE_EDGE1      = 0x01;
+		public static final int dMESHDATAUSE_EDGE2      = 0x02;
+		public static final int dMESHDATAUSE_EDGE3      = 0x04;
+		public static final int dMESHDATAUSE_VERTEX1    = 0x08;
+		public static final int dMESHDATAUSE_VERTEX2    = 0x10;
+		public static final int dMESHDATAUSE_VERTEX3    = 0x20;
+
+		private dMESHDATAUSE() {}
+	}
+
+	/*
+	 *	Set and get the TriMeshData additional data
+	 * Note: The data is NOT COPIED on assignment
+	 */
+	//	void dGeomTriMeshDataSet(DTriMeshData g, int data_id, Object in_data);
+	//	Object dGeomTriMeshDataGet(DTriMeshData g, int data_id);
+	//  void *dGeomTriMeshDataGet2(dTriMeshDataID g, int data_id, size_t *pout_size/*=NULL*/);
 
 //The following is not ported to Java because it is not supported by GIMPACT (TZ).
 //	/**
@@ -88,58 +134,48 @@ public interface DTriMesh extends DGeom {
 
 
 
-//	///**
-//	// * Per triangle callback. Allows the user to say if he wants a collision with
-//	// * a particular triangle.
-//	// */
-//	////typedef int dTriCallback(dGeom TriMesh, dGeom RefObject, int TriangleIndex);
-//	//	 interface dTriCallback {
-//	//		 int call(dGeom TriMesh, dGeom RefObject, int TriangleIndex);
-//	//	 }
-//	//ODE_API 
-//	void dGeomTriMeshSetCallback(DGeom g, dTriCallback Callback) {
-//		throw new UnsupportedOperationException();
-//	}
-//	//ODE_API 
-//	dTriCallback dGeomTriMeshGetCallback(DGeom g) {
-//		throw new UnsupportedOperationException();
-//	}
-//
-//	///**
-//	// * Per object callback. Allows the user to get the list of triangles in 1
-//	// * shot. Maybe we should remove this one.
-//	// */
-//	////typedef void dTriArrayCallback(dGeom TriMesh, dGeom RefObject, final int* TriIndices, int TriCount);
-//	//interface dTriArrayCallback {
-//	//	void call(dGeom TriMesh, dGeom RefObject, final int[] TriIndices, int TriCount);
-//	//}
-//	//ODE_API 
-//	void dGeomTriMeshSetArrayCallback(DGeom g, dTriArrayCallback ArrayCallback) {
-//		throw new UnsupportedOperationException();
-//	}
-//	//ODE_API 
-//	dTriArrayCallback dGeomTriMeshGetArrayCallback(DGeom g) {
-//		throw new UnsupportedOperationException();
-//	}
-//
-//	///**
-//	// * Ray callback.
-//	// * Allows the user to say if a ray collides with a triangle on barycentric
-//	// * coords. The user can for example sample a texture with alpha transparency
-//	// * to determine if a collision should occur.
-//	// */
-//	////typedef int dTriRayCallback(dGeom TriMesh, dGeom Ray, int TriangleIndex, double u, double v);
-//	//interface dTriRayCallback {
-//	//	int call(dGeom TriMesh, dGeom Ray, int TriangleIndex, double u, double v);
-//	//}
-//	//ODE_API 
-//	void dGeomTriMeshSetRayCallback(DGeom g, dTriRayCallback Callback) {
-//		throw new UnsupportedOperationException();
-//	}
-//	//ODE_API 
-//	dTriRayCallback dGeomTriMeshGetRayCallback(DGeom g) {
-//		throw new UnsupportedOperationException();
-//	}
+	/**
+	 * Per triangle callback. Allows the user to say if he wants a collision with
+	 * a particular triangle.
+	 * @param Callback the callback function
+	 */
+	////typedef int dTriCallback(dGeom TriMesh, dGeom RefObject, int TriangleIndex);
+	//ODE_API
+	//void dGeomTriMeshSetCallback(DGeom g, dTriCallback Callback) {
+	void setCallback(DTriCallback Callback);
+
+	//ODE_API
+	//dTriCallback dGeomTriMeshGetCallback(DGeom g)
+	DTriCallback getCallback();
+
+	//	///**
+	//	// * Per object callback. Allows the user to get the list of triangles in 1
+	//	// * shot. Maybe we should remove this one.
+	//	// */
+	//	////typedef void dTriArrayCallback(dGeom TriMesh, dGeom RefObject, final int* TriIndices, int TriCount);
+	//	//ODE_API
+	//	//void dGeomTriMeshSetArrayCallback(DGeom g, dTriArrayCallback ArrayCallback)
+	//	void setArrayCallback(DTriMesh.DTriArrayCallback ArrayCallback);
+	//
+	//	//ODE_API
+	//	//dTriArrayCallback dGeomTriMeshGetArrayCallback(DGeom g)
+	//	DTriMesh.DTriArrayCallback getArrayCallback();
+
+	/**
+	 * Ray callback.
+	 * Allows the user to say if a ray collides with a triangle on barycentric
+	 * coords. The user can for example sample a texture with alpha transparency
+	 * to determine if a collision should occur.
+	 * @param Callback the callback function
+	 */
+	////typedef int dTriRayCallback(dGeom TriMesh, dGeom Ray, int TriangleIndex, double u, double v);
+	//ODE_API
+	//void dGeomTriMeshSetRayCallback(DGeom g, dTriRayCallback Callback);
+	void setRayCallback(DTriMesh.DTriRayCallback Callback);
+
+	//ODE_API
+	//dTriRayCallback dGeomTriMeshGetRayCallback(DGeom g);
+	DTriMesh.DTriRayCallback getRayCallback();
 
 	/**
 	 * Triangle merging callback.
@@ -169,17 +205,15 @@ public interface DTriMesh extends DGeom {
 //		return OdeHelper.createTriMesh(space, Data, 
 //				Callback, ArrayCallback, RayCallback);
 //	}
-//
-//	//ODE_API 
-//	void dGeomTriMeshSetData(DGeom g, DTriMeshData Data) {
-//		throw new UnsupportedOperationException();
-//	}
-//	//ODE_API 
-//	DTriMeshData dGeomTriMeshGetData(DGeom g) {
-//		throw new UnsupportedOperationException();
-//	}
-//
-//
+
+	//ODE_API
+	//void dGeomTriMeshSetData(DGeom g, DTriMeshData Data) {
+	void setTrimeshData(DTriMeshData Data);
+	//ODE_API
+	//DTriMeshData dGeomTriMeshGetData(DGeom g) {
+	DTriMeshData getTrimeshData();
+
+
 	/** 
 	 * Enable/disable temporal coherence. 
 	 * @param cls Geometry class
@@ -205,57 +239,59 @@ public interface DTriMesh extends DGeom {
 	 * collision checked with a trimesh once, data is stored inside the trimesh.
 	 * With large worlds with lots of seperate objects this list could get huge.
 	 * We should be able to do this automagically.
-	 * @param g trimesh
 	 */
 	//ODE_API 
-	void clearTCCache(DTriMesh g);
+	void clearTCCache();
 
 
-//	/**
-//	 * returns the TriMeshDataID
-//	 */
-//	//ODE_API 
-//	DTriMeshData dGeomTriMeshGetTriMeshDataID(DTriMesh g);
-//
-//	/**
-//	 * Gets a triangle.
-//	 */
-//	//ODE_API 
-//	//void dGeomTriMeshGetTriangle(dGeom g, int Index, dVector3* v0, dVector3* v1, dVector3* v2) {
-//	void dGeomTriMeshGetTriangle(DTriMesh g, int Index, DVector3 v0, DVector3 v1, DVector3 v2);
-//
-//	/**
-//	 * Gets the point on the requested triangle and the given barycentric
-//	 * coordinates.
-//	 */
-//	//ODE_API 
-//	void getPoint(DTriMesh g, int Index, double u, double v, DVector3 Out);
-//
-//	/*
-//
-//This is how the strided data works:
-//
-//struct StridedVertex{
-//	dVector3 Vertex;
-//	// Userdata
-//};
-//int VertexStride = sizeof(StridedVertex);
-//
-//struct StridedTri{
-//	int Indices[3];
-//	// Userdata
-//};
-//int TriStride = sizeof(StridedTri);
-//
-//	 */
-//
-//
-//	//ODE_API 
-//	int getTriangleCount (DGeom g);
-//
-//	//ODE_API 
-//	void dGeomTriMeshDataUpdate(DTriMeshData g) {
-//		throw new UnsupportedOperationException();
-//	}
+	/**
+	 * @return the TriMeshData instance
+	 */
+	//ODE_API
+	//DTriMeshData dGeomTriMeshGetTriMeshDataID(DTriMesh g);
+	DTriMeshData getTriMeshData();
 
+	/**
+	 * Gets a triangle.
+	 * @param Index triangle index
+	 * @param v0 output node 0
+	 * @param v1 output node 1
+	 * @param v2 output node 2
+	 */
+	//ODE_API
+	//void dGeomTriMeshGetTriangle(dGeom g, int Index, dVector3* v0, dVector3* v1, dVector3* v2) {
+	void getTriangle(int Index, DVector3 v0, DVector3 v1, DVector3 v2);
+
+	/**
+	 * Gets the point on the requested triangle and the given barycentric
+	 * coordinates.
+	 * @param index triangle index
+	 * @param u u
+	 * @param v v
+	 * @param Out output
+	 */
+	//ODE_API
+	//void dGeomTriMeshGetPoint(dGeomID g, int index, dReal u, dReal v, dVector3 Out)
+	void getPoint(int index, double u, double v, DVector3 Out);
+
+	//	/*
+	//
+	//This is how the strided data works:
+	//
+	//struct StridedVertex{
+	//	dVector3 Vertex;
+	//	// Userdata
+	//};
+	//int VertexStride = sizeof(StridedVertex);
+	//
+	//struct StridedTri{
+	//	int Indices[3];
+	//	// Userdata
+	//};
+	//int TriStride = sizeof(StridedTri);
+	//
+	//	 */
+
+	//ODE_API
+	int getTriangleCount ();
 }

@@ -33,8 +33,6 @@ import org.ode4j.drawstuff.internal.DrawStuffNull;
 import org.ode4j.math.DMatrix3C;
 import org.ode4j.math.DVector3C;
 
-import javax.swing.*;
-
 /** 
  * DrawStuff
  * 
@@ -174,9 +172,7 @@ public class DrawStuff {
 	  public static void dsSimulationLoop (String[] args,
 			  int window_width, int window_height,
 			  dsFunctions fn) {
-		  SwingUtilities.invokeLater(()->{
-			  get().dsSimulationLoop(args, window_width, window_height, fn);
-		  });
+		  get().dsSimulationLoop(args, window_width, window_height, fn);
 	  }
 
 	/**
@@ -392,6 +388,24 @@ public class DrawStuff {
 	public static void dsDrawTriangle(DVector3C pos, DMatrix3C rot,
 			float[] v0, float[] v1, float[] v2, boolean solid) {
 		get().dsDrawTriangle(pos, rot, v0, v1, v2, solid);
+	}
+
+	/**
+	 * Draw triangles.
+	 *
+	 * @param pos   Position of center
+	 * @param R     orientation
+	 * @param v     list of vertices (x0, y0, z0, x1, y1, z1, ...)
+	 * @param solid set to 0 for wireframe
+	 */
+	public static void dsDrawTriangles(final float[] pos, final float[] R,
+									   final float[][] v, boolean solid) {
+		get().dsDrawTriangles(pos, R, v, solid);
+	}
+
+	public static void dsDrawTriangles(final DVector3C pos, final DMatrix3C R,
+									   final DVector3C[] v, boolean solid) {
+		get().dsDrawTriangles(pos, R, v, solid);
 	}
 
 	/**

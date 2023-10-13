@@ -307,7 +307,7 @@ public class MainGLFW {
 	static DSpace space;
 	static DJointGroup contactGroup;
 
-	static final DxHashSpace.Node[][] tablePtr = new DxHashSpace.Node[1][];
+	//static final DxHashSpace.Node[][] tablePtr = new DxHashSpace.Node[1][];
 
 	static Clip seaClip;
 
@@ -1291,7 +1291,7 @@ public class MainGLFW {
 			for (int i = 0; i < nbSteps; i++) {
 				physics_error = false;
 				saved_pos.set(body.getPosition());
-				((DxHashSpace)space).collide(data, /*callback*/callback2,tablePtr);
+				((DxHashSpace)space).collide(data, /*callback*/callback2);
 				world.step(dt / nbSteps);
 				contactGroup.empty();
 				if(physics_error) {

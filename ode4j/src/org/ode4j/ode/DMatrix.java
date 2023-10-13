@@ -226,7 +226,7 @@ public class DMatrix extends DMisc {
      * @return false if it failed
      */
     public static boolean dFactorCholesky (double[] A, int n) {
-        return Matrix.dFactorCholesky(A, n, null);
+        return Matrix.dFactorCholesky(A, n);
     }
 
 
@@ -247,7 +247,7 @@ public class DMatrix extends DMisc {
      * @param n n
      */
     public static void dSolveCholesky (double[] L, double[] x, int n) {
-        Matrix.dSolveCholesky(L, x, n, null);
+        Matrix.dSolveCholesky(L, x, n);
     }
 
 
@@ -263,7 +263,7 @@ public class DMatrix extends DMisc {
         return Matrix.dInvertPDMatrix(A, Ainv);
     }
     public static boolean dInvertPDMatrix (double[] A, double[] Ainv, int n) {
-        return Matrix.dInvertPDMatrix(A, Ainv, n, null);
+        return Matrix.dInvertPDMatrix(A, Ainv, n);
     }
 
 
@@ -318,11 +318,26 @@ public class DMatrix extends DMisc {
 //    public void dSolveL1T (const dReal *L, dReal *b, int n, int nskip);
 
 
+    /* in matlab syntax: a(1:n) = a(1:n) .* d(1:n)
+     */
+
     /**
-     * In matlab syntax: a(1:n) = a(1:n) .* d(1:n) 
+     * In matlab syntax: a(1:n) = a(1:n) .* d(1:n)
      * @param a a
      * @param d d
      */
+    // ODE_API
+    public static void dScaleVector (DVector3 a, DVector3C d) {
+        a.scale(d);
+    }
+
+    /**
+     * The function is an alias for @c dScaleVector.
+     *  It has been deprecated because of a wrong naming schema used.
+     * @param a a
+     * @param d d
+     */
+    @Deprecated // deprecated in ODE
     public static void dVectorScale (DVector3 a, DVector3C d) {
         a.scale(d);
     }
@@ -400,7 +415,7 @@ public class DMatrix extends DMisc {
      */
     public static void dLDLTRemove (double[] A, int[] p, double[] L, double[] d,
               int n1, int n2, int r, int nskip) {
-        Matrix.dLDLTRemove(A, p, L, d, n1, n2, r, nskip, null);
+        Matrix.dLDLTRemove(A, p, L, d, n1, n2, r, nskip);
     }
 
 
@@ -417,4 +432,5 @@ public class DMatrix extends DMisc {
         Matrix.dRemoveRowCol(A, n, nskip, r);
     }
 
+    protected DMatrix() {}
 }

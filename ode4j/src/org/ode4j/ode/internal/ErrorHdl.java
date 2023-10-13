@@ -37,13 +37,13 @@ public class ErrorHdl {
 
 	public static Logger logger = LoggerFactory.getLogger(ErrorHdl.class);
 
-	    /**
-	 * @author Tilmann Zaeschke
-	 */
-	public static class ErrorJump extends RuntimeException {
-		private static final long serialVersionUID = 1L;
-
-	}
+	//    /**
+	//	 * @author Tilmann Zaeschke
+	//	 */
+	//	public static class ErrorJump extends RuntimeException {
+	//		private static final long serialVersionUID = 1L;
+	//
+	//	}
 
 
 	private static dMessageFunction error_function = null;
@@ -119,10 +119,11 @@ public class ErrorHdl {
 		//  va_start (ap,msg);
 		if (error_function != null) {
 			error_function.call (num,msg,ap);
-		} 
-		logger.error("ODE Error " + num + ": " + msg, ap);
+		} else {
+			logger.error("ODE Error " + num + ": " + msg, ap);
+		}
 		throw new RuntimeException("#"+num + ": " + msg);
-		//System.exit (1);
+		//exit (1);
 	}
 
 
@@ -137,14 +138,12 @@ public class ErrorHdl {
 		//  va_start (ap,msg);
 		if (debug_function != null) {
 			debug_function.call (num,msg,ap);
+		} else {
+			logger.debug("ODE INTERNAL ERROR " + " " + num + ": " + msg, ap);
 		}
-		logger.debug("ODE INTERNAL ERROR " + " " + num + ": " + msg, ap);
 		// *((char *)0) = 0;   ... commit SEGVicide
 		//abort();
-//		msg += " -> ";
-//		for (Object o:ap) msg += o.toString() + " , ";
-//		throw new RuntimeException("#"+num + ": " + msg);
-		//  System.exit(2);
+		throw new RuntimeException("#"+num + ": " + String.format(msg, ap));
 	}
 
 
@@ -164,4 +163,6 @@ public class ErrorHdl {
 			logger.info("ODE Message " + num + ": " + msg, ap);
 		}
 	}
+
+	private ErrorHdl() {}
 }

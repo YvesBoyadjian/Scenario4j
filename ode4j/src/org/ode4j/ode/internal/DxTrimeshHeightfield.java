@@ -42,25 +42,30 @@ import org.ode4j.ode.DContactGeomBuffer;
 import org.ode4j.ode.DGeom;
 import org.ode4j.ode.DHeightfieldData;
 import org.ode4j.ode.DSpace;
-import org.ode4j.ode.internal.cpp4j.java.ObjArray;
 
 /**
  *
- * @author Tilmann Zaeschke
+ * ode4j enhances the functionality of the gimpact-based heightfield geom by adding simple support for holes and
+ * multiple layers. There is a corresponding demo showing 2 overlapping heightfields that look somewhat like a
+ * Swiss cheese. Moving bodies can fall through the holes and roll on both heightfields. The functionality is
+ * not very interesting on its own, but it allows to build complex environments including tunnels or caves
+ * (e.g. a pipe-like trimesh combined with a heightfield with 2 holes at the end of the tunnel) The code
+ * purposely enforces the rectangular shape of the holes to make it compatible with most of the rendering
+ * techniques. In order to keep the heightfield data API intact NaN value was chosen to denote a hole.
  */
 public class DxTrimeshHeightfield extends DxAbstractHeightfield {
 
     //#define dMIN(A,B)  ((A)>(B) ? (B) : (A))
-    private static final double dMIN(double A, double B) { return ((A)>(B) ? (B) : (A)); }
+    private static double dMIN(double A, double B) { return (Math.min((A), (B))); }
     //#define dMAX(A,B)  ((A)>(B) ? (A) : (B))
-    private static final double dMAX(double A, double B) { return ((A)>(B) ? (A) : (B)); }
+    private static double dMAX(double A, double B) { return (Math.max((A), (B))); }
     //
     //
     ////Three-way MIN and MAX
     //#define dMIN3(A,B,C)  ( (A)<(B) ? dMIN((A),(C)) : dMIN((B),(C)) )
-    private final double dMIN3(double A, double B, double C) { return A<B ? dMIN(A,C) : dMIN(B,C); }
+    private double dMIN3(double A, double B, double C) { return A<B ? dMIN(A,C) : dMIN(B,C); }
     //#define dMAX3(A,B,C)  ( (A)>(B) ? dMAX((A),(C)) : dMAX((B),(C)) )
-    private final double dMAX3(double A, double B, double C) { return A>B ? dMAX(A,C) : dMAX(B,C); }
+    private double dMAX3(double A, double B, double C) { return A>B ? dMAX(A,C) : dMAX(B,C); }
     //
     //#define dOPESIGN(a, op1, op2,b) \
     //(a)[0] op1 op2 ((b)[0]); \
@@ -125,12 +130,12 @@ public class DxTrimeshHeightfield extends DxAbstractHeightfield {
     private int              tempTriangleBufferSize;
 
     //private HeightFieldVertex[]  tempHeightBuffer;
-    private ObjArray<HeightFieldVertex>[]  tempHeightBuffer;
+    private int[]  tempHeightBuffer;
     private HeightFieldVertex[]   tempHeightInstances;
     private int              tempHeightBufferSizeX;
     private int              tempHeightBufferSizeZ;
 
-    private boolean	layered;
+    private final boolean	layered;
 
     public DxTrimeshHeightfield(DSpace space, DHeightfieldData data, boolean bPlaceable) {
         this(space, data, bPlaceable, false);
@@ -163,7 +168,7 @@ public class DxTrimeshHeightfield extends DxAbstractHeightfield {
 
     // compute axis aligned bounding box
     @Override
-    void computeAABB()
+    protected void computeAABB()
     {
         final DxHeightfieldData d = m_p_data;
 
@@ -322,10 +327,9 @@ public class DxTrimeshHeightfield extends DxAbstractHeightfield {
     {
         //delete[] tempTriangleBuffer;
         tempTriangleBuffer = null;
-        //TODO set size == 0? TZ
+        tempTriangleBufferSize = 0; // TZ just to be clean
     }
 
-    @SuppressWarnings("unchecked")
     private void allocateHeightBuffer(int numX, int numZ)
     {
         int alignedNumX = AlignBufferSize(numX, TEMP_HEIGHT_BUFFER_ELEMENT_COUNT_ALIGNMENT_X);
@@ -333,7 +337,7 @@ public class DxTrimeshHeightfield extends DxAbstractHeightfield {
         tempHeightBufferSizeX = alignedNumX;
         tempHeightBufferSizeZ = alignedNumZ;
         //tempHeightBuffer = new HeightFieldVertex *[alignedNumX];
-        tempHeightBuffer = new ObjArray[alignedNumX];
+        tempHeightBuffer = new int[alignedNumX];
         int numCells = alignedNumX * alignedNumZ;
         tempHeightInstances = new HeightFieldVertex [numCells];
         for (int i = 0; i < tempHeightInstances.length; i++) {
@@ -346,7 +350,7 @@ public class DxTrimeshHeightfield extends DxAbstractHeightfield {
             //          tempHeightBuffer[indexX] = ptrHeightMatrix;
             //          ptrHeightMatrix += alignedNumZ;
             //tempHeightBuffer[indexX] = tempHeightInstances[indexX];
-            tempHeightBuffer[indexX] = new ObjArray<HeightFieldVertex>(tempHeightInstances, indexX*alignedNumZ);
+            tempHeightBuffer[indexX] = indexX * alignedNumZ;
         }
     }
 
@@ -399,13 +403,13 @@ public class DxTrimeshHeightfield extends DxAbstractHeightfield {
     class HeightFieldVertex
     {
         //  public:
-        HeightFieldVertex(){};
+        // HeightFieldVertex(){};
 
         DVector3 vertex = new DVector3();
         //HeightFieldVertexCoords coords;
         //int[] coords = new int[2]; //use c1 & c2 (TZ)
         int coords0, coords1;
-    };
+    }
 
     //TODO TZ not used
 //  private class HeightFieldEdge
@@ -414,18 +418,20 @@ public class DxTrimeshHeightfield extends DxAbstractHeightfield {
 //      HeightFieldEdge(){};
 //
 //      //HeightFieldVertex   *vertices[2];
-//      HeightFieldVertex[]   vertices = new HeightFieldVertex[2];  //TODO v1/v1 (TZ)
+//      HeightFieldVertex[]   vertices = new HeightFieldVertex[2];
+//      HeightFieldVertex[]  virtices0, vertices1; // TZ: This is better than an array[2]
 //  };
 
     private class HeightFieldTriangle
     {
         //public:
-        HeightFieldTriangle(){};
+        // HeightFieldTriangle(){};
 
         //HeightFieldVertex   *vertices[3];
-        HeightFieldVertex[]   vertices = new HeightFieldVertex[3]; //TODO c1, c2, c3 (TZ)
+        // HeightFieldVertex[]   vertices = new HeightFieldVertex[3]; //TODO c1, c2, c3 (TZ)
+        HeightFieldVertex   vertices0, vertices1, vertices2;
         //double[]               planeDef=new double[4];
-    };
+    }
 
 
     //////// dxHeightfield /////////////////////////////////////////////////////////////////
@@ -474,7 +480,7 @@ public class DxTrimeshHeightfield extends DxAbstractHeightfield {
                 final double c_Xpos = Xpos;
                 //HeightFieldVertex HeightFieldRow = tempHeightBuffer[x_local];
                 //ObjArray<HeightFieldVertex> HeightFieldRow = new ObjArray<HeightFieldVertex>(tempHeightBuffer, x_local);
-                ObjArray<HeightFieldVertex> HeightFieldRow = tempHeightBuffer[x_local];
+                int posHeightFieldRow = tempHeightBuffer[x_local];
                 for ( z = minZ, z_local = 0; z_local < numZ; z++, z_local++)
                 {
                     Ypos = z * cfSampleDepth; // Always calculate pos via multiplication to avoid computational error accumulation during multiple additions
@@ -483,9 +489,10 @@ public class DxTrimeshHeightfield extends DxAbstractHeightfield {
                     //                  HeightFieldRow.at(z_local).vertex[0] = c_Xpos;
                     //                  HeightFieldRow.at(z_local).vertex[1] = h;
                     //                  HeightFieldRow.at(z_local).vertex[2] = Ypos;
-                    HeightFieldRow.at(z_local).vertex.set( c_Xpos, h, Ypos);
-                    HeightFieldRow.at(z_local).coords0 = x;
-                    HeightFieldRow.at(z_local).coords1 = z;
+                    HeightFieldVertex HeightFieldRowZ = tempHeightInstances[posHeightFieldRow + z_local];
+                    HeightFieldRowZ.vertex.set( c_Xpos, h, Ypos);
+                    HeightFieldRowZ.coords0 = x;
+                    HeightFieldRowZ.coords1 = z;
 
                     maxY = dMAX(maxY, h);
                     minY = dMIN(minY, h);
@@ -542,18 +549,22 @@ public class DxTrimeshHeightfield extends DxAbstractHeightfield {
 
         for ( x_local = 0; x_local < maxX_local; x_local++)
         {
-            ObjArray<HeightFieldVertex> HeightFieldRow      = tempHeightBuffer[x_local];
-            ObjArray<HeightFieldVertex> HeightFieldNextRow  = tempHeightBuffer[x_local + 1];
+            // ObjArray<HeightFieldVertex> HeightFieldRow      = tempHeightBuffer[x_local];
+            // ObjArray<HeightFieldVertex> HeightFieldNextRow  = tempHeightBuffer[x_local + 1];
+            int posHeightFieldRow      = tempHeightBuffer[x_local];
+            int posHeightFieldNextRow  = tempHeightBuffer[x_local + 1];
 
-            C = HeightFieldRow.at(0);
-            D = HeightFieldNextRow.at(0);
+            C = tempHeightInstances[posHeightFieldRow];//.at(0);
+            D = tempHeightInstances[posHeightFieldNextRow];//.at(0);
 
             for ( z_local = 0; z_local < maxZ_local; z_local++)
             {
                 A = C;
                 B = D;
-                C = HeightFieldRow.at(z_local + 1);//  [z_local + 1];
-                D = HeightFieldNextRow.at(z_local + 1);//[z_local + 1];
+                // C = HeightFieldRow.at(z_local + 1);//  [z_local + 1];
+                // D = HeightFieldNextRow.at(z_local + 1);//[z_local + 1];
+                C = tempHeightInstances[posHeightFieldRow + z_local + 1];//  [z_local + 1];
+                D = tempHeightInstances[posHeightFieldNextRow + z_local + 1];//[z_local + 1];
 
                 final double AHeight = A.vertex.get1();
                 final double BHeight = B.vertex.get1();
@@ -571,16 +582,16 @@ public class DxTrimeshHeightfield extends DxAbstractHeightfield {
                 if (isACollide || isBCollide || isCCollide)
                 {
                     HeightFieldTriangle CurrTriUp = tempTriangleBuffer[numTri++];// final ?? TZ
-                    CurrTriUp.vertices[0] = A;
-                    CurrTriUp.vertices[1] = C;
-                    CurrTriUp.vertices[2] = B;
+                    CurrTriUp.vertices0 = A;
+                    CurrTriUp.vertices1 = C;
+                    CurrTriUp.vertices2 = B;
                 }
                 if (isBCollide || isCCollide || isDCollide)
                 {
                     HeightFieldTriangle CurrTriDown = tempTriangleBuffer[numTri++];//final ?? TZ
-                    CurrTriDown.vertices[0] = D;
-                    CurrTriDown.vertices[1] = B;
-                    CurrTriDown.vertices[2] = C;
+                    CurrTriDown.vertices0 = D;
+                    CurrTriDown.vertices1 = B;
+                    CurrTriDown.vertices2 = C;
                 }
             }
         }
@@ -592,22 +603,24 @@ public class DxTrimeshHeightfield extends DxAbstractHeightfield {
         for (int k = 0; k < numTri; k++) {
             HeightFieldTriangle itTriangle = tempTriangleBuffer[k];
             for (int j = 0; j < 3; j ++) {
+                HeightFieldVertex hFVertex = j == 0 ? itTriangle.vertices0 : j == 1 ? itTriangle.vertices1 : itTriangle.vertices2;
                 for (int i = 0; i < 3; i ++) {
-                    vertices[k * 9 + j * 3 + i] = (float) itTriangle.vertices[j].vertex.get(i);
+                    // vertices[k * 9 + j * 3 + i] = (float) itTriangle.vertices[j].vertex.get(i);
+                    vertices[k * 9 + j * 3 + i] = (float) hFVertex.vertex.get(i);
                 }
                 faces[k * 3 + j] = k * 3 + j;
             }
         }
         DxGimpactData data = new DxGimpactData();
         data.build(vertices, faces);
-        DxGimpact trimesh = new DxGimpact(null, data);
+        DxGimpact trimesh = new DxGimpact(null, data, null, null, null);
         trimesh.recomputeAABB();
         numTerrainContacts = DxGeom.dCollide(trimesh, o2, flags, contacts, skip);
         trimesh.destroy();
         return numTerrainContacts;
     }
 
-    public static class CollideHeightfield implements DColliderFn {
+    static class CollideHeightfield implements DColliderFn {
         int dCollideHeightfield( DxTrimeshHeightfield o1, DxGeom o2, int flags, DContactGeomBuffer contacts, int skip )
         {
             dIASSERT( skip >= 1);//(int)sizeof(dContactGeom) );
