@@ -175,8 +175,11 @@ public class SoSphere extends SoShape {
       int depth;
     };
 
-    private final CacheState _cache = new CacheState();
-	 
+    private final CacheState _cache1 = new CacheState();
+    private final CacheState _cache2 = new CacheState();
+
+    private CacheState _lastComputedCache = null;
+
 // Computes S and T texture coordinates from point on surface
 private final float COMPUTE_S( SbVec3f point) {                                              
   float s = (float)Math.atan2(point.getValueRead()[0], point.getValueRead()[2]) * .159f + .5f;
@@ -414,13 +417,30 @@ public void GLRenderVertexArray(SoGLRenderAction action, boolean sendNormals, bo
   // Compute depth based on complexity
   int depth = computeDepth(action);
 
-  boolean cacheValid = _cache.radius == rad &&
-                    _cache.depth == depth &&
-                    _cache.useNormals == sendNormals &&
-                    _cache.useTexCoords == doTextures &&
-                    _cache.vbo.isValid(state);
+  boolean cache1Valid = _cache1.radius == rad &&
+                    _cache1.depth == depth &&
+                    _cache1.useNormals == sendNormals &&
+                    _cache1.useTexCoords == doTextures &&
+                    _cache1.vbo.isValid(state);
 
-  if (!cacheValid) {
+    boolean cache2Valid = _cache2.radius == rad &&
+            _cache2.depth == depth &&
+            _cache2.useNormals == sendNormals &&
+            _cache2.useTexCoords == doTextures &&
+            _cache2.vbo.isValid(state);
+
+  if (!cache1Valid && !cache2Valid) {
+
+      CacheState _cache;
+
+      if(_lastComputedCache == _cache1) {
+          _cache = _cache2;
+      }
+      else {
+          _cache = _cache1;
+      }
+      _lastComputedCache = _cache;
+
     _cache.radius = rad;
     _cache.depth = depth;
     _cache.useNormals = sendNormals;
@@ -624,6 +644,19 @@ public void GLRenderVertexArray(SoGLRenderAction action, boolean sendNormals, bo
     texCoordOffset.destructor(); 
     //dummy.destructor();
   }
+
+
+    CacheState _cache;
+
+    if (cache1Valid) {
+        _cache = _cache1;
+    }
+    else if (cache2Valid) {
+        _cache = _cache2;
+    }
+    else {
+        _cache = _lastComputedCache;
+    }
   
   _cache.vbo.bind(state);
 

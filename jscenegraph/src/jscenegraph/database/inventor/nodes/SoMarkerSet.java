@@ -1154,6 +1154,13 @@ public class SoMarkerSet extends SoPointSet {
 		}
 		
 		private static boolean firsterror = true;
+	private SoGLImage image = new SoGLImage();
+
+	private int imageWidth = -1;
+	private int imageHeight = -1;
+	private Object imageData = null;
+	private int imageDataOffset = -1;
+	private int imageAlign = -1;
 
 // doc in super
 public void
@@ -1295,27 +1302,41 @@ GLRender(SoGLRenderAction action)
     gl2.glPixelStorei(GL2.GL_UNPACK_ALIGNMENT, tmp.align);
     gl2.glRasterPos3f(point.getValueRead()[0], point.getValueRead()[1], -point.getValueRead()[2]);
     //gl2.glBitmap(tmp.width, tmp.height, 0, 0, 0, 0, tmp.data, tmp.dataOffset);
-	  SoGLImage image = new SoGLImage();
 
-	  MemoryBuffer mbu = MemoryBuffer.allocateBytes(tmp.width*tmp.height);
-	  ByteBuffer bb = ByteBuffer.wrap(tmp.data).order(ByteOrder.BIG_ENDIAN);
-	  bb.position(tmp.dataOffset);
-	  IntBuffer sb = bb.asIntBuffer();
-	  ByteBuffer bb2 = bb.slice();
-	  int index = 0;
-	  int index2 = 0;
-	  for (int j=0;j<tmp.height;j++) {
-	  	int indexSave = index2;
-		  for( int ii=0; ii<tmp.width;ii++) {
-			  int white = (bb2.get(index2/8) >>> (7 - (index2%8)) ) & 1;
-			  mbu.setByte(index, (byte)(white * 255));
-			  index++;index2++;
+	  if (
+	  !(imageWidth == tmp.width &&
+	  imageHeight == tmp.height &&
+	  imageData == tmp.data &&
+	  imageDataOffset == tmp.dataOffset &&
+	  imageAlign == tmp.align)
+	  ) {
+
+		  MemoryBuffer mbu = MemoryBuffer.allocateBytes(tmp.width * tmp.height);
+		  ByteBuffer bb = ByteBuffer.wrap(tmp.data).order(ByteOrder.BIG_ENDIAN);
+		  bb.position(tmp.dataOffset);
+		  IntBuffer sb = bb.asIntBuffer();
+		  ByteBuffer bb2 = bb.slice();
+		  int index = 0;
+		  int index2 = 0;
+		  for (int j = 0; j < tmp.height; j++) {
+			  int indexSave = index2;
+			  for (int ii = 0; ii < tmp.width; ii++) {
+				  int white = (bb2.get(index2 / 8) >>> (7 - (index2 % 8))) & 1;
+				  mbu.setByte(index, (byte) (white * 255));
+				  index++;
+				  index2++;
+			  }
+			  index2 = indexSave + tmp.align * Byte.SIZE;
 		  }
-		  index2 = indexSave+tmp.align*Byte.SIZE;
-	  }
-	  SbVec2s size = new SbVec2s((short)tmp.width, (short)tmp.height);
-	  image.setData(mbu,size,1,true, SoGLImage.Wrap.CLAMP, SoGLImage.Wrap.CLAMP,1.0f);
+		  SbVec2s size = new SbVec2s((short) tmp.width, (short) tmp.height);
+		  image.setData(mbu, size, 1, true, SoGLImage.Wrap.CLAMP, SoGLImage.Wrap.CLAMP, 1.0f);
 
+		  imageWidth = tmp.width;
+		  imageHeight = tmp.height;
+		  imageData = tmp.data;
+		  imageDataOffset = tmp.dataOffset;
+		  imageAlign = tmp.align;
+	  }
 
 	  final SbMatrix objToScreen = new SbMatrix();
 	  objToScreen.copyFrom( SoProjectionMatrixElement.get(state));
