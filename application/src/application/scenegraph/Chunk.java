@@ -51,7 +51,7 @@ public class Chunk {
 	
 	float[] verticesZ;
 	short[] normals;
-	byte[] colors;
+	byte[] colors; // SRGB
 	BitSet stone;
 	//int[] coordIndices;	
 

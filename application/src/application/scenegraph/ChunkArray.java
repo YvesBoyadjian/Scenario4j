@@ -409,7 +409,20 @@ public class ChunkArray {
 		
 		return RGBA;
 	}
-	
+
+	public void colorsGetRGB(byte[] image, int indexImage, int vertexIndex) {
+		int i = vertexIndex/h;
+		int j = vertexIndex - i*h;
+
+		Chunk c = getOneChunk(i,j);
+		int chunkIndice = getInChunkIndice(c, i,j);
+
+		image[indexImage] = c.colors[chunkIndice*4];
+		image[indexImage+1] = c.colors[chunkIndice*4+1];
+		image[indexImage+2] = c.colors[chunkIndice*4+2];
+		//byte alpha = c.colors[chunkIndice*4+3];
+	}
+
 	private Chunk getOneChunk(int i, int j) {
 		
 		int ic = lowChunkFromIndice(i); int jc = lowChunkFromIndice(j);

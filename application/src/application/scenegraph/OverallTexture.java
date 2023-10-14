@@ -29,7 +29,7 @@ public class OverallTexture {
 		this.ca = chunkArray;
 		
 		texture = new SoTexture2();
-		texture.image.setValue(new SbVec2s((short)ca.getW(),(short)ca.getH()),3,false, getImage2(), true);
+		texture.image.setValue(new SbVec2s((short)ca.getW(),(short)ca.getH()),3,true, getImage2(), true);
 	}
 
 	private MemoryBuffer getImage2() {
@@ -46,17 +46,8 @@ public class OverallTexture {
 			for(int j=0;j<h;j++) {
 				for(int i=0;i<w;i++) {
 					int index = i*h+j;
-					//int indexI = i+w*j;
-					
-					int RGBA = ca.colorsGetRGBA(index);
-					
-					image[indexImage] = (byte)((RGBA>>>24) & 0xFF);indexImage++;
-					image[indexImage] = (byte)((RGBA>>>16) & 0xFF);indexImage++;
-					image[indexImage] = (byte)((RGBA>>>8) & 0xFF);indexImage++;
-					
-	//				image[indexI*3] = ca.colorsGet(index*4);
-	//				image[indexI*3+1] = ca.colorsGet(index*4+1);
-	//				image[indexI*3+2] = ca.colorsGet(index*4+2);
+					ca.colorsGetRGB(image,indexImage, index);
+					indexImage+=3;
 				}
 			}
 			//saveImage2(image); //not very efficient ( 3 seconds gain)

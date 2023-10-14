@@ -570,12 +570,9 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 						blue_ = snow.getBlue();					
 					}
 					
-					int red = /*color.getRed()*color.getRed()*/red_*red_/255;
-					int green = /*color.getGreen()*color.getGreen()*/green_*green_/255;
-					int blue = /*color.getBlue()*color.getBlue()*/blue_*blue_/255;
 					int alpha = 255;//color.getAlpha();
 					
-					chunks.colorsPut(index, red, green, blue, alpha);
+					chunks.colorsPut(index, red_, green_, blue_, alpha);
 				}
 				updateZMinMax(zMinForI, zMaxForI);
 
