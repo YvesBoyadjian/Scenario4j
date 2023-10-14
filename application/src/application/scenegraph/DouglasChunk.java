@@ -378,6 +378,8 @@ public class DouglasChunk {
 
 		final List<Float> branchHoriLengths = new ArrayList<>();
 
+		final List<Float> branchVertiLengths = new ArrayList<>();
+
 		final List<SbVec3f> vertices = new ArrayList<>();
 		final List<SbVec3f> normals = new ArrayList<>();
 		final List<Integer> colors = new ArrayList<>();
@@ -469,6 +471,7 @@ public class DouglasChunk {
 				branchExtremity2.setValue(xTrunk+(float)Math.sin(azimuth2)*branchHoriLength,yTrunk+(float)Math.cos(azimuth2)*branchHoriLength,ze2);
 
 				branchHoriLengths.add(branchHoriLength);
+				branchVertiLengths.add(zStartBranch - zStartBranch2);
 
 				vertices.add(branchBase);
 				vertices.add(branchBase2);
@@ -508,7 +511,7 @@ public class DouglasChunk {
 
         nearF[groupIndex] = new IndexedFaceSetParametersImpl();
 
-		nearF[groupIndex].fill(nbVerticesNear, vertices, branchExtremityOn, normals, colors, branchHoriLengths, zDeltaBaseBranch, falling);
+		nearF[groupIndex].fill(nbVerticesNear, vertices, branchExtremityOn, normals, colors, branchHoriLengths,branchVertiLengths, zDeltaBaseBranch, falling);
 /*
 		douglasIndicesNearF = douglasIndicesF;
 		douglasVerticesNearF = douglasVerticesF;

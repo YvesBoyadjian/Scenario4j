@@ -58,6 +58,7 @@ public class IndexedFaceSetParametersImpl implements IndexedFaceSetParameters {
                      final List<SbVec3f> normals,
                      final List<Integer> colors,
                      final List<Float> branchHoriLengths,
+                     final List<Float> branchVertiLengths,
                      final float zDeltaBaseBranch,
                      final float falling) {
 
@@ -208,17 +209,18 @@ public class IndexedFaceSetParametersImpl implements IndexedFaceSetParameters {
         floatIndex = 0;
         for(int i=0;i<nbBranches;i++) {
             float branchHoriLength = branchHoriLengths.get(i);
+            float branchVertiLength = branchVertiLengths.get(i);
             // Branch base
             douglasTexCoordsNearF.setFloat(floatIndex,0); floatIndex++;
             douglasTexCoordsNearF.setFloat(floatIndex,0); floatIndex++;
             // Branch base 2
-            douglasTexCoordsNearF.setFloat(floatIndex,zDeltaBaseBranch); floatIndex++;
+            douglasTexCoordsNearF.setFloat(floatIndex,/*zDeltaBaseBranch*/branchVertiLength); floatIndex++;
             douglasTexCoordsNearF.setFloat(floatIndex,0); floatIndex++;
             // Branch extremity
-            douglasTexCoordsNearF.setFloat(floatIndex,branchHoriLength); floatIndex++;
+            douglasTexCoordsNearF.setFloat(floatIndex,/*branchHoriLength*/branchVertiLength); floatIndex++;
             douglasTexCoordsNearF.setFloat(floatIndex,-branchHoriLength); floatIndex++;
             // Branch Extremity 2
-            douglasTexCoordsNearF.setFloat(floatIndex,branchHoriLength); floatIndex++;
+            douglasTexCoordsNearF.setFloat(floatIndex,/*branchHoriLength*/branchVertiLength); floatIndex++;
             douglasTexCoordsNearF.setFloat(floatIndex,branchHoriLength); floatIndex++;
             if(branchExtremityOn) {
                 // Branch extremity 3

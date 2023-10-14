@@ -54,12 +54,7 @@
 
 package jscenegraph.database.inventor.actions;
 
-import static com.jogamp.opengl.GL.GL_COLOR_BUFFER_BIT;
-import static com.jogamp.opengl.GL.GL_DEPTH_BUFFER_BIT;
-import static com.jogamp.opengl.GL.GL_LINE_SMOOTH;
-import static com.jogamp.opengl.GL.GL_ONE;
-import static com.jogamp.opengl.GL.GL_ONE_MINUS_SRC_ALPHA;
-import static com.jogamp.opengl.GL.GL_SRC_ALPHA;
+import static com.jogamp.opengl.GL.*;
 import static com.jogamp.opengl.GL2.GL_ACCUM;
 import static com.jogamp.opengl.GL2.GL_LOAD;
 import static com.jogamp.opengl.GL2.GL_RETURN;
