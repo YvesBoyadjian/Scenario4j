@@ -1,8 +1,8 @@
 #version 400 core
 layout (location = 0) in vec3 s4j_Vertex;
 layout (location = 1) in vec3 s4j_Normal;
-layout (location = 2) in vec2 s4j_MultiTexCoord0;
-layout (location = 3) in vec4 s4j_Color;
+layout (location = 2) in vec4 s4j_Color;
+layout (location = 3) in vec2 s4j_MultiTexCoord0;
 uniform mat4 s4j_ModelViewMatrix;
 uniform mat4 s4j_ProjectionMatrix;
 uniform mat3 s4j_NormalMatrix;
@@ -15,6 +15,18 @@ out vec4 shadowCoord0;
 out vec4 nearShadowCoord0;
 uniform mat4 textureMatrix0;
 uniform mat4 nearTextureMatrix0;
+out vec4 shadowCoord1;
+out vec4 nearShadowCoord1;
+uniform mat4 textureMatrix1;
+uniform mat4 nearTextureMatrix1;
+out vec4 shadowCoord2;
+out vec4 nearShadowCoord2;
+uniform mat4 textureMatrix2;
+uniform mat4 nearTextureMatrix2;
+out vec4 shadowCoord3;
+out vec4 nearShadowCoord3;
+uniform mat4 textureMatrix3;
+uniform mat4 nearTextureMatrix3;
 uniform mat4 cameraTransform;
 out vec3 ecPosition3;
 out vec3 fragmentNormal;
@@ -44,6 +56,18 @@ vec4 diffuCol;
   shadowCoord0 = textureMatrix0 * pos;
 
   nearShadowCoord0 = nearTextureMatrix0 * pos;
+
+  shadowCoord1 = textureMatrix1 * pos;
+
+  nearShadowCoord1 = nearTextureMatrix1 * pos;
+
+  shadowCoord2 = textureMatrix2 * pos;
+
+  nearShadowCoord2 = nearTextureMatrix2 * pos;
+
+  shadowCoord3 = textureMatrix3 * pos;
+
+  nearShadowCoord3 = nearTextureMatrix3 * pos;
 
   perVertexColor = vec3(clamp(color.r, 0.0, 1.0), clamp(color.g, 0.0, 1.0), clamp(color.b, 0.0, 1.0));
 texCoord = s4j_MultiTexCoord0;
