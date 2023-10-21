@@ -620,14 +620,6 @@ public
 	    	GLFW.glfwWindowHint(GLFW.GLFW_OPENGL_DEBUG_CONTEXT, GLFW.GLFW_FALSE);
 	        GLCapabilities swtCapabilities = GL.createCapabilities();
 
-	        GL2 gl2 = new GL2() {};
-	        int[] rb = new int[1];
-	        gl2.glGetIntegerv(GL_RED_BITS, rb);
-	        System.out.println("Color depth : "+rb[0]+" bits");
-	        
-	        gl2.glGetIntegerv(GL11.GL_DEPTH_BITS, rb);
-	        System.out.println("Depth precision : "+rb[0]+" bits");
-	        
 	        parent.initialized = false; // have to reinitialize
 	    }
 	    if (shareID == -1) {

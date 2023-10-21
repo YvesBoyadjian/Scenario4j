@@ -862,9 +862,9 @@ public class MainGLFW {
 		// ____________________________________________________________________________________ Building OpenGL widget
 		GLData glf = new GLData(/*GLProfile.getDefault()*/);
 		glf.name = "Mount Rainier Island";
-		glf.redSize = 8;//10;
-		glf.greenSize = 8;//10;
-		glf.blueSize = 8;//10;
+		glf.redSize = 10;
+		glf.greenSize = 10;
+		glf.blueSize = 10;
 		glf.alphaSize = 0;
 		glf.depthSize = 32;
 		glf.doubleBuffer = true;

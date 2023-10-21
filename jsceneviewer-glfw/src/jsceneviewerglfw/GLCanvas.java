@@ -18,6 +18,7 @@ import java.nio.*;
 import static org.lwjgl.glfw.Callbacks.*;
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL30.*;
 import static org.lwjgl.system.MemoryStack.*;
 import static org.lwjgl.system.MemoryUtil.*;
 
@@ -76,8 +77,6 @@ public class GLCanvas extends Composite {
 			//if( vidMode.redBits() == 10) {
 			glfwWindowHint(GLFW_ALPHA_BITS, format.alphaSize != 0 ? format.alphaSize : GLFW_DONT_CARE);
 			//}
-			System.out.println("RGB : "+ vidMode.redBits()+" "+vidMode.greenBits()+" "+vidMode.blueBits());
-			System.out.println("Refresh Rate : "+vidMode.refreshRate()+" Hz");
 
 			glfwWindowHint(GLFW_DECORATED, GLFW_FALSE); //makes flashing the screen in windows, but necessary for linux
 
@@ -121,6 +120,25 @@ public class GLCanvas extends Composite {
 			glfwMakeContextCurrent(window);
 			// Enable v-sync (or not)
 			glfwSwapInterval(format.waitForRefresh ? 1 : 0);
+
+			GL.createCapabilities();
+
+			int[] r = new int[1];
+			int[] g = new int[1];
+			int[] b = new int[1];
+			int[] d = new int[1];
+			glGetFramebufferAttachmentParameteriv(GL_FRAMEBUFFER, GL_FRONT_LEFT, GL_FRAMEBUFFER_ATTACHMENT_RED_SIZE, r);
+			glGetFramebufferAttachmentParameteriv(GL_FRAMEBUFFER, GL_FRONT_LEFT, GL_FRAMEBUFFER_ATTACHMENT_GREEN_SIZE, g);
+			glGetFramebufferAttachmentParameteriv(GL_FRAMEBUFFER, GL_FRONT_LEFT, GL_FRAMEBUFFER_ATTACHMENT_BLUE_SIZE, b);
+			//glGetFramebufferAttachmentParameteriv(GL_FRAMEBUFFER, GL_FRONT_LEFT, GL_FRAMEBUFFER_ATTACHMENT_DEPTH_SIZE, d);
+			int[] fwidth = new int[1];
+			int[] fheight = new int[1];
+			glfwGetFramebufferSize(window, fwidth, fheight);
+
+			System.out.println("Defintion : "+fwidth[0]+" x "+fheight[0]);
+			System.out.println("RGB : "+ r[0]+" "+g[0]+" "+b[0]);
+			//System.out.println("Depth : "+ d[0]);
+			System.out.println("Refresh Rate : "+vidMode.refreshRate()+" Hz");
 
 			// Make the window visible
 			//glfwShowWindow(window);
