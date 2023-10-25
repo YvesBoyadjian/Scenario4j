@@ -366,6 +366,16 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 		}
 		
 	};
+	
+	private SoShaderProgram onScreenShaderProgram;
+	
+	private final SoTranslation rulerTranslation = new SoTranslation();
+	
+	private final SoFont rulerFont = new SoFont();
+	
+	private final SoBaseColor rulerColor = new SoBaseColor();
+	
+	private final SoText2 rulerText = new SoText2();
 
 	private final int indice(int i, int j, int width) {
 		return i + j*width;
@@ -1457,13 +1467,8 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 	    
 	    rulerSwitch.addChild(program2);
 		
-		rulerSwitch.addChild(rulerLineSet);
-		
-		sep.addChild(rulerSwitch);
-		
-
 		// ____________________________________________________________ Shader for screen display
-		SoShaderProgram onScreenShaderProgram = new SoShaderProgram();
+		onScreenShaderProgram = new SoShaderProgram();
 
 		SoVertexShader vertexShaderScreen = new SoVertexShader();
 
@@ -1545,9 +1550,24 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 
 		onScreenShaderProgram.shaderObject.set1Value(0, vertexShaderScreen);
 		onScreenShaderProgram.shaderObject.set1Value(1, fragmentShaderScreen);
-
+		
+		rulerSwitch.addChild(rulerLineSet);
+		
+		rulerSwitch.addChild(rulerTranslation);
+		
+		rulerSwitch.addChild(onScreenShaderProgram);
+		
+		rulerSwitch.addChild(rulerFont);
+		
+		rulerSwitch.addChild(rulerColor);
+		
+		rulerSwitch.addChild(rulerText);
+		
+		sep.addChild(rulerSwitch);
+		
 		sep.addChild(onScreenShaderProgram);
 
+		
 		SoDepthBuffer db = new SoDepthBuffer();
 
 		db.test.setValue(false);
@@ -3826,8 +3846,6 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 			
 			start.copyFrom(getCamera().position.getValue());
 			
-			start.setZ(start.getZ() - 100);
-			
 			SbVec3f end = new SbVec3f(4000,4000,4000);
 			
 			end.copyFrom(previousRulerPosition);
@@ -3840,6 +3858,24 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 			
 			rulerLineSet.numVertices.set1Value(0, 2);
 			rulerLineSet.vertexProperty.setValue(vertexProperty);
+			
+			rulerTranslation.translation.setValue(end);
+			
+			rulerColor.rgb.setValue(0, 0, 0);
+			
+			float distance = start.operator_minus(end).length();
+			
+			float distanceRounded = Math.round(distance);
+			
+			String distanceText = Integer.toString((int)distanceRounded)+" m";
+			
+			rulerFont.size.setValue(64f);
+			
+			rulerText.string.setValue(distanceText);
 		}
+	}
+	
+	public SoShaderProgram getonScreenShaderProgram() {
+		return onScreenShaderProgram;
 	}
 }
