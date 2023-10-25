@@ -445,12 +445,10 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 
 		
 		Color colorStone = STONE;
-		int redStone = colorStone.getRed()*colorStone.getRed()/255;
-		int greenStone = colorStone.getGreen()*colorStone.getGreen()/255;
-		int blueStone = colorStone.getBlue()*colorStone.getBlue()/255;
-		
-		final int rgbaStone = (colorStone.getAlpha() << 0) | (redStone << 24)| (greenStone << 16)|(blueStone<<8); 
-		
+		int redStone = colorStone.getRed();
+		int greenStone = colorStone.getGreen();
+		int blueStone = colorStone.getBlue();
+
 		if (re != null) {
 			int nb = 0;
 			for (int j = hImageW / 4; j < hImageW * 3 / 4; j++) {

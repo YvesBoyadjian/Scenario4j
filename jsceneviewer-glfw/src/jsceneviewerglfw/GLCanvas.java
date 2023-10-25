@@ -135,7 +135,7 @@ public class GLCanvas extends Composite {
 			int[] fheight = new int[1];
 			glfwGetFramebufferSize(window, fwidth, fheight);
 
-			System.out.println("Defintion : "+fwidth[0]+" x "+fheight[0]);
+			System.out.println("Definition : "+fwidth[0]+" x "+fheight[0]);
 			System.out.println("RGB : "+ r[0]+" "+g[0]+" "+b[0]);
 			//System.out.println("Depth : "+ d[0]);
 			System.out.println("Refresh Rate : "+vidMode.refreshRate()+" Hz");
