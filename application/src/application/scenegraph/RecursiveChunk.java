@@ -24,6 +24,7 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import application.scenegraph.douglas.IndexedFaceSetParameters;
+import jscenegraph.database.inventor.SbVec3fSingleFast;
 import org.lwjgl.BufferUtils;
 
 import jscenegraph.coin3d.inventor.nodes.SoLOD;
@@ -274,7 +275,7 @@ public class RecursiveChunk {
 				y_min = Float.MAX_VALUE;
 				y_max = - Float.MAX_VALUE;
 				
-				SbVec3f dummy = new SbVec3f();
+				SbVec3f dummy = new SbVec3fSingleFast();
 				
 				for(int i =0 ; i< decimatedChunkWidth; i++) {
 					for(int j =0 ; j<decimatedChunkHeight ; j++) {
@@ -283,9 +284,10 @@ public class RecursiveChunk {
 						int indice0 = i0*ca.getH()+j0;
 						int indice = i*decimatedChunkHeight+j;
 						ca.verticesGet(indice0, xyz);
-						fb.put(xyz[0]); //decimatedVertices.setFloat(indice*3, xyz[0]);
-						fb.put(xyz[1]); //decimatedVertices.setFloat(indice*3+1, xyz[1]);
-						fb.put(xyz[2]); //decimatedVertices.setFloat(indice*3+2, xyz[2]);
+						//decimatedVertices.setFloat(indice*3, xyz[0]);
+						//decimatedVertices.setFloat(indice*3+1, xyz[1]);
+						//decimatedVertices.setFloat(indice*3+2, xyz[2]);
+						fb.put(xyz);
 						
 						x_min = Math.min(xyz[0],x_min);
 						x_max = Math.max(xyz[0],x_max);

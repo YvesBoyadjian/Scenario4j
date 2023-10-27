@@ -53,7 +53,7 @@ public class SoTouchLODMaster extends SoNode {
 
 	private void reset() {
 		counter = firstRender ? -9999 : 0;
-		SoRecursiveIndexedFaceSet.nbDoLoad = firstRender ? -999999 : -1;
+		SoRecursiveIndexedFaceSet.nbDoLoad = firstRender ? -999999 : -4;
 	}
 	
 	public void increment() {
