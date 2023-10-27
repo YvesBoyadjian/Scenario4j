@@ -990,8 +990,10 @@ public class MainGLFW {
 				planksProperties.load(in);
 
 				in.close();
+				
+				SbViewportRegion vpRegion = viewer.getSceneHandler().getViewportRegion();
 
-				sg.loadPlanks(viewer,planksProperties);
+				sg.loadPlanks(vpRegion,planksProperties);
 
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
@@ -1486,7 +1488,7 @@ public class MainGLFW {
 				SbRotation rotation = vcamera.orientation.getValue();
 				SbRotation rot2 = new SbRotation();
 				rot2.setValue(new SbVec3f(1, 0, 0), (float) -Math.PI / 2);
-				sg.addPlank(viewer, translation, rot2.operator_mul(rotation));
+				sg.addPlank(translation, rot2.operator_mul(rotation));
 				id[0] = 1;
 				System.out.println("plank");
 			});
@@ -1505,7 +1507,10 @@ public class MainGLFW {
 				SbRotation rotation = vcamera.orientation.getValue();
 				SbRotation rot2 = new SbRotation();
 				rot2.setValue(new SbVec3f(1, 0, 0), (float) -Math.PI / 2);
-				sg.movePlank(viewer1, translation, rot2.operator_mul(rotation));
+				
+				SbViewportRegion vpRegion = viewer1.getSceneHandler().getViewportRegion();
+				
+				sg.movePlank(vpRegion, translation, rot2.operator_mul(rotation));
 			});
 
 			viewer.addKeyUpListener(SoKeyboardEvent.Key.P, () -> {

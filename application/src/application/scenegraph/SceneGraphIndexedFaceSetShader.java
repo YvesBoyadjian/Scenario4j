@@ -2968,7 +2968,7 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 		centerSwitch.whichChild.setValue(center ? SoSwitch.SO_SWITCH_ALL : SoSwitch.SO_SWITCH_NONE);
 	}
 
-	public void addPlank(SoQtConstrainedViewer viewer, SbVec3f translation, SbRotation rotation) {
+	public void addPlank(SbVec3f translation, SbRotation rotation) {
 		final SoSeparator plankSeparator = new SoSeparator();
 		final SoCube plank = new SoCube();
 		plank.setName("plank");
@@ -2994,7 +2994,7 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 		planks.add(box);
 	}
 
-	public void movePlank(SoQtConstrainedViewer viewer, SbVec3f translation, SbRotation rotation) {
+	public void movePlank(SbViewportRegion vpRegion, SbVec3f translation, SbRotation rotation) {
 		final SoSeparator plankSeparator = (SoSeparator) planksSeparator.getChild(planksSeparator.getNumChildren()-1);
 		final SoTranslation plankLayerTranslation = (SoTranslation) plankSeparator.getChild(0);
 		final SoRotation plankRotation = (SoRotation) plankSeparator.getChild(1);
@@ -3016,7 +3016,7 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 
 		SoPath path = sa.getPath();
 
-		SoGetMatrixAction getMatrixAction = new SoGetMatrixAction(viewer.getSceneHandler().getViewportRegion());
+		SoGetMatrixAction getMatrixAction = new SoGetMatrixAction(vpRegion);
 		getMatrixAction.apply(path);
 		SbMatrix matrix = getMatrixAction.getMatrix();
 
@@ -3109,7 +3109,7 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 		}
 	}
 
-	public void loadPlanks(SoQtConstrainedViewer viewer, Properties plankProperties) {
+	public void loadPlanks(SbViewportRegion vpRegion, Properties plankProperties) {
 		int plankIndex = 0;
 		String key;
 		while(plankProperties.containsKey((key="plankTranslX"+plankIndex))) {
@@ -3130,8 +3130,8 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 			SbVec3f translation = new SbVec3f(x,y,z);
 			SbRotation rotation = new SbRotation(q0,q1,q2,q3);
 
-			addPlank(viewer,translation,rotation);
-			movePlank(viewer,translation,rotation);
+			addPlank(translation,rotation);
+			movePlank(vpRegion,translation,rotation);
 			
 			plankIndex++;
 		}

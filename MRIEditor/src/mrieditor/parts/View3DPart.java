@@ -3,8 +3,14 @@
  */
 package mrieditor.parts;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Properties;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
@@ -41,6 +47,7 @@ import jscenegraph.coin3d.inventor.SbVec2i32;
 import jscenegraph.database.inventor.SbBasic;
 import jscenegraph.database.inventor.SbTime;
 import jscenegraph.database.inventor.SbVec3f;
+import jscenegraph.database.inventor.SbViewportRegion;
 import jscenegraph.database.inventor.SoDB;
 import jscenegraph.database.inventor.actions.SoGLRenderAction.TransparencyType;
 import jscenegraph.database.inventor.events.SoKeyboardEvent;
@@ -324,6 +331,31 @@ public class View3DPart {
 		sg.setPosition(MainGLFW.SCENE_POSITION.getX(), MainGLFW.SCENE_POSITION.getY()/*,SCENE_POSITION.getZ()*/);
 
 		sg.setHero(MainGLFW.hero);
+
+
+		// ______________________________________________________________________________________________________ planks
+		File planksFile = new File("planks.mri");
+		if (planksFile.exists()) {
+			try {
+				InputStream in = new FileInputStream(planksFile);
+
+				Properties planksProperties = new Properties();
+
+				planksProperties.load(in);
+
+				in.close();
+				
+				SbViewportRegion vpRegion = walkViewer.getSceneHandler().getViewportRegion();
+
+				sg.loadPlanks(vpRegion,planksProperties);
+
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+
+		}
 		
 		sg.setLevelOfDetail((float)OptionDialog.DEFAULT_LOD_FACTOR);
 		sg.setLevelOfDetailShadow((float) OptionDialog.DEFAULT_LOD_FACTOR_SHADOW);
