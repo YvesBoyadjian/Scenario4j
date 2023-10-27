@@ -167,7 +167,7 @@ updateCoinParameter(SoState state,  final SbName name,   int value)
     int cnt = owner.shaderObject.getNumNodes();
     for (int i = 0; i <cnt; i++) {
       SoNode node = owner.shaderObject.operator_square_bracket(i).get();
-      if (node.isOfType(SoShaderObject.getClassTypeId())) {
+      if ( node instanceof SoShaderObject/*.isOfType(SoShaderObject.getClassTypeId())*/) {
         ((SoShaderObject )node).updateStateMatrixParameters(cachecontext, state);
         ((SoShaderObject )node).updateLights(cachecontext,state);
       }
