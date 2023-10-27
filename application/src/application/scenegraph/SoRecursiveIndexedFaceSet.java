@@ -22,6 +22,8 @@ public class SoRecursiveIndexedFaceSet extends SoIndexedFaceSet {
 	boolean cleared = true;
 	
 	public static int nbDoLoad;
+	
+	private boolean lastRenderSucceded;
 
 	public SoRecursiveIndexedFaceSet(RecursiveChunk recursiveChunk) {
 		this.recursiveChunk = recursiveChunk;
@@ -86,6 +88,9 @@ public class SoRecursiveIndexedFaceSet extends SoIndexedFaceSet {
 				cleared = false;
 				hasJustBeenLoaded = true;
 			}
+			else {
+				//System.out.println("not yet");
+			}
 //		long delta = stop - start;
 //		
 //		if(delta > 10e6) {
@@ -96,7 +101,15 @@ public class SoRecursiveIndexedFaceSet extends SoIndexedFaceSet {
 		//long start = System.nanoTime();
 		if (!cleared && !hasJustBeenLoaded) {
 			super.GLRender(action);
+			lastRenderSucceded = true;
+		}
+		else {
+			lastRenderSucceded = false;
 		}
 		//long stop = System.nanoTime();
+	}
+	
+	public boolean lastRenderSucceded() {
+		return lastRenderSucceded;
 	}
 }

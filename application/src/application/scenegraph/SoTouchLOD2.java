@@ -83,7 +83,7 @@ public abstract class SoTouchLOD2 extends SoLOD implements SoTouchLODMaster.SoTo
 	}
 
 	public void
-	GLRenderBelowPath(SoGLRenderAction action)
+	GLRenderBelowPath_(SoGLRenderAction action)
 	{
 		int idx = this.whichToTraverse(action);
 
@@ -155,6 +155,191 @@ public abstract class SoTouchLOD2 extends SoLOD implements SoTouchLODMaster.SoTo
 		// don't auto cache LOD nodes.
 		SoGLCacheContextElement.shouldAutoCache(action.getState(),
 				SoGLCacheContextElement.AutoCache.DONT_AUTO_CACHE.getValue());
+	}
+	
+	public void GLRenderBelowPath(SoGLRenderAction action) {
+		int wantedIDX = this.whichToTraverse(action);
+
+		SoRecursiveIndexedFaceSet least_detailed = (SoRecursiveIndexedFaceSet) this.children.get(LEAST_DETAILED);
+		
+		SoGroup most_detailed = (SoGroup) this.children.get(MOST_DETAILED);
+
+		boolean leastDetailedWasClearedAndMostDetailedWanted = false;
+		
+		if(wantedIDX == MOST_DETAILED && least_detailed.cleared) {
+				wantedIDX = LEAST_DETAILED;
+				leastDetailedWasClearedAndMostDetailedWanted = true;
+		}
+
+		// ________________________________ We draw least detailed and clear the others
+		if (wantedIDX == LEAST_DETAILED) {
+			
+			if (least_detailed.cleared) {
+				master.increment();
+			}
+			
+			action.pushCurPath(wantedIDX, least_detailed);
+			if (!action.abortNow()) {
+				//SoNodeProfiling profiling; TODO
+				//profiling.preTraversal(action);
+				least_detailed.GLRenderBelowPath(action);
+				//profiling.postTraversal(action);
+			}
+			action.popCurPath();
+
+			if (least_detailed.lastRenderSucceded()) {
+				currentVisible = wantedIDX;
+			}
+			else {
+				master.increment();				
+			}
+			
+			if (!leastDetailedWasClearedAndMostDetailedWanted) {			
+				SoNode node = getChild(MOST_DETAILED);
+				clearTree(node);			
+			}
+		}
+		
+		// __________________________________ We want most detailed but previous was not
+		else if (currentVisible != MOST_DETAILED) {
+			
+			SoNode ch0 = most_detailed.getChild(0);		
+			SoNode ch1 = most_detailed.getChild(1);
+			SoNode ch2 = most_detailed.getChild(2);
+			SoNode ch3 = most_detailed.getChild(3);
+			
+			if (ch0 instanceof SoTouchLOD2) {
+				ch0 = ((SoTouchLOD2)ch0).getChild(LEAST_DETAILED);
+			}
+			
+			if (ch1 instanceof SoTouchLOD2) {
+				ch1 = ((SoTouchLOD2)ch1).getChild(LEAST_DETAILED);
+			}
+			
+			if (ch2 instanceof SoTouchLOD2) {
+				ch2 = ((SoTouchLOD2)ch2).getChild(LEAST_DETAILED);
+			}
+			
+			if (ch3 instanceof SoTouchLOD2) {
+				ch3 = ((SoTouchLOD2)ch3).getChild(LEAST_DETAILED);
+			}
+			
+			SoRecursiveIndexedFaceSet rifs0 = (SoRecursiveIndexedFaceSet) ch0;
+			SoRecursiveIndexedFaceSet rifs1 = (SoRecursiveIndexedFaceSet) ch1;
+			SoRecursiveIndexedFaceSet rifs2 = (SoRecursiveIndexedFaceSet) ch2;
+			SoRecursiveIndexedFaceSet rifs3 = (SoRecursiveIndexedFaceSet) ch3;
+			
+			boolean someoneFailed = false;
+			
+			if (rifs0.cleared) {
+				master.increment();
+			}
+
+			action.pushCurPath(wantedIDX, rifs0);
+			if (!action.abortNow()) {
+				//SoNodeProfiling profiling; TODO
+				//profiling.preTraversal(action);
+				rifs0.GLRenderBelowPath(action);
+				//profiling.postTraversal(action);
+			}
+			action.popCurPath();
+			
+			someoneFailed |= !rifs0.lastRenderSucceded();
+			
+			if (!someoneFailed) {
+				
+				if (rifs1.cleared) {
+					master.increment();
+				}
+				
+				action.pushCurPath(wantedIDX, rifs1);
+				if (!action.abortNow()) {
+					//SoNodeProfiling profiling; TODO
+					//profiling.preTraversal(action);
+					rifs1.GLRenderBelowPath(action);
+					//profiling.postTraversal(action);
+				}
+				action.popCurPath();
+			}
+			someoneFailed |= !rifs1.lastRenderSucceded();
+			
+			if (!someoneFailed) {
+				
+				if (rifs2.cleared) {
+					master.increment();
+				}
+				
+				action.pushCurPath(wantedIDX, rifs2);
+				if (!action.abortNow()) {
+					//SoNodeProfiling profiling; TODO
+					//profiling.preTraversal(action);
+					rifs2.GLRenderBelowPath(action);
+					//profiling.postTraversal(action);
+				}
+				action.popCurPath();
+			}
+			
+			someoneFailed |= !rifs2.lastRenderSucceded();
+			
+			if (!someoneFailed) {
+				
+				if (rifs3.cleared) {
+					master.increment();
+				}
+				
+				action.pushCurPath(wantedIDX, rifs3);
+				if (!action.abortNow()) {
+					//SoNodeProfiling profiling; TODO
+					//profiling.preTraversal(action);
+					rifs3.GLRenderBelowPath(action);
+					//profiling.postTraversal(action);
+				}
+				action.popCurPath();
+			}
+			
+			someoneFailed |= !rifs3.lastRenderSucceded();
+
+			if (someoneFailed) {
+				
+				master.increment();
+				
+				action.pushCurPath(wantedIDX, least_detailed);
+				if (!action.abortNow()) {
+					//SoNodeProfiling profiling; TODO
+					//profiling.preTraversal(action);
+					least_detailed.GLRenderBelowPath(action);
+					//profiling.postTraversal(action);
+				}
+				action.popCurPath();
+			}
+			else { // Don't set current unless all submesh have been rendered
+				currentVisible = wantedIDX;
+			}
+		}
+		// _________________________________ We draw most detailed
+		else { // wantedIDX == MOST_DETAILED 
+			action.pushCurPath(wantedIDX, most_detailed);
+			if (!action.abortNow()) {
+				//SoNodeProfiling profiling; TODO
+				//profiling.preTraversal(action);
+				most_detailed.GLRenderBelowPath(action);
+				//profiling.postTraversal(action);
+			}
+			action.popCurPath();
+
+			currentVisible = wantedIDX;
+		}
+
+		if(!least_detailed.cleared) {
+			cleared = false;
+		}
+		else if( currentVisible == LEAST_DETAILED) {
+			currentVisible = -1;
+		}
+
+		// don't auto cache LOD nodes.
+		SoGLCacheContextElement.shouldAutoCache(action.getState(),
+				SoGLCacheContextElement.AutoCache.DONT_AUTO_CACHE.getValue());		
 	}
 
 	public boolean all_children_have_been_loaded(SoNode child, SoAction action, int depth) {

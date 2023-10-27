@@ -357,6 +357,8 @@ public class View3DPart {
 
 		}
 		
+//		sg.enableFPS(true);
+		
 		sg.setLevelOfDetail((float)OptionDialog.DEFAULT_LOD_FACTOR);
 		sg.setLevelOfDetailShadow((float) OptionDialog.DEFAULT_LOD_FACTOR_SHADOW);
 		sg.setTreeDistance((float)OptionDialog.DEFAULT_TREE_DISTANCE);
@@ -369,6 +371,13 @@ public class View3DPart {
 					sceneGraphCamera.position.getValue().getZ() - walkViewer.EYES_HEIGHT);
 			sg.idle();
 		});
+		
+
+//		walkViewer.addIdleListener((viewer1) -> {
+//					sg.setFPS(viewer1.getFPS());
+//				}
+//		);
+		
 
         walkViewer.start();
         

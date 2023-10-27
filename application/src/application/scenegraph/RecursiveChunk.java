@@ -145,14 +145,14 @@ public class RecursiveChunk {
 			};
 			lod.center.setValue(getCenter());
 			lod.range.setValue(ChunkArray.DEFINITION * deltaX * 85.0f / /*250.0f*/master.getLodFactor());
-			SoGroup subChunkGroup = new SoGroup() {
+			SoGroup subChunkGroup = new SoGroup();
 //				public void notify(SoNotList list) {
 //					super.notify(list);
 //					if( getLevel() > 4) {
 //						int ii = 0;
 //					}
 //				}
-			};
+			
 			if(culling) {
 				//subChunkGroup.renderCulling.setValue(SoSeparator.CacheEnabled.ON);
 			}
