@@ -103,6 +103,16 @@ public class SbVec3f implements Cloneable, Mutable {
 	//protected float[] vec;
 	protected FloatMemoryBuffer vec;
 	protected int indice;
+
+	protected SbVec3f(boolean single) {
+		if (!single) {
+			vec = FloatMemoryBuffer.allocateFloats(3);
+			indice = 0;
+		}
+		else {
+			indice = -1;
+		}
+	}
 	
 	// Default constructor. 
 	public SbVec3f() {
@@ -285,7 +295,7 @@ public class SbVec3f implements Cloneable, Mutable {
      * For JOGL
      * @return
      */
-    public final FloatBuffer getValueGL() {
+    public FloatBuffer getValueGL() {
     	FloatBuffer fb = vec.toByteBuffer().asFloatBuffer();
     	fb.position(indice);
     	return fb;

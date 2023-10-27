@@ -610,13 +610,13 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 		{
 			float[] xyz = new float[3];
 			
-			SbVec3f p0 = new SbVec3f();
-			SbVec3f p1 = new SbVec3f();
-			SbVec3f p2 = new SbVec3f();
-			SbVec3f p3 = new SbVec3f();
-			SbVec3f v0 = new SbVec3f();
-			SbVec3f v1 = new SbVec3f();
-			SbVec3f n = new SbVec3f();
+			SbVec3f p0 = new SbVec3fSingleFast();
+			SbVec3f p1 = new SbVec3fSingleFast();
+			SbVec3f p2 = new SbVec3fSingleFast();
+			SbVec3f p3 = new SbVec3fSingleFast();
+			SbVec3f v0 = new SbVec3fSingleFast();
+			SbVec3f v1 = new SbVec3fSingleFast();
+			SbVec3fSingleFast n = new SbVec3fSingleFast();
 			for(int i=1;i<w-1;i++) {
 				for(int j=1; j<h-1;j++) {
 					int index = i*h+j;
@@ -632,7 +632,7 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 					v1.setValue(p1.operator_minus_equal(p3));
 					n.setValue(v0.operator_cross_equal(v1));
 					n.normalize();
-					chunks.normalsPut(index, n.getX(), n.getY(), n.getZ());
+					chunks.normalsPut(index, n.getValue());
 		
 					if((n.getZ()<0.45 && chunks.verticesGet(index,xyz)[2] < ALPINE_HEIGHT) || n.getZ()<0.35) {
 						chunks.colorsPut(index, redStone, greenStone, blueStone, 255);

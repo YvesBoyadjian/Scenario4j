@@ -15,6 +15,7 @@ import java.nio.ShortBuffer;
 import java.util.Arrays;
 import java.util.BitSet;
 
+import jscenegraph.database.inventor.SbVec3fSingleFast;
 import org.lwjgl.BufferUtils;
 
 import jscenegraph.coin3d.inventor.nodes.SoVertexProperty;
@@ -129,7 +130,7 @@ public class Chunk {
 //	    vertexProperty.orderedRGBA.setValues(0, colors);
 	    
 	    int nbVertices = verticesZ.length;
-	    final SbVec3f ptV = new SbVec3f();
+	    final SbVec3f ptV = new SbVec3fSingleFast();
 	    for(int i=0;i<nbVertices;i++) {
 	    	ptV.setValue(verticesX(i), verticesY(i), verticesZ[i]);
 	    	sceneBox.extendBy(ptV);

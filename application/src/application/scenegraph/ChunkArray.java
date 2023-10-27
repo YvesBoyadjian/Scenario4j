@@ -492,7 +492,7 @@ public class ChunkArray {
 		});
 	}
 	
-	public void normalsPut(int index, float valueX, float valueY, float valueZ) {
+	public void normalsPut(int index, float[] valueXYZ) {
 		int vertexIndex = index;
 		int i = vertexIndex/h;
 		int j = vertexIndex - i*h;
@@ -509,9 +509,9 @@ public class ChunkArray {
 		
 		chunksForEach(i,j,(c)-> {
 			int chunkIndice = getInChunkIndice(c, i,j);
-			c.normals[chunkIndice*3+0] = (short)Math.round(Short.MAX_VALUE * valueX);
-			c.normals[chunkIndice*3+1] = (short)Math.round(Short.MAX_VALUE * valueY);
-			c.normals[chunkIndice*3+2] = (short)Math.round(Short.MAX_VALUE * valueZ);
+			c.normals[chunkIndice*3+0] = (short)Math.round(Short.MAX_VALUE * valueXYZ[0]);
+			c.normals[chunkIndice*3+1] = (short)Math.round(Short.MAX_VALUE * valueXYZ[1]);
+			c.normals[chunkIndice*3+2] = (short)Math.round(Short.MAX_VALUE * valueXYZ[2]);
 		});
 	}
 

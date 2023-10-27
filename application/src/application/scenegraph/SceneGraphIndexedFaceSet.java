@@ -266,7 +266,7 @@ public class SceneGraphIndexedFaceSet implements SceneGraph {
 			v1.setValue(p1.operator_minus_equal(p3));
 			n.setValue(v0.operator_cross_equal(v1));
 			n.normalize();
-			chunks.normalsPut(index, n.getX(), n.getY(), n.getZ());
+			chunks.normalsPut(index, n.getValueRead());
 
 			if((n.getZ()<0.45 && chunks.verticesGet(index,xyz)[2] < ALPINE_HEIGHT) || n.getZ()<0.35) {
 				chunks.colorsPut(index, redStone, greenStone, blueStone, 255);
