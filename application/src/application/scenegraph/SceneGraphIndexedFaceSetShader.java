@@ -1928,6 +1928,11 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 		}
 
 		if(mustShowSpeech != speechShown) {
+
+			float angle = (float)Math.atan2(current_y - ORACLE_Y, current_x - ORACLE_X) + (float)Math.PI/2;
+
+			oracleSpeechRotation.rotation.setValue(new SbVec3f(0,1,0),angle);
+
 			oracleSpeechSwitch.whichChild.setValue(mustShowSpeech ? SoSwitch.SO_SWITCH_ALL : SoSwitch.SO_SWITCH_NONE);
 			oracleSpeechSwitchShadow.whichChild.setValue(mustShowSpeech ? SoSwitch.SO_SWITCH_ALL : SoSwitch.SO_SWITCH_NONE);
 		}
