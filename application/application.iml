@@ -12,12 +12,10 @@
     <orderEntry type="module" module-name="jscenegraph" exported="" />
     <orderEntry type="module" module-name="jsceneviewer-glfw" exported="" />
     <orderEntry type="module" module-name="lwjgl-utils" exported="" />
-    <orderEntry type="module" module-name="geotools" exported="" />
     <orderEntry type="module" module-name="loader" exported="" />
     <orderEntry type="module" module-name="jscenegraph" exported="" />
     <orderEntry type="module" module-name="jsceneviewer-glfw" exported="" />
     <orderEntry type="module" module-name="lwjgl-utils" exported="" />
-    <orderEntry type="module" module-name="geotools" exported="" />
     <orderEntry type="module" module-name="gdx" exported="" />
     <orderEntry type="module" module-name="ode4j" exported="" />
     <orderEntry type="module" module-name="vk-bootstrap" exported="" />

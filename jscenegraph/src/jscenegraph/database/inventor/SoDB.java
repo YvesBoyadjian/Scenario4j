@@ -91,6 +91,7 @@ import jscenegraph.database.inventor.sensors.SoSensorCB;
 import jscenegraph.database.inventor.sensors.SoSensorManager;
 import jscenegraph.database.inventor.sensors.SoTimerSensor;
 import jscenegraph.freecad.SoFC;
+import jscenegraph.optimization.inventor.nodes.SoOptimizationFromXYUV;
 import jscenegraph.port.Util;
 
 
@@ -681,6 +682,8 @@ init()
         // FIXME: probably temporary. Add FXViz::init() or something? pederb, 2007-03-09
         SoShadowGroup.init(); // COIN 3D
         SoVolumetricShadowGroup.init(); // COIN 3D
+
+        SoOptimizationFromXYUV.initClass(); // Optimization
 
         SoFC.init(); // FreeCAD
 

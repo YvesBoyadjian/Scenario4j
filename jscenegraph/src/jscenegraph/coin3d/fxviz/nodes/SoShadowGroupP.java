@@ -547,6 +547,9 @@ setVertexShader(SoState state)
 
 	gen.addDeclaration("uniform vec4 s4j_FrontLightModelProduct_sceneColor;",false);
 
+	gen.addDeclaration("uniform bool s4j_FromXYUV;", false);
+	gen.addDeclaration("uniform vec4 s4j_XYUV;", false);
+
   boolean storedinvalid = SoCacheElement.setInvalid(false);
 
   state.push();
@@ -738,7 +741,12 @@ setVertexShader(SoState state)
     break;
   }
   gen.addMainStatement("perVertexColor = vec3(clamp(color.r, 0.0, 1.0), clamp(color.g, 0.0, 1.0), clamp(color.b, 0.0, 1.0));\n"+
-                       "texCoord = s4j_MultiTexCoord0;\n"+
+		  				"if (s4j_FromXYUV) {\n"+
+		  				"	texCoord = vec2((s4j_Vertex.x - s4j_XYUV.x) * s4j_XYUV.z, (s4j_Vertex.y - s4j_XYUV.y) * s4j_XYUV.w);\n"+
+		  				"}\n"+
+		  				"else {\n"+
+                       "	texCoord = s4j_MultiTexCoord0;\n"+
+		  				"}\n"+
                        //"gl_TexCoord[1] = gl_MultiTexCoord1;\n"+ CORE
                        "gl_Position = s4j_ProjectionMatrix * s4j_ModelViewMatrix * vec4(s4j_Vertex, 1.0);\n"+
                        "frontColor = diffuCol;\n");

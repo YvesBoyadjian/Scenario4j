@@ -52,6 +52,7 @@ import jscenegraph.database.inventor.elements.SoProjectionMatrixElement;
 import jscenegraph.database.inventor.elements.SoViewingMatrixElement;
 import jscenegraph.database.inventor.misc.SoNotList;
 import jscenegraph.database.inventor.nodes.*;
+import jscenegraph.optimization.inventor.nodes.SoOptimizationFromXYUV;
 import jscenegraph.port.Ctx;
 import jscenegraph.port.memorybuffer.MemoryBuffer;
 import jsceneviewerglfw.inventor.qt.viewers.SoQtConstrainedViewer;
@@ -927,7 +928,20 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 		master.setLodFactor(LEVEL_OF_DETAIL);
 	    
 	    landSep.addChild(master);
-	    
+
+		SoOptimizationFromXYUV optimizationFromXYUV = new SoOptimizationFromXYUV();
+
+		//optimizationFromXYUV.isActive.setValue(false); // inactive for now
+
+		float xMinTexture = rc.x_min;
+		float yMinTexture = rc.y_max;
+		float xMaxTexture = rc.x_max;
+		float yMaxTexture = rc.y_min;
+
+		optimizationFromXYUV.xyMinMax.setValue(xMinTexture, yMinTexture, xMaxTexture, yMaxTexture);
+
+		landSep.addChild(optimizationFromXYUV);
+
 	    chunkTree = rc.getGroup(master,true);
 	    landSep.addChild(chunkTree);
 	    

@@ -99,7 +99,7 @@ public class SbSphere implements Mutable {
 	private final SbVec3f     center = new SbVec3f();
 	private float       radius;
 
-	private final SbVec3f dummy = new SbVec3f();
+	private final SbVec3f dummy = new SbVec3fSingleFast();
 		   
     //! Constructors.
 	public SbSphere()  {}

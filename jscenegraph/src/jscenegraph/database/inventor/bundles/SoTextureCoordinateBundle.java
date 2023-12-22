@@ -75,6 +75,7 @@ import jscenegraph.database.inventor.caches.SoBoundingBoxCache;
 import jscenegraph.database.inventor.elements.SoGLCacheContextElement;
 import jscenegraph.database.inventor.nodes.SoNode;
 import jscenegraph.database.inventor.nodes.SoShape;
+import jscenegraph.optimization.inventor.elements.SoFromXYUVElement;
 import jscenegraph.port.Ctx;
 import jscenegraph.port.Destroyable;
 
@@ -208,7 +209,9 @@ public SoTextureCoordinateBundle(SoAction action,
 	    if (multienabled[i]) {
 	      switch (this.coordElt.getType(i)) {
 	      case /*SoMultiTextureCoordinateElement::*/DEFAULT:
-	        this.initDefault(action, i);
+			  if (!SoFromXYUVElement.getInstance(state).isActive()) {
+				  this.initDefault(action, i);
+			  }
 	        break;
 	      case /*SoMultiTextureCoordinateElement::*/EXPLICIT:
 	        this.flags |= FLAG_NEEDINDICES;

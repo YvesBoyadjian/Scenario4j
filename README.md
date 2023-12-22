@@ -65,3 +65,5 @@ Credits :
 - Beach sound : https://lasonotheque.org/detail-2572-falaise-2.html
 
 - Cat : https://free3d.com/3d-model/cat-v1--522281.html
+
+- Optimization : https://www.youtube.com/watch?v=5zlfJW2VGLM

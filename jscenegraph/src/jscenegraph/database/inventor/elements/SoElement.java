@@ -92,6 +92,8 @@ import jscenegraph.database.inventor.SoType.CreateMethod;
 import jscenegraph.database.inventor.SoTypeList;
 import jscenegraph.database.inventor.misc.SoState;
 import jscenegraph.mevis.inventor.elements.SoGLVBOElement;
+import jscenegraph.optimization.inventor.elements.SoFromXYUVElement;
+import jscenegraph.optimization.inventor.elements.SoGLFromXYUVElement;
 import jscenegraph.port.Destroyable;
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -445,7 +447,10 @@ private        int                 depth;
 		SoTextureScalePolicyElement.initClass(SoTextureScalePolicyElement.class); // COIN 3D
 		
 		SoTextureScaleQualityElement.initClass(SoTextureScaleQualityElement.class); // COIN 3D
-		
+
+		SoElement.initClass(SoFromXYUVElement.class); // Optimization
+		SoElement.initClass(SoGLFromXYUVElement.class); // Optimization
+
 		       // Other derived classes
 		       SoElement.initClass(SoBBoxModelMatrixElement.class);
 		       SoElement.initClass(SoLocalBBoxMatrixElement.class);

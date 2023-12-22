@@ -234,7 +234,7 @@ public class RecursiveChunk {
 	
 	FloatMemoryBuffer getDecimatedTexCoords() {
 		
-		if(decimatedTextCoords == null) {
+		if(decimatedTextCoords == null && false) {
 			
 		int decimatedChunkWidth = getDecimatedChunkWidth();
 		int decimatedChunkHeight = getDecimatedChunkHeight();

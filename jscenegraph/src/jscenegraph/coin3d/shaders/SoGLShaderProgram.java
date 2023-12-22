@@ -32,6 +32,7 @@ import jscenegraph.coin3d.misc.SoGL;
 import jscenegraph.coin3d.shaders.inventor.nodes.SoShaderProgram;
 import jscenegraph.coin3d.shaders.inventor.nodes.SoShaderProgramEnableCB;
 import jscenegraph.database.inventor.SbName;
+import jscenegraph.database.inventor.SbVec4f;
 import jscenegraph.database.inventor.elements.SoGLCacheContextElement;
 import jscenegraph.database.inventor.misc.SoState;
 import jscenegraph.database.inventor.nodes.SoNode;
@@ -173,6 +174,19 @@ updateCoinParameter(SoState state,  final SbName name,   int value)
       }
     }
   }
+  }
+
+  public void updateXYUVParameters(SoState state) { // CORE
+    if(this.owner != null) {
+      int cachecontext = SoGLCacheContextElement.get(state);
+      int cnt = owner.shaderObject.getNumNodes();
+      for (int i = 0; i <cnt; i++) {
+        SoNode node = owner.shaderObject.operator_square_bracket(i).get();
+        if ( node instanceof SoShaderObject) {
+          ((SoShaderObject )node).updateXYUVParameters(cachecontext, state);
+        }
+      }
+    }
   }
 
 public void

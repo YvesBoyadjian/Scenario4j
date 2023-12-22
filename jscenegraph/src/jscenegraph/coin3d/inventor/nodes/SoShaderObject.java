@@ -60,6 +60,7 @@ import jscenegraph.database.inventor.nodes.SoNode;
 import jscenegraph.database.inventor.nodes.SoSubNode;
 import jscenegraph.database.inventor.sensors.SoNodeSensor;
 import jscenegraph.database.inventor.sensors.SoSensor;
+import jscenegraph.optimization.inventor.elements.SoFromXYUVElement;
 import jscenegraph.port.FILE;
 import jscenegraph.port.Util;
 
@@ -416,6 +417,7 @@ updateParameters(SoState state)
   /*PRIVATE(this).*/updateCoinParameters(cachecontext, state);
   updateLights(cachecontext, state);
   updateColor(state);
+  updateXYUVParameters(cachecontext, state);
 }
 
 public void updateColor(SoState state) {
@@ -893,6 +895,32 @@ updateStateMatrixParameters(final int cachecontext, SoState state)
   }
 //#undef STATE_PARAM
 }
+
+    public void updateXYUVParameters(final int cachecontext, SoState state) {
+
+        if (!this.owner.isActive.getValue()) return;
+
+        SoGLShaderObject shaderobject = this.getGLShaderObject(cachecontext);
+        if (shaderobject == null) return;
+
+        int pHandle = SoGLShaderProgramElement.get(state).getGLSLShaderProgramHandle(state);
+        if(pHandle > 0) {
+
+            SoFromXYUVElement fromXYUVElement = SoFromXYUVElement.getInstance(state);
+            boolean isActive = fromXYUVElement.isActive();
+            final SbVec4f xyuv = fromXYUVElement.getXYUV();
+
+            int fromXYUVLocation = state.getGL2().glGetUniformLocation(pHandle, "s4j_FromXYUV");
+            if (fromXYUVLocation >= 0) {
+                state.getGL2().glUniform1i(fromXYUVLocation, isActive ? 1 : 0);
+            }
+
+            int xYUVLocation = state.getGL2().glGetUniformLocation(pHandle, "s4j_XYUV");
+            if (xYUVLocation >= 0) {
+                state.getGL2().glUniform4fv(xYUVLocation, 1, xyuv.toFloatGL());
+            }
+        }
+    }
 
 private boolean
 containStateMatrixParameters()
