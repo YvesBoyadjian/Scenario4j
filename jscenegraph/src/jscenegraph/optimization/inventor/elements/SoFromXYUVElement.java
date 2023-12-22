@@ -2,13 +2,14 @@ package jscenegraph.optimization.inventor.elements;
 
 import jscenegraph.database.inventor.SbName;
 import jscenegraph.database.inventor.SbVec4f;
+import jscenegraph.database.inventor.elements.SoElement;
 import jscenegraph.database.inventor.elements.SoFontNameElement;
 import jscenegraph.database.inventor.elements.SoNormalElement;
 import jscenegraph.database.inventor.elements.SoReplacedElement;
 import jscenegraph.database.inventor.misc.SoState;
 import jscenegraph.database.inventor.nodes.SoNode;
 
-public class SoFromXYUVElement extends SoReplacedElement {
+public class SoFromXYUVElement extends /*SoElement*/SoReplacedElement {
 
     private boolean isActive;
     private final SbVec4f xyuv = new SbVec4f();
@@ -18,6 +19,24 @@ public class SoFromXYUVElement extends SoReplacedElement {
         isActive = false;
         xyuv.setValue(0,0,1,1);
     }
+/*
+    @Override
+    public boolean matches(SoElement elt) {
+        SoFromXYUVElement other = (SoFromXYUVElement) elt;
+        return other.isActive == isActive && other.xyuv.equals(xyuv,0);
+    }
+
+    @Override
+    public SoElement copyMatchInfo() {
+
+        SoFromXYUVElement result = (SoFromXYUVElement) getTypeId().createInstance();
+
+        result.isActive = isActive;
+        result.xyuv.copyFrom(xyuv);
+
+        return result;
+    }
+*/
     public static void set(SoState state, SoNode node, boolean isActive, SbVec4f xyuv) {
 
         // Get an instance we can change (pushing if necessary)

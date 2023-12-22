@@ -3,12 +3,16 @@ package jscenegraph.optimization.inventor.elements;
 import jscenegraph.coin3d.shaders.SoGLShaderProgram;
 import jscenegraph.coin3d.shaders.inventor.elements.SoGLShaderProgramElement;
 import jscenegraph.database.inventor.SbVec4f;
+import jscenegraph.database.inventor.elements.SoElement;
 import jscenegraph.database.inventor.misc.SoState;
 
 public class SoGLFromXYUVElement extends SoFromXYUVElement {
 
-    public void postPop(SoState state) {
-        updateXYUVParameters(state); // CORE
+    public void pop(SoState state, SoElement prevTopElement) {
+        super.pop(state, prevTopElement);
+        if (!matches(prevTopElement)) {
+            updateXYUVParameters(state); // CORE
+        }
     }
 
     protected void setElt(SoState state, boolean isActive, SbVec4f xyuv) {
@@ -22,7 +26,7 @@ public class SoGLFromXYUVElement extends SoFromXYUVElement {
 
         if(null!=sp &&sp.isEnabled())
         {
-            sp.updateXYUVParameters(state);
+            sp.updateXYUVParameters(state, this);
         }
     }
 }

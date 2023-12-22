@@ -36,6 +36,7 @@ import jscenegraph.database.inventor.SbVec4f;
 import jscenegraph.database.inventor.elements.SoGLCacheContextElement;
 import jscenegraph.database.inventor.misc.SoState;
 import jscenegraph.database.inventor.nodes.SoNode;
+import jscenegraph.optimization.inventor.elements.SoFromXYUVElement;
 
 /**
  * @author Yves Boyadjian
@@ -176,14 +177,14 @@ updateCoinParameter(SoState state,  final SbName name,   int value)
   }
   }
 
-  public void updateXYUVParameters(SoState state) { // CORE
+  public void updateXYUVParameters(SoState state, SoFromXYUVElement fromXYUVElement) { // CORE
     if(this.owner != null) {
       int cachecontext = SoGLCacheContextElement.get(state);
       int cnt = owner.shaderObject.getNumNodes();
       for (int i = 0; i <cnt; i++) {
         SoNode node = owner.shaderObject.operator_square_bracket(i).get();
         if ( node instanceof SoShaderObject) {
-          ((SoShaderObject )node).updateXYUVParameters(cachecontext, state);
+          ((SoShaderObject )node).updateXYUVParameters(cachecontext, state, fromXYUVElement);
         }
       }
     }

@@ -417,7 +417,8 @@ updateParameters(SoState state)
   /*PRIVATE(this).*/updateCoinParameters(cachecontext, state);
   updateLights(cachecontext, state);
   updateColor(state);
-  updateXYUVParameters(cachecontext, state);
+    SoFromXYUVElement fromXYUVElement = SoFromXYUVElement.getInstance(state);
+  updateXYUVParameters(cachecontext, state, fromXYUVElement);
 }
 
 public void updateColor(SoState state) {
@@ -896,7 +897,7 @@ updateStateMatrixParameters(final int cachecontext, SoState state)
 //#undef STATE_PARAM
 }
 
-    public void updateXYUVParameters(final int cachecontext, SoState state) {
+    public void updateXYUVParameters(final int cachecontext, SoState state, SoFromXYUVElement fromXYUVElement) {
 
         if (!this.owner.isActive.getValue()) return;
 
@@ -906,7 +907,6 @@ updateStateMatrixParameters(final int cachecontext, SoState state)
         int pHandle = SoGLShaderProgramElement.get(state).getGLSLShaderProgramHandle(state);
         if(pHandle > 0) {
 
-            SoFromXYUVElement fromXYUVElement = SoFromXYUVElement.getInstance(state);
             boolean isActive = fromXYUVElement.isActive();
             final SbVec4f xyuv = fromXYUVElement.getXYUV();
 
