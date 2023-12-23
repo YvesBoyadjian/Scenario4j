@@ -25,6 +25,7 @@ import java.util.stream.Stream;
 
 import application.scenegraph.douglas.IndexedFaceSetParameters;
 import jscenegraph.database.inventor.SbVec3fSingleFast;
+import jscenegraph.database.inventor.nodes.*;
 import org.lwjgl.BufferUtils;
 
 import jscenegraph.coin3d.inventor.nodes.SoLOD;
@@ -33,12 +34,6 @@ import jscenegraph.database.inventor.SbBox3f;
 import jscenegraph.database.inventor.SbVec3f;
 import jscenegraph.database.inventor.actions.SoGLRenderAction;
 import jscenegraph.database.inventor.misc.SoNotList;
-import jscenegraph.database.inventor.nodes.SoCamera;
-import jscenegraph.database.inventor.nodes.SoGroup;
-import jscenegraph.database.inventor.nodes.SoIndexedFaceSet;
-import jscenegraph.database.inventor.nodes.SoNode;
-import jscenegraph.database.inventor.nodes.SoPerspectiveCamera;
-import jscenegraph.database.inventor.nodes.SoSeparator;
 import jscenegraph.port.memorybuffer.FloatMemoryBuffer;
 
 import javax.swing.*;
@@ -217,7 +212,8 @@ public class RecursiveChunk {
 
 	private SoNode getIndexedFaceSet() {
 		
-		SoIndexedFaceSet indexedFaceSet = new SoRecursiveIndexedFaceSet(this);
+		/*SoIndexedFaceSet*/
+		SoVertexShape indexedFaceSet = new SoRecursiveIndexedFaceSet(this);
 		
 //		SoVertexProperty vertexProperty = new SoVertexProperty();
 //		vertexProperty.vertex.setValuesPointer(getDecimatedVertices(),getDecimatedVerticesBuffer());

@@ -10,12 +10,13 @@ import jscenegraph.database.inventor.SbVec3f;
 import jscenegraph.database.inventor.actions.SoAction;
 import jscenegraph.database.inventor.actions.SoGLRenderAction;
 import jscenegraph.database.inventor.nodes.SoIndexedFaceSet;
+import jscenegraph.database.inventor.nodes.SoTriangleStripSet;
 
 /**
  * @author Yves Boyadjian
  *
  */
-public class SoRecursiveIndexedFaceSet extends SoIndexedFaceSet {
+public class SoRecursiveIndexedFaceSet extends SoIndexedFaceSet/*SoTriangleStripSet*/ {
 	
 	RecursiveChunk recursiveChunk;
 	
