@@ -52,6 +52,8 @@ Export-Package: com.jogamp.common.nio,
  jscenegraph.mevis.inventor.system,
  jscenegraph.nodekits.inventor,
  jscenegraph.nodekits.inventor.nodekits,
+ jscenegraph.optimization.inventor.elements,
+ jscenegraph.optimization.inventor.nodes,
  jscenegraph.port,
  jscenegraph.port.memorybuffer,
  net.sourceforge.jpcap.util
