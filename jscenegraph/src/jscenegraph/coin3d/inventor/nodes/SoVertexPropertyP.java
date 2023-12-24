@@ -19,6 +19,7 @@ public class SoVertexPropertyP implements Destroyable {
 
 	  public final SoVBO[] vertexvbo = new SoVBO[1]; //ptr
 	  public final SoVBO[] normalvbo = new SoVBO[1]; //ptr
+	public final SoVBO[] normalvboShort = new SoVBO[1]; //ptr
 	  public final SoVBO[] colorvbo = new SoVBO[1]; //ptr
 
 	  public final SbList<SoVBO[]> texcoordvbo = new SbList<>();
@@ -30,6 +31,7 @@ public class SoVertexPropertyP implements Destroyable {
 	      }
 	    Destroyable.delete( this.vertexvbo[0]);
 	    Destroyable.delete( this.normalvbo[0]);
+		Destroyable.delete( this.normalvboShort[0]);
 	    Destroyable.delete( this.colorvbo[0]);
 	}
 }

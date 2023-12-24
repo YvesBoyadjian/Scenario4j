@@ -133,7 +133,7 @@ public void
 SoVRMLNormal_doAction(SoAction action)
 {
   SoNormalElement.set(action.getState(), this,
-                       this.vector.getNum(), this.vector.getValuesSbVec3fArray(/*0*/));
+                       this.vector.getNum(), this.vector.getValuesSbVec3fArray(/*0*/), 0, null);
 }
 
 // Doc in parent

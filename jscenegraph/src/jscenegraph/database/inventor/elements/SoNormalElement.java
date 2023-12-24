@@ -60,6 +60,7 @@ import jscenegraph.database.inventor.misc.SoState;
 import jscenegraph.database.inventor.nodes.SoNode;
 import jscenegraph.mevis.inventor.elements.SoGLVBOElement;
 import jscenegraph.port.SbVec3fArray;
+import jscenegraph.port.SbVec3sArray;
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -84,7 +85,11 @@ public class SoNormalElement extends SoReplacedElement {
 	   protected
 		        int             numNormals;
 	   protected SbVec3fArray       normals;
-		    
+
+    protected
+    int             numNormalsShort;
+    protected SbVec3sArray       normalsShort;
+
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -102,6 +107,9 @@ init(SoState state)
 
     normals     = null;
     numNormals  = 0;
+
+    normalsShort = null;
+    numNormalsShort = 0;
 }
 
 	   
@@ -113,7 +121,8 @@ init(SoState state)
   
   //! Returns the number of normal vectors in an instance
   public int             getNum()           { return numNormals; }
- 
+    public int             getNumShort()           { return numNormalsShort; }
+
      //! Returns the indexed normal from an element
   public SbVec3f get(int index)
          {
@@ -150,7 +159,8 @@ init(SoState state)
 
 public static void
 set(SoState state, SoNode node,
-                     int numNormals, final SbVec3fArray normals)
+                     int numNormals, final SbVec3fArray normals,
+    int numNormalsShort, final SbVec3sArray normalsShort)
 //
 ////////////////////////////////////////////////////////////////////////
 {
@@ -158,6 +168,7 @@ set(SoState state, SoNode node,
     //SoGLVBOElement.unsetVBOIfEnabled(state, SoGLVBOElement.VBOType.NORMAL_VBO);
     if (state.isElementEnabled(SoGLVBOElement.getClassStackIndex(SoGLVBOElement.class))) { // COIN 3D
         SoGLVBOElement.setNormalVBO(state, null);
+        SoGLVBOElement.setNormalShortVBO(state, null);
       }
 
     // Get an instance we can change (pushing if necessary)
@@ -165,6 +176,8 @@ set(SoState state, SoNode node,
     if (elt != null) {
         elt.numNormals = numNormals;
         elt.normals    = normals;
+        elt.numNormalsShort = numNormalsShort;
+        elt.normalsShort = normalsShort;
     }
 }
 
@@ -177,5 +190,13 @@ getArrayPtr()
   return this.normals;
 }
 
-  
+    /*!
+    Returns a pointer to the normal array. This method is not part of the OIV API.
+  */
+    public SbVec3sArray
+    getArrayPtrShort()
+    {
+        return this.normalsShort;
+    }
+
    }

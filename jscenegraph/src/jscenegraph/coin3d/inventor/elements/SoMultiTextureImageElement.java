@@ -313,7 +313,7 @@ getImage(SoState state,
 	elem.pimpl.ensureCapacity(unit);
 	UnitData ud = elem.pimpl.unitdata.operator_square_bracket(unit);
 
-	size.setValue(ud.size.getValue()[0], ud.size.getValue()[1]);
+	size.setValue(ud.size.getX(), ud.size.getY());
 	numComponents[0] = ud.numComponents;
 	return ud.bytes;
 }

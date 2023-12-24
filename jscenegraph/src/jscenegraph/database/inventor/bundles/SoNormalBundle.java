@@ -175,7 +175,7 @@ set(int numNormals, final SbVec3fArray normals)
 
     // Set the normals in the normal element
     SoNormalElement.set(state, currentNode,
-                         numNormals, normals);
+                         numNormals, normals,0,null);
 
     // Get the new instance of the normal element for inquiring or
     // sending normals

@@ -96,6 +96,7 @@ import jscenegraph.database.inventor.nodes.SoVertexPropertyCache.SoVPCacheFunc;
 import jscenegraph.port.Ctx;
 import jscenegraph.port.IntArrayPtr;
 import jscenegraph.port.SbVec3fArray;
+import jscenegraph.port.SbVec3sArray;
 
 /**
  * @author Yves Boyadjian
@@ -584,10 +585,11 @@ public void GLRender(SoGLRenderAction action)
 
 	  final SoCoordinateElement[] coords = new SoCoordinateElement[1]; //ptr
 	  final SbVec3fArray[] normals = new SbVec3fArray[1];
+		final SbVec3sArray[] normalsShort = new SbVec3sArray[1];
 	  boolean doTextures;
 	  boolean needNormals = true;
 
-	  SoVertexShape.getVertexData(action.getState(), coords, normals,
+	  SoVertexShape.getVertexData(action.getState(), coords, normals, normalsShort,
 	                               needNormals);
 
 	  final SoTextureCoordinateBundle tb = new SoTextureCoordinateBundle(action, false, false);

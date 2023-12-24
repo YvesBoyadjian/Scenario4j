@@ -37,7 +37,8 @@ public class SoRecursiveIndexedFaceSet extends SoIndexedFaceSet/*SoTriangleStrip
 		SoVertexProperty vertexProperty = new SoVertexProperty();
 		vertexProperty.vertex.setValuesPointer(parameters.vertices()/*recursiveChunk.getDecimatedVertices()*//*,recursiveChunk.getDecimatedVerticesBuffer()*/);
 	    vertexProperty.normalBinding.setValue(SoVertexProperty.Binding.PER_VERTEX_INDEXED);
-	    vertexProperty.normal.setValuesPointer(/*0,*/ parameters.normals()/*recursiveChunk.getDecimatedNormals()*//*,recursiveChunk.getDecimatedNormalsBuffer()*/);
+	    //vertexProperty.normal.setValuesPointer(/*0,*/ parameters.normals()/*recursiveChunk.getDecimatedNormals()*//*,recursiveChunk.getDecimatedNormalsBuffer()*/);
+		vertexProperty.normalShort.setValuesPointer(/*0,*/ parameters.normalsShort()/*recursiveChunk.getDecimatedNormals()*//*,recursiveChunk.getDecimatedNormalsBuffer()*/);
 	    vertexProperty.texCoord.setValuesPointer(/*0,*/ parameters.textureCoords()/*recursiveChunk.getDecimatedTexCoords()*//*,recursiveChunk.getDecimatedTexCoordsBuffer()*/);
 
 	    boolean wasEnabled = this.vertexProperty.enableNotify(false);

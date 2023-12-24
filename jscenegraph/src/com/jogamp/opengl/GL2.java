@@ -3196,18 +3196,21 @@ ByteBuffer data ) {
 		return true;
 	}
 
-	default void glBufferData(int arg1, long arg2, Buffer arg3, int arg4) {
+	default void glBufferData(int target, long arg2, Buffer arg3, int usage) {
 		if(arg3 instanceof ByteBuffer) {
-			org.lwjgl.opengl.GL15.glBufferData(arg1,/* arg2,*/ (ByteBuffer)arg3, arg4);
+			org.lwjgl.opengl.GL15.glBufferData(target,/* arg2,*/ (ByteBuffer)arg3, usage);
 		}
 		else if(arg3 instanceof FloatBuffer) {
-			org.lwjgl.opengl.GL15.glBufferData(arg1,/* arg2,*/ (FloatBuffer)arg3, arg4);
+			org.lwjgl.opengl.GL15.glBufferData(target,/* arg2,*/ (FloatBuffer)arg3, usage);
 		}
 		else if(arg3 instanceof IntBuffer) {
-			org.lwjgl.opengl.GL15.glBufferData(arg1,/* arg2,*/ (IntBuffer)arg3, arg4);
+			org.lwjgl.opengl.GL15.glBufferData(target,/* arg2,*/ (IntBuffer)arg3, usage);
+		}
+		else if(arg3 instanceof ShortBuffer) {
+			org.lwjgl.opengl.GL15.glBufferData(target,/* arg2,*/ (ShortBuffer)arg3, usage);
 		}
 		else {
-			org.lwjgl.opengl.GL15.glBufferData(arg1, arg2, arg4);
+			org.lwjgl.opengl.GL15.glBufferData(target, arg2, usage);
 		}
 	}
 

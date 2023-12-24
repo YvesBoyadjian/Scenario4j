@@ -553,7 +553,7 @@ shadowmap_glcallback(Object closure, SoAction action)
     SoLazyElement.setLightModel(state, SoLazyElement.LightModel.BASE_COLOR.getValue());
     SoTextureQualityElement.set(state, 0.0f);
     SoMaterialBindingElement.set(state,/* null,*/ SoMaterialBindingElement.Binding.OVERALL);
-    SoNormalElement.set(state, null, 0, null/*, false*/); //YB
+    SoNormalElement.set(state, null, 0, null/*, false*/,0,null); //YB
 
 
     SoOverrideElement.setNormalVectorOverride(state, null, true);

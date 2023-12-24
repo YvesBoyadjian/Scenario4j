@@ -72,12 +72,7 @@ import jscenegraph.database.inventor.fields.SoMFInt32;
 import jscenegraph.database.inventor.misc.SoNotList;
 import jscenegraph.database.inventor.misc.SoNotRec;
 import jscenegraph.database.inventor.misc.SoState;
-import jscenegraph.port.Array;
-import jscenegraph.port.Destroyable;
-import jscenegraph.port.FloatArray;
-import jscenegraph.port.IntArray;
-import jscenegraph.port.IntArrayPtr;
-import jscenegraph.port.SbVec3fArray;
+import jscenegraph.port.*;
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -201,10 +196,10 @@ public SoIndexedShape()
 {
     nodeHeader.SO_NODE_CONSTRUCTOR(/*SoIndexedShape*/);
 
-    nodeHeader.SO_NODE_ADD_MFIELD(coordIndex,"coordIndex", new Integer(0));
-    nodeHeader.SO_NODE_ADD_MFIELD(materialIndex,"materialIndex",     new Integer(-1));
-    nodeHeader.SO_NODE_ADD_MFIELD(normalIndex,"normalIndex",       new Integer(-1));
-    nodeHeader.SO_NODE_ADD_MFIELD(textureCoordIndex,"textureCoordIndex", new Integer(-1));
+    nodeHeader.SO_NODE_ADD_MFIELD(coordIndex,"coordIndex", Integer.valueOf(0));
+    nodeHeader.SO_NODE_ADD_MFIELD(materialIndex,"materialIndex",     Integer.valueOf(-1));
+    nodeHeader.SO_NODE_ADD_MFIELD(normalIndex,"normalIndex",       Integer.valueOf(-1));
+    nodeHeader.SO_NODE_ADD_MFIELD(textureCoordIndex,"textureCoordIndex", Integer.valueOf(-1));
     colorI = null;
     normalI = null;
     texCoordI = null;
@@ -819,7 +814,8 @@ allocateSequentialWithHoles()
 public boolean
 getVertexData(final SoState state,
                               final SoCoordinateElement[] coords,
-                              final SbVec3fArray[] normals,
+                              final SbVec3fArray[] normalsFloat,
+              final SbVec3sArray[] normalsShort,
                               final IntArrayPtr[] cindices,
                               final IntArrayPtr[] nindices,
                               final IntArrayPtr[] tindices,
@@ -828,7 +824,7 @@ getVertexData(final SoState state,
                               boolean needNormals,
                               final boolean[] normalCacheUsed)
 {
-  super.getVertexData(state, coords, normals, needNormals);
+  super.getVertexData(state, coords, normalsFloat, normalsShort, needNormals);
   
   cindices[0] = this.coordIndex.getValuesIntArrayPtr(0);
   numcindices[0] = this.coordIndex.getNum();
@@ -845,15 +841,15 @@ getVertexData(final SoState state,
     nindices[0] = this.normalIndex.getValuesIntArrayPtr(0);
     if (this.normalIndex.getNum() <= 0 || nindices[0].get(0) < 0) nindices[0] = null;
 
-    if (normals[0] == null) {
+    if (normalsFloat[0] == null && normalsShort[0] == null) {
       SoNormalCache nc = this.generateAndReadLockNormalCache(state);
-      normals[0] = nc.getNormals();
+      normalsFloat[0] = nc.getNormals();
       nindices[0] = nc.getIndices();
       normalCacheUsed[0] = true;
      
       // if no normals were generated, unlock normal cache before
       // returning
-      if (normals[0] == null) {
+      if (normalsFloat[0] == null) {
         this.readUnlockNormalCache();
         normalCacheUsed[0] = false;
       }

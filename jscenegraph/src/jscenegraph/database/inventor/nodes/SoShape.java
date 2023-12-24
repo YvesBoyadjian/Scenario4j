@@ -120,6 +120,7 @@ import jscenegraph.coin3d.shaders.inventor.elements.SoGLShaderProgramElement;
 import jscenegraph.coin3d.shaders.inventor.nodes.SoShaderProgram;
 import jscenegraph.database.inventor.*;
 import jscenegraph.database.inventor.elements.*;
+import jscenegraph.port.*;
 import org.lwjglx.util.glu.GLUtessellator;
 import org.lwjglx.util.glu.GLUtessellatorCallback;
 import org.lwjglx.util.glu.GLUtessellatorCallbackAdapter;
@@ -157,12 +158,6 @@ import jscenegraph.database.inventor.shapenodes.soshape_primdata;
 import jscenegraph.database.inventor.shapenodes.soshape_trianglesort;
 import jscenegraph.mevis.inventor.elements.SoGLVBOElement;
 import jscenegraph.mevis.inventor.misc.SoVBO;
-import jscenegraph.port.Array;
-import jscenegraph.port.Ctx;
-import jscenegraph.port.Destroyable;
-import jscenegraph.port.FloatBufferAble;
-import jscenegraph.port.SbColorArray;
-import jscenegraph.port.SbVec3fArray;
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -2287,7 +2282,8 @@ int hasWarned = 0;
 protected boolean
 startVertexArray(SoGLRenderAction action,
                           SoCoordinateElement coords,
-                          SbVec3fArray pervertexnormals,
+                          SbVec3fArray pervertexnormalsFloat,
+                         SbVec3sArray pervertexnormalsShort,
                           boolean texpervertex,
                           boolean colorpervertex)
 {
@@ -2400,7 +2396,7 @@ startVertexArray(SoGLRenderAction action,
       }
     }
   }
-  if (pervertexnormals != null) {
+  if (pervertexnormalsFloat != null) {
     SoVBO vbo = dovbo ? vboelem.getNormalVBO() : null;
     /*GLvoid*/FloatBufferAble dataptr = null;
     if (vbo != null) {
@@ -2408,7 +2404,7 @@ startVertexArray(SoGLRenderAction action,
       didbind = true;
     }
     else {
-      dataptr = (/*GLvoid*/FloatBufferAble) pervertexnormals;
+      dataptr = (/*GLvoid*/FloatBufferAble) pervertexnormalsFloat;
       if (didbind) {
         SoGL.cc_glglue_glBindBuffer(glue, GL_ARRAY_BUFFER, 0);
         didbind = false;
@@ -2430,6 +2426,36 @@ startVertexArray(SoGLRenderAction action,
           }
       }
   }
+    else if (pervertexnormalsShort != null) {
+        SoVBO vbo = dovbo ? vboelem.getNormalShortVBO() : null;
+        /*GLvoid*/ShortBufferAble dataptr = null;
+        if (vbo != null) {
+            vbo.bindBuffer(contextid);
+            didbind = true;
+        }
+        else {
+            dataptr = (/*GLvoid*/ShortBufferAble) pervertexnormalsShort;
+            if (didbind) {
+                SoGL.cc_glglue_glBindBuffer(glue, GL_ARRAY_BUFFER, 0);
+                didbind = false;
+            }
+        }
+        //SoGL.cc_glglue_glNormalPointer(glue, GL_FLOAT, 0, dataptr);
+
+        glue.glVertexAttribPointerARB(1,3,GL_SHORT,GL_FALSE!=0,0,dataptr);
+
+        SoGL.cc_glglue_glEnableClientState(glue, GL_NORMAL_ARRAY);
+
+        glue.glEnableVertexAttribArrayARB(1);
+
+        int pHandle = SoGLShaderProgramElement.get(state).getGLSLShaderProgramHandle(state);
+        if(pHandle >0 ) {
+            int perVertexLocation = state.getGL2().glGetUniformLocation(pHandle, "s4j_PerVertexNormal");
+            if (perVertexLocation >= 0) {
+                state.getGL2().glUniform1i(perVertexLocation, 1);
+            }
+        }
+    }
 
   /*GLvoid*/FloatBufferAble dataptr = null;
   if (vertexvbo != null) {

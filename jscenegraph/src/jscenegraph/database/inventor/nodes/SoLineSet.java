@@ -101,6 +101,7 @@ import jscenegraph.mevis.inventor.misc.SoVBO;
 import jscenegraph.port.IntArrayPtr;
 import jscenegraph.port.IntPtr;
 import jscenegraph.port.SbVec3fArray;
+import jscenegraph.port.SbVec3sArray;
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -364,10 +365,11 @@ generatePrimitives(SoAction action)
 
 	  final SoCoordinateElement[] coords = new SoCoordinateElement[1]; // ptr
 	  final SbVec3fArray[] normals = new SbVec3fArray[1];
+	final SbVec3sArray[] normalsShort = new SbVec3sArray[1];
 	  boolean doTextures;
 	  boolean needNormals = true;
 
-	  SoVertexShape.getVertexData(action.getState(), coords, normals,
+	  SoVertexShape.getVertexData(action.getState(), coords, normals, normalsShort,
 	                               needNormals);
 
 	  if (normals[0] == null) needNormals = false;

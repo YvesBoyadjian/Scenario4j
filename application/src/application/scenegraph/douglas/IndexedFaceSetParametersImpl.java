@@ -2,6 +2,7 @@ package application.scenegraph.douglas;
 
 import jscenegraph.database.inventor.SbVec3f;
 import jscenegraph.port.memorybuffer.FloatMemoryBuffer;
+import jscenegraph.port.memorybuffer.ShortMemoryBuffer;
 
 import java.util.List;
 
@@ -26,6 +27,11 @@ public class IndexedFaceSetParametersImpl implements IndexedFaceSetParameters {
     @Override
     public FloatMemoryBuffer normals() {
         return douglasNormalsNearF;
+    }
+
+    @Override
+    public ShortMemoryBuffer normalsShort() {
+        return null;
     }
 
     @Override

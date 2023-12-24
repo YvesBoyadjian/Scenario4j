@@ -135,6 +135,9 @@ public class VoidPtr implements Destroyable {
 		else if(object instanceof SbVec3fArray) {
 			buffer = ((SbVec3fArray)object).toFloatBuffer();
 		}
+		else if(object instanceof SbVec3sArray) {
+			buffer = ((SbVec3sArray)object).toShortBuffer();
+		}
 		else if(object instanceof SbVec2fArray) {
 			buffer = ((SbVec2fArray)object).toFloatBuffer();
 		}

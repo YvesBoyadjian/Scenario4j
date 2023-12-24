@@ -113,13 +113,7 @@ import jscenegraph.database.inventor.misc.SoState;
 import jscenegraph.database.inventor.nodes.SoVertexPropertyCache.SoVPCacheFunc;
 import jscenegraph.mevis.inventor.elements.SoGLVBOElement;
 import jscenegraph.mevis.inventor.misc.SoVBO;
-import jscenegraph.port.Ctx;
-import jscenegraph.port.Destroyable;
-import jscenegraph.port.FloatArray;
-import jscenegraph.port.IntArrayPtr;
-import jscenegraph.port.MutableSbVec3fArray;
-import jscenegraph.port.SbVec3fArray;
-import jscenegraph.port.SbVec4fArray;
+import jscenegraph.port.*;
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -514,11 +508,12 @@ generatePrimitives(SoAction action)
 
 	  final SoCoordinateElement[] coords = new SoCoordinateElement[1]; //ptr
 	  final SbVec3fArray[] normals = new SbVec3fArray[1];
+    final SbVec3sArray[] normalsShort = new SbVec3sArray[1];
 	  boolean doTextures;
 
 	  boolean needNormals = true;
 
-	  SoVertexShape.getVertexData(state, coords, normals,
+	  SoVertexShape.getVertexData(state, coords, normals, normalsShort,
 	                               needNormals);
 
 	  final SoTextureCoordinateBundle tb = new SoTextureCoordinateBundle(action, false, false);
@@ -1137,6 +1132,7 @@ GLRender(SoGLRenderAction action)
 	    // render normally
 	    final SoCoordinateElement[] tmp = new SoCoordinateElement[1]; // ptr
 	    final SbVec3fArray[] normals = new SbVec3fArray[1]; // ptr
+          final SbVec3sArray[] normalsShort = new SbVec3sArray[1]; // ptr
 	    boolean doTextures;
 
 	    mb = new SoMaterialBundle(action);
@@ -1145,7 +1141,7 @@ GLRender(SoGLRenderAction action)
 
 	    boolean needNormals = !mb.isColorOnly() || tb.isFunction();
 
-	    SoVertexShape.getVertexData(state, tmp, normals,
+	    SoVertexShape.getVertexData(state, tmp, normals, normalsShort,
 	                                 needNormals);
 
 	    SoGLCoordinateElement coords = (SoGLCoordinateElement )tmp[0];
@@ -1231,6 +1227,7 @@ GLRender(SoGLRenderAction action)
 	      boolean dovbo = this.startVertexArray(action,
 	                                            coords,
 	                                            nbind == Binding.PER_VERTEX ? normals[0] : null,
+                  nbind == Binding.PER_VERTEX ? normalsShort[0] : null,
 	                                            doTextures,
 	                                            (mbind == Binding.PER_VERTEX));
 	      int numprimitives = this.numVertices.getNum();
@@ -1447,13 +1444,14 @@ useConvexCache(SoAction action)
 
   final SoCoordinateElement[] tmp = new SoCoordinateElement[1]; // ptr
   final SbVec3fArray[] normals = new SbVec3fArray[1]; //ptr
+    final SbVec3sArray[] normalsShort = new SbVec3sArray[1]; //ptr
   boolean doTextures;
 
   final SoMaterialBundle mb = new SoMaterialBundle(action);
 
   boolean needNormals = !mb.isColorOnly();
 
-  SoVertexShape.getVertexData(state, tmp, normals,
+  SoVertexShape.getVertexData(state, tmp, normals, normalsShort,
                                needNormals);
 
   final SoGLCoordinateElement coords = (SoGLCoordinateElement )tmp[0];

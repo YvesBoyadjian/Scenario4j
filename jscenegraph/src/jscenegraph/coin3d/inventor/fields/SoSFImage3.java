@@ -33,22 +33,22 @@ public class SoSFImage3 extends SoSField<SbImage> {
     SoReadError.post(in, "Premature end of file reading images dimensions");
     return false;
   }
-  size.getValue()[0] = s1[0];
-  size.getValue()[1] = s2[0];
-  size.getValue()[2] = s3[0];
+  size.setValue(0, s1[0]);
+  size.setValue(1, s2[0]);
+  size.setValue(2, s3[0]);
 
   // Note: empty images (dimensions 0x0x0) are allowed.
 
-  if (size.getValue()[0] < 0 || size.getValue()[1] < 0 || size.getValue()[2] < 0 || nc[0] < 0 || nc[0] > 4) {
-    SoReadError.post(in, "Invalid image specification %dx%dx%dx%d"+size.getValue()[0]+"x"+size.getValue()[1]+"x"+size.getValue()[2]+"x"+ nc);
+  if (size.getX() < 0 || size.getY() < 0 || size.getZ() < 0 || nc[0] < 0 || nc[0] > 4) {
+    SoReadError.post(in, "Invalid image specification %dx%dx%dx%d"+size.getX()+"x"+size.getY()+"x"+size.getZ()+"x"+ nc);
     return false;
   }
 
-  int buffersize = (int)(size.getValue()[0]) * (int)(size.getValue()[1]) * (int)(size.getValue()[2]) * nc[0];
+  int buffersize = (int)(size.getX()) * (int)(size.getY()) * (int)(size.getZ()) * nc[0];
 
   if (buffersize == 0 &&
-      (size.getValue()[0] != 0 || size.getValue()[1] != 0 || size.getValue()[2] != 0 || nc[0] != 0)) {
-    SoReadError.post(in, "Invalid image specification "+size.getValue()[0]+"x"+size.getValue()[1]+"x"+size.getValue()[2]+"x"+ nc);
+      (size.getX() != 0 || size.getY() != 0 || size.getZ() != 0 || nc[0] != 0)) {
+    SoReadError.post(in, "Invalid image specification "+size.getX()+"x"+size.getY()+"x"+size.getZ()+"x"+ nc);
     return false;
   }
 
@@ -78,7 +78,7 @@ public class SoSFImage3 extends SoSField<SbImage> {
   }
   else {
     int byte_ = 0;
-    int numpixels = (int)(size.getValue()[0]) * (int)(size.getValue()[1]) * (int)(size.getValue()[2]);
+    int numpixels = (int)(size.getX()) * (int)(size.getY()) * (int)(size.getZ());
     for (int i = 0; i < numpixels; i++) {
       final int[] l = new int[1];
       if (!in.read(l)) {

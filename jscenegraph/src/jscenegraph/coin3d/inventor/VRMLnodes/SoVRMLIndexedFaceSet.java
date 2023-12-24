@@ -255,10 +255,7 @@ import jscenegraph.database.inventor.misc.SoState;
 import jscenegraph.database.inventor.nodes.SoSubNode;
 import jscenegraph.mevis.inventor.elements.SoGLVBOElement;
 import jscenegraph.mevis.inventor.misc.SoVBO;
-import jscenegraph.port.Destroyable;
-import jscenegraph.port.IntArrayPtr;
-import jscenegraph.port.MutableSbVec3fArray;
-import jscenegraph.port.SbVec3fArray;
+import jscenegraph.port.*;
 
 /**
  * @author BOYADJIAN
@@ -468,6 +465,7 @@ public void GLRender(SoGLRenderAction action)
 
   final SoCoordinateElement[] coords = new SoCoordinateElement[1]; //ptr
   final SbVec3fArray[] normals = new SbVec3fArray[1];
+  final SbVec3sArray[] normalsShort = new SbVec3sArray[1];
   final IntArrayPtr[] cindices = new IntArrayPtr[1];
   final int[] numindices = new int[1];
   final IntArrayPtr[] nindices = new IntArrayPtr[1];
@@ -576,6 +574,7 @@ public void GLRender(SoGLRenderAction action)
     boolean dovbo = this.startVertexArray(action,
                                           coords[0],
                                           (nbind != Binding.NONE_OVERALL) ? normals[0] : null,
+                                          null,
                                           doTextures,
                                           mbind != Binding.NONE_OVERALL);
     didrenderasvbo = dovbo;

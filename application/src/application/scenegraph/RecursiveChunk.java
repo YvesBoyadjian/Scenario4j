@@ -26,6 +26,7 @@ import java.util.stream.Stream;
 import application.scenegraph.douglas.IndexedFaceSetParameters;
 import jscenegraph.database.inventor.SbVec3fSingleFast;
 import jscenegraph.database.inventor.nodes.*;
+import jscenegraph.port.memorybuffer.ShortMemoryBuffer;
 import org.lwjgl.BufferUtils;
 
 import jscenegraph.coin3d.inventor.nodes.SoLOD;
@@ -428,9 +429,9 @@ public class RecursiveChunk {
 //		return decimatedTexCoordsBuffer;
 //	}
 	
-	FloatMemoryBuffer getDecimatedNormals() {
+	FloatMemoryBuffer getDecimatedNormalsFloat() {
 		
-		if( decimatedNormals == null) {
+		if( decimatedNormalsFloat == null) {
 		if( true /*|| (decimatedNormals = loadDecimatedNormals()) == null*/) { // load does not accelerate loading					
 			int sourceChunkWidth = ni;
 			int sourceChunkHeight = nj;
@@ -487,20 +488,85 @@ public class RecursiveChunk {
 					indice++;
 				}
 			}
-			this.decimatedNormals = /*FloatMemoryBuffer.allocateFromFloatArray(*/decimatedNormals/*)*/;
+			this.decimatedNormalsFloat = /*FloatMemoryBuffer.allocateFromFloatArray(*/decimatedNormals/*)*/;
 			//saveDecimatedNormals(); // load does not accelerate loading
 		}
 		}
-		return decimatedNormals;
-	}	
-	
+		return decimatedNormalsFloat;
+	}
+	ShortMemoryBuffer getDecimatedNormalsShort() {
+
+		if( decimatedNormalsShort == null) {
+			if( true /*|| (decimatedNormals = loadDecimatedNormals()) == null*/) { // load does not accelerate loading
+				int sourceChunkWidth = ni;
+				int sourceChunkHeight = nj;
+				int decimatedChunkWidth = getDecimatedChunkWidth();
+				int decimatedChunkHeight = getDecimatedChunkHeight();
+				int nbVertices = decimatedChunkWidth *decimatedChunkHeight;
+
+				ShortMemoryBuffer decimatedNormals = ShortMemoryBuffer.allocateShortsMalloc(nbVertices*3);
+
+				int nb = 1;
+//			for(int i=0;i<l;i++) {
+//				nb *= 3;
+//			}
+				int delta = (nb - 1)/2;
+
+				int indice = 0;
+
+				float normalX, normalY, normalZ;
+				for(int i =0 ; i< decimatedChunkWidth; i++) {
+					for(int j =0 ; j< decimatedChunkHeight; j++) {
+						int i0 = fromSonToSourceI(i);
+						int j0 = fromSonToSourceJ(j);
+						int nbc = 0;
+						normalX = 0; normalY = 0; normalZ = 0;
+						for(int di = -delta; di<=delta; di++) {
+							for( int dj = -delta; dj<= delta; dj++) {
+
+								int i1 = i0 + di;
+								int j1 = j0 + dj;
+
+								if(i1 < this.i0) {
+									i1 = this.i0;
+								}
+								if(j1 < this.j0) {
+									j1 = this.j0;
+								}
+								if(i1 >= sourceChunkWidth + this.i0) {
+									i1 = sourceChunkWidth - 1 + this.i0;
+								}
+								if(j1 >= sourceChunkHeight + this.j0) {
+									j1 = sourceChunkHeight - 1 + this.j0;
+								}
+								//int indice0 = i0*chunkWidth+j0;
+								int indice0 = i1*ca.getH()+j1;
+								normalX += ca.normalsGet(indice0*3);
+								normalY += ca.normalsGet(indice0*3+1);
+								normalZ += ca.normalsGet(indice0*3+2);
+								nbc++;
+							}
+						}
+						decimatedNormals.setShort(indice*3, (short)((normalX / nbc) * Short.MAX_VALUE));
+						decimatedNormals.setShort(indice*3+1, (short)((normalY / nbc) * Short.MAX_VALUE));
+						decimatedNormals.setShort(indice*3+2, (short)((normalZ / nbc) * Short.MAX_VALUE));
+						indice++;
+					}
+				}
+				this.decimatedNormalsShort = /*FloatMemoryBuffer.allocateFromFloatArray(*/decimatedNormals/*)*/;
+				//saveDecimatedNormals(); // load does not accelerate loading
+			}
+		}
+		return decimatedNormalsShort;
+	}
+
 	private void saveDecimatedNormals() {
 		File file = new File(getFilename("decimatedNormals"));
 		try {
 			FileOutputStream fos = new FileOutputStream(file);
-			byte[] b = new byte[decimatedNormals.numFloats()*Float.BYTES];
+			byte[] b = new byte[decimatedNormalsFloat.numFloats()*Float.BYTES];
 			ByteBuffer bb = ByteBuffer.wrap(b);
-			bb.asFloatBuffer().put(decimatedNormals.toFloatArray());
+			bb.asFloatBuffer().put(decimatedNormalsFloat.toFloatArray());
 			fos.write(b);
 			fos.close();
 		} catch (FileNotFoundException e) {
@@ -588,8 +654,10 @@ public class RecursiveChunk {
 	
 	//private FloatBuffer decimatedVerticesBuffer;
 	
-	private FloatMemoryBuffer decimatedNormals;
-	
+	private FloatMemoryBuffer decimatedNormalsFloat;
+
+	private ShortMemoryBuffer decimatedNormalsShort;
+
 	//private FloatBuffer decimatedNormalsBuffer;
 	
 	private FloatMemoryBuffer decimatedTextCoords;
@@ -645,7 +713,7 @@ public class RecursiveChunk {
 		getDecimatedVertices();
 		
 		if(KEEP_IN_MEMORY) {		
-			getDecimatedNormals();//getDecimatedNormalsBuffer();
+			getDecimatedNormalsShort();//getDecimatedNormalsBuffer();
 			getDecimatedTexCoords();//getDecimatedTexCoordsBuffer();
 			getDecimatedCoordIndices();
 		}
@@ -710,7 +778,7 @@ public class RecursiveChunk {
 		}
 		if(decimatedVerticesCount == 0) {
 		FloatMemoryBuffer.free(decimatedVertices); decimatedVertices = null; //decimatedVerticesBuffer = null;		
-		FloatMemoryBuffer.free(decimatedNormals); decimatedNormals = null; //decimatedNormalsBuffer = null;
+		FloatMemoryBuffer.free(decimatedNormalsShort); decimatedNormalsShort = null; //decimatedNormalsBuffer = null;
 		FloatMemoryBuffer.free(decimatedTextCoords); decimatedTextCoords = null; //decimatedTexCoordsBuffer = null;
 		decimatedCoordIndices = null;
 		}
@@ -722,7 +790,7 @@ public class RecursiveChunk {
 			decimatedParameters = es.submit(()->{
 
 				getDecimatedVertices();
-				getDecimatedNormals();
+				getDecimatedNormalsShort();
 				getDecimatedTexCoords();
 				getDecimatedCoordIndices();
 				return new IndexedFaceSetParameters() {
@@ -738,7 +806,10 @@ public class RecursiveChunk {
 
 					@Override
 					public FloatMemoryBuffer normals() {
-						return decimatedNormals;
+						return decimatedNormalsFloat;
+					}
+					public ShortMemoryBuffer normalsShort() {
+						return decimatedNormalsShort;
 					}
 
 					@Override

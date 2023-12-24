@@ -465,27 +465,27 @@ loadFilenames(SoInput  in)
         final SbVec3s size = new SbVec3s();
         final boolean[] srgb = new boolean[1];
         MemoryBuffer imgbytes = tmpimage.getValue(size, nc, srgb);
-        if (size.getValue()[2]==0) size.getValue()[2]=1;
+        if (size.getZ()==0) size.setValue(2,(short)1);
         if (this.images.isDefault()) { // First time => allocate memory
-          volumeSize.setValue(size.getValue()[0],
-                              size.getValue()[1],
-                              (short)(size.getValue()[2]*numImages));
+          volumeSize.setValue(size.getX(),
+                              size.getY(),
+                              (short)(size.getZ()*numImages));
           volumenc[0] = nc[0];
           this.images.setValue(volumeSize, nc[0], null);
         }
         else { // Verify size & components
-          if (size.getValue()[0] != volumeSize.getValue()[0] ||
-              size.getValue()[1] != volumeSize.getValue()[1] ||
+          if (size.getX() != volumeSize.getX() ||
+              size.getY() != volumeSize.getY() ||
               //FIXME: always 1 or what? (kintel 20020110)
-              size.getValue()[2] != (volumeSize.getValue()[2]/numImages) ||
+              size.getZ() != (volumeSize.getZ()/numImages) ||
               nc[0] != volumenc[0]) {
             sizeError = true;
             retval = false;
 
             String errstr =
             "Texture file #"+n+" ("+filename+") has wrong size:"+
-                           "Expected ("+volumeSize.getValue()[0]+","+volumeSize.getValue()[1]+","+volumeSize.getValue()[2]+","+volumenc+
-                           ") got ("+size.getValue()[0]+","+size.getValue()[1]+","+size.getValue()[2]+","+nc+")\n";
+                           "Expected ("+volumeSize.getX()+","+volumeSize.getY()+","+volumeSize.getZ()+","+volumenc+
+                           ") got ("+size.getX()+","+size.getY()+","+size.getZ()+","+nc+")\n";
             if (in != null) SoReadError.post(in, errstr);
             else SoDebugError.postWarning("SoTexture3::loadFilenames()",
                                            errstr);
@@ -497,8 +497,8 @@ loadFilenames(SoInput  in)
           boolean oldnotify = this.images.enableNotify(false);
           MemoryBuffer volbytes = this.images.startEditing(volumeSize,
                                                               volumenc, srgb);
-          Util.memcpy(volbytes,(int)(size.getValue()[0])*(int)(size.getValue()[1])*(int)(size.getValue()[2])*nc[0]*n,
-                 imgbytes, (int)(size.getValue()[0])*(int)(size.getValue()[1])*(int)(size.getValue()[2])*nc[0]);
+          Util.memcpy(volbytes,(int)(size.getX())*(int)(size.getY())*(int)(size.getZ())*nc[0]*n,
+                 imgbytes, (int)(size.getX())*(int)(size.getY())*(int)(size.getZ())*nc[0]);
           this.images.finishEditing();
           this.images.enableNotify(oldnotify);
           this.glimagevalid = false; // recreate GL images in next GLRender()

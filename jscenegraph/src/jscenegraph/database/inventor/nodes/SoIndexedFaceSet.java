@@ -298,12 +298,7 @@ import jscenegraph.database.inventor.nodes.SoVertexPropertyCache.SoVPCacheFunc;
 import jscenegraph.mevis.inventor.elements.SoGLVBOElement;
 import jscenegraph.mevis.inventor.misc.SoVBO;
 import jscenegraph.mevis.inventor.misc.SoVertexArrayIndexer;
-import jscenegraph.port.Ctx;
-import jscenegraph.port.Destroyable;
-import jscenegraph.port.IntArray;
-import jscenegraph.port.IntArrayPtr;
-import jscenegraph.port.MutableSbVec3fArray;
-import jscenegraph.port.SbVec3fArray;
+import jscenegraph.port.*;
 
 /**
  * @author Yves Boyadjian
@@ -588,7 +583,8 @@ public void GLRender(SoGLRenderAction action)
 	  Binding nbind = this.findNormalBinding(state);
 
 	  final SoCoordinateElement[] coords = new SoCoordinateElement[1]; //ptr
-	  final SbVec3fArray[] normals = new SbVec3fArray[1]; //ptr
+	  final SbVec3fArray[] normalsFloat = new SbVec3fArray[1]; //ptr
+	final SbVec3sArray[] normalsShort = new SbVec3sArray[1]; //ptr
 	  final IntArrayPtr[] cindices = new IntArrayPtr[1]; //ptr
 	  final int[] numindices = new int[1];
 	  final IntArrayPtr[] nindices = new IntArrayPtr[1];
@@ -603,13 +599,13 @@ public void GLRender(SoGLRenderAction action)
 	  doTextures = tb.needCoordinates();
 	  boolean sendNormals = !mb.isColorOnly() || tb.isFunction();
 
-	  this.getVertexData(state, coords, normals, cindices,
+	  this.getVertexData(state, coords, normalsFloat, normalsShort, cindices,
 	                      nindices, tindices, mindices, numindices,
 	                      sendNormals, normalCacheUsed);
 
 	  if (!sendNormals) nbind = Binding.OVERALL;
 	  else if (nbind == Binding.OVERALL) {
-	    if (normals[0]!=null) gl2.glNormal3fv(normals[0].getFast(0).getValueRead());
+	    if (normalsFloat[0]!=null) gl2.glNormal3fv(normalsFloat[0].getFast(0).getValueRead());
 	    else gl2.glNormal3f(0.0f, 0.0f, 1.0f);
 	  }
 	  else if (normalCacheUsed[0] && nbind == Binding.PER_VERTEX) {
@@ -651,7 +647,7 @@ public void GLRender(SoGLRenderAction action)
 	  }
 
 	  boolean convexcacheused = false;
-	  if (this.useConvexCache(action, normals[0], nindices[0], normalCacheUsed[0])) {
+	  if (this.useConvexCache(action, normalsFloat[0], nindices[0], normalCacheUsed[0])) {
 	    cindices[0] = pimpl.convexCache.getCoordIndices();
 	    numindices[0] = pimpl.convexCache.getNumCoordIndices();
 	    mindices[0] = pimpl.convexCache.getMaterialIndices();
@@ -708,7 +704,8 @@ public void GLRender(SoGLRenderAction action)
 	  if (dova) {
 	    boolean dovbo = this.startVertexArray(action,
 	                                          coords[0],
-	                                          (nbind != Binding.OVERALL) ? normals[0] : null,
+	                                          (nbind != Binding.OVERALL) ? normalsFloat[0] : null,
+				(nbind != Binding.OVERALL) ? normalsShort[0] : null,
 	                                          doTextures,
 	                                          mbind != Binding.OVERALL);
 	    didrenderasvbo = dovbo;
@@ -815,7 +812,7 @@ public void GLRender(SoGLRenderAction action)
 	    SoGL.sogl_render_faceset((SoGLCoordinateElement)coords[0],
 	                        cindices[0],
 	                        numindices[0],
-	                        normals[0],
+	                        normalsFloat[0],
 	                        nindices[0],
 	                        /*&*/mb,
 	                        mindices[0],
@@ -1037,6 +1034,7 @@ useConvexCache(SoAction action,
   if (this.vertexProperty.getValue() != null) this.vertexProperty.getValue().doAction(action);
   final SoCoordinateElement[] coords = new SoCoordinateElement[1]; //ptr
   final SbVec3fArray[] dummynormals = new SbVec3fArray[1]; // ptr
+	final SbVec3sArray[] dummynormalsShort = new SbVec3sArray[1]; // ptr
   final IntArrayPtr[] cindices = new IntArrayPtr[1];
   final int[] numindices = new int[1];
   final IntArrayPtr[] dummynindices = new IntArrayPtr[1];
@@ -1047,7 +1045,7 @@ useConvexCache(SoAction action,
   // normals was included as parameters to this function (to avoid
   // a double readLock on the normal cache), so tell getVertexData()
   // not to return normals.
-  this.getVertexData(state, coords, dummynormals, cindices,
+  this.getVertexData(state, coords, dummynormals, dummynormalsShort, cindices,
                       dummynindices, tindices, mindices, numindices,
                       false, dummy);
   
@@ -1379,6 +1377,7 @@ generatePrimitives(SoAction action)
 
   final SoCoordinateElement[] coords = new SoCoordinateElement[1]; //ptr
   final SbVec3fArray[] normals = new SbVec3fArray[1]; //ptr
+	final SbVec3sArray[] normalsShort = new SbVec3sArray[1]; //ptr
   final IntArrayPtr[] cindices = new IntArrayPtr[1]; //ptr
   final int[] numindices = new int[1];
   final IntArrayPtr[] nindices = new IntArrayPtr[1]; //ptr
@@ -1390,7 +1389,7 @@ generatePrimitives(SoAction action)
 
   sendNormals = true; // always generate normals
 
-  getVertexData(state, coords, normals, cindices,
+  getVertexData(state, coords, normals, normalsShort, cindices,
                 nindices, tindices, mindices, numindices,
                 sendNormals, normalCacheUsed);
 

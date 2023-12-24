@@ -211,7 +211,7 @@ public void SoNormal_doAction(SoAction action)
   if (!this.vector.isIgnored() &&
       !SoOverrideElement.getNormalVectorOverride(state)) {
     SoNormalElement.set(state, this,
-                         this.vector.getNum(), this.vector.getValuesSbVec3fArray(/*0*/));
+                         this.vector.getNum(), this.vector.getValuesSbVec3fArray(/*0*/),0,null);
     if (this.isOverride()) {
       SoOverrideElement.setNormalVectorOverride(state, this, true);
     }

@@ -106,6 +106,7 @@ public class SoGLVBOElement extends SoElement {
 		
 		  public SoVBO vertexvbo;
 		  public SoVBO normalvbo;
+        public SoVBO normalshortvbo;
 		  public SoVBO colorvbo;
 		  public final SbList <SoVBO> texcoordvbo = new SbList<>();
 	}
@@ -118,7 +119,9 @@ public
     NORMAL_VBO( 1),
     COLOR_VBO( 2),
     TEXCOORD_VBO( 3),
-    MAX_VBO_TYPES( 4);
+
+    NORMAL_SHORT_VBO(4),
+    MAX_VBO_TYPES( 5);
     private int value;
     VBOType(int value) {
     	this.value = value;
@@ -175,6 +178,9 @@ case MAX_VBO_TYPES:
 case NORMAL_VBO:
 	  element.pimpl.normalvbo = vbo[0];
 	break;
+      case NORMAL_SHORT_VBO:
+          element.pimpl.normalshortvbo = vbo[0];
+          break;
 case TEXCOORD_VBO:
 	if (element.pimpl.texcoordvbo.getLength() == 0) {
 		element.pimpl.texcoordvbo.append(vbo[0]);
@@ -223,6 +229,16 @@ setNormalVBO(SoState state, SoVBO vbo)
   elem.pimpl.normalvbo = vbo;
 }
 
+    /*!
+      Sets the normal VBO.
+    */
+    public static void
+    setNormalShortVBO(SoState state, SoVBO vbo)
+    {
+        SoGLVBOElement elem = getElement(state);
+        elem.pimpl.normalshortvbo = vbo;
+    }
+
 /*!
   Sets the color VBO.
 */
@@ -253,6 +269,7 @@ init(SoState state)
 {
   this.pimpl.vertexvbo = null;
   this.pimpl.normalvbo = null;
+  this.pimpl.normalshortvbo = null;
   this.pimpl.colorvbo = null;
   this.pimpl.texcoordvbo.truncate(0);
 }
@@ -266,6 +283,7 @@ push(SoState state)
 
   this.pimpl.vertexvbo = prev.pimpl.vertexvbo;
   this.pimpl.normalvbo = prev.pimpl.normalvbo;
+  this.pimpl.normalshortvbo = prev.pimpl.normalshortvbo;
   this.pimpl.colorvbo = prev.pimpl.colorvbo;
   this.pimpl.texcoordvbo.truncate(0);
 
@@ -325,6 +343,12 @@ getNormalVBO()
 {
   return this.pimpl.normalvbo;
 }
+
+    public SoVBO
+    getNormalShortVBO()
+    {
+        return this.pimpl.normalshortvbo;
+    }
 
 public SoVBO 
 getColorVBO() 

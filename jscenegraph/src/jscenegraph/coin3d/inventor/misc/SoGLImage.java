@@ -686,7 +686,7 @@ checkTransparency()
   }
   else {
     if (numcomponents[0] == 2 || numcomponents[0] == 4) {
-      int n = size.getValue()[0] * size.getValue()[1] * ((size.getValue()[2] != 0) ? size.getValue()[2] : 1);
+      int n = size.getX() * size.getY() * ((size.getZ() != 0) ? size.getZ() : 1);
       int nc = numcomponents[0];
       int ptr = /* bytes +*/ nc - 1; // java port
 
@@ -754,10 +754,10 @@ createGLDisplayList(SoState state)
 
   if (this.pbuffer == null && bytes == null) return null;
 
-  int xsize = size.getValue()[0];
-  int ysize = size.getValue()[1];
-  int zsize = size.getValue()[2];
-  boolean is3D = (size.getValue()[2]==0)?false:true;
+  int xsize = size.getX();
+  int ysize = size.getY();
+  int zsize = size.getZ();
+  boolean is3D = (size.getZ()==0)?false:true;
 
   // these might change if image is resized
   MemoryBuffer imageptr = bytes;
@@ -784,7 +784,7 @@ createGLDisplayList(SoState state)
   dl.ref();
 
   if (bytes != null) {
-    boolean is3D1 = (size.getValue()[2]==0)?false:true;
+    boolean is3D1 = (size.getZ()==0)?false:true;
     if (is3D1) {
       dl.setTextureTarget((int) GL2.GL_TEXTURE_3D);
     }
@@ -822,7 +822,7 @@ int target;
 // Casting away const
 final SbVec3s size = this.image !=null ? new SbVec3s(this.image.getSize()) : new SbVec3s(this.glsize);
 
-if (size.getValue()[2] >= 1) target = GL2.GL_TEXTURE_3D;
+if (size.getZ() >= 1) target = GL2.GL_TEXTURE_3D;
 else {
  target = (this.flags & SoGLImage.Flags.RECTANGLE.getValue())!=0 ?
    GL2.GL_TEXTURE_RECTANGLE/*_EXT*/ : GL2.GL_TEXTURE_2D;
@@ -1245,7 +1245,7 @@ setData(final SbImage image,
     MemoryBuffer bytes = image.getValue(size, nc, srgb);
     copyok = copyok && bytes != null && (size.operator_equal_equal(this.glsize)) && (nc[0] == this.glcomp);
 
-    boolean is3D = (size.getValue()[2]==0)?false:true;
+    boolean is3D = (size.getZ()==0)?false:true;
     boolean usesubimage = SoGLImage.COIN_TEX2_USE_GLTEXSUBIMAGE != 0 &&
       ((is3D && SoGLDriverDatabase.isSupported(glw, SoGLDriverDatabase.SO_GL_3D_TEXTURES)) ||
        (!is3D && SoGLDriverDatabase.isSupported(glw, SoGLDriverDatabase.SO_GL_TEXSUBIMAGE)));
@@ -1266,23 +1266,23 @@ setData(final SbImage image,
 
       if (dl.isMipMapTextureObject()) {
         if (is3D)
-          fast_mipmap(createinstate, size.getValue()[0], size.getValue()[1], size.getValue()[2], nc[0], srgb[0], bytes,
+          fast_mipmap(createinstate, size.getX(), size.getY(), size.getZ(), nc[0], srgb[0], bytes,
                       true, compress);
         else
-          fast_mipmap(createinstate, size.getValue()[0], size.getValue()[1], nc[0], srgb[0], bytes,
+          fast_mipmap(createinstate, size.getX(), size.getY(), nc[0], srgb[0], bytes,
                       true, compress);
       }
       else {
         /*GLenum*/int format = Gl.coin_glglue_get_texture_format(glw, nc[0]);
         if (is3D) {
           Gl.cc_glglue_glTexSubImage3D(glw, GL2.GL_TEXTURE_3D, 0, 0, 0, 0,
-                                    size.getValue()[0], size.getValue()[1], size.getValue()[2],
+                                    size.getX(), size.getY(), size.getZ(),
                                     format, GL2.GL_UNSIGNED_BYTE,
                                      bytes);
         }
         else {
           Gl.cc_glglue_glTexSubImage2D(glw, GL2.GL_TEXTURE_2D, 0, 0, 0,
-                                    size.getValue()[0], size.getValue()[1],
+                                    size.getX(), size.getY(),
                                     format, GL2.GL_UNSIGNED_BYTE,
                                      bytes);
         }

@@ -480,6 +480,7 @@ public class SoBrepFaceSet extends SoIndexedFaceSet {
 
         final SoCoordinateElement[] coords = new SoCoordinateElement[1]; // ptr
         final SbVec3fArray[] normals = new SbVec3fArray[1];
+                    final SbVec3sArray[] normalsShort = new SbVec3sArray[1];
         final IntArrayPtr[] cindices = new IntArrayPtr[1];
         final int[] numindices = new int[1];
         final IntArrayPtr[] nindices = new IntArrayPtr[1];
@@ -491,7 +492,7 @@ public class SoBrepFaceSet extends SoIndexedFaceSet {
 
                     boolean sendNormals = !mb.isColorOnly() || tb.isFunction();
 
-                    this.getVertexData(state, coords, normals, cindices,
+                    this.getVertexData(state, coords, normals, normalsShort, cindices,
                             nindices, tindices, mindices, numindices,
                             sendNormals, normalCacheUsed);
 

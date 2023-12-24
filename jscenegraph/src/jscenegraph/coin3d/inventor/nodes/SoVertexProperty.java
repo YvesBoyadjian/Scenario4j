@@ -208,6 +208,7 @@ import jscenegraph.coin3d.inventor.elements.SoMultiTextureCoordinateElement;
 import jscenegraph.coin3d.misc.Tidbits;
 import jscenegraph.database.inventor.SbVec2f;
 import jscenegraph.database.inventor.SbVec3f;
+import jscenegraph.database.inventor.SbVec3s;
 import jscenegraph.database.inventor.SoType;
 import jscenegraph.database.inventor.actions.SoAction;
 import jscenegraph.database.inventor.actions.SoCallbackAction;
@@ -224,13 +225,7 @@ import jscenegraph.database.inventor.elements.SoNormalBindingElement;
 import jscenegraph.database.inventor.elements.SoNormalElement;
 import jscenegraph.database.inventor.elements.SoOverrideElement;
 import jscenegraph.database.inventor.errors.SoDebugError;
-import jscenegraph.database.inventor.fields.SoField;
-import jscenegraph.database.inventor.fields.SoFieldData;
-import jscenegraph.database.inventor.fields.SoMFInt32;
-import jscenegraph.database.inventor.fields.SoMFUInt32;
-import jscenegraph.database.inventor.fields.SoMFVec2f;
-import jscenegraph.database.inventor.fields.SoMFVec3f;
-import jscenegraph.database.inventor.fields.SoSFEnum;
+import jscenegraph.database.inventor.fields.*;
 import jscenegraph.database.inventor.misc.SoBase;
 import jscenegraph.database.inventor.misc.SoNotList;
 import jscenegraph.database.inventor.misc.SoState;
@@ -297,6 +292,8 @@ public class SoVertexProperty extends SoNode {
 	  public final SoSFEnum materialBinding = new SoSFEnum();
 	  public final SoMFInt32 textureUnit = new SoMFInt32();
 
+	public final SoMFVec3s normalShort = new SoMFVec3s();
+
 	  private SoVertexPropertyP pimpl;
 	  
 	  /*!
@@ -320,6 +317,8 @@ public class SoVertexProperty extends SoNode {
 
 	  nodeHeader.SO_NODE_ADD_FIELD(normalBinding,"normalBinding", (SoVertexProperty.Binding.PER_VERTEX_INDEXED.getValue()));
 	  nodeHeader.SO_NODE_ADD_FIELD(materialBinding,"materialBinding", (SoVertexProperty.Binding.OVERALL.getValue()));
+
+	  nodeHeader.SO_NODE_ADD_EMPTY_MFIELD(normalShort, "normalShort");
 
 	  nodeHeader.SO_NODE_DEFINE_ENUM_VALUE(Binding.OVERALL);
 	  nodeHeader.SO_NODE_DEFINE_ENUM_VALUE(Binding.PER_PART);
@@ -563,39 +562,62 @@ public class SoVertexProperty extends SoNode {
 	updateNormal(SoState state, int overrideflags, boolean glrender, boolean vbo)
 	{
 	   int numvertex = this.vertex.getNum();
-	   int num = this.normal.getNum();
-	  if (num > 0 && !TEST_OVERRIDE(SoOverrideElement.ElementMask.NORMAL_VECTOR, overrideflags)) {
+	   final int num = this.normal.getNum();
+	   final int numShort = this.normalShort.getNum();
+	  if ((num > 0 || numShort > 0) && !TEST_OVERRIDE(SoOverrideElement.ElementMask.NORMAL_VECTOR, overrideflags)) {
 	    SoNormalElement.set(state, this, num,
-	                         this.normal.getValuesSbVec3fArray(/*0*/));
+	                         this.normal.getValuesSbVec3fArray(/*0*/), numShort, this.normalShort.getValuesSbVec3sArray());
 	    if (this.isOverride()) {
 	      SoOverrideElement.setNormalVectorOverride(state, this, true);
 	    }
 	    if (glrender) {
-	      boolean setvbo = false;
-	      if ((num == numvertex) && vbo) {
-	        boolean dirty = false;
-	        setvbo = true;
-	        if (this.pimpl.normalvbo[0] == null) {
-	          this.pimpl.normalvbo[0] = new SoVBO(GL2.GL_ARRAY_BUFFER/*, GL2.GL_STATIC_DRAW*/); 
-	          dirty =  true;
-	        }
-	        else if (this.pimpl.normalvbo[0].getBufferDataId() != this.getNodeId()) {
-	          dirty = true;
-	        }
-	        if (dirty) {
-	          this.pimpl.normalvbo[0].setBufferData(VoidPtr.create(this.normal.getValuesSbVec3fArray(/*0*/)),
-	                                                  num*SbVec3f.sizeof(),
-	                                                  this.getNodeId(),state);
-	        }
-	      }
-	      else if (this.pimpl.normalvbo[0] != null && this.pimpl.normalvbo[0].getBufferDataId() != 0) {
-	        // clear buffers to deallocate VBO memory
-	        this.pimpl.normalvbo[0].setBufferData(null, 0, 0,state);
-	      }
-	      SoGLVBOElement.setNormalVBO(state, setvbo ? this.pimpl.normalvbo[0] : null);
+			{
+				boolean setvbo = false;
+				if ((num == numvertex) && vbo) {
+					boolean dirty = false;
+					setvbo = true;
+					if (this.pimpl.normalvbo[0] == null) {
+						this.pimpl.normalvbo[0] = new SoVBO(GL2.GL_ARRAY_BUFFER/*, GL2.GL_STATIC_DRAW*/);
+						dirty = true;
+					} else if (this.pimpl.normalvbo[0].getBufferDataId() != this.getNodeId()) {
+						dirty = true;
+					}
+					if (dirty) {
+						this.pimpl.normalvbo[0].setBufferData(VoidPtr.create(this.normal.getValuesSbVec3fArray(/*0*/)),
+								num * SbVec3f.sizeof(),
+								this.getNodeId(), state);
+					}
+				} else if (this.pimpl.normalvbo[0] != null && this.pimpl.normalvbo[0].getBufferDataId() != 0) {
+					// clear buffers to deallocate VBO memory
+					this.pimpl.normalvbo[0].setBufferData(null, 0, 0, state);
+				}
+				SoGLVBOElement.setNormalVBO(state, setvbo ? this.pimpl.normalvbo[0] : null);
+			}
+			{
+				boolean setvboShort = false;
+				if ((numShort == numvertex) && vbo) {
+					boolean dirty = false;
+					setvboShort = true;
+					if (this.pimpl.normalvboShort[0] == null) {
+						this.pimpl.normalvboShort[0] = new SoVBO(GL2.GL_ARRAY_BUFFER/*, GL2.GL_STATIC_DRAW*/);
+						dirty = true;
+					} else if (this.pimpl.normalvboShort[0].getBufferDataId() != this.getNodeId()) {
+						dirty = true;
+					}
+					if (dirty) {
+						this.pimpl.normalvboShort[0].setBufferData(VoidPtr.create(this.normalShort.getValuesSbVec3sArray(/*0*/)),
+								numShort * SbVec3s.sizeof(),
+								this.getNodeId(), state);
+					}
+				} else if (this.pimpl.normalvboShort[0] != null && this.pimpl.normalvboShort[0].getBufferDataId() != 0) {
+					// clear buffers to deallocate VBO memory
+					this.pimpl.normalvboShort[0].setBufferData(null, 0, 0, state);
+				}
+				SoGLVBOElement.setNormalShortVBO(state, setvboShort ? this.pimpl.normalvboShort[0] : null);
+			}
 	    }
 	  }
-	  if (this.normal.getNum() > 0 && !TEST_OVERRIDE(SoOverrideElement.ElementMask.NORMAL_BINDING, overrideflags)) {
+	  if ((this.normal.getNum() > 0 || this.normalShort.getNum() > 0) && !TEST_OVERRIDE(SoOverrideElement.ElementMask.NORMAL_BINDING, overrideflags)) {
 	    SoNormalBindingElement.set(state,/* this,*/
 	                                SoNormalBindingElement.Binding.fromValue(
 	                                this.normalBinding.getValue()));

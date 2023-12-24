@@ -135,7 +135,7 @@ setValue(final SbVec3s size, int bytesperpixel,
     // check for special case where we don't have to reallocate
     if (bytes != null&& (size.operator_equal_equal(this.size)) && (bytesperpixel == bpp)) {    	
       Util.memcpy(bytes, bytes, 
-             (int)(size.getValue()[0]) * (int)(size.getValue()[1]) * (int)(size.getValue()[2]==0?1:size.getValue()[2]) *
+             (int)(size.getX()) * (int)(size.getY()) * (int)(size.getZ()==0?1:size.getZ()) *
              bytesperpixel);
       //writeUnlock();
       return;
@@ -144,7 +144,7 @@ setValue(final SbVec3s size, int bytesperpixel,
   freeData();
   this.size.copyFrom(size);
   bpp = bytesperpixel;
-  int buffersize = (int)(size.getValue()[0]) * (int)(size.getValue()[1]) * (int)(size.getValue()[2]==0?1:size.getValue()[2]) * 
+  int buffersize = (int)(size.getX()) * (int)(size.getY()) * (int)(size.getZ()==0?1:size.getZ()) *
     bytesperpixel;
   if (buffersize != 0) {
     // Align buffers because the binary file format has the data aligned
@@ -156,7 +156,7 @@ setValue(final SbVec3s size, int bytesperpixel,
     if (bytes != null) {
       // Important: don't copy buffersize num bytes here!
     	Util.memcpy(this.bytes, bytes,
-                   (int)(size.getValue()[0]) * (int)(size.getValue()[1]) * (int)(size.getValue()[2]==0?1:size.getValue()[2]) * 
+                   (int)(size.getX()) * (int)(size.getY()) * (int)(size.getZ()==0?1:size.getZ()) *
                    bytesperpixel);
     }
   }
@@ -175,7 +175,7 @@ getValue(SbVec2s size, final int[] bytesperpixel, final boolean[] srgb)
 {
   final SbVec3s tmpsize = new SbVec3s();
   MemoryBuffer bytes = this.getValue(tmpsize, bytesperpixel, srgb);
-  size.setValue(tmpsize.getValue()[0], tmpsize.getValue()[1]);
+  size.setValue(tmpsize.getX(), tmpsize.getY());
   return bytes;
 }
 

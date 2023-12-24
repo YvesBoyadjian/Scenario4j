@@ -82,6 +82,7 @@ import jscenegraph.mevis.inventor.misc.SoVBO;
 import jscenegraph.port.Ctx;
 import jscenegraph.port.MutableSbVec3fArray;
 import jscenegraph.port.SbVec3fArray;
+import jscenegraph.port.SbVec3sArray;
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -514,10 +515,11 @@ computeBBox(SoAction action, final SbBox3f box, final SbVec3f center)
 
   final SoCoordinateElement[] coords = new SoCoordinateElement[1]; //ptr
   final SbVec3fArray[] normals = new SbVec3fArray[1]; // ptr
+  final SbVec3sArray[] normalsShort = new SbVec3sArray[1]; // ptr
   boolean doTextures;
   boolean needNormals = true;
 
-  SoVertexShape.getVertexData(action.getState(), coords, normals,
+  SoVertexShape.getVertexData(action.getState(), coords, normals, normalsShort,
         needNormals);
 
   if (normals[0] == null) needNormals = false;

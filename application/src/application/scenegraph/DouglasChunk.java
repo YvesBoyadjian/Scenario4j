@@ -12,6 +12,7 @@ import application.scenegraph.douglas.IndexedFaceSetParametersImpl;
 import jscenegraph.coin3d.inventor.lists.SbListInt;
 import jscenegraph.database.inventor.*;
 import jscenegraph.port.memorybuffer.FloatMemoryBuffer;
+import jscenegraph.port.memorybuffer.ShortMemoryBuffer;
 
 public class DouglasChunk {
 	
@@ -700,6 +701,11 @@ public class DouglasChunk {
 				}
 
 				@Override
+				public ShortMemoryBuffer normalsShort() {
+					return null;
+				}
+
+				@Override
 				public FloatMemoryBuffer textureCoords() {
 					return douglasTexCoordsF;
 				}
@@ -758,6 +764,11 @@ public class DouglasChunk {
 					@Override
 					public FloatMemoryBuffer normals() {
 						return nearF[nearIndex].normals();//douglasNormalsNearF;
+					}
+
+					@Override
+					public ShortMemoryBuffer normalsShort() {
+						return null;
 					}
 
 					@Override

@@ -1819,7 +1819,7 @@ public void GLRender(SoGLRenderAction action)
         }
         gl2.glNormal3f(0, 0, -1);
         normals.setValueXYZ(0,0,0,-1);
-        SoNormalElement.set(state,this,1,normals);
+        SoNormalElement.set(state,this,1,normals,0,null);
         SoGLNormalElement normalElement = (SoGLNormalElement) SoNormalElement.getInstance(state);
         normalElement.send(gl2,0);
 
@@ -1878,7 +1878,7 @@ public void GLRender(SoGLRenderAction action)
 
         gl2.glNormal3f(0, 0, 1);
         normals.setValueXYZ(0,0,0,1);
-        SoNormalElement.set(state,this,1,normals);
+        SoNormalElement.set(state,this,1,normals,0,null);
         SoGLNormalElement normalElement = (SoGLNormalElement) SoNormalElement.getInstance(state);
         normalElement.send(gl2,0);
 

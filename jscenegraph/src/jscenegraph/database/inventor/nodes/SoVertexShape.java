@@ -100,6 +100,7 @@ import jscenegraph.mevis.inventor.misc.SoVBO;
 import jscenegraph.port.Ctx;
 import jscenegraph.port.Destroyable;
 import jscenegraph.port.SbVec3fArray;
+import jscenegraph.port.SbVec3sArray;
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -674,6 +675,7 @@ public static void
 getVertexData(SoState state,
                              final SoCoordinateElement [] coords,
                              final SbVec3fArray [] normals,
+              final SbVec3sArray[] normalsShort,
                              boolean neednormals)
 {
   coords[0] = SoCoordinateElement.getInstance(state);
@@ -682,6 +684,11 @@ getVertexData(SoState state,
   normals[0] = null;
   if (neednormals) {
     normals[0] = SoNormalElement.getInstance(state).getArrayPtr();
+  }
+
+  normalsShort[0] = null;
+  if (neednormals) {
+    normalsShort[0] = SoNormalElement.getInstance(state).getArrayPtrShort();
   }
 }
 

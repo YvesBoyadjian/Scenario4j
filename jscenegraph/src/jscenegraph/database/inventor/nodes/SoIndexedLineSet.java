@@ -1005,7 +1005,8 @@ countPolylinesAndSegments()
         Binding nbind = this.findNormalBinding(state);
 
   final SoCoordinateElement[] coords = new SoCoordinateElement[1]; //ptr
-  final SbVec3fArray[] normals = new SbVec3fArray[1];
+  final SbVec3fArray[] normalsFloat = new SbVec3fArray[1];
+        final SbVec3sArray[] normalsShort = new SbVec3sArray[1];
   final IntArrayPtr[] cindices = new IntArrayPtr[1];
         final int[] numindices = new int[1];
   final IntArrayPtr[] normindices = new IntArrayPtr[1];
@@ -1015,11 +1016,11 @@ countPolylinesAndSegments()
         boolean sendNormals = true;
         final boolean[] normalCacheUsed = new boolean[1];
 
-        getVertexData(state, coords, normals, cindices,
+        getVertexData(state, coords, normalsFloat, normalsShort, cindices,
                 normindices, texindices, matindices, numindices,
                 sendNormals, normalCacheUsed);
 
-        if (normals[0] == null) {
+        if (normalsFloat[0] == null && normalsShort[0] == null) {
             sendNormals = false;
             nbind = Binding.OVERALL;
         }
@@ -1082,8 +1083,8 @@ countPolylinesAndSegments()
                 vertex.setDetail( pointDetail);
 
                 final SbVec3fSingle dummynormal = new SbVec3fSingle(0.0f, 0.0f, 1.0f);
-  final MutableSbVec3fArray currnormal = (normals[0] == null) ? new MutableSbVec3fArray(dummynormal) :
-                MutableSbVec3fArray.from(normals[0]);
+  final MutableSbVec3fArray currnormal = (normalsFloat[0] == null) ? new MutableSbVec3fArray(dummynormal) :
+                MutableSbVec3fArray.from(normalsFloat[0]);
 
                 if (nbind == Binding.OVERALL) {
                     vertex.setNormal( currnormal.get(0));
@@ -1108,10 +1109,10 @@ countPolylinesAndSegments()
                         if (normPerPolyline || nbind.getValue() >= Binding.PER_VERTEX.getValue()) {
                             if (normindices[0] != null) {
                                 pointDetail.setNormalIndex( normindices[0].get());
-                                currnormal.assign(normals[0], normindices[0].get()); normindices[0].plusPlus();
+                                currnormal.assign(normalsFloat[0], normindices[0].get()); normindices[0].plusPlus();
                             } else {
                                 pointDetail.setNormalIndex(normnr);
-                                currnormal.assign(normals[0],normnr); normnr++;
+                                currnormal.assign(normalsFloat[0],normnr); normnr++;
                             }
                             vertex.setNormal( currnormal.get(0));
                         }
@@ -1134,10 +1135,10 @@ countPolylinesAndSegments()
                             if (nbind == Binding.PER_SEGMENT || nbind == Binding.PER_SEGMENT_INDEXED) {
                                 if (normindices[0] != null) {
                                     pointDetail.setNormalIndex( normindices[0].get());
-                                    currnormal.assign(normals[0], normindices[0].get()); normindices[0].plusPlus();
+                                    currnormal.assign(normalsFloat[0], normindices[0].get()); normindices[0].plusPlus();
                                 } else {
                                     pointDetail.setNormalIndex(normnr);
-                                    currnormal.assign(normals[0],normnr); normnr++;
+                                    currnormal.assign(normalsFloat[0],normnr); normnr++;
                                 }
                                 vertex.setNormal( currnormal.get(0));
                             }
@@ -1153,10 +1154,10 @@ countPolylinesAndSegments()
                             if (nbind.getValue() >= Binding.PER_VERTEX.getValue()) {
                                 if (normindices[0]!=null) {
                                     pointDetail.setNormalIndex( normindices[0].get());
-                                    currnormal.assign(normals[0], normindices[0].get()); normindices[0].plusPlus();
+                                    currnormal.assign(normalsFloat[0], normindices[0].get()); normindices[0].plusPlus();
                                 } else {
                                     pointDetail.setNormalIndex(normnr);
-                                    currnormal.assign(normals[0],normnr); normnr++;
+                                    currnormal.assign(normalsFloat[0],normnr); normnr++;
                                 }
                                 vertex.setNormal( currnormal.get(0));
                             }
@@ -1197,10 +1198,10 @@ countPolylinesAndSegments()
                     }
                     if (normindices[0] != null) {
                         pointDetail.setNormalIndex( normindices[0].get());
-                        currnormal.assign(normals[0], normindices[0].get()); normindices[0].plusPlus();
+                        currnormal.assign(normalsFloat[0], normindices[0].get()); normindices[0].plusPlus();
                     } else if (nbind != Binding.OVERALL) {
                         pointDetail.setNormalIndex(normnr);
-                        currnormal.assign(normals[0],normnr); normnr++;
+                        currnormal.assign(normalsFloat[0],normnr); normnr++;
                     }
                     vertex.setNormal(  currnormal.get(0));
                     if (doTextures) {
@@ -1226,10 +1227,10 @@ countPolylinesAndSegments()
                     if (nbind.getValue() >= Binding.PER_VERTEX.getValue()) {
                         if (normindices[0]!=null) {
                             pointDetail.setNormalIndex( normindices[0].get());
-                            currnormal.assign(normals[0],normindices[0].get()); normindices[0].plusPlus();
+                            currnormal.assign(normalsFloat[0],normindices[0].get()); normindices[0].plusPlus();
                         } else {
                             pointDetail.setNormalIndex(normnr);
-                            currnormal.assign(normals[0],normnr); normnr++;
+                            currnormal.assign(normalsFloat[0],normnr); normnr++;
                         }
                         vertex.setNormal( currnormal.get(0));
                     }
@@ -1257,10 +1258,10 @@ countPolylinesAndSegments()
                         if (nbind.getValue() >= Binding.PER_VERTEX.getValue()) {
                             if (normindices[0] != null) {
                                 pointDetail.setNormalIndex( normindices[0].get());
-                                currnormal.assign(normals[0],normindices[0].get()); normindices[0].plusPlus();
+                                currnormal.assign(normalsFloat[0],normindices[0].get()); normindices[0].plusPlus();
                             } else {
                                 pointDetail.setNormalIndex(normnr);
-                                currnormal.assign(normals[0],normnr); normnr++;
+                                currnormal.assign(normalsFloat[0],normnr); normnr++;
                             }
                             vertex.setNormal( currnormal.get(0));
                         }

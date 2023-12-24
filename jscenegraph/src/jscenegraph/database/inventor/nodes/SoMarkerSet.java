@@ -58,6 +58,7 @@ import jscenegraph.database.inventor.fields.SoFieldData;
 import jscenegraph.database.inventor.fields.SoMFInt32;
 import jscenegraph.database.inventor.misc.SoState;
 import jscenegraph.port.SbVec3fArray;
+import jscenegraph.port.SbVec3sArray;
 import jscenegraph.port.Util;
 import jscenegraph.port.core.GLBitmap;
 import jscenegraph.port.memorybuffer.MemoryBuffer;
@@ -1188,9 +1189,10 @@ GLRender(SoGLRenderAction action)
 
   final SoCoordinateElement[] tmpcoord = new SoCoordinateElement[1]; // pointer
   final SbVec3fArray[]  dummy = new SbVec3fArray[1]; // pointer
+	final SbVec3sArray[]  dummyShort = new SbVec3sArray[1]; // pointer
   final boolean needNormals = false;
 
-  SoVertexShape.getVertexData(state, tmpcoord, dummy, needNormals);
+  SoVertexShape.getVertexData(state, tmpcoord, dummy, dummyShort, needNormals);
 
   if (!this.shouldGLRender(action)) {
     state.pop();
@@ -1404,9 +1406,10 @@ getPrimitiveCount(SoGetPrimitiveCountAction action)
 
   final SoCoordinateElement[] coord = new SoCoordinateElement[1];
   final SbVec3fArray[] dummy = new SbVec3fArray[1];
+	final SbVec3sArray[] dummyShort = new SbVec3sArray[1];
   final boolean needNormals = false;
 
-  SoVertexShape.getVertexData(state, coord, dummy,
+  SoVertexShape.getVertexData(state, coord, dummy, dummyShort,
                                needNormals);
 
   int idx = this.startIndex.getValue();
