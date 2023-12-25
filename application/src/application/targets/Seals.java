@@ -4,6 +4,8 @@
 package application.targets;
 
 import java.util.Random;
+import java.util.SplittableRandom;
+import java.util.random.RandomGenerator;
 
 import application.objects.Target;
 import application.objects.TargetBase;
@@ -58,8 +60,8 @@ public class Seals extends TargetBase implements Target {
 	}
 	
 	private void compute() {
-		
-		Random randomPlacementSeals = new Random(SEED_SEAL_PLACEMENT);		
+
+		RandomGenerator randomPlacementSeals = new SplittableRandom(SEED_SEAL_PLACEMENT);
 		
 		int[] indices = new int[4];
 		
@@ -104,14 +106,14 @@ public class Seals extends TargetBase implements Target {
 		sealCoords.setNum(nbSeals);
 	}
 
-	float getRandomX(Random randomPlacementTrees) {
+	float getRandomX(RandomGenerator randomPlacementTrees) {
 		SbBox3f sceneBox = sg.getChunks().getSceneBoxFullIsland();
 		float xMin = sceneBox.getBounds()[0];
 		float xMax = sceneBox.getBounds()[3];
 		return xMin + (xMax - xMin) * randomPlacementTrees.nextFloat();
 	}
 	
-	float getRandomY(Random randomPlacementTrees) {
+	float getRandomY(RandomGenerator randomPlacementTrees) {
 		SbBox3f sceneBox = sg.getChunks().getSceneBoxFullIsland();
 		float yMin = sceneBox.getBounds()[1];
 		float yMax = sceneBox.getBounds()[4];
