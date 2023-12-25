@@ -15,6 +15,7 @@ import java.io.InputStream;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.function.Supplier;
+import java.util.random.RandomGenerator;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
@@ -501,7 +502,7 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 				float zMinForI = Float.MAX_VALUE;
 				float zMaxForI = -Float.MAX_VALUE;
 
-				final Random randomForI = new Random(i);
+				final RandomGenerator randomForI = new SplittableRandom(i);
 				float[] xyz = new float[3];
 
 				SbVec3f ptV = new SbVec3f();
