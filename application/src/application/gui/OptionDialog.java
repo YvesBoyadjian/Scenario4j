@@ -36,8 +36,8 @@ public class OptionDialog extends JDialog {
      * low by default
      */
     public static final double DEFAULT_SHADOW_PRECISION = 0.05;//0.075;
-    public static final double DEFAULT_LOD_FACTOR = 0.25;//0.5;
-    public static final double DEFAULT_LOD_FACTOR_SHADOW = 0.25;//0.5;
+    public static final double DEFAULT_LOD_FACTOR = 0.5;
+    public static final double DEFAULT_LOD_FACTOR_SHADOW = 0.5;
     public static final double DEFAULT_TREE_DISTANCE = 1500;//3000;
     public static final double DEFAULT_TREE_SHADOW_DISTANCE = 500;//1500;
     public static final int DEFAULT_ISLAND_DEPTH = 5612;
@@ -138,8 +138,8 @@ public class OptionDialog extends JDialog {
 
     private void onLowest() {
         setShadowPrecision(0.01);
-        setLODFactor(0.05);
-        setLODFactorShadow(0.05);
+        setLODFactor(0.1);
+        setLODFactorShadow(0.1);
         setTreeDistance(500);
         setTreeShadowDistance(500);
         setIslandDepth(5612);
@@ -148,8 +148,8 @@ public class OptionDialog extends JDialog {
 
     private void onLow() {
         setShadowPrecision(0.05);
-        setLODFactor(0.25);
-        setLODFactorShadow(0.25);
+        setLODFactor(0.5);
+        setLODFactorShadow(0.5);
         setTreeDistance(1500);
         setTreeShadowDistance(500);
         setIslandDepth(5612);
@@ -158,8 +158,8 @@ public class OptionDialog extends JDialog {
 
     private void onMedium() {
         setShadowPrecision(0.075/*DEFAULT_SHADOW_PRECISION*/);
-        setLODFactor(0.5/*DEFAULT_LOD_FACTOR*/);
-        setLODFactorShadow(0.5/*DEFAULT_LOD_FACTOR_SHADOW*/);
+        setLODFactor(1.0/*DEFAULT_LOD_FACTOR*/);
+        setLODFactorShadow(1.0/*DEFAULT_LOD_FACTOR_SHADOW*/);
         setTreeDistance(4500/*DEFAULT_TREE_DISTANCE*/);
         setTreeShadowDistance(1500/*DEFAULT_TREE_SHADOW_DISTANCE*/);
         setIslandDepth(5612/*DEFAULT_ISLAND_DEPTH*/);
@@ -168,8 +168,8 @@ public class OptionDialog extends JDialog {
 
     private void onHigh() {
         setShadowPrecision(0.2);
-        setLODFactor(1.0);
-        setLODFactorShadow(1.0);
+        setLODFactor(2.0);
+        setLODFactorShadow(2.0);
         setTreeDistance(7000);
         setTreeShadowDistance(3000);
         setIslandDepth(14000);
@@ -178,8 +178,8 @@ public class OptionDialog extends JDialog {
 
     private void onUltra() {
         setShadowPrecision(0.2);
-        setLODFactor(1.0);
-        setLODFactorShadow(1.0);
+        setLODFactor(2.0);
+        setLODFactorShadow(2.0);
         setTreeDistance(7000);
         setTreeShadowDistance(3000);
         setIslandDepth(14000);
@@ -188,8 +188,8 @@ public class OptionDialog extends JDialog {
 
     private void onExtreme() {
         setShadowPrecision(0.2);
-        setLODFactor(2.0);
-        setLODFactorShadow(2.0);
+        setLODFactor(3.0);
+        setLODFactorShadow(3.0);
         setTreeDistance(15000);
         setTreeShadowDistance(6000);
         setIslandDepth(14000);
@@ -221,7 +221,7 @@ public class OptionDialog extends JDialog {
             // SHADOW_PRECISION
             spinnerShadowgroup.setModel(new SpinnerNumberModel((double)sg.getShadowGroup().precision.getValue(),0.01 - delta,0.4 + delta,0.01));
             // LOD_FACTOR
-            spinnerLODFactor.setModel(new SpinnerNumberModel((double)sg.getLevelOfDetail(),0.05 - delta,2.0 + delta,0.05));
+            spinnerLODFactor.setModel(new SpinnerNumberModel((double)sg.getLevelOfDetail(),0.05 - delta,3.0 + delta,0.05));
             // LOD_FACTOR_SHADOW
             //spinnerLODFactorShadow.setModel(new SpinnerNumberModel((double)sg.getLevelOfDetailShadow(),0.05 - delta,2.0 + delta,0.05));
             // TREE_DISTANCE
