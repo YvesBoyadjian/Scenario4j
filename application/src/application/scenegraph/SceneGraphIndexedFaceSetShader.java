@@ -398,7 +398,7 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 			float zTranslation,
 			int max_i,
 			long[] trails,
-			final JProgressBar progressBar) {
+			final JProgressBar progressBar, boolean unpickableLand) {
 		super();
 		this.rw = rwp.provide();
 		this.overlap = overlap;
@@ -881,11 +881,13 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 	    shapeHints.shapeType.setValue(SoShapeHints.ShapeType.SOLID);
 	    shapeHints.vertexOrdering.setValue(SoShapeHints.VertexOrdering.CLOCKWISE);
 	    landSep.addChild(shapeHints);
-	    
-	    SoPickStyle ps = new SoPickStyle();
-	    ps.style.setValue(SoPickStyle.Style.UNPICKABLE);
-	    
-	    landSep.addChild(ps);
+
+		if (unpickableLand) {
+			SoPickStyle ps = new SoPickStyle();
+			ps.style.setValue(SoPickStyle.Style.UNPICKABLE);
+
+			landSep.addChild(ps);
+		}
 	    
 	    SoShaderProgram program = new SoShaderProgram();
 	    
@@ -974,8 +976,11 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 	    shapeHints.shapeType.setValue(SoShapeHints.ShapeType.SOLID);
 	    shapeHints.vertexOrdering.setValue(SoShapeHints.VertexOrdering.COUNTERCLOCKWISE);
 	    douglasSep.addChild(shapeHints);
-	    
-	    douglasSep.addChild(ps);
+
+		SoPickStyle ps = new SoPickStyle();
+		ps.style.setValue(SoPickStyle.Style.UNPICKABLE);
+
+		douglasSep.addChild(ps);
 	    
 	    SoTexture2 douglasTexture = new SoTexture2();
 	    

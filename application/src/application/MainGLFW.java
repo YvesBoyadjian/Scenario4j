@@ -383,7 +383,7 @@ public class MainGLFW {
 
 		int overlap = 13;
 		//SceneGraph sg = new SceneGraphIndexedFaceSet(rw,re,overlap,Z_TRANSLATION);
-		sg = new SceneGraphIndexedFaceSetShader(rw, re, overlap, Z_TRANSLATION, max_i, trails, progressBar);
+		sg = new SceneGraphIndexedFaceSetShader(rw, re, overlap, Z_TRANSLATION, max_i, trails, progressBar, true);
 		//SceneGraph sg = new ShadowTestSceneGraph();
 		rw = null; // for garbage collection
 		re = null; // for garbage collection
