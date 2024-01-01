@@ -422,13 +422,13 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 
 		chunks = new ChunkArray(w,h,full_island_w);
 		
-		float West_Bounding_Coordinate = -122.00018518518522f;
-	      float East_Bounding_Coordinate= -121.74981481481484f;
-	      float North_Bounding_Coordinate= 47.000185185185195f;
-	      float South_Bounding_Coordinate= 46.749814814814826f;
+		double West_Bounding_Coordinate = -122.00018518518522;
+	      double East_Bounding_Coordinate= -121.74981481481484;
+	      double North_Bounding_Coordinate= 47.000185185185195;
+	      double South_Bounding_Coordinate= 46.749814814814826;
 	      
-	      float delta_y_deg = (North_Bounding_Coordinate - South_Bounding_Coordinate)/wImageW;
-	      float delta_x_deg = (East_Bounding_Coordinate - West_Bounding_Coordinate)/hImageW;
+	      float delta_y_deg = (float)(North_Bounding_Coordinate - South_Bounding_Coordinate)/wImageW;
+	      float delta_x_deg = (float)(East_Bounding_Coordinate - West_Bounding_Coordinate)/hImageW;
 	      
 	      float earth_radius = 6371e3f;
 	      float earth_circumference = earth_radius * 2 * (float)Math.PI;

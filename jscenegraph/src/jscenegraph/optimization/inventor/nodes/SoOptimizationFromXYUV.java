@@ -5,6 +5,7 @@ import jscenegraph.database.inventor.SbVec4f;
 import jscenegraph.database.inventor.SbVec4fSingle;
 import jscenegraph.database.inventor.SoType;
 import jscenegraph.database.inventor.actions.SoGLRenderAction;
+import jscenegraph.database.inventor.actions.SoRayPickAction;
 import jscenegraph.database.inventor.fields.SoField;
 import jscenegraph.database.inventor.fields.SoFieldData;
 import jscenegraph.database.inventor.fields.SoSFBool;
@@ -86,5 +87,6 @@ public class SoOptimizationFromXYUV extends SoNode {
     initClass() {
         SoSubNode.SO__NODE_INIT_CLASS(SoOptimizationFromXYUV.class, "OptimizationFromXYUV", SoNode.class);
         SO_ENABLE(SoGLRenderAction.class, SoGLFromXYUVElement.class);
+        SO_ENABLE(SoRayPickAction.class, SoGLFromXYUVElement.class);
     }
 }

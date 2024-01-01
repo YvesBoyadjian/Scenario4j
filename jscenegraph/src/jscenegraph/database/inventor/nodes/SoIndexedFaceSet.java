@@ -254,6 +254,7 @@ import jscenegraph.coin3d.misc.SoGL;
 import jscenegraph.database.inventor.SbMatrix;
 import jscenegraph.database.inventor.SbVec3f;
 import jscenegraph.database.inventor.SbVec3fSingle;
+import jscenegraph.database.inventor.SbVec3s;
 import jscenegraph.database.inventor.SbVec4f;
 import jscenegraph.database.inventor.SoDebug;
 import jscenegraph.database.inventor.SoPickedPoint;
@@ -1392,6 +1393,17 @@ generatePrimitives(SoAction action)
   getVertexData(state, coords, normals, normalsShort, cindices,
                 nindices, tindices, mindices, numindices,
                 sendNormals, normalCacheUsed);
+  
+  if (normals[0] == null && normalsShort[0] != null) {
+	  SbVec3sArray source = normalsShort[0];
+	  int length = source.length();
+	  SbVec3fArray destination = SbVec3fArray.allocate(length);
+	  for (int i=0; i<length; i++) {
+		  SbVec3s dummy = source.getOFast(i);
+		  destination.setValueXYZ(i, (float)dummy.getX()/Short.MAX_VALUE, (float)dummy.getY()/Short.MAX_VALUE, (float)dummy.getZ()/Short.MAX_VALUE);
+	  }
+	  normals[0] = destination;
+  }
 
   SoTextureCoordinateBundle tb = new SoTextureCoordinateBundle(action, false, false);
   doTextures = tb.needCoordinates();

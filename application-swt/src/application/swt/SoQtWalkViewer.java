@@ -27,6 +27,7 @@ import jscenegraph.database.inventor.SbVec3f;
 import jscenegraph.database.inventor.events.SoEvent;
 import jscenegraph.database.inventor.events.SoKeyboardEvent;
 import jscenegraph.database.inventor.events.SoLocation2Event;
+import jscenegraph.database.inventor.events.SoMouseButtonEvent;
 import jscenegraph.database.inventor.nodes.SoCamera;
 import jscenegraph.database.inventor.sensors.SoIdleSensor;
 import jscenegraph.database.inventor.sensors.SoSensor;
@@ -258,7 +259,39 @@ public class SoQtWalkViewer extends SoQtConstrainedViewer {
         }
         return false;
     }
+    
+	
+	protected void onFire(SoMouseButtonEvent event) {
+		// do nothing by default
+	}    
 
+	protected boolean processSoMouseButtonEvent(SoMouseButtonEvent event) {
+		  if (SoMouseButtonEvent.SO_MOUSE_PRESS_EVENT(event, SoMouseButtonEvent.Button.BUTTON1)) {
+			  onFire(event);
+			  return true;
+		  }
+		  if (SoMouseButtonEvent.SO_MOUSE_RELEASE_EVENT(event, SoMouseButtonEvent.Button.BUTTON1)) {
+		  	return true;
+		  }
+			if (SoMouseButtonEvent.SO_MOUSE_PRESS_EVENT(event, SoMouseButtonEvent.Button.BUTTON2)) {
+//				onAim(event,true);
+				return true;
+			}
+			if (SoMouseButtonEvent.SO_MOUSE_RELEASE_EVENT(event, SoMouseButtonEvent.Button.BUTTON2)) {
+//				onAim(event,false);
+				return true;
+			}
+			if (SoMouseButtonEvent.SO_MOUSE_PRESS_EVENT(event, SoMouseButtonEvent.Button.BUTTON3)) {
+//				onAim(event,true);
+				return true;
+			}
+			if (SoMouseButtonEvent.SO_MOUSE_RELEASE_EVENT(event, SoMouseButtonEvent.Button.BUTTON3)) {
+//				onAim(event,false);
+				return true;
+			}
+		  return false;
+	}
+	
     protected void updateLocation(SbVec3f diff_position) {
 
         double currentTimeSec = System.nanoTime()/1.0e9;
@@ -315,6 +348,11 @@ public class SoQtWalkViewer extends SoQtConstrainedViewer {
             result = processSoKeyboardEvent((SoKeyboardEvent)
                     (event));
         }
+  	  else if (event.isOfType(SoMouseButtonEvent.getClassTypeId()))
+  	  {
+  		    result = processSoMouseButtonEvent((SoMouseButtonEvent)
+  		  	      (event));		  
+  	  }
 
         if (!result)
         {

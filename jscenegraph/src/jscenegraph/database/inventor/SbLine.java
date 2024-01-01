@@ -288,9 +288,9 @@ final float EPSILON = 1e-10f;
     //     two dimensions are the axes of the aligned plane we will
     //     use to project the triangle.
     //
-    float       xAbs = norm.getValueRead()[0] < 0.0 ? -norm.getValueRead()[0] : norm.getValueRead()[0];
-    float       yAbs = norm.getValueRead()[1] < 0.0 ? -norm.getValueRead()[1] : norm.getValueRead()[1];
-    float       zAbs = norm.getValueRead()[2] < 0.0 ? -norm.getValueRead()[2] : norm.getValueRead()[2];
+    float       xAbs = norm.getCoord(0) < 0.0 ? -norm.getCoord(0) : norm.getCoord(0);
+    float       yAbs = norm.getCoord(1) < 0.0 ? -norm.getCoord(1) : norm.getCoord(1);
+    float       zAbs = norm.getCoord(2) < 0.0 ? -norm.getCoord(2) : norm.getCoord(2);
     int         axis0, axis1;
 
     if (xAbs > yAbs && xAbs > zAbs) {
@@ -312,19 +312,19 @@ final float EPSILON = 1e-10f;
     //     Since we deal with only 2 components, we can avoid the
     //     third computation.
     //
-    float intersection0 = getPosition().getValueRead()[axis0] + t * getDirection().getValueRead()[axis0];
-    float intersection1 = getPosition().getValueRead()[axis1] + t * getDirection().getValueRead()[axis1];
+    float intersection0 = getPosition().getCoord(axis0) + t * getDirection().getCoord(axis0);
+    float intersection1 = getPosition().getCoord(axis1) + t * getDirection().getCoord(axis1);
 
     final SbVec2fSingle     diff0 = new SbVec2fSingle(), diff1 = new SbVec2fSingle(), diff2 = new SbVec2fSingle();
     boolean      isInter = false;
     float       alpha = Float.NaN, beta;
 
-    diff0.getValue()[0] = intersection0 - v0.getValueRead()[axis0];
-    diff0.getValue()[1] = intersection1 - v0.getValueRead()[axis1];
-    diff1.getValue()[0] = v1.getValueRead()[axis0]     - v0.getValueRead()[axis0];
-    diff1.getValue()[1] = v1.getValueRead()[axis1]     - v0.getValueRead()[axis1];
-    diff2.getValue()[0] = v2.getValueRead()[axis0]     - v0.getValueRead()[axis0];
-    diff2.getValue()[1] = v2.getValueRead()[axis1]     - v0.getValueRead()[axis1];
+    diff0.getValue()[0] = intersection0 - v0.getCoord(axis0);
+    diff0.getValue()[1] = intersection1 - v0.getCoord(axis1);
+    diff1.getValue()[0] = v1.getCoord(axis0)     - v0.getCoord(axis0);
+    diff1.getValue()[1] = v1.getCoord(axis1)     - v0.getCoord(axis1);
+    diff2.getValue()[0] = v2.getCoord(axis0)     - v0.getCoord(axis0);
+    diff2.getValue()[1] = v2.getCoord(axis1)     - v0.getCoord(axis1);
 
     // Note: This code was rearranged somewhat from the code in
     // Graphics Gems to provide a little more numeric

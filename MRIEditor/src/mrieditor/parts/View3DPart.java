@@ -23,7 +23,9 @@ import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.widgets.TextFactory;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
@@ -49,11 +51,15 @@ import jscenegraph.database.inventor.SbTime;
 import jscenegraph.database.inventor.SbVec3f;
 import jscenegraph.database.inventor.SbViewportRegion;
 import jscenegraph.database.inventor.SoDB;
+import jscenegraph.database.inventor.SoPickedPoint;
+import jscenegraph.database.inventor.actions.SoRayPickAction;
 import jscenegraph.database.inventor.actions.SoGLRenderAction.TransparencyType;
 import jscenegraph.database.inventor.events.SoKeyboardEvent;
+import jscenegraph.database.inventor.events.SoMouseButtonEvent;
 import jscenegraph.database.inventor.misc.SoNotRec;
 import jscenegraph.database.inventor.nodes.SoCamera;
 import jscenegraph.database.inventor.nodes.SoLineSet;
+import jscenegraph.database.inventor.nodes.SoNode;
 import jscenegraph.database.inventor.nodes.SoOrthographicCamera;
 import jscenegraph.database.inventor.nodes.SoPerspectiveCamera;
 import jscenegraph.database.inventor.sensors.SoDataSensor;
@@ -83,6 +89,10 @@ public class View3DPart {
 	private boolean ruler;
 	
 	private SbVec3f previousRulerPosition = new SbVec3f();
+	
+	private boolean polylineDraw;
+	
+	private MouseListener polylineDrawMouseListener;
 
 	@Inject
 	private MPart part;
@@ -126,6 +136,17 @@ public class View3DPart {
 				toggleRuler();
 			}
 			
+		});
+		
+		Button button4 = new Button(upperToolBar, SWT.TOGGLE);
+		button4.setText("Polyline Draw");
+		
+		button4.addSelectionListener(new SelectionAdapter() {
+			
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				togglePolylineDraw();
+			}
 		});
 		
 		Composite intermediate = new Composite(parent,SWT.NONE);
@@ -175,6 +196,31 @@ public class View3DPart {
 		    		orthoCamera.height.setValue(orthoCamera.height.getValue()*(100.0f - 5.0f * count)/100.0f);
 		    		
 		    	}
+			}
+		    
+			protected void onFire(SoMouseButtonEvent event) {
+				if (polylineDraw) {
+
+					SbViewportRegion vr = this.getSceneHandler().getViewportRegion();
+					SoNode sg_ = this.getSceneHandler().getSceneGraph();
+
+					SoRayPickAction fireAction = new SoRayPickAction(vr);
+					
+					fireAction.setPoint(event.getPosition(vr));
+
+					fireAction.apply(sg_);
+					
+					SoPickedPoint pp = fireAction.getPickedPoint();
+					if( pp == null) {
+						fireAction.destructor();
+						return;
+					}
+					else {
+						SbVec3f i = pp.getPoint();
+						System.out.println("x = "+i.getX()+", y = "+i.getY()+", z = "+i.getZ());
+					}
+					fireAction.destructor();					
+				}
 			}
 		    
 		    public void idle() {
@@ -253,6 +299,18 @@ public class View3DPart {
 		    }
 		};
         walkViewer.buildWidget(style);
+        
+        polylineDrawMouseListener = new MouseAdapter() {
+
+			@Override
+			public void mouseDown(MouseEvent e) {
+				int mouseX = e.x;
+				int mouseY = e.y;
+				
+				System.out.println("x = "+ mouseX +", y = " + mouseY);
+			}
+        	
+        };
 	}
 
 	@Focus
@@ -288,7 +346,7 @@ public class View3DPart {
 				MainGLFW.Z_TRANSLATION, 
 				max_i, 
 				trails, 
-				null);
+				null, false);
 
 		walkViewer.setHeadlight(false);
 
@@ -381,6 +439,15 @@ public class View3DPart {
 
         walkViewer.start();
         
+        setEventCallback(true);
+		
+		System.out.println("Load 3D Model");		
+		
+	}
+	
+	private void setEventCallback(boolean set) {
+
+		if (set) {
         walkViewer.setEventCallback(new SoQtGLWidget.eventCBType() {
 
 			@Override
@@ -404,9 +471,10 @@ public class View3DPart {
 			}
         	
         }, null);
-		
-		System.out.println("Load 3D Model");		
-		
+		}
+		else {
+			walkViewer.setEventCallback(null, null);
+		}
 	}
 	
 	private void upperView() {
@@ -451,6 +519,21 @@ public class View3DPart {
 			sg.setRuler(null);
 		} else {
 			previousRulerPosition.copyFrom(walkViewer.getCameraController().getCamera().position.getValue());
+		}
+	}
+	
+	private void togglePolylineDraw() {
+		polylineDraw = !polylineDraw;
+		
+		if (polylineDraw) {
+			walkViewer.getGLWidget().addMouseListener(polylineDrawMouseListener);
+			walkViewer.setViewing(false);
+			setEventCallback(false);
+		}
+		else {
+			walkViewer.getGLWidget().removeMouseListener(polylineDrawMouseListener);
+			walkViewer.setViewing(true);
+			setEventCallback(true);
 		}
 	}
 }
