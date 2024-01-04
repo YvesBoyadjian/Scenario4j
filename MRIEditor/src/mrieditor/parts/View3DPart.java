@@ -216,7 +216,9 @@ public class View3DPart {
 						return;
 					}
 					else {
-						SbVec3f i = pp.getPoint();
+						SbVec3f i = new SbVec3f(pp.getPoint());
+						i.setZ(i.getZ()+10f);
+						sg.addPolylinePoint(i);
 						System.out.println("x = "+i.getX()+", y = "+i.getY()+", z = "+i.getZ());
 					}
 					fireAction.destructor();					
@@ -529,6 +531,8 @@ public class View3DPart {
 			walkViewer.getGLWidget().addMouseListener(polylineDrawMouseListener);
 			walkViewer.setViewing(false);
 			setEventCallback(false);
+			
+			sg.removeAllPolylinePoints();
 		}
 		else {
 			walkViewer.getGLWidget().removeMouseListener(polylineDrawMouseListener);

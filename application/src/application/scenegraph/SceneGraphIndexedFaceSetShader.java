@@ -369,6 +369,18 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 		
 	};
 	
+	private final SoSwitch polylineSwitch = new SoSwitch();
+	
+	private final SoLineSet polylineLineSet = new SoLineSet() {
+		public void
+		GLRender(SoGLRenderAction action) {
+			super.GLRender(action);
+		}
+		
+	};
+	
+	private final List<SbVec3f> polylinePoints = new ArrayList<>();
+	
 	private SoShaderProgram onScreenShaderProgram;
 	
 	private final SoTranslation rulerTranslation = new SoTranslation();
@@ -1571,6 +1583,8 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 		onScreenShaderProgram.shaderObject.set1Value(0, vertexShaderScreen);
 		onScreenShaderProgram.shaderObject.set1Value(1, fragmentShaderScreen);
 		
+		// ___________________________________________________ Ruler
+		
 		rulerSwitch.addChild(rulerLineSet);
 		
 		rulerSwitch.addChild(rulerTranslation);
@@ -1584,6 +1598,18 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 		rulerSwitch.addChild(rulerText);
 		
 		sep.addChild(rulerSwitch);
+		
+		// ____________________________________________________ Polyline
+	    
+	    polylineSwitch.addChild(program2);
+		
+		polylineSwitch.addChild(polylineLineSet);
+		
+		//polylineSwitch.addChild(onScreenShaderProgram);
+		
+		//polylineSwitch.addChild(rulerColor);
+		
+		sep.addChild(polylineSwitch);
 		
 		sep.addChild(onScreenShaderProgram);
 
@@ -3898,6 +3924,32 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 			
 			rulerText.string.setValue(distanceText);
 		}
+	}
+	
+	public void addPolylinePoint(SbVec3f polylinePoint) {
+		
+		polylinePoints.add(new SbVec3f(polylinePoint));
+
+		polylineSwitch.whichChild.setValue(SoSwitch.SO_SWITCH_ALL);
+		
+		SoVertexProperty vertexProperty = new SoVertexProperty();
+		
+		int polylinePointsSize = polylinePoints.size();
+		
+		for (int i = 0; i < polylinePointsSize; i++) {
+			vertexProperty.vertex.set1Value(i, polylinePoints.get(i));
+		}
+		vertexProperty.vertex.setNum(polylinePointsSize);
+		
+		polylineLineSet.numVertices.set1Value(0, polylinePointsSize);
+		polylineLineSet.vertexProperty.setValue(vertexProperty);
+	}
+	
+	public void removeAllPolylinePoints() {
+		
+		polylinePoints.clear();
+
+		polylineSwitch.whichChild.setValue(SoSwitch.SO_SWITCH_NONE);
 	}
 	
 	public SoShaderProgram getonScreenShaderProgram() {

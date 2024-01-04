@@ -307,15 +307,15 @@ Destructor.
 	    final SbVec3f pt = new SbVec3f();
 	    if ((this.flags & FLAG_3DTEXTURES)!=0) {
 	      pt.copyFrom( point.operator_minus(this.defaultorigo));
-	      this.dummyInstance.getRef()[2].accept( pt.getValueRead()[2]/this.defaultsize.getValueRead()[2]);
+	      this.dummyInstance.getRef()[2].accept( pt.getZ()/this.defaultsize.getZ());
 	    }
 	    else {
-	      pt.setValue(point.getValueRead()[this.defaultdim0]-this.defaultorigo.getValueRead()[0],
-	                  point.getValueRead()[this.defaultdim1]-this.defaultorigo.getValueRead()[1],
+	      pt.setValue(point.getCoord(this.defaultdim0)-this.defaultorigo.getX(),
+	                  point.getCoord(this.defaultdim1)-this.defaultorigo.getY(),
 	                  0.0f);
 	    }
-	    this.dummyInstance.getRef()[0].accept( pt.getValueRead()[0]/this.defaultsize.getValueRead()[0]);
-	    this.dummyInstance.getRef()[1].accept( pt.getValueRead()[1]/this.defaultsize.getValueRead()[1]);
+	    this.dummyInstance.getRef()[0].accept( pt.getX()/this.defaultsize.getX());
+	    this.dummyInstance.getRef()[1].accept( pt.getY()/this.defaultsize.getY());
 	    return this.dummyInstance;
 	  }
 	  else {
