@@ -11,6 +11,8 @@ uniform bool s4j_PerVertexColor;
 uniform vec3 s4j_NormalUniform;
 uniform bool s4j_PerVertexNormal;
 uniform vec4 s4j_FrontLightModelProduct_sceneColor;
+uniform bool s4j_FromXYUV;
+uniform vec4 s4j_XYUV;
 out vec4 shadowCoord0;
 out vec4 nearShadowCoord0;
 uniform mat4 textureMatrix0;
@@ -70,7 +72,12 @@ vec4 diffuCol;
   nearShadowCoord3 = nearTextureMatrix3 * pos;
 
   perVertexColor = vec3(clamp(color.r, 0.0, 1.0), clamp(color.g, 0.0, 1.0), clamp(color.b, 0.0, 1.0));
-texCoord = s4j_MultiTexCoord0;
+if (s4j_FromXYUV) {
+	texCoord = vec2((s4j_Vertex.x - s4j_XYUV.x) * s4j_XYUV.z, (s4j_Vertex.y - s4j_XYUV.y) * s4j_XYUV.w);
+}
+else {
+	texCoord = s4j_MultiTexCoord0;
+}
 gl_Position = s4j_ProjectionMatrix * s4j_ModelViewMatrix * vec4(s4j_Vertex, 1.0);
 frontColor = diffuCol;
 
