@@ -3952,6 +3952,10 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 		polylineSwitch.whichChild.setValue(SoSwitch.SO_SWITCH_NONE);
 	}
 	
+	public List<SbVec3f> getPolylinePoints() {
+		return new ArrayList<>(polylinePoints);
+	}
+	
 	public SoShaderProgram getonScreenShaderProgram() {
 		return onScreenShaderProgram;
 	}

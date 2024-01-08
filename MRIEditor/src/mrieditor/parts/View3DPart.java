@@ -6,8 +6,10 @@ package mrieditor.parts;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
@@ -36,6 +38,8 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.FileDialog;
+import org.eclipse.swt.widgets.MessageBox;
 
 import application.MainGLFW;
 import application.RasterProvider;
@@ -147,6 +151,17 @@ public class View3DPart {
 			public void widgetSelected(SelectionEvent e) {
 				togglePolylineDraw();
 			}
+		});
+		
+		Button button5 = new Button(upperToolBar, SWT.PUSH);
+		button5.setText("Save Polyline");
+		
+		button5.addSelectionListener(new SelectionAdapter() {
+			
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				savePolyline(parent);
+			}			
 		});
 		
 		Composite intermediate = new Composite(parent,SWT.NONE);
@@ -538,6 +553,41 @@ public class View3DPart {
 			walkViewer.getGLWidget().removeMouseListener(polylineDrawMouseListener);
 			walkViewer.setViewing(true);
 			setEventCallback(true);
+		}
+	}
+	
+	private void savePolyline(Composite parent) {
+		List<SbVec3f> points = sg.getPolylinePoints();
+		FileDialog fd = new FileDialog(parent.getShell(), SWT.SAVE);
+		String[] extensions = new String[1];
+		extensions[0] = "*.poly";
+		fd.setFilterExtensions(extensions);
+		String path = fd.open();
+		if (path != null) {
+			Properties props = new Properties();
+			
+			int index = 0;
+			for (SbVec3f point : points) {
+				index++;				
+				props.put("X"+index, Float.toString(point.getX()));
+				props.put("Y"+index, Float.toString(point.getY()));
+				props.put("Z"+index, Float.toString(point.getZ()));
+			}
+			
+			File savePolyFile = new File(path);
+			
+			try {
+				OutputStream out = new FileOutputStream(savePolyFile);
+				
+				props.store(out, "Polyline");
+
+				out.close();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+			System.err.println(props.toString());
 		}
 	}
 }
