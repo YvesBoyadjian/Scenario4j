@@ -25,6 +25,8 @@ import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.widgets.TextFactory;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
@@ -162,6 +164,18 @@ public class View3DPart {
 			public void widgetSelected(SelectionEvent e) {
 				savePolyline(parent);
 			}			
+		});
+		
+		Button button6 = new Button(upperToolBar, SWT.PUSH);
+		button6.setText("Load Polyline");
+		
+		button6.addSelectionListener(new SelectionAdapter() {
+			
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				loadPolyline(parent);
+			}			
+			
 		});
 		
 		Composite intermediate = new Composite(parent,SWT.NONE);
@@ -328,6 +342,7 @@ public class View3DPart {
 			}
         	
         };
+        
 	}
 
 	@Focus
@@ -568,11 +583,12 @@ public class View3DPart {
 			
 			int index = 0;
 			for (SbVec3f point : points) {
-				index++;				
 				props.put("X"+index, Float.toString(point.getX()));
 				props.put("Y"+index, Float.toString(point.getY()));
 				props.put("Z"+index, Float.toString(point.getZ()));
+				index++;				
 			}
+			props.put("numPoints", Integer.toString(index));
 			
 			File savePolyFile = new File(path);
 			
@@ -589,5 +605,56 @@ public class View3DPart {
 			
 			System.err.println(props.toString());
 		}
+	}
+	
+	private void loadPolyline(Composite parent) {
+		FileDialog fd = new FileDialog(parent.getShell(), SWT.OPEN);
+		String[] extensions = new String[1];
+		extensions[0] = "*.poly";
+		fd.setFilterExtensions(extensions);
+		String path = fd.open();
+		if (path != null) {
+			Properties props = new Properties();
+			
+			File loadPolyFile = new File(path);
+			
+			try {
+				InputStream in = new FileInputStream(loadPolyFile);
+				
+				props.load(in);
+				
+				in.close();
+				
+				String numPoints = props.getProperty("numPoints");
+				if (numPoints == null) {
+					return;
+				}
+								
+				sg.removeAllPolylinePoints();
+				
+				int n = Integer.valueOf(numPoints);
+				for (int i=0; i<n; i++) {
+					String x = "X" + i;
+					String y = "Y" + i;
+					String z = "Z" + i;
+					
+					String xs = props.getProperty(x);
+					String ys = props.getProperty(y);
+					String zs = props.getProperty(z);
+					
+					float xf = Float.valueOf(xs);
+					float yf = Float.valueOf(ys);
+					float zf = Float.valueOf(zs);
+					
+					SbVec3f point = new SbVec3f(xf,yf,zf);
+					
+					sg.addPolylinePoint(point);
+				}
+				
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}		
 	}
 }
