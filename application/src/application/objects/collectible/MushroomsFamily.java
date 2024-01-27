@@ -55,8 +55,8 @@ public class MushroomsFamily extends ThreeDObjectFamilyBase implements ThreeDObj
         for (int i=0; i<nbPolylinePoints-1; i++) {
             SbVec3f p1 = polylinePoints.get(i);
             SbVec3f p2 = polylinePoints.get(i+1);
-            float pp1Z = sg.getZ(p1.x(),p1.y(),p1.z());
-            float pp2Z = sg.getZ(p2.x(),p2.y(),p2.z());
+            float pp1Z = p1.z()-5;//sg.getZ(p1.x(),p1.y(),p1.z());
+            float pp2Z = p2.z()-5;//sg.getZ(p2.x(),p2.y(),p2.z());
 
             SbVec3f pp1 = new SbVec3f(p1.x(),p1.y(),pp1Z+0.5f);
             SbVec3f pp2 = new SbVec3f(p2.x(),p2.y(),pp2Z+0.5f);
@@ -81,7 +81,10 @@ public class MushroomsFamily extends ThreeDObjectFamilyBase implements ThreeDObj
 
         node.addChild(polylineLineSet);
 
-        nbMushrooms = 0;
+        mushroomsCoords.setValue(new SbVec3f());
+        addInstance(0);
+
+        nbMushrooms = 1;
     }
 
     @Override
@@ -100,6 +103,6 @@ public class MushroomsFamily extends ThreeDObjectFamilyBase implements ThreeDObj
 
     @Override
     public float getViewDistance() {
-        return 150.0f;
+        return 99999;
     }
 }
