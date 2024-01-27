@@ -1278,13 +1278,56 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 
 		// End targets
 
+		SoShaderProgram program2 = new SoShaderProgram();
+
+		SoVertexShader vs = new SoVertexShader();
+
+		vs.sourceType.setValue(SoShaderObject.SourceType.GLSL_PROGRAM);
+		vs.sourceProgram.setValue(
+				"#version 330 core\n"+
+						"layout (location = 0) in vec3 aPos;\n"+
+						"uniform mat4 s4j_ModelViewMatrix;\n"+
+						"uniform mat4 s4j_ProjectionMatrix;\n"+
+						"void main()\n"+
+						"{\n"+
+						"gl_Position = s4j_ProjectionMatrix * s4j_ModelViewMatrix * vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"+
+						"}\n");
+
+		final SoShaderStateMatrixParameter mvs2 = new SoShaderStateMatrixParameter();
+		mvs2.name.setValue("s4j_ModelViewMatrix");
+		mvs2.matrixType.setValue(SoShaderStateMatrixParameter.MatrixType.MODELVIEW);
+
+		final SoShaderStateMatrixParameter ps2 = new SoShaderStateMatrixParameter();
+		ps2.name.setValue("s4j_ProjectionMatrix");
+		ps2.matrixType.setValue(SoShaderStateMatrixParameter.MatrixType.PROJECTION);
+
+		vs.parameter.set1Value(0, mvs2);
+		vs.parameter.set1Value(1, ps2);
+
+		program2.shaderObject.set1Value(0, vs);
+
+		SoFragmentShader fs = new SoFragmentShader();
+
+		fs.sourceType.setValue(SoShaderObject.SourceType.GLSL_PROGRAM);
+		fs.sourceProgram.setValue(
+				"#version 330 core\n"+
+						"out vec4 FragColor;\n"+
+						"void main()\n"+
+						"{\n"+
+						"FragColor = vec4(0.0f, 0.0f, 0.0f, 1.0f);\n"+
+						"}\n"
+		);
+
+		program2.shaderObject.set1Value(1, fs);
+
 		// ___________________________________________________ Collectibles
 
 		boots = new BootsFamily(this, 57);
 		boots.setSpin(!haveBoots);
 		collectibleFamilies.add(boots);
 
-		mushrooms = new MushroomsFamily(this, getPolylinePoints());
+		loadPolyline("application/ressource/PathToTheSeals1.poly");
+		mushrooms = new MushroomsFamily(this, getPolylinePoints(), program2);
 		collectibleFamilies.add(mushrooms);
 
 		for( ThreeDObjectFamily collectibleFamily : collectibleFamilies) {
@@ -1456,48 +1499,6 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 		//forest = null; // for garbage collection : no, we need forest
 		
 
-	    SoShaderProgram program2 = new SoShaderProgram();
-	    
-	    SoVertexShader vs = new SoVertexShader();
-
-	    vs.sourceType.setValue(SoShaderObject.SourceType.GLSL_PROGRAM);
-	    vs.sourceProgram.setValue(
-	            "#version 330 core\n"+
-	                    "layout (location = 0) in vec3 aPos;\n"+
-	                    "uniform mat4 s4j_ModelViewMatrix;\n"+
-	                    "uniform mat4 s4j_ProjectionMatrix;\n"+
-	                    "void main()\n"+
-	                    "{\n"+
-	                    "gl_Position = s4j_ProjectionMatrix * s4j_ModelViewMatrix * vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"+
-	                    "}\n");
-
-	    final SoShaderStateMatrixParameter mvs2 = new SoShaderStateMatrixParameter();
-	    mvs2.name.setValue("s4j_ModelViewMatrix");
-	    mvs2.matrixType.setValue(SoShaderStateMatrixParameter.MatrixType.MODELVIEW);
-
-	    final SoShaderStateMatrixParameter ps2 = new SoShaderStateMatrixParameter();
-	    ps2.name.setValue("s4j_ProjectionMatrix");
-	    ps2.matrixType.setValue(SoShaderStateMatrixParameter.MatrixType.PROJECTION);
-
-	    vs.parameter.set1Value(0, mvs2);
-	    vs.parameter.set1Value(1, ps2);
-
-	    program2.shaderObject.set1Value(0, vs);
-
-	    SoFragmentShader fs = new SoFragmentShader();
-
-	    fs.sourceType.setValue(SoShaderObject.SourceType.GLSL_PROGRAM);
-	    fs.sourceProgram.setValue(
-	            "#version 330 core\n"+
-	                    "out vec4 FragColor;\n"+
-	                    "void main()\n"+
-	                    "{\n"+
-	                    "FragColor = vec4(0.0f, 0.0f, 0.0f, 1.0f);\n"+
-	                    "}\n"
-	    );
-
-	    program2.shaderObject.set1Value(1, fs);
-	    
 	    rulerSwitch.addChild(program2);
 		
 		// ____________________________________________________________ Shader for screen display

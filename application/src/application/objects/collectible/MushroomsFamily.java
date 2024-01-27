@@ -2,6 +2,7 @@ package application.objects.collectible;
 
 import application.scenegraph.SceneGraphIndexedFaceSetShader;
 import jscenegraph.coin3d.inventor.nodes.SoVertexProperty;
+import jscenegraph.coin3d.shaders.inventor.nodes.SoShaderProgram;
 import jscenegraph.database.inventor.SbVec3f;
 import jscenegraph.database.inventor.fields.SoMFVec3f;
 import jscenegraph.database.inventor.nodes.SoLineSet;
@@ -17,6 +18,8 @@ public class MushroomsFamily extends ThreeDObjectFamilyBase implements ThreeDObj
 
     List<SbVec3f> polylinePoints;
 
+    List<SbVec3f> polylinePointsOnLand;
+
     private int nbMushrooms;
 
     SoMFVec3f mushroomsCoords = new SoMFVec3f();
@@ -26,13 +29,14 @@ public class MushroomsFamily extends ThreeDObjectFamilyBase implements ThreeDObj
     SoSeparator node = new SoSeparator();
     private final SoLineSet polylineLineSet = new SoLineSet();
 
-    public MushroomsFamily(SceneGraphIndexedFaceSetShader sg, List<SbVec3f> polylinePoints) {
+    public MushroomsFamily(SceneGraphIndexedFaceSetShader sg, List<SbVec3f> polylinePoints, SoShaderProgram program2) {
         this.sg = sg;
         int nbPolylinePoints = polylinePoints.size();
         this.polylinePoints = new ArrayList<>(nbPolylinePoints);
         for (int i=0; i<nbPolylinePoints; i++) {
             this.polylinePoints.add(new SbVec3f(polylinePoints.get(i)));
         }
+        node.addChild(program2);
     }
 
     @Override
@@ -47,22 +51,28 @@ public class MushroomsFamily extends ThreeDObjectFamilyBase implements ThreeDObj
 
     private void doCompute() {
         int nbPolylinePoints = polylinePoints.size();
+        polylinePointsOnLand = new ArrayList<>();
         for (int i=0; i<nbPolylinePoints-1; i++) {
             SbVec3f p1 = polylinePoints.get(i);
             SbVec3f p2 = polylinePoints.get(i+1);
             float pp1Z = sg.getZ(p1.x(),p1.y(),p1.z());
             float pp2Z = sg.getZ(p2.x(),p2.y(),p2.z());
 
-            SbVec3f pp1 = new SbVec3f(p1.x(),p1.y(),pp1Z);
-            SbVec3f pp2 = new SbVec3f(p2.x(),p2.y(),pp2Z);
+            SbVec3f pp1 = new SbVec3f(p1.x(),p1.y(),pp1Z+0.5f);
+            SbVec3f pp2 = new SbVec3f(p2.x(),p2.y(),pp2Z+0.5f);
+
+            polylinePointsOnLand.add(pp1);
+            if (i == nbPolylinePoints-2) {
+                polylinePointsOnLand.add(pp2);
+            }
         }
 
         SoVertexProperty vertexProperty = new SoVertexProperty();
 
-        int polylinePointsSize = polylinePoints.size();
+        int polylinePointsSize = polylinePointsOnLand.size();
 
         for (int i = 0; i < polylinePointsSize; i++) {
-            vertexProperty.vertex.set1Value(i, polylinePoints.get(i));
+            vertexProperty.vertex.set1Value(i, polylinePointsOnLand.get(i));
         }
         vertexProperty.vertex.setNum(polylinePointsSize);
 
@@ -70,6 +80,8 @@ public class MushroomsFamily extends ThreeDObjectFamilyBase implements ThreeDObj
         polylineLineSet.vertexProperty.setValue(vertexProperty);
 
         node.addChild(polylineLineSet);
+
+        nbMushrooms = 0;
     }
 
     @Override
