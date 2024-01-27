@@ -14,7 +14,7 @@ import jscenegraph.database.inventor.nodes.SoTranslation;
 
 import java.util.*;
 
-public class SoCollectibles extends SoSeparator {
+public class So3DObjects extends SoSeparator {
 
     private Collectible collectible;
     private SbVec3f referencePoint;
@@ -31,7 +31,7 @@ public class SoCollectibles extends SoSeparator {
 
     private float nearestCollectibleDistance = 99;
 
-    public SoCollectibles(Collectible collectible) {
+    public So3DObjects(Collectible collectible) {
         super();
         renderCaching.setValue(SoSeparator.CacheEnabled.OFF);
         this.collectible = collectible;

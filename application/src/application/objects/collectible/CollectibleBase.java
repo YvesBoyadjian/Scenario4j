@@ -1,7 +1,6 @@
 package application.objects.collectible;
 
-import application.nodes.SoCollectibles;
-import application.nodes.SoTargets;
+import application.nodes.So3DObjects;
 import jscenegraph.database.inventor.nodes.SoGroup;
 
 import java.util.ArrayList;
@@ -12,7 +11,7 @@ import java.util.Map;
 public class CollectibleBase {
     private final Map<Integer, SoGroup> groups = new HashMap<>();
     private final List<Integer> instances = new ArrayList<>();
-    private SoCollectibles graphicObject;
+    private So3DObjects graphicObject;
 
     public void setGroup(SoGroup group, int instance) {
         this.groups.put(instance, group);
@@ -30,11 +29,11 @@ public class CollectibleBase {
         return instances.indexOf(instance);
     }
 
-    public SoCollectibles getGraphicObject() {
+    public So3DObjects getGraphicObject() {
         return graphicObject;
     }
 
-    public void setGraphicObject(SoCollectibles graphicObject) {
+    public void setGraphicObject(So3DObjects graphicObject) {
         this.graphicObject = graphicObject;
     }
 }

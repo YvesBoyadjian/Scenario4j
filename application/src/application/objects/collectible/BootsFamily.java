@@ -1,6 +1,5 @@
 package application.objects.collectible;
 
-import application.nodes.SoCollectibles;
 import application.scenegraph.SceneGraphIndexedFaceSetShader;
 import jscenegraph.database.inventor.SbBox3f;
 import jscenegraph.database.inventor.SbVec3f;

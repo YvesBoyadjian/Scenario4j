@@ -1,7 +1,6 @@
 package application.objects.collectible;
 
-import application.nodes.SoCollectibles;
-import application.nodes.SoTargets;
+import application.nodes.So3DObjects;
 import jscenegraph.database.inventor.nodes.SoNode;
 
 public interface Collectible {
@@ -10,9 +9,9 @@ public interface Collectible {
 
     int indexOfInstance(int instance);
 
-    SoCollectibles getGraphicObject();
+    So3DObjects getGraphicObject();
 
-    void setGraphicObject(SoCollectibles graphicObject);
+    void setGraphicObject(So3DObjects graphicObject);
 
     int getNbCollectibles();
 

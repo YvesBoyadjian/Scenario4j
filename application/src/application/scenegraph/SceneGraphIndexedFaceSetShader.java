@@ -6,7 +6,6 @@ package application.scenegraph;
 import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBuffer;
-import java.awt.image.DataBufferFloat;
 import java.awt.image.Raster;
 import java.io.File;
 import java.io.FileInputStream;
@@ -22,7 +21,6 @@ import java.util.stream.Stream;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 
-import application.MainGLFW;
 import application.RasterProvider;
 import application.nodes.*;
 import application.objects.Hero;
@@ -49,14 +47,11 @@ import jscenegraph.database.inventor.*;
 import jscenegraph.database.inventor.actions.SoGLRenderAction;
 import jscenegraph.database.inventor.actions.SoGetMatrixAction;
 import jscenegraph.database.inventor.actions.SoSearchAction;
-import jscenegraph.database.inventor.elements.SoProjectionMatrixElement;
-import jscenegraph.database.inventor.elements.SoViewingMatrixElement;
 import jscenegraph.database.inventor.misc.SoNotList;
 import jscenegraph.database.inventor.nodes.*;
 import jscenegraph.optimization.inventor.nodes.SoOptimizationFromXYUV;
 import jscenegraph.port.Ctx;
 import jscenegraph.port.memorybuffer.MemoryBuffer;
-import jsceneviewerglfw.inventor.qt.viewers.SoQtConstrainedViewer;
 import org.ode4j.math.DMatrix3;
 import org.ode4j.math.DMatrix3C;
 import org.ode4j.ode.*;
@@ -1288,7 +1283,7 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 
 		for( Collectible collectibleFamily : collectibleFamilies) {
 
-			SoCollectibles collectiblesSeparator = new SoCollectibles(collectibleFamily);
+			So3DObjects collectiblesSeparator = new So3DObjects(collectibleFamily);
 
 			collectiblesSeparator.setReferencePoint(targetsRefPoint);
 			collectiblesSeparator.setCameraDirection(cameraDirection);
