@@ -1742,8 +1742,8 @@ rayPickTriangle(SoRayPickAction action,
 //
 ////////////////////////////////////////////////////////////////////////
 {
-    final SbVec3f             point = new SbVec3f();
-    final SbVec3fSingle             barycentric = new SbVec3fSingle();
+    final SbVec3fSingleFast             point = new SbVec3fSingleFast();
+    final SbVec3fSingleFast             barycentric = new SbVec3fSingleFast();
     final boolean[]              onFrontSide = new boolean[1];
     SoPickedPoint       pp;
 

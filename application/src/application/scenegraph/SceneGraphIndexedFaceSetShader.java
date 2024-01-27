@@ -367,6 +367,8 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 		
 	};
 	
+	private final SoSeparator polylineSep = new SoSeparator();
+	
 	private final SoSwitch polylineSwitch = new SoSwitch();
 	
 	private final SoLineSet polylineLineSet = new SoLineSet() {
@@ -1610,8 +1612,12 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 		//polylineSwitch.addChild(onScreenShaderProgram);
 		
 		//polylineSwitch.addChild(rulerColor);
+	    
+	    polylineSep.addChild(transl);
 		
-		sep.addChild(polylineSwitch);
+		polylineSep.addChild(polylineSwitch);
+		
+		sep.addChild(polylineSep);
 		
 		sep.addChild(onScreenShaderProgram);
 

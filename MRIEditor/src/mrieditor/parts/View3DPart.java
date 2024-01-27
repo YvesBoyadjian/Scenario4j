@@ -245,8 +245,8 @@ public class View3DPart {
 						return;
 					}
 					else {
-						SbVec3f i = new SbVec3f(pp.getPoint());
-						i.setZ(i.getZ()+10f);
+						SbVec3f i = new SbVec3f(pp.getPoint().operator_minus(sg.getTranslation()));
+						i.setZ(i.getZ()+20f);
 						sg.addPolylinePoint(i);
 						System.out.println("x = "+i.getX()+", y = "+i.getY()+", z = "+i.getZ());
 					}
