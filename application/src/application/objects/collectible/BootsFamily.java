@@ -10,7 +10,7 @@ import jscenegraph.database.inventor.nodes.*;
 import java.io.File;
 import java.util.Random;
 
-public class BootsFamily extends CollectibleBase implements ThreeDObjectFamily {
+public class BootsFamily extends ThreeDObjectFamilyBase implements ThreeDObjectFamily {
 
     final int FIFTY_THOUSAND = 50000;
     int NB_BOOTS_BIRTHS = FIFTY_THOUSAND;

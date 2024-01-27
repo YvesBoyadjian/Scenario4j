@@ -8,7 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class CollectibleBase {
+public class ThreeDObjectFamilyBase {
     private final Map<Integer, SoGroup> groups = new HashMap<>();
     private final List<Integer> instances = new ArrayList<>();
     private So3DObjects graphicObject;
