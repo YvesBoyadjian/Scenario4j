@@ -26,7 +26,7 @@ import application.nodes.*;
 import application.objects.Hero;
 import application.objects.Target;
 import application.objects.collectible.BootsFamily;
-import application.objects.collectible.Collectible;
+import application.objects.collectible.ThreeDObjectFamily;
 import application.objects.enemy.EnemyFamily;
 import application.scenario.Scenario;
 import application.targets.*;
@@ -282,7 +282,7 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 
 	final SoGroup collectibleGroup = new SoGroup();
 
-	final List<Collectible> collectibleFamilies = new ArrayList<>();
+	final List<ThreeDObjectFamily> collectibleFamilies = new ArrayList<>();
 
 	final SoSeparator planksSeparator = new SoSeparator();
 
@@ -1281,7 +1281,7 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 		boots.setSpin(!haveBoots);
 		collectibleFamilies.add(boots);
 
-		for( Collectible collectibleFamily : collectibleFamilies) {
+		for( ThreeDObjectFamily collectibleFamily : collectibleFamilies) {
 
 			So3DObjects collectiblesSeparator = new So3DObjects(collectibleFamily);
 
@@ -3493,7 +3493,7 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 
 	public float getNearestCollectibleDistance() {
 		float nearestCollectibleDistance = 99;
-		for( Collectible collectible : collectibleFamilies) {
+		for( ThreeDObjectFamily collectible : collectibleFamilies) {
 			nearestCollectibleDistance = Math.min(nearestCollectibleDistance,collectible.getGraphicObject().getNearestCollectibleDistance());
 		}
 		//nearestCollectibleDistance = Math.min(nearestCollectibleDistance,enemiesSeparator.getNearestEnemyDistance());

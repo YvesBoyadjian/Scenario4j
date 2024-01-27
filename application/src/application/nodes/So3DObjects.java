@@ -1,6 +1,6 @@
 package application.nodes;
 
-import application.objects.collectible.Collectible;
+import application.objects.collectible.ThreeDObjectFamily;
 import jscenegraph.coin3d.inventor.SbBSPTree;
 import jscenegraph.coin3d.inventor.lists.SbListInt;
 import jscenegraph.database.inventor.SbSphere;
@@ -16,7 +16,7 @@ import java.util.*;
 
 public class So3DObjects extends SoSeparator {
 
-    private Collectible collectible;
+    private ThreeDObjectFamily collectible;
     private SbVec3f referencePoint;
     private SbVec3f cameraDirection;
 
@@ -31,7 +31,7 @@ public class So3DObjects extends SoSeparator {
 
     private float nearestCollectibleDistance = 99;
 
-    public So3DObjects(Collectible collectible) {
+    public So3DObjects(ThreeDObjectFamily collectible) {
         super();
         renderCaching.setValue(SoSeparator.CacheEnabled.OFF);
         this.collectible = collectible;
@@ -139,7 +139,7 @@ public class So3DObjects extends SoSeparator {
         super.removeChild(target);
     }
 
-    public Collectible getCollectible() {
+    public ThreeDObjectFamily getCollectible() {
         return collectible;
     }
 

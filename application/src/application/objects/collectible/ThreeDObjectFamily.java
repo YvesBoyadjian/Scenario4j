@@ -3,7 +3,7 @@ package application.objects.collectible;
 import application.nodes.So3DObjects;
 import jscenegraph.database.inventor.nodes.SoNode;
 
-public interface Collectible {
+public interface ThreeDObjectFamily {
 
     int getInstance( int index);
 
