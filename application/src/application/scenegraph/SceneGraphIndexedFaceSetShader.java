@@ -3960,4 +3960,49 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 	public SoShaderProgram getonScreenShaderProgram() {
 		return onScreenShaderProgram;
 	}
+
+	public void loadPolyline(String path) {
+		
+		Properties props = new Properties();
+		
+		File loadPolyFile = new File(path);
+		
+		try {
+			InputStream in = new FileInputStream(loadPolyFile);
+			
+			props.load(in);
+			
+			in.close();
+			
+			String numPoints = props.getProperty("numPoints");
+			if (numPoints == null) {
+				return;
+			}
+							
+			removeAllPolylinePoints();
+			
+			int n = Integer.valueOf(numPoints);
+			for (int i=0; i<n; i++) {
+				String x = "X" + i;
+				String y = "Y" + i;
+				String z = "Z" + i;
+				
+				String xs = props.getProperty(x);
+				String ys = props.getProperty(y);
+				String zs = props.getProperty(z);
+				
+				float xf = Float.valueOf(xs);
+				float yf = Float.valueOf(ys);
+				float zf = Float.valueOf(zs);
+				
+				SbVec3f point = new SbVec3f(xf,yf,zf);
+				
+				addPolylinePoint(point);
+			}
+			
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 }
