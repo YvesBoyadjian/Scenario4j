@@ -26,6 +26,7 @@ import application.nodes.*;
 import application.objects.Hero;
 import application.objects.Target;
 import application.objects.collectible.BootsFamily;
+import application.objects.collectible.MushroomsFamily;
 import application.objects.collectible.ThreeDObjectFamily;
 import application.objects.enemy.EnemyFamily;
 import application.scenario.Scenario;
@@ -327,6 +328,8 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 	boolean haveBoots;
 
     BootsFamily boots;
+
+	MushroomsFamily mushrooms;
 
 	boolean softShadows = true;
 
@@ -1280,6 +1283,9 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 		boots = new BootsFamily(this, 57);
 		boots.setSpin(!haveBoots);
 		collectibleFamilies.add(boots);
+
+		mushrooms = new MushroomsFamily(this, getPolylinePoints());
+		collectibleFamilies.add(mushrooms);
 
 		for( ThreeDObjectFamily collectibleFamily : collectibleFamilies) {
 
