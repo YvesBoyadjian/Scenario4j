@@ -4,11 +4,11 @@ import jscenegraph.database.inventor.SbVec3f;
 import jscenegraph.database.inventor.nodes.SoSeparator;
 import jscenegraph.database.inventor.nodes.SoTranslation;
 
-public class SoCollectible extends SoSeparator {
+public class So3DObject extends SoSeparator {
 
     private int instance;
 
-    public SoCollectible(int instance) {
+    public So3DObject(int instance) {
         super();
         renderCaching.setValue(SoSeparator.CacheEnabled.OFF);
         pickCulling.setValue(CacheEnabled.OFF); // Speed up picking

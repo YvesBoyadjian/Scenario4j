@@ -1,14 +1,11 @@
 package application.nodes;
 
-import application.objects.Target;
 import application.objects.collectible.Collectible;
 import jscenegraph.coin3d.inventor.SbBSPTree;
 import jscenegraph.coin3d.inventor.lists.SbListInt;
 import jscenegraph.database.inventor.SbSphere;
 import jscenegraph.database.inventor.SbVec3f;
-import jscenegraph.database.inventor.SbViewportRegion;
 import jscenegraph.database.inventor.actions.SoGLRenderAction;
-import jscenegraph.database.inventor.actions.SoGetBoundingBoxAction;
 import jscenegraph.database.inventor.elements.SoCacheElement;
 import jscenegraph.database.inventor.misc.SoState;
 import jscenegraph.database.inventor.nodes.SoNode;
@@ -30,7 +27,7 @@ public class SoCollectibles extends SoSeparator {
     private final Set<Integer> actualChildren = new HashSet<>();
     private final Set<Integer> nearChildren = new HashSet<>();
 
-    private final Map<Integer,SoCollectible> idxToCollectibles = new HashMap<>();
+    private final Map<Integer, So3DObject> idxToCollectibles = new HashMap<>();
 
     private float nearestCollectibleDistance = 99;
 
@@ -88,7 +85,7 @@ public class SoCollectibles extends SoSeparator {
             if( !actualChildren.contains(id)) {
                 int instance = (Integer)bspTree.getUserData(id);
 
-                SoCollectible collectibleSeparator = new SoCollectible(instance);
+                So3DObject collectibleSeparator = new So3DObject(instance);
                 collectibleSeparator.ref();
 
                 SoTranslation collectibleTranslation = new SoTranslation();
@@ -116,26 +113,26 @@ public class SoCollectibles extends SoSeparator {
         actualChildrenSaved.addAll(actualChildren);
         for( int id : actualChildrenSaved) {
             if(actualChildren.contains(id) && !nearChildren.contains(id)) {
-                SoCollectible child = idxToCollectibles.get(id);
+                So3DObject child = idxToCollectibles.get(id);
                 removeCollectible(child,id);
             }
         }
         for(int id : actualChildren) {
-            SoCollectible child = idxToCollectibles.get(id);
+            So3DObject child = idxToCollectibles.get(id);
             float distance = referencePoint.operator_minus(child.getCoordinates()).length();
             nearestCollectibleDistance = Math.min(nearestCollectibleDistance,distance);
         }
         //System.out.println(nearestCollectibleDistance);
     }
 
-    void addCollectible(SoCollectible target, int id) {
+    void addCollectible(So3DObject target, int id) {
         actualChildren.add(id);
         super.addChild(target);
         idxToCollectibles.put(id,target);
 //        target.unref();
     }
 
-    void removeCollectible(SoCollectible target, int id) {
+    void removeCollectible(So3DObject target, int id) {
         actualChildren.remove(id);
         idxToCollectibles.remove(id);
 //        target.ref();
@@ -146,10 +143,10 @@ public class SoCollectibles extends SoSeparator {
         return collectible;
     }
 
-    public Collection<SoCollectible> getNearChildren() {
-        Collection<SoCollectible> nearChildren = new ArrayList<>();
+    public Collection<So3DObject> getNearChildren() {
+        Collection<So3DObject> nearChildren = new ArrayList<>();
         for(int id : actualChildren) {
-            SoCollectible child = idxToCollectibles.get(id);
+            So3DObject child = idxToCollectibles.get(id);
             nearChildren.add(child);
         }
         return nearChildren;
