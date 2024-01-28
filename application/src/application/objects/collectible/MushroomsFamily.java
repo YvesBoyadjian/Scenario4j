@@ -52,11 +52,14 @@ public class MushroomsFamily extends ThreeDObjectFamilyBase implements ThreeDObj
     private void doCompute() {
         int nbPolylinePoints = polylinePoints.size();
         polylinePointsOnLand = new ArrayList<>();
+
+        int[] indices = new int[4];
+
         for (int i=0; i<nbPolylinePoints-1; i++) {
             SbVec3f p1 = polylinePoints.get(i);
             SbVec3f p2 = polylinePoints.get(i+1);
-            float pp1Z = p1.z()-5;//sg.getZ(p1.x(),p1.y(),p1.z());
-            float pp2Z = p2.z()-5;//sg.getZ(p2.x(),p2.y(),p2.z());
+            float pp1Z = sg.getInternalZ(p1.x(),p1.y(),indices,true) + sg.getzTranslation();
+            float pp2Z = sg.getInternalZ(p2.x(),p2.y(),indices,true) + sg.getzTranslation();
 
             SbVec3f pp1 = new SbVec3f(p1.x(),p1.y(),pp1Z+0.5f);
             SbVec3f pp2 = new SbVec3f(p2.x(),p2.y(),pp2Z+0.5f);
