@@ -408,6 +408,13 @@ private static Path findFileWithExtension(Path parentPath, String extension, boo
                             return;
                         }
                     }
+                    for (Path root : fs.getRootDirectories()) {
+                        obj = findFileWithExtension(root,".obj",true);
+                        if (obj != null) {
+                            readOBJ(f, obj);
+                            return;
+                        }
+                    }
                 }
             }
             else {
@@ -512,7 +519,7 @@ private static Path findFileWithExtension(Path parentPath, String extension, boo
 */
         InputStream inputStream = null;
         try {
-            inputStream = new FileInputStream(objPath.toFile());
+            inputStream = Files.newInputStream(objPath);
             Obj obj = ObjReader.read(inputStream);
             Obj renderableObj = ObjUtils.convertToRenderable(obj);
 
@@ -525,7 +532,7 @@ private static Path findFileWithExtension(Path parentPath, String extension, boo
             if (!materials.isEmpty()) {
                 String materialName = materials.get(0);
                 Path materialPath = objPath.getParent().resolve(materialName);
-                List<Mtl> mtls = MtlReader.read(new FileInputStream(materialPath.toFile()));
+                List<Mtl> mtls = MtlReader.read(Files.newInputStream(materialPath));
                 if (!mtls.isEmpty()) {
                     Mtl mtl = mtls.get(0);
                     String imageName = mtl.getMapKd();

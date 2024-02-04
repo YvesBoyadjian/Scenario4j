@@ -4,11 +4,14 @@ import application.scenegraph.SceneGraphIndexedFaceSetShader;
 import jscenegraph.coin3d.inventor.nodes.SoVertexProperty;
 import jscenegraph.coin3d.shaders.inventor.nodes.SoShaderProgram;
 import jscenegraph.database.inventor.SbVec3f;
+import jscenegraph.database.inventor.actions.SoGLRenderAction;
 import jscenegraph.database.inventor.fields.SoMFVec3f;
+import jscenegraph.database.inventor.nodes.SoFile;
 import jscenegraph.database.inventor.nodes.SoLineSet;
 import jscenegraph.database.inventor.nodes.SoNode;
 import jscenegraph.database.inventor.nodes.SoSeparator;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,6 +32,8 @@ public class MushroomsFamily extends ThreeDObjectFamilyBase implements ThreeDObj
     SoSeparator node = new SoSeparator();
     private final SoLineSet polylineLineSet = new SoLineSet();
 
+    public String filePath = "ressource/MushroomButton_L2.123c905c8c0c-b164-45b5-ae21-cd1ca6951a92.zip";
+
     public MushroomsFamily(SceneGraphIndexedFaceSetShader sg, List<SbVec3f> polylinePoints, SoShaderProgram program2) {
         this.sg = sg;
         int nbPolylinePoints = polylinePoints.size();
@@ -36,7 +41,26 @@ public class MushroomsFamily extends ThreeDObjectFamilyBase implements ThreeDObj
         for (int i=0; i<nbPolylinePoints; i++) {
             this.polylinePoints.add(new SbVec3f(polylinePoints.get(i)));
         }
-        node.addChild(program2);
+//        node.addChild(program2);
+
+        String mushroomPath = filePath;
+
+        File mushroomFile = new File(mushroomPath);
+
+        if(!mushroomFile.exists()) {
+            mushroomPath = "application/"+mushroomPath;
+        }
+
+        SoFile file = new SoFile() {
+            @Override
+            public void GLRender(SoGLRenderAction action) {
+                super.GLRender(action);
+            }
+        };
+
+        node.addChild(file);
+
+        file.name.setValue(mushroomPath);
     }
 
     @Override
@@ -82,12 +106,14 @@ public class MushroomsFamily extends ThreeDObjectFamilyBase implements ThreeDObj
         polylineLineSet.numVertices.set1Value(0, polylinePointsSize);
         polylineLineSet.vertexProperty.setValue(vertexProperty);
 
-        node.addChild(polylineLineSet);
+//        node.addChild(polylineLineSet);
 
-        mushroomsCoords.setValue(new SbVec3f());
-        addInstance(0);
+        for (int i=0; i<nbPolylinePoints; i++) {
+            mushroomsCoords.set1Value(i,polylinePointsOnLand.get(i));
+            addInstance(i);
+        }
 
-        nbMushrooms = 1;
+        nbMushrooms = polylinePointsSize;
     }
 
     @Override
