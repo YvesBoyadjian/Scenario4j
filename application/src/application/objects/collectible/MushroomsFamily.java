@@ -12,6 +12,8 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.SplittableRandom;
+import java.util.random.RandomGenerator;
 
 public class MushroomsFamily extends ThreeDObjectFamilyBase implements ThreeDObjectFamily {
 
@@ -86,7 +88,7 @@ public class MushroomsFamily extends ThreeDObjectFamilyBase implements ThreeDObj
 
         int[] indices = new int[4];
 
-        Random random = new Random(42);
+        RandomGenerator random = new SplittableRandom(42);
 
         for (int i=0; i<nbPolylinePoints-1; i++) {
             SbVec3f p1 = polylinePoints.get(i);
@@ -94,9 +96,9 @@ public class MushroomsFamily extends ThreeDObjectFamilyBase implements ThreeDObj
 
             float distance = p2.operator_minus(p1).length();
 
-            float lambda = 1f;
+            float lambda = 1.0f;
 
-            for (float curviligne=0; curviligne<distance;curviligne++) {
+            for (float curviligne=0; curviligne<distance;curviligne += 5.0f) {
                 float alpha = curviligne/distance;
                 float beta = 1 - alpha;
 
@@ -108,7 +110,7 @@ public class MushroomsFamily extends ThreeDObjectFamilyBase implements ThreeDObj
 
                 SbVec3f p = p1.operator_mul(alpha).operator_add(p2.operator_mul(beta)).operator_add(new SbVec3f(dx,dy,0));
                 float ppZ = sg.getInternalZ(p.x(),p.y(),indices,true) + sg.getzTranslation();
-                SbVec3f pp = new SbVec3f(p.x(),p.y(),ppZ+0.05f);
+                SbVec3f pp = new SbVec3f(p.x(),p.y(),ppZ);
                 polylinePointsOnLand.add(pp);
             }
 
@@ -162,6 +164,6 @@ public class MushroomsFamily extends ThreeDObjectFamilyBase implements ThreeDObj
 
     @Override
     public float getViewDistance() {
-        return 150;
+        return 200;
     }
 }
