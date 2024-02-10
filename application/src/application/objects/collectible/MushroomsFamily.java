@@ -97,10 +97,14 @@ public class MushroomsFamily extends ThreeDObjectFamilyBase implements ThreeDObj
 
             float lambda = 0.5f;
 
-            for (float curviligne=0; curviligne<distance;curviligne += 8.0f) {
+            for (float curviligne=0; curviligne<distance;curviligne += 1.0f) {
+
+                if(random.nextFloat() > 0.2f) {
+                    continue;
+                }
+
                 float alpha = curviligne/distance;
                 float beta = 1 - alpha;
-
 
                 float dxy = -(1 / lambda) * (float)Math.log( 1 - random.nextDouble() );
                 float angle = (float)Math.PI*2*random.nextFloat();
@@ -153,7 +157,7 @@ public class MushroomsFamily extends ThreeDObjectFamilyBase implements ThreeDObj
         for (int i=0; i<polylinePointsSize; i++) {
             mushroomsCoords.set1Value(i,polylinePointsOnLand.get(i));
             addInstance(i);
-            scaleFactors[i] = ((float)Math.pow(randomS.nextFloat(),6)+0.5f) * MUSHROOM_SCALE_FACTOR * 2;
+            scaleFactors[i] = ((float)Math.pow(randomS.nextFloat(),10)+1.0f) * MUSHROOM_SCALE_FACTOR;
             SoSeparator node = new SoSeparator();
 
             node.ref();
