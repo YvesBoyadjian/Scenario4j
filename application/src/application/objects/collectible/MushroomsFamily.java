@@ -31,10 +31,20 @@ public class MushroomsFamily extends ThreeDObjectFamilyBase implements ThreeDObj
 
     boolean computed;
 
-    SoSeparator node = new SoSeparator();
+    SoFile file = new SoFile() {
+        @Override
+        public void GLRender(SoGLRenderAction action) {
+            super.GLRender(action);
+        }
+    };
+
 //    private final SoLineSet polylineLineSet = new SoLineSet();
 
     public String filePath = "ressource/MushroomButton_L2.123c905c8c0c-b164-45b5-ae21-cd1ca6951a92.zip";
+
+    float[] scaleFactors;
+
+    SoNode[] nodes;
 
     public MushroomsFamily(SceneGraphIndexedFaceSetShader sg, List<SbVec3f> polylinePoints, SoShaderProgram program2) {
         this.sg = sg;
@@ -53,21 +63,7 @@ public class MushroomsFamily extends ThreeDObjectFamilyBase implements ThreeDObj
             mushroomPath = "application/"+mushroomPath;
         }
 
-        SoFile file = new SoFile() {
-            @Override
-            public void GLRender(SoGLRenderAction action) {
-                super.GLRender(action);
-            }
-        };
-
-        SoScale scale = new SoScale();
-        scale.scaleFactor.setValue(MUSHROOM_SCALE_FACTOR,MUSHROOM_SCALE_FACTOR,MUSHROOM_SCALE_FACTOR);
-
-        node.ref();
-
-        node.addChild(scale);
-
-        node.addChild(file);
+        file.ref();
 
         file.name.setValue(mushroomPath);
     }
@@ -140,9 +136,27 @@ public class MushroomsFamily extends ThreeDObjectFamilyBase implements ThreeDObj
 
 //        node.addChild(polylineLineSet);
 
+        RandomGenerator randomS = new SplittableRandom(43);
+
+        scaleFactors = new float[polylinePointsSize];
+        nodes = new SoNode[polylinePointsSize];
+
         for (int i=0; i<polylinePointsSize; i++) {
             mushroomsCoords.set1Value(i,polylinePointsOnLand.get(i));
             addInstance(i);
+            scaleFactors[i] = ((float)Math.pow(randomS.nextFloat(),6)+0.05f) * MUSHROOM_SCALE_FACTOR * 20;
+            SoSeparator node = new SoSeparator();
+
+            node.ref();
+
+            SoScale scale = new SoScale();
+            scale.scaleFactor.setValue(scaleFactors[i],scaleFactors[i],scaleFactors[i]);
+
+            node.addChild(scale);
+
+            node.addChild(file);
+
+            nodes[i] = node;
         }
 
         nbMushrooms = polylinePointsSize;
@@ -158,8 +172,8 @@ public class MushroomsFamily extends ThreeDObjectFamilyBase implements ThreeDObj
     }
 
     @Override
-    public SoNode getNode() {
-        return node;
+    public SoNode getNode(int index) {
+        return nodes[index];
     }
 
     @Override

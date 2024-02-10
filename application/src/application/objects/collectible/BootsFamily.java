@@ -134,7 +134,7 @@ public class BootsFamily extends ThreeDObjectFamilyBase implements ThreeDObjectF
     }
 
     @Override
-    public SoNode getNode() {
+    public SoNode getNode(int index) {
         return node;
     }
 

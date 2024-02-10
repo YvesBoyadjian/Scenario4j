@@ -17,7 +17,7 @@ public interface ThreeDObjectFamily {
 
     float[] getCollectible(int sealIndex, float[] vector);
 
-    SoNode getNode();
+    SoNode getNode(int index);
 
     float getViewDistance();
 }

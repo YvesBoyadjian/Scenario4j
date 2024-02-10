@@ -99,7 +99,7 @@ public class So3DObjects extends SoSeparator {
 
                 collectibleSeparator.addChild(collectibleTranslation);
 
-                SoNode collectibleNode = collectible.getNode();
+                SoNode collectibleNode = collectible.getNode(index);
 
                 collectibleSeparator.addChild(collectibleNode);
 
