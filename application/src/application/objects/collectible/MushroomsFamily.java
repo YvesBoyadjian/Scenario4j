@@ -5,6 +5,7 @@ import jscenegraph.coin3d.inventor.nodes.SoVertexProperty;
 import jscenegraph.coin3d.shaders.inventor.nodes.SoShaderProgram;
 import jscenegraph.database.inventor.SbVec3f;
 import jscenegraph.database.inventor.actions.SoGLRenderAction;
+import jscenegraph.database.inventor.engines.SoElapsedTime;
 import jscenegraph.database.inventor.fields.SoMFVec3f;
 import jscenegraph.database.inventor.nodes.*;
 
@@ -30,6 +31,8 @@ public class MushroomsFamily extends ThreeDObjectFamilyBase implements ThreeDObj
     SoMFVec3f mushroomsCoords = new SoMFVec3f();
 
     boolean computed;
+
+    SoElapsedTime elapsedTime = new SoElapsedTime();
 
     SoFile file = new SoFile() {
         @Override
@@ -92,9 +95,9 @@ public class MushroomsFamily extends ThreeDObjectFamilyBase implements ThreeDObj
 
             float distance = p2.operator_minus(p1).length();
 
-            float lambda = 1.0f;
+            float lambda = 0.5f;
 
-            for (float curviligne=0; curviligne<distance;curviligne += 5.0f) {
+            for (float curviligne=0; curviligne<distance;curviligne += 8.0f) {
                 float alpha = curviligne/distance;
                 float beta = 1 - alpha;
 
@@ -141,10 +144,16 @@ public class MushroomsFamily extends ThreeDObjectFamilyBase implements ThreeDObj
         scaleFactors = new float[polylinePointsSize];
         nodes = new SoNode[polylinePointsSize];
 
+        SoRotationXYZ rotXYZ = new SoRotationXYZ();
+
+        rotXYZ.axis.setValue(SoRotationXYZ.Axis.Z);
+
+        rotXYZ.angle.connectFrom(elapsedTime.timeOut);
+
         for (int i=0; i<polylinePointsSize; i++) {
             mushroomsCoords.set1Value(i,polylinePointsOnLand.get(i));
             addInstance(i);
-            scaleFactors[i] = ((float)Math.pow(randomS.nextFloat(),6)+0.05f) * MUSHROOM_SCALE_FACTOR * 20;
+            scaleFactors[i] = ((float)Math.pow(randomS.nextFloat(),6)+0.5f) * MUSHROOM_SCALE_FACTOR * 2;
             SoSeparator node = new SoSeparator();
 
             node.ref();
@@ -153,6 +162,8 @@ public class MushroomsFamily extends ThreeDObjectFamilyBase implements ThreeDObj
             scale.scaleFactor.setValue(scaleFactors[i],scaleFactors[i],scaleFactors[i]);
 
             node.addChild(scale);
+
+            node.addChild(rotXYZ);
 
             node.addChild(file);
 
