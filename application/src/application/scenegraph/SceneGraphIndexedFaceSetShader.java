@@ -4016,6 +4016,10 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 		Properties props = new Properties();
 		
 		File loadPolyFile = new File(path);
+
+		if (!loadPolyFile.exists()) {
+			loadPolyFile = new File(path.substring(path.indexOf("/")+1));
+		}
 		
 		try {
 			InputStream in = new FileInputStream(loadPolyFile);
