@@ -3941,8 +3941,11 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 		List<SbVec3f> polylinePoints = polylinePointsMap.get(polylineName);
 		
 		polylinePoints.add(new SbVec3f(polylinePoint));
-
-		polylineSwitch.whichChild.setValue(SoSwitch.SO_SWITCH_ALL);
+		
+		updateLineSets(polylineName, polylinePoints);
+	}
+	
+	private void updateLineSets(String polylineName, List<SbVec3f> polylinePoints){
 		
 		SoVertexProperty vertexProperty = new SoVertexProperty();
 		
@@ -3972,6 +3975,12 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 		for (SoLineSet lineSet : polylineLineSetMap.values()) {
 			polylineGroup.addChild(lineSet);
 		}
+		if (polylineGroup.getNumChildren() == 0) {
+			polylineSwitch.whichChild.setValue(SoSwitch.SO_SWITCH_NONE);
+		}
+		else {
+			polylineSwitch.whichChild.setValue(SoSwitch.SO_SWITCH_ALL);
+		}
 	}
 	
 	public void removeAllPolylinePoints(String polylineName) {
@@ -3981,8 +3990,8 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 		List<SbVec3f> polylinePoints = polylinePointsMap.get(polylineName);
 		
 		polylinePoints.clear();
-
-		polylineSwitch.whichChild.setValue(SoSwitch.SO_SWITCH_NONE);
+		
+		updateLineSets(polylineName, polylinePoints);
 	}
 	
 	public List<SbVec3f> getPolylinePoints(String polylineName) {

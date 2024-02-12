@@ -83,6 +83,8 @@ import jsceneviewer.inventor.qt.viewers.SoQtFullViewer.BuildFlag;
  * 
  */
 public class View3DPart {
+	
+	private static final String EDITED_POLYLINE_NAME = "editedPolyline";
 
 	private TableViewer tableViewer;
 	
@@ -259,7 +261,7 @@ public class View3DPart {
 					else {
 						SbVec3f i = new SbVec3f(pp.getPoint().operator_minus(sg.getTranslation()));
 						i.setZ(i.getZ()+20f);
-						sg.addPolylinePoint(i);
+						sg.addPolylinePoint(EDITED_POLYLINE_NAME,i);
 						System.out.println("x = "+i.getX()+", y = "+i.getY()+", z = "+i.getZ());
 					}
 					fireAction.destructor();					
@@ -567,7 +569,7 @@ public class View3DPart {
 	}
 	
 	private void erasePolyline() {		
-		sg.removeAllPolylinePoints();		
+		sg.removeAllPolylinePoints(EDITED_POLYLINE_NAME);		
 	}
 	
 	private void togglePolylineDraw() {
@@ -586,7 +588,7 @@ public class View3DPart {
 	}
 	
 	private void savePolyline(Composite parent) {
-		List<SbVec3f> points = sg.getPolylinePoints();
+		List<SbVec3f> points = sg.getPolylinePoints(EDITED_POLYLINE_NAME);
 		FileDialog fd = new FileDialog(parent.getShell(), SWT.SAVE);
 		String[] extensions = new String[1];
 		extensions[0] = "*.poly";
