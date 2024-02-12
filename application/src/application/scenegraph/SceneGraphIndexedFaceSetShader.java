@@ -375,6 +375,8 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 	private final Map<String,SoLineSet> polylineLineSetMap = new HashMap<>();
 	
 	private final Map<String,List<SbVec3f>> polylinePointsMap = new HashMap<>();
+
+	private boolean showPolylines = false;
 	
 	private SoShaderProgram onScreenShaderProgram;
 	
@@ -1329,6 +1331,8 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 		collectibleFamilies.add(new MushroomsFamily(this, getPolylinePoints("PathToTheSeals2.poly"), program2));
 		loadPolyline("application/ressource/PathToTheSeals3.poly");
 		collectibleFamilies.add(new MushroomsFamily(this, getPolylinePoints("PathToTheSeals3.poly"), program2));
+		loadPolyline("application/ressource/PathToTheSeals4.poly");
+		collectibleFamilies.add(new MushroomsFamily(this, getPolylinePoints("PathToTheSeals4.poly"), program2));
 
 		for( ThreeDObjectFamily collectibleFamily : collectibleFamilies) {
 
@@ -3975,12 +3979,17 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 		for (SoLineSet lineSet : polylineLineSetMap.values()) {
 			polylineGroup.addChild(lineSet);
 		}
-		if (polylineGroup.getNumChildren() == 0) {
+		if (polylineGroup.getNumChildren() == 0 || !showPolylines) {
 			polylineSwitch.whichChild.setValue(SoSwitch.SO_SWITCH_NONE);
 		}
 		else {
 			polylineSwitch.whichChild.setValue(SoSwitch.SO_SWITCH_ALL);
 		}
+	}
+
+	public void showPolylines(boolean showPolylines) {
+		this.showPolylines = showPolylines;
+		updatePolylineGroup();
 	}
 	
 	public void removeAllPolylinePoints(String polylineName) {
