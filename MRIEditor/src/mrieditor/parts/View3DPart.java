@@ -144,6 +144,18 @@ public class View3DPart {
 			
 		});
 		
+		Button button7 = new Button(upperToolBar, SWT.PUSH);
+		button7.setText("Erase Polyline");
+		
+		button7.addSelectionListener(new SelectionAdapter() {
+			
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				erasePolyline();
+			}
+			
+		});
+		
 		Button button4 = new Button(upperToolBar, SWT.TOGGLE);
 		button4.setText("Polyline Draw");
 		
@@ -554,6 +566,10 @@ public class View3DPart {
 		}
 	}
 	
+	private void erasePolyline() {		
+		sg.removeAllPolylinePoints();		
+	}
+	
 	private void togglePolylineDraw() {
 		polylineDraw = !polylineDraw;
 		
@@ -561,8 +577,6 @@ public class View3DPart {
 			walkViewer.getGLWidget().addMouseListener(polylineDrawMouseListener);
 			walkViewer.setViewing(false);
 			setEventCallback(false);
-			
-			sg.removeAllPolylinePoints();
 		}
 		else {
 			walkViewer.getGLWidget().removeMouseListener(polylineDrawMouseListener);
