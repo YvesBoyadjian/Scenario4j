@@ -329,7 +329,7 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 
     BootsFamily boots;
 
-	MushroomsFamily mushrooms;
+	//MushroomsFamily mushrooms;
 
 	boolean softShadows = true;
 
@@ -370,16 +370,11 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 	private final SoSeparator polylineSep = new SoSeparator();
 	
 	private final SoSwitch polylineSwitch = new SoSwitch();
+	private final SoGroup polylineGroup = new SoGroup();
+
+	private final Map<String,SoLineSet> polylineLineSetMap = new HashMap<>();
 	
-	private final SoLineSet polylineLineSet = new SoLineSet() {
-		public void
-		GLRender(SoGLRenderAction action) {
-			super.GLRender(action);
-		}
-		
-	};
-	
-	private final List<SbVec3f> polylinePoints = new ArrayList<>();
+	private final Map<String,List<SbVec3f>> polylinePointsMap = new HashMap<>();
 	
 	private SoShaderProgram onScreenShaderProgram;
 	
@@ -1329,8 +1324,11 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 		collectibleFamilies.add(boots);
 
 		loadPolyline("application/ressource/PathToTheSeals1.1.poly");
-		mushrooms = new MushroomsFamily(this, getPolylinePoints(), program2);
-		collectibleFamilies.add(mushrooms);
+		collectibleFamilies.add(new MushroomsFamily(this, getPolylinePoints("PathToTheSeals1.1.poly"), program2));
+		loadPolyline("application/ressource/PathToTheSeals2.poly");
+		collectibleFamilies.add(new MushroomsFamily(this, getPolylinePoints("PathToTheSeals2.poly"), program2));
+		loadPolyline("application/ressource/PathToTheSeals3.poly");
+		collectibleFamilies.add(new MushroomsFamily(this, getPolylinePoints("PathToTheSeals3.poly"), program2));
 
 		for( ThreeDObjectFamily collectibleFamily : collectibleFamilies) {
 
@@ -1606,8 +1604,10 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 		// ____________________________________________________ Polyline
 	    
 	    polylineSwitch.addChild(program2);
+
+		polylineSwitch.addChild(polylineGroup);
 		
-		polylineSwitch.addChild(polylineLineSet);
+		//polylineSwitch.addChild(polylineLineSet);
 		
 		//polylineSwitch.addChild(onScreenShaderProgram);
 		
@@ -3934,7 +3934,11 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 		}
 	}
 	
-	public void addPolylinePoint(SbVec3f polylinePoint) {
+	public void addPolylinePoint(String polylineName, SbVec3f polylinePoint) {
+
+		polylinePointsMap.putIfAbsent(polylineName, new ArrayList<>());
+
+		List<SbVec3f> polylinePoints = polylinePointsMap.get(polylineName);
 		
 		polylinePoints.add(new SbVec3f(polylinePoint));
 
@@ -3948,20 +3952,41 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 			vertexProperty.vertex.set1Value(i, polylinePoints.get(i));
 		}
 		vertexProperty.vertex.setNum(polylinePointsSize);
-		
+
+		SoLineSet polylineLineSet = polylineLineSetMap.get(polylineName);
+
+		if (polylineLineSet == null) {
+			polylineLineSet = new SoLineSet();
+			polylineLineSet.ref();
+			polylineLineSetMap.put(polylineName, polylineLineSet);
+		}
+
 		polylineLineSet.numVertices.set1Value(0, polylinePointsSize);
 		polylineLineSet.vertexProperty.setValue(vertexProperty);
+
+		updatePolylineGroup();
+	}
+
+	void updatePolylineGroup() {
+		polylineGroup.removeAllChildren();
+		for (SoLineSet lineSet : polylineLineSetMap.values()) {
+			polylineGroup.addChild(lineSet);
+		}
 	}
 	
-	public void removeAllPolylinePoints() {
+	public void removeAllPolylinePoints(String polylineName) {
+
+		polylinePointsMap.putIfAbsent(polylineName, new ArrayList<>());
+
+		List<SbVec3f> polylinePoints = polylinePointsMap.get(polylineName);
 		
 		polylinePoints.clear();
 
 		polylineSwitch.whichChild.setValue(SoSwitch.SO_SWITCH_NONE);
 	}
 	
-	public List<SbVec3f> getPolylinePoints() {
-		return new ArrayList<>(polylinePoints);
+	public List<SbVec3f> getPolylinePoints(String polylineName) {
+		return new ArrayList<>(polylinePointsMap.get(polylineName));
 	}
 	
 	public SoShaderProgram getonScreenShaderProgram() {
@@ -3985,8 +4010,11 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 			if (numPoints == null) {
 				return;
 			}
+
+			String polylineName = loadPolyFile.getName();
+			System.out.println(polylineName);
 							
-			removeAllPolylinePoints();
+			removeAllPolylinePoints(polylineName);
 			
 			int n = Integer.valueOf(numPoints);
 			for (int i=0; i<n; i++) {
@@ -4004,7 +4032,7 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 				
 				SbVec3f point = new SbVec3f(xf,yf,zf);
 				
-				addPolylinePoint(point);
+				addPolylinePoint(polylineName,point);
 			}
 			
 		} catch (IOException e) {
