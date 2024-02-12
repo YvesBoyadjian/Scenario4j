@@ -1323,8 +1323,8 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 		boots.setSpin(!haveBoots);
 		collectibleFamilies.add(boots);
 
-		loadPolyline("application/ressource/PathToTheSeals1.1.poly");
-		collectibleFamilies.add(new MushroomsFamily(this, getPolylinePoints("PathToTheSeals1.1.poly"), program2));
+		loadPolyline("application/ressource/PathToTheSeals1.2.poly");
+		collectibleFamilies.add(new MushroomsFamily(this, getPolylinePoints("PathToTheSeals1.2.poly"), program2));
 		loadPolyline("application/ressource/PathToTheSeals2.poly");
 		collectibleFamilies.add(new MushroomsFamily(this, getPolylinePoints("PathToTheSeals2.poly"), program2));
 		loadPolyline("application/ressource/PathToTheSeals3.poly");
