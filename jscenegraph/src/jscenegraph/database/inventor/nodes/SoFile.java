@@ -92,6 +92,7 @@ import java.net.URI;
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
+import java.nio.ShortBuffer;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
 import java.util.*;
@@ -447,15 +448,17 @@ private static Path findFileWithExtension(Path parentPath, String extension, boo
                 if (materialModel instanceof MaterialModelV2) {
                     MaterialModelV2 materialModelV2 = (MaterialModelV2) materialModel;
                     TextureModel baseColorTexture = materialModelV2.getBaseColorTexture();
-                    ImageModel imageModel = baseColorTexture.getImageModel();
-                    String imageURI = imageModel.getUri();
+                    if (baseColorTexture != null) {
+                        ImageModel imageModel = baseColorTexture.getImageModel();
+                        String imageURI = imageModel.getUri();
 
-                    Path rootDir = gltf.getParent();
-                    Path imagePath = rootDir.resolve(imageURI);
-                    SoTexture2 texture = textureFromPath(imagePath,false);
+                        Path rootDir = gltf.getParent();
+                        Path imagePath = rootDir.resolve(imageURI);
+                        SoTexture2 texture = textureFromPath(imagePath, false);
 
-                    f.children.append(texture);
-                    System.out.println("");
+                        f.children.append(texture);
+                        System.out.println("");
+                    }
                 }
             }
             List<SceneModel> sceneModels = gltfModel.getSceneModels();
@@ -629,7 +632,7 @@ private static Path findFileWithExtension(Path parentPath, String extension, boo
                                     positionsData != null &&
                                     normalsData != null &&
                                     texCoordsData != null &&
-                                    Objects.equals(indiceDataType, int.class) &&
+                                    (Objects.equals(indiceDataType, int.class) || Objects.equals(indiceDataType, short.class)) &&
                                     Objects.equals(positionDataType, float.class) &&
                                     Objects.equals(normalDataType, float.class) &&
                                     Objects.equals(texCoordDataType, float.class)) {
@@ -638,19 +641,37 @@ private static Path findFileWithExtension(Path parentPath, String extension, boo
                         ByteBuffer normalsBuffer = normalsData.createByteBuffer();
                         ByteBuffer texCoordsBuffer = texCoordsData.createByteBuffer();
                         if (indicesBuffer != null && positionsBuffer != null && normalsBuffer != null && texCoordsBuffer != null) {
-                            IntBuffer indicesIntBuffer = indicesBuffer.asIntBuffer();
+
                             FloatBuffer positionsFloatBuffer = positionsBuffer.asFloatBuffer();
                             FloatBuffer normalsFloatBuffer = normalsBuffer.asFloatBuffer();
                             FloatBuffer texCoordsFloatBuffer = texCoordsBuffer.asFloatBuffer();
 
-                            int numIndices = indicesIntBuffer.remaining();
-                            int numTriangles = numIndices/3;
-                            int[] indicesArray = new int[numTriangles*4];
-                            for(int triangle = 0 ; triangle < numTriangles; triangle++) {
-                                indicesArray[triangle*4] = indicesIntBuffer.get(triangle*3);
-                                indicesArray[triangle*4+1] = indicesIntBuffer.get(triangle*3+1);
-                                indicesArray[triangle*4+2] = indicesIntBuffer.get(triangle*3+2);
-                                indicesArray[triangle*4+3] = -1;
+                            int[] indicesArray = null;
+                            if(Objects.equals(indiceDataType, int.class)) {
+                                IntBuffer indicesIntBuffer = indicesBuffer.asIntBuffer();
+
+                                int numIndices = indicesIntBuffer.remaining();
+                                int numTriangles = numIndices / 3;
+                                indicesArray = new int[numTriangles * 4];
+                                for (int triangle = 0; triangle < numTriangles; triangle++) {
+                                    indicesArray[triangle * 4] = indicesIntBuffer.get(triangle * 3);
+                                    indicesArray[triangle * 4 + 1] = indicesIntBuffer.get(triangle * 3 + 1);
+                                    indicesArray[triangle * 4 + 2] = indicesIntBuffer.get(triangle * 3 + 2);
+                                    indicesArray[triangle * 4 + 3] = -1;
+                                }
+                            }
+                            else if (Objects.equals(indiceDataType, short.class)) {
+                                ShortBuffer indicesIntBuffer = indicesBuffer.asShortBuffer();
+
+                                int numIndices = indicesIntBuffer.remaining();
+                                int numTriangles = numIndices / 3;
+                                indicesArray = new int[numTriangles * 4];
+                                for (int triangle = 0; triangle < numTriangles; triangle++) {
+                                    indicesArray[triangle * 4] = shortToInt(indicesIntBuffer.get(triangle * 3));
+                                    indicesArray[triangle * 4 + 1] = shortToInt(indicesIntBuffer.get(triangle * 3 + 1));
+                                    indicesArray[triangle * 4 + 2] = shortToInt(indicesIntBuffer.get(triangle * 3 + 2));
+                                    indicesArray[triangle * 4 + 3] = -1;
+                                }
                             }
 
                             float[] positionsArray = new float[positionsFloatBuffer.remaining()];
@@ -682,6 +703,10 @@ private static Path findFileWithExtension(Path parentPath, String extension, boo
             group.addChild(recursiveAddNode(f, child));
         }
         return group;
+    }
+
+    private static int shortToInt(short shortValue) {
+        return Short.toUnsignedInt(shortValue);
     }
 
     private static ByteBuffer pathToByteBuffer(Path path) {
