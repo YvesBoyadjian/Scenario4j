@@ -24,10 +24,12 @@
 
 package jscenegraph.coin3d.inventor.elements;
 
+import jscenegraph.coin3d.inventor.elements.gl.SoGLMultiTextureImageElement;
 import jscenegraph.coin3d.inventor.lists.SbList;
 import jscenegraph.coin3d.inventor.lists.SbListOfMutableRefs;
 import jscenegraph.database.inventor.SbColor;
 import jscenegraph.database.inventor.SbVec2s;
+import jscenegraph.database.inventor.SbVec3fSingleFast;
 import jscenegraph.database.inventor.SbVec3s;
 import jscenegraph.database.inventor.elements.SoElement;
 import jscenegraph.database.inventor.misc.SoState;
@@ -127,7 +129,7 @@ public class SoMultiTextureImageElement extends SoElement {
 	  public MemoryBuffer bytes;
 	  public SoMultiTextureImageElement.Wrap wrapS, wrapT, wrapR;
 	  public SoMultiTextureImageElement.Model model;
-	  public final SbColor blendColor = new SbColor();
+	  public final /*SbColor*/ SbVec3fSingleFast blendColor = new /*SbColor*/SbVec3fSingleFast();
 	  
 	  public UnitData() {
 	   nodeid = 0;
@@ -166,9 +168,10 @@ public class SoMultiTextureImageElement extends SoElement {
 	  public
 	    void ensureCapacity(int unit) {
 	      while (unit >= this.unitdata.getLength()) {
-	        this.unitdata.append(new SoMultiTextureImageElement.UnitData());
+	        this.unitdata.append(defaultdata);
 	      }
 	    }
+	    final SoMultiTextureImageElement.UnitData defaultdata = new SoMultiTextureImageElement.UnitData();
 	    final SbListOfMutableRefs<SoMultiTextureImageElement.UnitData> unitdata = new SbListOfMutableRefs<>(()->new SoMultiTextureImageElement.UnitData());
 	  };
 
@@ -504,7 +507,7 @@ ud.blendColor.copyFrom(blendColor);
 /*!
 FIXME: write doc.
 */
-public SbColor 
+public /*SbColor*/SbVec3fSingleFast
 getBlendColor(SoState state, int unit)
 {
 SoMultiTextureImageElement elem =

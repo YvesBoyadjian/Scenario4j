@@ -87,7 +87,7 @@ public class SoGLMultiTextureImageElement extends SoMultiTextureImageElement {
 			  public
 				  void ensureCapacity(int unit) {
 				    while (unit >= this.unitdata.getLength()) {
-				      this.unitdata.append(new SoGLMultiTextureImageElement.GLUnitData());
+				      this.unitdata.append(defaultdata/*new SoGLMultiTextureImageElement.GLUnitData()*/);
 				    }
 				  }
 

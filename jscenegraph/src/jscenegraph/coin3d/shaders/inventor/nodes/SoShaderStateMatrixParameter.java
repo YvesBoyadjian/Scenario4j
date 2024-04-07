@@ -234,7 +234,7 @@ updateValue(SoState state)
   case TRANSPOSE: value.copyFrom(matrix.transpose()); break;
   case INVERSE: value.copyFrom(matrix.inverse()); break;
   case INVERSE_TRANSPOSE: value.copyFrom(matrix.inverse().transpose()); break;
-      case INVERSE_TRANSPOSE_3: value.copyFrom(matrix.inverse().transpose());
+      case INVERSE_TRANSPOSE_3: value.copyFrom(matrix.inverse(value).transpose(value));
       value.getValueLinear3(valueLinear3);
       break;
   default: assert(false);// && "illegal matrix transform type"); break;

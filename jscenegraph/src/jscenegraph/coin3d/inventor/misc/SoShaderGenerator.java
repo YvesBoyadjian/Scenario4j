@@ -16,12 +16,12 @@ public class SoShaderGenerator {
 
 		  String version;
 		  String defines;
-		  String declarations;
+		  StringBuilder declarations;
 		  String functions;
 		  StringBuilder main;
 		  
 		  boolean dirty;
-		  String combined;
+		  StringBuilder combined;
 		  
 		  /*!
 		  Constructor.
@@ -45,10 +45,10 @@ public class SoShaderGenerator {
 			  this.dirty = true;
 		  this.version = "";//.makeEmpty(freeoldstrings);
 		  this.defines = "";//.makeEmpty(freeoldstrings);
-		  this.declarations = "";//.makeEmpty(freeoldstrings);
+		  this.declarations = new StringBuilder();//.makeEmpty(freeoldstrings);
 		  this.functions = "";//.makeEmpty(freeoldstrings);
 		  this.main = new StringBuilder(1024);//.makeEmpty(freeoldstrings);
-		  this.combined = "";//.makeEmpty(freeoldstrings);
+		  this.combined = new StringBuilder();//.makeEmpty(freeoldstrings);
 		}
 
 
@@ -79,10 +79,10 @@ public class SoShaderGenerator {
 		public void 
 		addDeclaration( String str,  boolean checkexists)
 		{
-		  if (!checkexists || (SbString.find(this.declarations,str) < 0)) {
+		  if (!checkexists || (SbString.find(this.declarations.toString(),str) < 0)) {
 		    this.dirty = true;
-		    this.declarations += str;
-		    this.declarations += "\n";
+		    this.declarations.append(str);
+		    this.declarations.append("\n");
 		  }
 		}
 
@@ -141,17 +141,17 @@ public class SoShaderGenerator {
 		{
 		  if (this.dirty) {
 			  this.dirty = false;
-		    this.combined = "";//.makeEmpty(false);
-		    this.combined += this.version;
-		    this.combined += this.defines;
+		    this.combined = new StringBuilder();//.makeEmpty(false);
+		    this.combined.append(this.version);
+		    this.combined.append(this.defines);
 		  
-		    this.combined += this.declarations;
-		    this.combined += this.functions;
-		    this.combined += "void main(void) {\n";
-		    this.combined += this.main.toString();
-		    this.combined += "}\n";
+		    this.combined.append(this.declarations.toString());
+		    this.combined.append(this.functions);
+		    this.combined.append("void main(void) {\n");
+		    this.combined.append(this.main.toString());
+		    this.combined.append("}\n");
 		  }
-		  return this.combined;
+		  return this.combined.toString();
 		}
 		  
 }

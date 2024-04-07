@@ -280,7 +280,34 @@ public class SbMatrix implements Mutable {
 	  		float[][] m = other.matrix;
 	  		setValue(m);
 	  	}
-	  	
+
+
+	private void setValue(float a11, float a12, float a13, float a14,
+						  float a21, float a22, float a23, float a24,
+						  float a31, float a32, float a33, float a34,
+						  float a41, float a42, float a43, float a44) {
+
+		matrix[0][0] = a11;
+		matrix[0][1] = a12;
+		matrix[0][2] = a13;
+		matrix[0][3] = a14;
+
+		matrix[1][0] = a21;
+		matrix[1][1] = a22;
+		matrix[1][2] = a23;
+		matrix[1][3] = a24;
+
+		matrix[2][0] = a31;
+		matrix[2][1] = a32;
+		matrix[2][2] = a33;
+		matrix[2][3] = a34;
+
+		matrix[3][0] = a41;
+		matrix[3][1] = a42;
+		matrix[3][2] = a43;
+		matrix[3][3] = a44;
+	}
+
 	  	// Sets value from 4x4 array of elements. 
 	  	public void setValue(float[][] m) {
 	  	     matrix[0][0] = m[0][0];
@@ -501,7 +528,7 @@ inverse(SbMatrix dummy)
 
     // Affine case...
     final SbMatrix affineAnswer = dummy;//new SbMatrix();
-    if (  affine_inverse( new SbMatrix(matrix), affineAnswer ) )
+    if (  affine_inverse( this, affineAnswer ) )
         return affineAnswer;
 
     int[]         index = new int[4];
@@ -1500,6 +1527,16 @@ transpose()
                     matrix[0][3], matrix[1][3], matrix[2][3], matrix[3][3]);
 }
 
+	public SbMatrix
+	transpose(final SbMatrix dummy)
+	{
+		dummy.setValue(matrix[0][0], matrix[1][0], matrix[2][0], matrix[3][0],
+				matrix[0][1], matrix[1][1], matrix[2][1], matrix[3][1],
+				matrix[0][2], matrix[1][2], matrix[2][2], matrix[3][2],
+				matrix[0][3], matrix[1][3], matrix[2][3], matrix[3][3]);
+
+		return dummy;
+	}
 
 //
 // Composes the matrix from translation, rotation, scale, etc.
