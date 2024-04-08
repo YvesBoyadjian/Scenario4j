@@ -473,7 +473,7 @@ public class SoState implements Destroyable {
 		pimpl.depth--;
 		int n = pimpl.pushstore.elements.getLength();
 		if (n != 0) {
-    IntArrayPtr array = pimpl.pushstore.elements.getArrayPtr();
+    /*IntArrayPtr*/SbListInt array = pimpl.pushstore.elements/*.getArrayPtr()*/;
 			for (int i = n-1; i >= 0; i--) {
 				int idx = array.get(i);
 				SoElement elem = this.stack[idx];

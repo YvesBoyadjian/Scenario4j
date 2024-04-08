@@ -54,11 +54,7 @@
 
 package jscenegraph.database.inventor.nodes;
 
-import jscenegraph.database.inventor.SbMatrix;
-import jscenegraph.database.inventor.SbRotation;
-import jscenegraph.database.inventor.SbVec3f;
-import jscenegraph.database.inventor.SbVec3fSingle;
-import jscenegraph.database.inventor.SoType;
+import jscenegraph.database.inventor.*;
 import jscenegraph.database.inventor.actions.SoAction;
 import jscenegraph.database.inventor.actions.SoCallbackAction;
 import jscenegraph.database.inventor.actions.SoGLRenderAction;
@@ -169,7 +165,7 @@ public class SoRotationXYZ extends SoTransformation {
 	            return SbRotation.identity();
 
 	        else {
-	            final SbVec3fSingle         ax = new SbVec3fSingle(0.0f, 0.0f, 0.0f);
+	            final SbVec3fSingleFast ax = new SbVec3fSingleFast(0.0f, 0.0f, 0.0f);
 	            final SbRotation      rot = new SbRotation();
 
 	            switch (Axis.values()[axis.getValue()]) {

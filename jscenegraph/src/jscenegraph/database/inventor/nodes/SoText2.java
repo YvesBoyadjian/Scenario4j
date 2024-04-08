@@ -60,15 +60,7 @@ import java.nio.ShortBuffer;
 import com.jogamp.opengl.GL2;
 
 import jscenegraph.coin3d.inventor.elements.SoGLMultiTextureEnabledElement;
-import jscenegraph.database.inventor.SbBox3f;
-import jscenegraph.database.inventor.SbMatrix;
-import jscenegraph.database.inventor.SbVec2s;
-import jscenegraph.database.inventor.SbVec3f;
-import jscenegraph.database.inventor.SbVec3fSingle;
-import jscenegraph.database.inventor.SbVec4f;
-import jscenegraph.database.inventor.SbViewportRegion;
-import jscenegraph.database.inventor.SoPickedPoint;
-import jscenegraph.database.inventor.SoType;
+import jscenegraph.database.inventor.*;
 import jscenegraph.database.inventor.actions.SoAction;
 import jscenegraph.database.inventor.actions.SoGLRenderAction;
 import jscenegraph.database.inventor.actions.SoRayPickAction;
@@ -289,12 +281,12 @@ toObjectSpace(final SbVec3f pixel, final SbMatrix matrix,
 {
     // Viewport transformation, to normalized device coordinates:
     SbVec2s vpSize = vpr.getViewportSizePixels();
-    final SbVec3fSingle ndc = new SbVec3fSingle();
-    ndc.getValue()[0] = pixel.getValueRead()[0]*2.0f/vpSize.getValue()[0] - 1.0f;
-    ndc.getValue()[1] = pixel.getValueRead()[1]*2.0f/vpSize.getValue()[1] - 1.0f;
-    ndc.getValue()[2] = pixel.getValueRead()[2];
+    final SbVec3fSingleFast ndc = new SbVec3fSingleFast();
+    ndc.getValue()[0] = pixel.getX()*2.0f/vpSize.getValue()[0] - 1.0f;
+    ndc.getValue()[1] = pixel.getY()*2.0f/vpSize.getValue()[1] - 1.0f;
+    ndc.getValue()[2] = pixel.getZ();
 
-    final SbVec3f result = new SbVec3f();
+    final SbVec3f result = new SbVec3fSingleFast();
     matrix.multVecMatrix(ndc, result);
 
     return result;

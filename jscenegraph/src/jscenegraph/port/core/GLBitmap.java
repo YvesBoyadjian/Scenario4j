@@ -26,6 +26,8 @@ public class GLBitmap {
 
     private final static SbVec2fArray tcArray = new SbVec2fArray(FloatMemoryBuffer.allocateFloats(2 * 6));
 
+    private final static SbColor black = new SbColor(0.0f, 0.0f, 0.0f);
+
     public static void glBitmap(
             SoState state,
             SoNode node,
@@ -61,7 +63,7 @@ public class GLBitmap {
                 0,
                 image,
                 SoMultiTextureImageElement.Model.MODULATE,
-                new SbColor(0.0f, 0.0f, 0.0f)
+                black
         );
 
         SoGLMultiTextureEnabledElement.set(state,node,0,true);
@@ -71,10 +73,10 @@ public class GLBitmap {
         float xScreenEnd = xScreenStart + width;
         float yScreenEnd = yScreenStart + height;
 
-        SbVec3f a = new SbVec3fSingle(xScreenStart,yScreenStart,-1);
-        SbVec3f b = new SbVec3fSingle(xScreenEnd,yScreenStart,-1);
-        SbVec3f c = new SbVec3fSingle(xScreenStart,yScreenEnd,-1);
-        SbVec3f d = new SbVec3fSingle(xScreenEnd,yScreenEnd,-1);
+        SbVec3f a = new SbVec3fSingleFast(xScreenStart,yScreenStart,-1);
+        SbVec3f b = new SbVec3fSingleFast(xScreenEnd,yScreenStart,-1);
+        SbVec3f c = new SbVec3fSingleFast(xScreenStart,yScreenEnd,-1);
+        SbVec3f d = new SbVec3fSingleFast(xScreenEnd,yScreenEnd,-1);
 
         a = transformer.transform(a);
         b = transformer.transform(b);

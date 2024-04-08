@@ -181,7 +181,7 @@ public class SbRotation implements Mutable {
 //
 // Use: public
 
-    private final SbVec3fSingle     q = new SbVec3fSingle(); // SINGLE_THREAD
+    private final SbVec3fSingleFast     q = new SbVec3fSingleFast(); // SINGLE_THREAD
     
 public void
 getValue(final SbVec3f axis, final float[] radians)
@@ -268,7 +268,7 @@ getValue(final SbVec3f axis, final float[] radians)
 	// Sets value of vector from 3D rotation axis vector and angle in radians. 
 	public SbRotation setValue(SbVec3f axis, float radians) {
 		
-		  final SbVec3f q = new SbVec3f();
+		  final SbVec3f q = new SbVec3fSingleFast();
 		   
 		    q.copyFrom(axis);
 		    q.normalize();

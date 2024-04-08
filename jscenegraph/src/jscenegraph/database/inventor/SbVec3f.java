@@ -464,7 +464,7 @@ operator_minus_equal(SbVec3f v)
 	// Component-wise binary scalar multiplication operator. 
 	public SbVec3f operator_mul(float d) {
 		SbVec3f v = this;
-	     return new SbVec3f(v.g(0) * d,
+	     return new SbVec3fSingleFast(v.g(0) * d,
 	    		                     v.g(1) * d,
 	    		                     v.g(2) * d);
 	    		  	}
@@ -484,7 +484,7 @@ operator_minus_equal(SbVec3f v)
 	   
 	  public SbVec3f operator_add(SbVec3f v2) {
 		  SbVec3f v1 = this;
-		     return new SbVec3f(v1.g(0) + v2.g(0),
+		     return new SbVec3fSingleFast(v1.g(0) + v2.g(0),
 		    		                     v1.g(1) + v2.g(1),
 		    		                     v1.g(2) + v2.g(2));
 		    		  	}
@@ -495,7 +495,7 @@ operator_minus_equal(SbVec3f v)
 	   
 	  public SbVec3f operator_minus(SbVec3f v2) {
 		  SbVec3f v1 = this;
-		     return new SbVec3f(v1.g(0) - v2.g(0),
+		     return new SbVec3fSingleFast(v1.g(0) - v2.g(0),
 		    		                      v1.g(1) - v2.g(1),
 		    		                      v1.g(2) - v2.g(2));		    		  		  
 	  }
@@ -513,7 +513,7 @@ operator_minus_equal(SbVec3f v)
 	// Nondestructive unary negation - returns a new vector
 	//
 	  public SbVec3f operator_minus() {
-		  return new SbVec3f(-g(0), -g(1), -g(2));
+		  return new SbVec3fSingleFast(-g(0), -g(1), -g(2));
 	  }
 
 	  //

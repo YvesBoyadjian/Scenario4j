@@ -163,12 +163,14 @@ public class SoGLRenderAction extends SoAction implements Destroyable {
           NONE, // COIN 3D
           SORTED_LAYERS_BLEND; // COIN 3D
 
+        private static final TransparencyType[] values = values();
+
            public int getValue() {
         	   return ordinal();
            }
 
 		public static TransparencyType fromValue(int value) {
-			return values()[value];
+			return values[value];
 		}
       };
 

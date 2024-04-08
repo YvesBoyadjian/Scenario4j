@@ -7,6 +7,7 @@ import application.scenegraph.douglas.IndexedFaceSetParameters;
 import jscenegraph.coin3d.inventor.nodes.SoVertexProperty;
 import jscenegraph.database.inventor.SbBox3f;
 import jscenegraph.database.inventor.SbVec3f;
+import jscenegraph.database.inventor.SbVec3fSingleFast;
 import jscenegraph.database.inventor.actions.SoAction;
 import jscenegraph.database.inventor.actions.SoGLRenderAction;
 import jscenegraph.database.inventor.elements.SoGLCacheContextElement;
@@ -117,9 +118,9 @@ public class SoLODIndexedFaceSet extends /*SoIndexedFaceSet*/SoGroup {
 		}
 		else {
 
-			SbVec3f closestPoint = new SbVec3f(finalBox.getClosestExternalPoint(referencePoint));
+			SbVec3f closestPoint = new SbVec3fSingleFast(finalBox.getClosestExternalPoint(referencePoint));
 
-			SbVec3f closestPoint2 = new SbVec3f(finalBox.getClosestExternalPoint(referencePoint2));
+			SbVec3f closestPoint2 = new SbVec3fSingleFast(finalBox.getClosestExternalPoint(referencePoint2));
 
 			if( closestPoint2.operator_minus(referencePoint2,dummy).length() <= 200 ) {
 				if(!load(true))

@@ -50,6 +50,8 @@ public class SoShaderStateMatrixParameter extends SoUniformShaderParameter {
 		    MODELVIEW_PROJECTION(3);
 		  
 		  private int value;
+
+          private static final MatrixType[] values = values();
 		  
 		  MatrixType(int value) {
 			  this.value = value;
@@ -60,7 +62,7 @@ public class SoShaderStateMatrixParameter extends SoUniformShaderParameter {
 			}
 
 			public static MatrixType fromValue(Integer value2) {
-				return values()[value2];
+				return values[value2];
 			}
 		  };
 
@@ -72,6 +74,8 @@ public class SoShaderStateMatrixParameter extends SoUniformShaderParameter {
               INVERSE_TRANSPOSE_3(4);
 
 			  private int value;
+
+              private static final MatrixTransform[] values = values();
 			  
 			  MatrixTransform(int value) {
 				  this.value = value;
@@ -80,7 +84,7 @@ public class SoShaderStateMatrixParameter extends SoUniformShaderParameter {
 				return value;
 			}
 			public static MatrixTransform fromValue(Integer value2) {
-				return values()[value2];
+				return values[value2];
 			}
 		  };
 

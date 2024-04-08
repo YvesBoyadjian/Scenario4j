@@ -5,6 +5,7 @@ import jscenegraph.coin3d.inventor.SbBSPTree;
 import jscenegraph.coin3d.inventor.lists.SbListInt;
 import jscenegraph.database.inventor.SbSphere;
 import jscenegraph.database.inventor.SbVec3f;
+import jscenegraph.database.inventor.SbVec3fSingleFast;
 import jscenegraph.database.inventor.actions.SoGLRenderAction;
 import jscenegraph.database.inventor.elements.SoCacheElement;
 import jscenegraph.database.inventor.misc.SoState;
@@ -68,6 +69,8 @@ public class So3DObjects extends SoSeparator {
         bspTree.addPoint(collectiblePosition,instance);
     }
 
+    final SbVec3f dummy = new SbVec3fSingleFast();
+
     void update_children_list() {
 
         nearSphere.setValue(referencePoint.operator_add(cameraDirection.operator_mul(collectible.getViewDistance()*0.0f)), collectible.getViewDistance());
@@ -119,7 +122,7 @@ public class So3DObjects extends SoSeparator {
         }
         for(int id : actualChildren) {
             So3DObject child = idxToCollectibles.get(id);
-            float distance = referencePoint.operator_minus(child.getCoordinates()).length();
+            float distance = referencePoint.operator_minus(child.getCoordinates(), dummy).length();
             nearestCollectibleDistance = Math.min(nearestCollectibleDistance,distance);
         }
         //System.out.println(nearestCollectibleDistance);

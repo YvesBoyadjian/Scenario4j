@@ -63,12 +63,7 @@ import jscenegraph.coin3d.inventor.elements.SoMultiTextureCoordinateElement;
 import jscenegraph.coin3d.inventor.elements.SoMultiTextureCoordinateElement.SoTextureCoordinateFunctionCB;
 import jscenegraph.coin3d.inventor.elements.SoMultiTextureEnabledElement;
 import jscenegraph.coin3d.inventor.elements.SoTextureUnitElement;
-import jscenegraph.database.inventor.SbBox3f;
-import jscenegraph.database.inventor.SbVec2f;
-import jscenegraph.database.inventor.SbVec3f;
-import jscenegraph.database.inventor.SbVec3fSingle;
-import jscenegraph.database.inventor.SbVec4f;
-import jscenegraph.database.inventor.SbVec4fSingle;
+import jscenegraph.database.inventor.*;
 import jscenegraph.database.inventor.actions.SoAction;
 import jscenegraph.database.inventor.actions.SoGLRenderAction;
 import jscenegraph.database.inventor.caches.SoBoundingBoxCache;
@@ -398,8 +393,8 @@ Destructor.
   }
   
   private SoShape shapenode; //ptr
-  private final SbVec3f defaultorigo = new SbVec3f();
-  private final SbVec3f defaultsize = new SbVec3f();
+  private final SbVec3f defaultorigo = new SbVec3fSingleFast();
+  private final SbVec3f defaultsize = new SbVec3fSingleFast();
   private final SbVec4fSingle dummyInstance = new SbVec4fSingle();
   private int defaultdim0, defaultdim1;
   

@@ -84,8 +84,8 @@ SbXfBox3f, SbBox2f, SbBox2s, SbVec3f, SbVec2f, SbVec2s, SbMatrix, SoGetBoundingB
  */
 public class SbBox3f implements Mutable {
 
-	private final SbVec3fSingle min = new SbVec3fSingle();
-	private final SbVec3fSingle max = new SbVec3fSingle();
+	private final SbVec3fSingleFast min = new SbVec3fSingleFast();
+	private final SbVec3fSingleFast max = new SbVec3fSingleFast();
 
 	public SbBox3f() {
 		makeEmpty();
@@ -172,7 +172,7 @@ public class SbBox3f implements Mutable {
 	}
 
 	// Returns the center of the box.
-	public void getCenter(SbVec3fSingle center) {
+	public void getCenter(SbVec3fSingleFast center) {
 	     center.setValue(0.5f * (min.getX() + max.getX()),
 	    		                       0.5f * (min.getY() + max.getY()),
 	    		                       0.5f * (min.getZ() + max.getZ()));
@@ -721,10 +721,10 @@ public boolean contains(SbBox3f other) {
 	return true;
 }
 
-private final SbVec3fSingle closest = new SbVec3fSingle(); // SINGLE_THREAD
-private final SbVec3fSingle center = new SbVec3fSingle(); // SINGLE_THREAD
-private final SbVec3fSingle vec = new SbVec3fSingle(); // SINGLE_THREAD
-private final SbVec3fSingle absvec = new SbVec3fSingle(); // SINGLE_THREAD
+private final SbVec3fSingleFast closest = new SbVec3fSingleFast(); // SINGLE_THREAD
+private final SbVec3fSingleFast center = new SbVec3fSingleFast(); // SINGLE_THREAD
+private final SbVec3fSingleFast vec = new SbVec3fSingleFast(); // SINGLE_THREAD
+private final SbVec3fSingleFast absvec = new SbVec3fSingleFast(); // SINGLE_THREAD
 
 /*!
   Return the point on the box closest to the given \a point.
