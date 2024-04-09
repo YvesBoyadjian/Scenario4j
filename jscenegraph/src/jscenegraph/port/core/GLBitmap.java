@@ -102,6 +102,16 @@ public class GLBitmap {
         tcArray.getFast(4).setValue(1,1);//,dt);
         tcArray.getFast(5).setValue(0,1);//,ct);
 
+        callGL(state);
+
+        //image.unref(state);
+
+        charPosition.setX(charPosition.getX()+xmove);
+        charPosition.setY(charPosition.getY()+ymove);
+    }
+
+    private static void callGL(SoState state) {
+
         // ________________________________________________ Vertex coords
         final int[] vertex_bo = new int[1];
 
@@ -142,9 +152,5 @@ public class GLBitmap {
         gl2.glDeleteBuffers(1,vertex_bo);
         gl2.glDeleteBuffers(1,texture_coordinate_bo);
 
-        //image.unref(state);
-
-        charPosition.setX(charPosition.getX()+xmove);
-        charPosition.setY(charPosition.getY()+ymove);
     }
 }

@@ -15,6 +15,7 @@ import java.util.function.Consumer;
 import javax.imageio.ImageIO;
 
 import org.lwjgl.*;
+import org.lwjgl.BufferUtils;
 import org.lwjgl.glfw.*;
 import org.lwjgl.opengl.*;
 import org.lwjgl.system.*;
