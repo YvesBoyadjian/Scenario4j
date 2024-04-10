@@ -109,6 +109,13 @@ public class SbVec3fArray extends Indexable<SbVec3f> implements ByteBufferAble, 
 		return new FloatArray(delta*3,valuesArray);
 	}
 
+	public float[] toFloats() {
+		if (delta != 0) {
+			throw new IllegalStateException();
+		}
+		return valuesArray.toFloatArray();
+	}
+
 	@Override
 	public FloatBuffer toFloatBuffer() {
 		

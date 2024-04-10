@@ -59,7 +59,7 @@ public class VertexAttribList implements Destroyable {
                 z = vertices.get(j); j++;
                 vboArray.setValueXYZ(i,x,y,z);
             }
-            gl2.glBufferData(GL_ARRAY_BUFFER,vboArray.sizeof(),vboArray.toFloatBuffer(),GL_STATIC_DRAW);
+            gl2.glBufferData(GL_ARRAY_BUFFER,vboArray.sizeof(),vboArray./*toFloatBuffer()*/toFloats(),GL_STATIC_DRAW);
             gl2.glBindBuffer(GL_ARRAY_BUFFER,0);
         }
 
