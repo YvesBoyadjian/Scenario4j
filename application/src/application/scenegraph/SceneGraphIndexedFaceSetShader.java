@@ -2882,10 +2882,17 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 		return douglas_distance_shadow_foliage[0];
 	}
 
+	float currentFPS = 0;
+
 	public void setFPS(float fps) {
 		if( fpsSwitch.whichChild.getValue() == SoSwitch.SO_SWITCH_NONE) {
 			return; // FPS disabled
 		}
+
+		if(currentFPS == fps) {
+			return;
+		}
+		currentFPS = fps;
 
 		String str = String.format("%.1f fps", fps);
 		//if (!Objects.equals(fpsDisplay.string.getValueAt(0),str)) { // Better foster frame regularity
