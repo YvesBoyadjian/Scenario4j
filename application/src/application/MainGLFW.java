@@ -1550,14 +1550,19 @@ public class MainGLFW {
 			});
 		} // end GOD
 
+//		final long[] nanotime = new long[1];
+//		nanotime[0] = -1;
+//
 //		viewer.getSceneHandler().getGLRenderAction().setAbortCallback(new SoGLRenderAction.SoGLRenderAbortCB() {
 //			@Override
 //			public SoGLRenderAction.AbortCode abort(Object userData) {
-//				if ((System.nanoTime() -
-//						viewer.getStartPaintTime()) > 1e9/50) {
-//					return SoGLRenderAction.AbortCode.ABORT;
+//				long newTime = System.nanoTime();
+//				if (newTime -
+//						nanotime[0] > 1e9/60 && nanotime[0] != -1) {
+//					nanotime[0] = newTime;
+//					return SoGLRenderAction.AbortCode.CONTINUE;
 //				}
-//
+//				nanotime[0] = newTime;
 //				return SoGLRenderAction.AbortCode.CONTINUE;
 //			}
 //		}, null);
