@@ -1656,7 +1656,7 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 		billboardSeparator.addChild(color);
 
 		//fpsDisplay.string.setValue("60.0 FPS");
-		fpsDisplay.enableNotify(false);
+		fpsDisplay.string.enableNotify(false);
 
 		billboardSeparator.addChild(fpsDisplay);
 

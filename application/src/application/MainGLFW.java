@@ -74,6 +74,7 @@ import jscenegraph.database.inventor.events.SoMouseButtonEvent;
 import jscenegraph.database.inventor.actions.SoAction;
 import jscenegraph.database.inventor.actions.SoRayPickAction;
 import jscenegraph.database.inventor.nodes.*;
+import jscenegraph.interaction.inventor.SoSceneManager;
 import jscenegraph.port.KDebug;
 import jsceneviewerglfw.inventor.qt.SoQt;
 import jsceneviewerglfw.inventor.qt.SoQtCameraController;
@@ -626,6 +627,10 @@ public class MainGLFW {
 		viewer.setUpDirection(new SbVec3f(0, 0, 1));
 
 		viewer.getCameraController().setAutoClipping(false);
+
+		// In order not to invalidate shaders
+		SoSceneManager.enableRealTimeUpdate(false);
+		SoDB.enableRealTimeSensor(false);
 
 		SoCamera camera = viewer.getCameraController().getCamera();
 

@@ -269,7 +269,7 @@ public class SbDPViewVolume implements Mutable {
 	  this.ulf.setValue(left, top, -nearval);
 	}
 	
-	private final SbVec3f dummy = new SbVec3f();
+	private final SbVec3fSingleFast dummy = new SbVec3fSingleFast();
 
 	public void update(SbViewVolume sbViewVolume) {
 		this.llf.setValue(sbViewVolume.llf.operator_minus(sbViewVolume.projPoint, dummy));

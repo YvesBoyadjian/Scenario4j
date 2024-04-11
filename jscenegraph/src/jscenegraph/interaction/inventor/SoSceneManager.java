@@ -703,4 +703,35 @@ public void destructor()
 		   {
 		       return sceneSensor.getPriority();
 		   }
+
+
+
+	////////////////////////////////////////////////////////////////////////
+//
+// Description:
+//      Enables/Disable the realTime update after each redraw
+//
+// Use: static public
+
+	/*!
+  Set whether or not for SoSceneManager instances to "touch" the
+  global \c realTime field after a redraw. If this is not done,
+  redrawing when animating the scene will only happen as fast as the
+  \c realTime interval goes (which defaults to 12 times a second).
+
+  \sa SoDB::setRealTimeInterval()
+ */
+	public static void
+	enableRealTimeUpdate(final boolean flag)
+	{
+		if (updateRealTime == flag)
+			return;
+
+		updateRealTime = flag;
+
+		if (updateRealTime)
+			realTimeSensor.schedule();
+		else
+			realTimeSensor.unschedule();
+	}
 }
