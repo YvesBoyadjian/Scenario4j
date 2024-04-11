@@ -67,6 +67,7 @@ import application.terrain.IslandLoader;
 import application.trails.TrailsLoader;
 import application.viewer.glfw.SoQtWalkViewer;
 import jscenegraph.database.inventor.*;
+import jscenegraph.database.inventor.actions.SoGLRenderAction;
 import jscenegraph.database.inventor.actions.SoGLRenderAction.TransparencyType;
 import jscenegraph.database.inventor.events.SoKeyboardEvent;
 import jscenegraph.database.inventor.events.SoMouseButtonEvent;
@@ -1543,6 +1544,18 @@ public class MainGLFW {
 				idTrail[0] = 0;
 			});
 		} // end GOD
+
+//		viewer.getSceneHandler().getGLRenderAction().setAbortCallback(new SoGLRenderAction.SoGLRenderAbortCB() {
+//			@Override
+//			public SoGLRenderAction.AbortCode abort(Object userData) {
+//				if ((System.nanoTime() -
+//						viewer.getStartPaintTime()) > 1e9/50) {
+//					return SoGLRenderAction.AbortCode.ABORT;
+//				}
+//
+//				return SoGLRenderAction.AbortCode.CONTINUE;
+//			}
+//		}, null);
 
 		scenario.start(loadingQuestIndex,viewer);
 

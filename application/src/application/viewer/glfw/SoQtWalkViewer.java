@@ -611,7 +611,7 @@ protected void onAim(SoMouseButtonEvent event, boolean aim) {
 
     protected void paintGL(GL2 gl2) {
 
-//		startPaintTime = System.nanoTime();
+		startPaintTime = System.nanoTime();
     	
     	//idle();
     	super.paintGL(gl2);
