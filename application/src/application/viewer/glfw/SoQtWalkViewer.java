@@ -612,6 +612,10 @@ protected void onAim(SoMouseButtonEvent event, boolean aim) {
     protected void paintGL(GL2 gl2) {
 
 		startPaintTime = System.nanoTime();
+
+//		if(startPaintTime - newFrameTime > 1e9/60) {
+//			System.err.println("slow 1 " + (startPaintTime - newFrameTime)/1e6 + " ms");
+//		}
     	
     	//idle();
     	super.paintGL(gl2);
@@ -637,6 +641,10 @@ protected void onAim(SoMouseButtonEvent event, boolean aim) {
     		nbFrames = 0;
     		lastFrameTime = newFrameTime;
     	}
+
+//		if (newFrameTime - startPaintTime > 1e9/60) {
+//			System.err.println("slow 2 " + (newFrameTime - startPaintTime)/1e6 + " ms");
+//		}
 /*
 		if (-deltaTime > 0.07 * 1e9) {
 			System.out.println(" lengthy " + (int)(1.0e9/deltaTime) + " fps ");

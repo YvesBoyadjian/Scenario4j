@@ -1552,17 +1552,17 @@ public class MainGLFW {
 
 //		final long[] nanotime = new long[1];
 //		nanotime[0] = -1;
-//
+
 //		viewer.getSceneHandler().getGLRenderAction().setAbortCallback(new SoGLRenderAction.SoGLRenderAbortCB() {
 //			@Override
 //			public SoGLRenderAction.AbortCode abort(Object userData) {
 //				long newTime = System.nanoTime();
 //				if (newTime -
-//						nanotime[0] > 1e9/60 && nanotime[0] != -1) {
-//					nanotime[0] = newTime;
-//					return SoGLRenderAction.AbortCode.CONTINUE;
+//						/*nanotime[0]*/viewer.getStartPaintTime() > 1e9/80 /*&& nanotime[0] != -1*/) {
+//					//nanotime[0] = newTime;
+//					return SoGLRenderAction.AbortCode.PRUNE;
 //				}
-//				nanotime[0] = newTime;
+//				//nanotime[0] = newTime;
 //				return SoGLRenderAction.AbortCode.CONTINUE;
 //			}
 //		}, null);
