@@ -263,7 +263,7 @@ findPoints(final SbSphere sphere, final SbListInt array)
 	}
 	
 	public SbBSPTree(int maxnodepts, int initsize) {
-		  pointsArray = new SbListIndexable((size)-> { return new SbVec3fArray(FloatMemoryBuffer.allocateFloats(size*3)); },initsize);
+		  pointsArray = new SbListIndexable((size)-> { return new SbVec3fArray(FloatMemoryBuffer.allocateFloatsNoBuffer(size*3)); },initsize);
 		  userdataArray = new SbList<>(initsize);
 		  
 		  this.topnode = new coin_bspnode(this.pointsArray);

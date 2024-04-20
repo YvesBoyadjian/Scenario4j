@@ -58,7 +58,16 @@ public class FloatMemoryBuffer extends MemoryBuffer {
 
 		return memoryBuffer;
 	}
-	
+
+	public static final FloatMemoryBuffer allocateFloatsNoBuffer(int numFloats) {
+
+		FloatMemoryBuffer memoryBuffer = new FloatMemoryBuffer();
+
+		memoryBuffer.floatArray = new float[numFloats];
+
+		return memoryBuffer;
+	}
+
 	public static final FloatMemoryBuffer allocateFloatsMalloc(int numFloats) {
 		
 		FloatMemoryBuffer memoryBuffer = new FloatMemoryBuffer();
@@ -100,16 +109,19 @@ public class FloatMemoryBuffer extends MemoryBuffer {
 			int destPos,
 			int length
 	) {
-		FloatBuffer destSlice = dest.toFloatBuffer().position(destPos).slice();
-		FloatBuffer srcSlice = src.toFloatBuffer().position(srcPos).slice().limit(length);
-		destSlice.put(srcSlice);
+		if (dest.isByteBufferPresent() && src.isByteBufferPresent()) {
+			FloatBuffer destSlice = dest.toFloatBuffer().position(destPos).slice();
+			FloatBuffer srcSlice = src.toFloatBuffer().position(srcPos).slice().limit(length);
+			destSlice.put(srcSlice);
 
-		dest.toFloatBuffer().position(0);
-		src.toFloatBuffer().position(0);
-
-//		for(int i=0; i<length; i++) {
-//			dest.setFloat(i+destPos,src.getFloat(i+srcPos));
-//		}
+			dest.toFloatBuffer().position(0);
+			src.toFloatBuffer().position(0);
+		}
+		else {
+		for(int i=0; i<length; i++) {
+			dest.setFloat(i+destPos,src.getFloat(i+srcPos));
+		}
+		}
 	}
 
 	public void setFloats(float[] srcFloats, int numFloats) {

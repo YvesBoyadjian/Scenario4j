@@ -128,6 +128,10 @@ public class MemoryBuffer implements Destroyable, ByteBufferAble {
 		return byteBuffer;
 	}
 
+	public boolean isByteBufferPresent() {
+		return byteBuffer != null;
+	}
+
 	public void free() {
 		if(byteBuffer != null && malloc) {
 			MemoryBufferPool.pool.memFree(byteBuffer);//MemoryUtil.memFree(byteBuffer);

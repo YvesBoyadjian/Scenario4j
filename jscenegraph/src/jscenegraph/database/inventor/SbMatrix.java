@@ -1247,14 +1247,17 @@ LUBackSubstitution(int index[/*4*/], float b[/*4*/])
 	
 	// Multiplies matrix by given matrix on right. 
 	public SbMatrix multRight(final SbMatrix m) {
-		
+	return multRight(m,new float[4][4]);
+	}
+		public SbMatrix multRight(final SbMatrix m, final float[][]tmp) {
+
 	     // Trivial cases
 		      if (IS_IDENTITY(m))
 		          return this;
 		      else if (IS_IDENTITY(/*matrix*/this)) // java port
 		          return (this.copyFrom(m.matrix));
 		          
-		      final float[][]       tmp = new float[4][4];
+		      //final float[][]       tmp = new float[4][4];
 		  
 //		  #define MULT_RIGHT(i,j) (matrix[i][0]*m.matrix[0][j] + 
 //		                           matrix[i][1]*m.matrix[1][j] + 

@@ -210,13 +210,15 @@ public void updateParameter(SoGLShaderObject shader)
  */
 final SbMatrix matrix = SbMatrix.identity(); // SINGLE_THREAD
 
+    final float[][]tmp = new float[4][4]; // SINGLE_THREAD
+
 public void
 updateValue(SoState state)
 {
   switch (MatrixType.fromValue(this.matrixType.getValue())) {
     case MODELVIEW: {
       matrix.copyFrom(SoModelMatrixElement.get(state));
-      matrix.multRight(SoViewingMatrixElement.get(state));
+      matrix.multRight(SoViewingMatrixElement.get(state),tmp);
     } break;
     case PROJECTION: {
       matrix.copyFrom(SoProjectionMatrixElement.get(state));
@@ -227,8 +229,8 @@ updateValue(SoState state)
     } break;
     case MODELVIEW_PROJECTION: {
       matrix.copyFrom(SoModelMatrixElement.get(state));
-      matrix.multRight(SoViewingMatrixElement.get(state));
-      matrix.multRight(SoProjectionMatrixElement.get(state));
+      matrix.multRight(SoViewingMatrixElement.get(state),tmp);
+      matrix.multRight(SoProjectionMatrixElement.get(state),tmp);
     } break;
     default: assert(false);// && "illegal matrix type"); break;
   }
