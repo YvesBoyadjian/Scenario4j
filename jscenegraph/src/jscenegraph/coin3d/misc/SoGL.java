@@ -2220,7 +2220,7 @@ sogl_render_cylinder( float radius,
 
     gl2.glGenBuffers(1,side_vertex_vbo);
     gl2.glBindBuffer(GL_ARRAY_BUFFER,side_vertex_vbo[0]);
-    gl2.glBufferData(GL_ARRAY_BUFFER,sideVertexVboArray.sizeof(),sideVertexVboArray.toFloatBuffer(),GL_STATIC_DRAW);
+    gl2.glBufferData(GL_ARRAY_BUFFER,sideVertexVboArray.sizeof(),sideVertexVboArray./*toFloatBuffer()*/toByteBuffer(),GL_STATIC_DRAW);
 
     gl2.glVertexAttribPointer(0,3,GL_FLOAT,false,0,0);
     gl2.glEnableVertexAttribArray(0);
@@ -2229,7 +2229,7 @@ sogl_render_cylinder( float radius,
 
     gl2.glGenBuffers(1,side_normal_vbo);
     gl2.glBindBuffer(GL_ARRAY_BUFFER,side_normal_vbo[0]);
-    gl2.glBufferData(GL_ARRAY_BUFFER,sideNormalVboArray.sizeof(),sideNormalVboArray.toFloatBuffer(),GL_STATIC_DRAW);
+    gl2.glBufferData(GL_ARRAY_BUFFER,sideNormalVboArray.sizeof(),sideNormalVboArray./*toFloatBuffer()*/toByteBuffer(),GL_STATIC_DRAW);
 
     gl2.glVertexAttribPointer(1,3,GL_FLOAT,false,0,0);
     gl2.glEnableVertexAttribArray(1);
@@ -2349,7 +2349,7 @@ sogl_generate_3d_circle(SbVec3fArray coords, int num, float radius, float y)
   float deltaAngle = 2.0f*(float)(Math.PI)/(float)(num);
   float angle = 0.0f;
   for (int i = 0; i < num; i++) {
-      SbVec3f coordsi = coords.get(i);
+      SbVec3f coordsi = coords.getFast(i);
     coordsi.setX( -(float)(Math.sin(angle)) * radius);
     coordsi.setY( y);
     coordsi.setZ( -(float)(Math.cos(angle)) * radius);

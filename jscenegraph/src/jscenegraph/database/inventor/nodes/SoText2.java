@@ -291,6 +291,22 @@ toObjectSpace(final SbVec3f pixel, final SbMatrix matrix,
 
     return result;
 }
+    public static SbVec3f
+    toObjectSpaceFast(final SbVec3f pixel, final SbMatrix matrix,
+                  final SbViewportRegion vpr, final SbVec3fSingleFast ndc, final SbVec3f result)
+//
+////////////////////////////////////////////////////////////////////////
+    {
+        // Viewport transformation, to normalized device coordinates:
+        SbVec2s vpSize = vpr.getViewportSizePixels();
+        ndc.getValue()[0] = pixel.getX()*2.0f/vpSize.getValue()[0] - 1.0f;
+        ndc.getValue()[1] = pixel.getY()*2.0f/vpSize.getValue()[1] - 1.0f;
+        ndc.getValue()[2] = pixel.getZ();
+
+        matrix.multVecMatrix(ndc, result);
+
+        return result;
+    }
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -354,11 +370,14 @@ GLRender(SoGLRenderAction action)
 
     SbViewportRegion vpr = SoViewportRegionElement.get(state);
 
+    final SbVec3fSingleFast ndc = new SbVec3fSingleFast();
+    final SbVec3fSingleFast result = new SbVec3fSingleFast();
+
     GLBitmap.Transformer transformer = new GLBitmap.Transformer() {
         @Override
-        public SbVec3f transform(SbVec3f in) {
-            return toObjectSpace(in, screenToObj,
-                    vpr);
+        public SbVec3f transform(SbVec3f in, SbVec3f out) {
+            return toObjectSpaceFast(in, screenToObj,
+                    vpr, ndc, out);
         }
     };
 
@@ -380,7 +399,10 @@ GLRender(SoGLRenderAction action)
         // space, and feed that back to the glRasterPos command (which
         // will turn around and transform it back into screen-space,
         // but oh well).
-        SbVec3f lineOrigin = transformer.transform(charPosition);
+
+        SbVec3f lineOrigin = new SbVec3fSingleFast();
+
+        lineOrigin = transformer.transform(charPosition, lineOrigin);
 
         gl2.glRasterPos3f(0,0,0);
 
@@ -399,9 +421,11 @@ GLRender(SoGLRenderAction action)
             // space, and feed that back to the glRasterPos command (which
             // will turn around and transform it back into screen-space,
             // but oh well).
-            SbVec3f lineOrigin = transformer.transform(charPosition);
+            SbVec3fSingleFast lineOrigin = new SbVec3fSingleFast();
+
+            lineOrigin = (SbVec3fSingleFast)transformer.transform(charPosition, lineOrigin);
             //toObjectSpace(charPosition, screenToObj, vpr);
-            gl2.glRasterPos3fv(lineOrigin.getValueRead(),0);
+            gl2.glRasterPos3fv(lineOrigin.getValue(),0);
 
             myFont.drawString(line,state,this,charPosition,transformer);
         }

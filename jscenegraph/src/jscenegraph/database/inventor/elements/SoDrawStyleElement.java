@@ -78,9 +78,11 @@ public class SoDrawStyleElement extends SoInt32Element {
         LINES,                  //!< Outlined regions
         POINTS,                 //!< Points
         INVISIBLE;               //!< Nothing!
-        
+
+        private static Style[] values = Style.values();
+
         public static Style fromValue(int value) {
-        	return Style.values()[value];
+        	return values[value];
         }
         public int getValue() {
         	return ordinal();

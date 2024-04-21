@@ -63,17 +63,7 @@ import jscenegraph.coin3d.inventor.misc.SoGenerate;
 import jscenegraph.coin3d.misc.SoGL;
 import jscenegraph.coin3d.misc.SoPick;
 import jscenegraph.coin3d.shaders.inventor.elements.SoGLShaderProgramElement;
-import jscenegraph.database.inventor.SbBox3f;
-import jscenegraph.database.inventor.SbVec2f;
-import jscenegraph.database.inventor.SbVec2s;
-import jscenegraph.database.inventor.SbVec3f;
-import jscenegraph.database.inventor.SbVec3fSingle;
-import jscenegraph.database.inventor.SbVec4f;
-import jscenegraph.database.inventor.SbVec4fSingle;
-import jscenegraph.database.inventor.SoMachine;
-import jscenegraph.database.inventor.SoPickedPoint;
-import jscenegraph.database.inventor.SoPrimitiveVertex;
-import jscenegraph.database.inventor.SoType;
+import jscenegraph.database.inventor.*;
 import jscenegraph.database.inventor.actions.SoAction;
 import jscenegraph.database.inventor.actions.SoGLRenderAction;
 import jscenegraph.database.inventor.actions.SoGetPrimitiveCountAction;
@@ -662,6 +652,8 @@ rayPickBoundingBox(SoRayPickAction action, final SbBox3f bbox)
 
     final int[] swappedColor = new int[1]; // SINGLE_THREAD
 
+    final SbVec3fSingleFast normal = new SbVec3fSingleFast(); // SINGLE_THREAD
+
     void GLRenderVertexArray(SoGLRenderAction action,
                                  boolean sendNormals, boolean doTextures)
 {
@@ -710,7 +702,6 @@ rayPickBoundingBox(SoRayPickAction action, final SbBox3f bbox)
       texCoordOffset = new CharPtr(texCoordsPtr);
       colorOffset = new CharPtr(colorsPtr);
 
-      final SbVec3fSingle normal = new SbVec3fSingle();
       for (int face = 0; face < 6; face++) {
           if (materialPerFace && face > 0) {
               color = colors.get(face);

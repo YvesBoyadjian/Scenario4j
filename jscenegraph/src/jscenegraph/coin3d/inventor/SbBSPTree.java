@@ -35,6 +35,7 @@ package jscenegraph.coin3d.inventor;
 import jscenegraph.coin3d.inventor.lists.SbList;
 import jscenegraph.coin3d.inventor.lists.SbListIndexable;
 import jscenegraph.coin3d.inventor.lists.SbListInt;
+import jscenegraph.coin3d.inventor.lists.SbListInteger;
 import jscenegraph.database.inventor.SbBox3f;
 import jscenegraph.database.inventor.SbSphere;
 import jscenegraph.database.inventor.SbVec3f;
@@ -114,7 +115,7 @@ public int addPoint(final SbVec3f pt, final int maxpts)
     int i;
     final SbVec3fSingle tmp = new SbVec3fSingle();
     for (i = 0; i < n; i++) {
-      tmp.copyFrom((pointsArray).operator_square_bracket(this.indices.operator_square_bracket(i)));
+      tmp.copyFrom((pointsArray).operator_square_bracket_fast(this.indices.operator_square_bracket(i)));
       if (pt.operator_equal_equal(tmp)) break;
     }
     if (i == n) {
@@ -245,6 +246,28 @@ findPoints(final SbSphere sphere, final SbListInt array)
     }
   }
 }
+
+		public void
+		findPoints(final SbSphere sphere, final SbListInteger array)
+		{
+			if (this.left != null) {
+				max.copyFrom(sphere.getCenter());
+				min.copyFrom(sphere.getCenter());
+				min.getValue()[this.dimension] -= sphere.getRadius();
+				max.getValue()[this.dimension] += sphere.getRadius();
+
+				if (this.leftOf(min)) this.left.findPoints(sphere, array);
+				if (!this.leftOf(max)) this.right.findPoints(sphere, array);
+			}
+			else {
+				int i, n = this.indices.getLength();
+				for (i = 0; i < n; i++) {
+					SbVec3f pt = (pointsArray).operator_square_bracket_fast(this.indices.operator_square_bracket(i));
+					if (sphere.pointInside(pt))
+						array.append(this.indices.operator_square_bracket(i));
+				}
+			}
+		}
 
 	}
 	
@@ -469,6 +492,21 @@ findPoints(final SbSphere sphere, final SbListInt array)
 	                      SbListInt array)
 	{
 	  this.topnode.findPoints(sphere, array);
+	}
+
+	/*!
+	  WARNING: Please don't use this function. It can cause hard to find
+	  bugs on the Windows platform if your application is linked against a
+	  different CRT than your Coin DLL.
+
+	  Use void findPoints(const SbSphere &sphere, SbIntList & array)
+	  instead.
+	*/
+	public void
+	findPoints(final SbSphere sphere,
+			   SbListInteger array)
+	{
+		this.topnode.findPoints(sphere, array);
 	}
 
 /*!

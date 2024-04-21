@@ -246,14 +246,14 @@ public class SbViewVolume implements Mutable {
 		affine.setTranslate((llfO.operator_add(projPoint).operator_minus()));
 		affine.multRight(skewMatInv);
 
-		final SbVec3f eye = new SbVec3f();
+		final SbVec3f eye = new SbVec3fSingleFast();
 		affine.multVecMatrix(projPoint, eye);
 
 		final SbMatrix moveToEye = new SbMatrix();
 		moveToEye.setTranslate(eye.operator_minus());
 		affine.multRight(moveToEye);
 
-		final SbVec3f llfEye = new SbVec3f(), lrfEye = new SbVec3f(), ulfEye = new SbVec3f();
+		final SbVec3f llfEye = new SbVec3fSingleFast(), lrfEye = new SbVec3fSingleFast(), ulfEye = new SbVec3fSingleFast();
 		skewMatInv.multVecMatrix(llfO, llfEye);
 		skewMatInv.multVecMatrix(lrfO, lrfEye);
 		skewMatInv.multVecMatrix(ulfO, ulfEye);
@@ -1861,10 +1861,12 @@ public class SbViewVolume implements Mutable {
    clipper.clip(planes.get(i));
  }
  int n = clipper.getNumVertices();
- for (i = 0; i < n; i++) {
-   final SbVec3f tmp = new SbVec3f();
-   clipper.getVertex(i, tmp,null);
-   isect.extendBy(tmp);
+ if (n > 0) {
+	 final SbVec3f tmp = new SbVec3fSingleFast();
+	 for (i = 0; i < n; i++) {
+		 clipper.getVertex(i, tmp, null);
+		 isect.extendBy(tmp);
+	 }
  }
  clipper.reset();
 }

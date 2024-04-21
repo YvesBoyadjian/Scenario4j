@@ -6,6 +6,8 @@ package jscenegraph.database.inventor.engines;
 import static jscenegraph.database.inventor.misc.SoBasic.SO__CONCAT;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.HashMap;
+import java.util.Map;
 
 import jscenegraph.database.inventor.SbColor;
 import jscenegraph.database.inventor.SbMatrix;
@@ -719,8 +721,12 @@ public class SoBuiltinFieldConverter extends SoFieldConverter {
 	// Multi so Single:
 	// if (MField.getNum() > 0) SoSField.setValue(SoMField[0])
 
+	private Map<String, Map<String,String>> so_concatt = new HashMap<>();
+
 	private TypeConst SO__CONCATT(String arg1, String arg2) {
-		String str = arg1 + arg2;
+		so_concatt.putIfAbsent(arg1, new HashMap<>());
+		so_concatt.get(arg1).putIfAbsent(arg2, arg1 + arg2);
+		String str = so_concatt.get(arg1).get(arg2);
 		return TypeConst.valueOf(str);
 	}
 

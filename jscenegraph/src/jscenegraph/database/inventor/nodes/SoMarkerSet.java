@@ -31,14 +31,7 @@ import jscenegraph.coin3d.inventor.lists.SbList;
 import jscenegraph.coin3d.inventor.misc.SoGLImage;
 import jscenegraph.coin3d.shaders.SoGLShaderProgram;
 import jscenegraph.coin3d.shaders.inventor.elements.SoGLShaderProgramElement;
-import jscenegraph.database.inventor.SbBox3f;
-import jscenegraph.database.inventor.SbMatrix;
-import jscenegraph.database.inventor.SbVec2s;
-import jscenegraph.database.inventor.SbVec3f;
-import jscenegraph.database.inventor.SbVec3fSingle;
-import jscenegraph.database.inventor.SbViewVolume;
-import jscenegraph.database.inventor.SbViewportRegion;
-import jscenegraph.database.inventor.SoType;
+import jscenegraph.database.inventor.*;
 import jscenegraph.database.inventor.actions.SoGLRenderAction;
 import jscenegraph.database.inventor.actions.SoGetPrimitiveCountAction;
 import jscenegraph.database.inventor.bundles.SoMaterialBundle;
@@ -1353,12 +1346,16 @@ GLRender(SoGLRenderAction action)
 
 	  GLBitmap.Transformer transformer = new GLBitmap.Transformer() {
 		  @Override
-		  public SbVec3f transform(SbVec3f in) {
-			  return SoText2.toObjectSpace(in, screenToObj, vpr);
+		  public SbVec3f transform(SbVec3f in, SbVec3f out) {
+			  return SoText2.toObjectSpaceFast(in, screenToObj, vpr, new SbVec3fSingleFast(),out);
 		  }
 	  };
 
-	  GLBitmap.glBitmap(state, this, new SbVec3fSingle(point.getValueRead()[0], point.getValueRead()[1], -point.getValueRead()[2]), transformer,tmp.width, tmp.height, 0, 0, 0, 0, image);
+	  GLBitmap.glBitmap(state, this, new SbVec3fSingle(point.getValue()[0], point.getValue()[1], -point.getValue()[2]), transformer,tmp.width, tmp.height, 0, 0, 0, 0, image
+			  , new SbVec3fSingleFast()
+			  , new SbVec3fSingleFast()
+			  , new SbVec3fSingleFast()
+			  , new SbVec3fSingleFast());
   }
 
   // FIXME: this looks wrong, shouldn't we rather reset the alignment

@@ -19,7 +19,7 @@ import static com.jogamp.opengl.GL.GL_ARRAY_BUFFER;
 public class GLBitmap {
 
     public interface Transformer {
-        SbVec3f transform(SbVec3f in);
+        SbVec3f transform(SbVec3f in, SbVec3f out);
     }
 
     private final static SbVec3fArray vboArray = new SbVec3fArray(FloatMemoryBuffer.allocateFloats(3 * 6));
@@ -39,7 +39,11 @@ public class GLBitmap {
             float yorig,
             float xmove,
             float ymove,
-            SoGLImage image
+            SoGLImage image,
+            SbVec3f a,
+            SbVec3f b,
+            SbVec3f c,
+            SbVec3f d
     ) {
 
 //        SoGLImage image = new SoGLImage();
@@ -73,15 +77,31 @@ public class GLBitmap {
         float xScreenEnd = xScreenStart + width;
         float yScreenEnd = yScreenStart + height;
 
-        SbVec3f a = new SbVec3fSingleFast(xScreenStart,yScreenStart,-1);
-        SbVec3f b = new SbVec3fSingleFast(xScreenEnd,yScreenStart,-1);
-        SbVec3f c = new SbVec3fSingleFast(xScreenStart,yScreenEnd,-1);
-        SbVec3f d = new SbVec3fSingleFast(xScreenEnd,yScreenEnd,-1);
+        if (a == null)
+        a = new SbVec3fSingleFast(xScreenStart,yScreenStart,-1);
+        else {
+            a.setValue(xScreenStart,yScreenStart,-1);
+        }
+        if (b == null)
+        b = new SbVec3fSingleFast(xScreenEnd,yScreenStart,-1);
+        else {
+            b.setValue(xScreenEnd,yScreenStart,-1);
+        }
+        if (c == null)
+        c = new SbVec3fSingleFast(xScreenStart,yScreenEnd,-1);
+        else {
+            c.setValue(xScreenStart,yScreenEnd,-1);
+        }
+        if (d == null)
+        d = new SbVec3fSingleFast(xScreenEnd,yScreenEnd,-1);
+        else {
+            d.setValue(xScreenEnd,yScreenEnd,-1);
+        }
 
-        a = transformer.transform(a);
-        b = transformer.transform(b);
-        c = transformer.transform(c);
-        d = transformer.transform(d);
+        a = transformer.transform(a,a);
+        b = transformer.transform(b,b);
+        c = transformer.transform(c,c);
+        d = transformer.transform(d,d);
 
         vboArray.setO(0,a);
         vboArray.setO(1,b);

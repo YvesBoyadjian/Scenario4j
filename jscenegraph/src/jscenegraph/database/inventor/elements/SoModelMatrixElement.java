@@ -310,13 +310,15 @@ rotateBy(SoState state, SoNode node,
 
 final SbMatrix    m = new SbMatrix(); // SINGLE_THREAD
 
+    final float[] dummy = new float[16]; // SINGLE_THREAD
+
 public void
 rotateEltBy(final SbRotation rotation)
 //
 ////////////////////////////////////////////////////////////////////////
 {
     rotation.getValue(m);
-    modelMatrix.multLeft(m);
+    modelMatrix.multLeft(m, dummy);
 
     flags.isModelIdentity  = false;     // Assume the worst
     flags.haveModelCull = false;

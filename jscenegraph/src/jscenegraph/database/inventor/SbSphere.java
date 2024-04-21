@@ -98,6 +98,7 @@ public class SbSphere implements Mutable {
 
 	private final SbVec3f     center = new SbVec3f();
 	private float       radius;
+    private float       radiusSquare;
 
 	private final SbVec3f dummy = new SbVec3fSingleFast();
 		   
@@ -109,6 +110,7 @@ public class SbSphere implements Mutable {
 	    {
 	        center.copyFrom(c);
 	        radius = r;
+            radiusSquare = radius >= 0 ? radius * radius : -1;
 	    }
 	    	
 	@Override
@@ -116,6 +118,7 @@ public class SbSphere implements Mutable {
 		SbSphere otherSphere = (SbSphere)other;
 		center.copyFrom(otherSphere.center);
 		radius = otherSphere.radius;
+        radiusSquare = otherSphere.radiusSquare;
 	}
 	
 	 
@@ -125,6 +128,7 @@ public class SbSphere implements Mutable {
 	    {
 	        center.copyFrom( c);
 	        radius = r;
+            radiusSquare = radius >= 0 ? radius * radius : -1;
 	    }
 	    	
 	// Return the center and radius. 
@@ -149,6 +153,7 @@ public class SbSphere implements Mutable {
 	   {
 	       center.copyFrom((box.getMin().operator_add(box.getMax())).operator_mul(0.5f));
 	       radius = (box.getMax().operator_minus(center)).length();
+           radiusSquare = radius >= 0 ? radius * radius : -1;
 	   }
 	   	
 
@@ -265,6 +270,7 @@ public  void
                                "Radius should be >= 0.0f.");
  //#endif // COIN_DEBUG
    this.radius = radiusarg;
+     radiusSquare = radius >= 0 ? radius * radius : -1;
  }
 
 /*!
@@ -273,7 +279,7 @@ public  void
 public boolean
 pointInside(final SbVec3f p)
 {
-  return (p.operator_minus(center,dummy)).length() < radius;
+  return (p.operator_minus(center,dummy)).sqrLength() < radiusSquare;
 }
 
 }

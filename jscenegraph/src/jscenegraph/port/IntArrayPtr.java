@@ -49,7 +49,7 @@ public class IntArrayPtr implements Destroyable, IntBufferAble {
 	private int [] array;	
 	private int intOffset;
 
-	private IntBuffer[] intBuffer = new IntBuffer[1];
+	private IntBuffer[] intBuffer;// = new IntBuffer[1];
 		
 	public IntArrayPtr(int start, int[] values) {
 		this.array = values;
@@ -57,6 +57,11 @@ public class IntArrayPtr implements Destroyable, IntBufferAble {
 	}
 
 	public IntArrayPtr(int[] array) {
+		this.array = array;
+		intOffset = 0;
+	}
+
+	public void initializeFrom(int[] array) {
 		this.array = array;
 		intOffset = 0;
 	}
@@ -181,6 +186,9 @@ public class IntArrayPtr implements Destroyable, IntBufferAble {
 	public IntBuffer toIntBuffer() {
 		int offset = intOffset;
 		int length = array.length - offset;
+		if(intBuffer == null) {
+			intBuffer = new IntBuffer[1];
+		}
 		if(intBuffer[0] == null || intBuffer[0].capacity() != length) {
 			intBuffer[0] = BufferUtils.createIntBuffer(length);
 		//}
@@ -194,7 +202,9 @@ public class IntArrayPtr implements Destroyable, IntBufferAble {
 	@Override
 	public void destructor() {
 		array = null;
-		intBuffer[0] = null;
+		if (intBuffer != null) {
+			intBuffer[0] = null;
+		}
 	}
 
 	public boolean plusLessThan(int delta, IntArrayPtr other) {

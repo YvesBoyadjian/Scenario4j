@@ -271,10 +271,8 @@ import jscenegraph.coin3d.fxviz.elements.SoGLShadowCullingElement;
 import jscenegraph.coin3d.fxviz.elements.SoShadowStyleElement;
 import jscenegraph.database.inventor.SoType;
 import jscenegraph.database.inventor.actions.SoGLRenderAction;
-import jscenegraph.database.inventor.fields.SoFieldData;
-import jscenegraph.database.inventor.fields.SoSFBool;
-import jscenegraph.database.inventor.fields.SoSFEnum;
-import jscenegraph.database.inventor.fields.SoSFFloat;
+import jscenegraph.database.inventor.fields.*;
+import jscenegraph.database.inventor.misc.SoBase;
 import jscenegraph.database.inventor.misc.SoNotList;
 import jscenegraph.database.inventor.misc.SoNotRec;
 import jscenegraph.database.inventor.nodes.SoGroup;
@@ -440,11 +438,24 @@ public class SoShadowGroup extends SoSeparator {
 			}
 		}
 
-		if (pimpl.vertexshadercache != null) {
-			pimpl.vertexshadercache.invalidate();
+		boolean fromTime = false;
+		rec = nl.getFirstRec();
+		SoBase base = rec.getBase();
+		if (base instanceof SoGlobalField) {
+			SoGlobalField globalField = (SoGlobalField) base;
+			SoField myField = globalField.getMyField();
+			if (myField instanceof SoSFTime) {
+				fromTime = true;
+			}
 		}
-		if (pimpl.fragmentshadercache != null) {
-			pimpl.fragmentshadercache.invalidate();
+
+		if (!fromTime) {
+			if (pimpl.vertexshadercache != null) {
+				pimpl.vertexshadercache.invalidate();
+			}
+			if (pimpl.fragmentshadercache != null) {
+				pimpl.fragmentshadercache.invalidate();
+			}
 		}
 		super.notify(nl);
 	}

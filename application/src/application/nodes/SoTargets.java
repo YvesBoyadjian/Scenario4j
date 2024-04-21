@@ -7,6 +7,7 @@ import application.objects.Target;
 import jscenegraph.coin3d.inventor.SbBSPTree;
 import jscenegraph.coin3d.inventor.VRMLnodes.SoVRMLBillboard;
 import jscenegraph.coin3d.inventor.lists.SbListInt;
+import jscenegraph.coin3d.inventor.lists.SbListInteger;
 import jscenegraph.database.inventor.SbSphere;
 import jscenegraph.database.inventor.SbVec3f;
 import jscenegraph.database.inventor.actions.SoGLRenderAction;
@@ -32,7 +33,7 @@ public class SoTargets extends SoSeparator {
 
 	private final SbBSPTree bspTree = new SbBSPTree();
 	private final SbSphere nearSphere = new SbSphere();
-	private final SbListInt nearIDS = new SbListInt();
+	private final SbListInteger nearIDS = new SbListInteger();
 
 	private final Set<Integer> actualChildren = new HashSet<>();
 	private final Set<Integer> nearChildren = new HashSet<>();
@@ -113,7 +114,7 @@ public class SoTargets extends SoSeparator {
 
 		int nbIDS = nearIDS.size();
 		for( int i=0;i<nbIDS;i++) {
-			int id = nearIDS.get(i);
+			Integer id = nearIDS.get(i);
 			if( !actualChildren.contains(id)) {
 				int instance = (Integer)bspTree.getUserData(id);
 //				SoTarget child = (SoTarget)bspTree.getUserData(id);
@@ -154,7 +155,7 @@ public class SoTargets extends SoSeparator {
 
 		final Set<Integer> actualChildrenSaved = new HashSet<>();
 		actualChildrenSaved.addAll(actualChildren);
-		for( int id : actualChildrenSaved) {
+		for( Integer id : actualChildrenSaved) {
 			if(actualChildren.contains(id) && !nearChildren.contains(id)) {
 				//SoTarget child = (SoTarget)bspTree.getUserData(id);
 				SoTarget child = idxToTargets.get(id);

@@ -50,7 +50,9 @@ import jscenegraph.database.inventor.nodes.SoNode;
 import jscenegraph.port.Mutable;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Yves Boyadjian
@@ -193,6 +195,8 @@ multi_translateWrap( SoGLImage.Wrap wrap)
   return SoMultiTextureImageElement.Wrap.CLAMP;
 }
 
+private final Map<Integer, String> coin_texunitX_model = new HashMap<>();
+
 /*!
   Sets the current texture. Id \a didapply is TRUE, it is assumed
   that the texture image already is the current GL texture. Do not
@@ -246,8 +250,11 @@ set(SoState state, SoNode node,
   
   SoGLShaderProgram prog = SoGLShaderProgramElement.get(state);
   if (prog != null) {
-    String str;
-    str = "coin_texunit"+unit+"_model";
+    String str = elem.coin_texunitX_model.get(unit);
+    if (str == null) {
+      str = "coin_texunit" + unit + "_model";
+      elem.coin_texunitX_model.put(unit,str);
+    }
     prog.updateCoinParameter(state, new SbName(str/*.getString()*/), ud.glimage != null ? model.getValue() : 0);
   }
 }

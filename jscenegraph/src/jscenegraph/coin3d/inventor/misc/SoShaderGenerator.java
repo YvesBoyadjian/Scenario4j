@@ -17,7 +17,7 @@ public class SoShaderGenerator {
 		  String version;
 		  String defines;
 		  StringBuilder declarations;
-		  String functions;
+		  StringBuilder functions;
 		  StringBuilder main;
 		  
 		  boolean dirty;
@@ -46,7 +46,7 @@ public class SoShaderGenerator {
 		  this.version = "";//.makeEmpty(freeoldstrings);
 		  this.defines = "";//.makeEmpty(freeoldstrings);
 		  this.declarations = new StringBuilder();//.makeEmpty(freeoldstrings);
-		  this.functions = "";//.makeEmpty(freeoldstrings);
+		  this.functions = new StringBuilder();//.makeEmpty(freeoldstrings);
 		  this.main = new StringBuilder(1024);//.makeEmpty(freeoldstrings);
 		  this.combined = new StringBuilder();//.makeEmpty(freeoldstrings);
 		}
@@ -92,10 +92,10 @@ public class SoShaderGenerator {
 		public void 
 		addFunction( String str,  boolean checkexists)
 		{
-		  if (!checkexists || (SbString.find(this.functions,str) < 0)) {
+		  if (!checkexists || (SbString.find(this.functions.toString(),str) < 0)) {
 		    this.dirty = true;
-		    this.functions += str;
-		    this.functions += "\n";
+		    this.functions.append(str);
+		    this.functions.append("\n");
 		  }
 		}
 
@@ -146,7 +146,7 @@ public class SoShaderGenerator {
 		    this.combined.append(this.defines);
 		  
 		    this.combined.append(this.declarations.toString());
-		    this.combined.append(this.functions);
+		    this.combined.append(this.functions.toString());
 		    this.combined.append("void main(void) {\n");
 		    this.combined.append(this.main.toString());
 		    this.combined.append("}\n");

@@ -6,6 +6,7 @@ package application.scenegraph;
 import jscenegraph.coin3d.inventor.nodes.SoLOD;
 import jscenegraph.database.inventor.SbMatrix;
 import jscenegraph.database.inventor.SbVec3f;
+import jscenegraph.database.inventor.SbVec3fSingleFast;
 import jscenegraph.database.inventor.SbViewVolume;
 import jscenegraph.database.inventor.actions.SoAction;
 import jscenegraph.database.inventor.actions.SoGLRenderAction;
@@ -505,6 +506,10 @@ public abstract class SoTouchLOD2 extends SoLOD implements SoTouchLODMaster.SoTo
 //		}
 	}
 
+
+	final SbVec3f worldcenter = new SbVec3fSingleFast();
+
+	final SbVec3f model_xyz = new SbVec3fSingleFast();
 	/*!
 	  Returns the child to traverse based on the ranges in
 	  SoLOD::range. Will clamp to index to the number of children.  This
@@ -517,8 +522,6 @@ public abstract class SoTouchLOD2 extends SoLOD implements SoTouchLODMaster.SoTo
 	  SoState state = action.getState();
 	  final SbMatrix mat = SoModelMatrixElement.get(state); //ref
 	  //final SbViewVolume vv = SoViewVolumeElement.get(state); //ref
-
-	  final SbVec3f worldcenter = new SbVec3f();
 	  mat.multVecMatrix(this.center.getValue(), worldcenter);
 
 	  //float dist = (vv.getProjectionPoint().operator_minus( worldcenter)).length();
@@ -532,9 +535,7 @@ public abstract class SoTouchLOD2 extends SoLOD implements SoTouchLODMaster.SoTo
 	  RecursiveChunk rc = SoRecursiveIndexedFaceSet.recursiveChunk;
 	  
 	  float model_x, model_y;
-	  
-	  SbVec3f model_xyz = new SbVec3f();
-	  
+
 	  SoCamera camera = master.getCamera();
 
 	  SbVec3f world_camera_position = camera.position.getValue();

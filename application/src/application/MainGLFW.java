@@ -630,7 +630,7 @@ public class MainGLFW {
 
 		// In order not to invalidate shaders
 		SoSceneManager.enableRealTimeUpdate(false);
-		SoDB.enableRealTimeSensor(false);
+		//SoDB.enableRealTimeSensor(false); impossible to disable: Will always be reenabled by other objects like SoBlinker
 
 		SoCamera camera = viewer.getCameraController().getCamera();
 
@@ -1174,7 +1174,7 @@ public class MainGLFW {
 
 
 		// Maximum number of contacts to create between bodies (see ODE documentation)
-		final int MAX_NUM_CONTACTS = 8;
+		final int MAX_NUM_CONTACTS = 3;//8;
 		//dContact contacts[MAX_NUM_CONTACTS];
 		//Don't reuse contacts between callbacks, it causes errors when on planks
 		//final DContactBuffer contacts = new DContactBuffer(MAX_NUM_CONTACTS);

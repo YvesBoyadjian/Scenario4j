@@ -552,6 +552,17 @@ public void destructor()
   super.destructor();
 }
 
+
+	final SoCoordinateElement[] coords = new SoCoordinateElement[1]; //ptr
+	final SbVec3fArray[] normalsFloat = new SbVec3fArray[1]; //ptr
+	final SbVec3sArray[] normalsShort = new SbVec3sArray[1]; //ptr
+	final IntArrayPtr[] cindices = new IntArrayPtr[1]; //ptr
+	final int[] numindices = new int[1];
+	final IntArrayPtr[] nindices = new IntArrayPtr[1];
+	final IntArrayPtr[] tindices = new IntArrayPtr[1];
+	final IntArrayPtr[] mindices = new IntArrayPtr[1];
+	final boolean[] normalCacheUsed = new boolean[1];
+
 ////////////////////////////////////////////////////////////////////////
 //
 // Description:
@@ -583,21 +594,20 @@ public void GLRender(SoGLRenderAction action)
 	  Binding mbind = this.findMaterialBinding(state);
 	  Binding nbind = this.findNormalBinding(state);
 
-	  final SoCoordinateElement[] coords = new SoCoordinateElement[1]; //ptr
-	  final SbVec3fArray[] normalsFloat = new SbVec3fArray[1]; //ptr
-	final SbVec3sArray[] normalsShort = new SbVec3sArray[1]; //ptr
-	  final IntArrayPtr[] cindices = new IntArrayPtr[1]; //ptr
-	  final int[] numindices = new int[1];
-	  final IntArrayPtr[] nindices = new IntArrayPtr[1];
-	  final IntArrayPtr[] tindices = new IntArrayPtr[1];
-	  final IntArrayPtr[] mindices = new IntArrayPtr[1];
-	  boolean doTextures;
-	  final boolean[] normalCacheUsed = new boolean[1];
+	  coords[0] = null;//final SoCoordinateElement[] coords = new SoCoordinateElement[1]; //ptr
+	normalsFloat[0] = null;//final SbVec3fArray[] normalsFloat = new SbVec3fArray[1]; //ptr
+	normalsShort[0] = null;//final SbVec3sArray[] normalsShort = new SbVec3sArray[1]; //ptr
+	  cindices[0] = null;//final IntArrayPtr[] cindices = new IntArrayPtr[1]; //ptr
+	  numindices[0] = 0;//final int[] numindices = new int[1];
+	  nindices[0] = null;//final IntArrayPtr[] nindices = new IntArrayPtr[1];
+	  tindices[0] = null;//final IntArrayPtr[] tindices = new IntArrayPtr[1];
+	  mindices[0] = null;//final IntArrayPtr[] mindices = new IntArrayPtr[1];
+	  normalCacheUsed[0] = false;//final boolean[] normalCacheUsed = new boolean[1];
 
 	  final SoMaterialBundle mb = new SoMaterialBundle(action);
 
 	  final SoTextureCoordinateBundle tb = new SoTextureCoordinateBundle(action, true, false);
-	  doTextures = tb.needCoordinates();
+	boolean doTextures = tb.needCoordinates();
 	  boolean sendNormals = !mb.isColorOnly() || tb.isFunction();
 
 	  this.getVertexData(state, coords, normalsFloat, normalsShort, cindices,

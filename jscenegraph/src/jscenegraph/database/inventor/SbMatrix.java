@@ -1300,6 +1300,11 @@ public float MULT_LEFT(int i,int j, SbMatrix m) {
 public SbMatrix 
 multLeft(final SbMatrix m)
 {
+	return multLeft(m,null);
+}
+	public SbMatrix
+	multLeft(final SbMatrix m, float[] tmp)
+	{
     // Trivial cases
     if (IS_IDENTITY(m))
         return this;
@@ -1307,29 +1312,31 @@ multLeft(final SbMatrix m)
         this.copyFrom(m);
         return this;
     }
-    final float[][]       tmp= new float[4][4];
+	if (tmp == null) {
+		tmp = new float[16];
+	}
 
 //#define MULT_LEFT(i,j) (m.matrix[i][0]*matrix[0][j] + \
 //                        m.matrix[i][1]*matrix[1][j] + \
 //                        m.matrix[i][2]*matrix[2][j] + \
 //                        m.matrix[i][3]*matrix[3][j])
 
-    tmp[0][0] = MULT_LEFT(0,0,m);
-    tmp[0][1] = MULT_LEFT(0,1,m);
-    tmp[0][2] = MULT_LEFT(0,2,m);
-    tmp[0][3] = MULT_LEFT(0,3,m);
-    tmp[1][0] = MULT_LEFT(1,0,m);
-    tmp[1][1] = MULT_LEFT(1,1,m);
-    tmp[1][2] = MULT_LEFT(1,2,m);
-    tmp[1][3] = MULT_LEFT(1,3,m);
-    tmp[2][0] = MULT_LEFT(2,0,m);
-    tmp[2][1] = MULT_LEFT(2,1,m);
-    tmp[2][2] = MULT_LEFT(2,2,m);
-    tmp[2][3] = MULT_LEFT(2,3,m);
-    tmp[3][0] = MULT_LEFT(3,0,m);
-    tmp[3][1] = MULT_LEFT(3,1,m);
-    tmp[3][2] = MULT_LEFT(3,2,m);
-    tmp[3][3] = MULT_LEFT(3,3,m);
+    tmp[0] = MULT_LEFT(0,0,m);
+    tmp[1] = MULT_LEFT(0,1,m);
+    tmp[2] = MULT_LEFT(0,2,m);
+    tmp[3] = MULT_LEFT(0,3,m);
+    tmp[4] = MULT_LEFT(1,0,m);
+    tmp[5] = MULT_LEFT(1,1,m);
+    tmp[6] = MULT_LEFT(1,2,m);
+    tmp[7] = MULT_LEFT(1,3,m);
+    tmp[8] = MULT_LEFT(2,0,m);
+    tmp[9] = MULT_LEFT(2,1,m);
+    tmp[10] = MULT_LEFT(2,2,m);
+    tmp[11] = MULT_LEFT(2,3,m);
+    tmp[12] = MULT_LEFT(3,0,m);
+    tmp[13] = MULT_LEFT(3,1,m);
+    tmp[14] = MULT_LEFT(3,2,m);
+    tmp[15] = MULT_LEFT(3,3,m);
 
 //#undef MULT_LEFT
 
@@ -1453,6 +1460,26 @@ multLeft(final SbMatrix m)
 		matrix[3][1] = m[3][1];
 		matrix[3][2] = m[3][2];
 		matrix[3][3] = m[3][3];
+		return this;
+	}
+	// java port
+	public SbMatrix copyFrom(float[] m) {
+		matrix[0][0] = m[0];
+		matrix[0][1] = m[1];
+		matrix[0][2] = m[2];
+		matrix[0][3] = m[3];
+		matrix[1][0] = m[4];
+		matrix[1][1] = m[5];
+		matrix[1][2] = m[6];
+		matrix[1][3] = m[7];
+		matrix[2][0] = m[8];
+		matrix[2][1] = m[9];
+		matrix[2][2] = m[10];
+		matrix[2][3] = m[11];
+		matrix[3][0] = m[12];
+		matrix[3][1] = m[13];
+		matrix[3][2] = m[14];
+		matrix[3][3] = m[15];
 		return this;
 	}
 

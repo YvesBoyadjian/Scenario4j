@@ -23,11 +23,7 @@
 
 package jscenegraph.database.inventor.elements;
 
-import jscenegraph.database.inventor.SbBox3f;
-import jscenegraph.database.inventor.SbMatrix;
-import jscenegraph.database.inventor.SbPlane;
-import jscenegraph.database.inventor.SbVec3f;
-import jscenegraph.database.inventor.SbViewVolume;
+import jscenegraph.database.inventor.*;
 import jscenegraph.database.inventor.errors.SoDebugError;
 import jscenegraph.database.inventor.misc.SoState;
 import jscenegraph.port.Array;
@@ -273,10 +269,10 @@ public class SoCullElement extends SoElement {
 	  if (elem == null) return false;
 
 	  int i, j;
-	  final SbVec3f min = new SbVec3f(), max = new SbVec3f();
+	  final SbVec3fSingleFast min = new SbVec3fSingleFast(), max = new SbVec3fSingleFast();
 	  min.copyFrom( box.getMin());
 	  max.copyFrom( box.getMax());
-	  final SbVec3f[] pts = new SbVec3f[8]; for ( i=0;i<8;i++) {pts[i] = new SbVec3f();}
+	  final SbVec3f[] pts = new SbVec3f[8]; for ( i=0;i<8;i++) {pts[i] = new SbVec3fSingleFast();}
 
 	  final SbMatrix mm = new SbMatrix();
 	  boolean identity = ! transform;
@@ -291,9 +287,9 @@ public class SoCullElement extends SoElement {
 
 	  // create the 8 box corner points
 	  for (i = 0; i < 8; i++) {
-	    pts[i].setValue(0, (i & 1) !=0 ? min.getValueRead()[0] : max.getValueRead()[0]);
-	    pts[i].setValue(1, (i & 2) !=0 ? min.getValueRead()[1] : max.getValueRead()[1]);
-	    pts[i].setValue(2, (i & 4) !=0 ? min.getValueRead()[2] : max.getValueRead()[2]);
+	    pts[i].setValue(0, (i & 1) !=0 ? min.getValue()[0] : max.getValue()[0]);
+	    pts[i].setValue(1, (i & 2) !=0 ? min.getValue()[1] : max.getValue()[1]);
+	    pts[i].setValue(2, (i & 4) !=0 ? min.getValue()[2] : max.getValue()[2]);
 	    if (!identity) mm.multVecMatrix(pts[i], pts[i]);
 	  }
 

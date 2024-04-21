@@ -1006,7 +1006,12 @@ reset(SoState state, int bitmask)
             !this.colorpacker.transpMatch(this.coinstate.transpnodeid)) {
                 this.packColors(this.colorpacker);
             }
-            this.packedpointer = new IntArrayPtr(this.colorpacker.getPackedColors());
+            if (this.packedpointer instanceof IntArrayPtr) {
+                this.packedpointer.initializeFrom(this.colorpacker.getPackedColors());
+            }
+            else {
+                this.packedpointer = new IntArrayPtr(this.colorpacker.getPackedColors());
+            }
         }
   else this.packedpointer = this.coinstate.packedarray;
 
