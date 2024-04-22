@@ -133,10 +133,10 @@ public void getMatrix(SoGetMatrixAction action)
 	      // only cache if we do a full traversal
 	      break;
 	    }
-	    final SoNodeProfiling profiling = new SoNodeProfiling();
-	    profiling.preTraversal(action);
+	    //final SoNodeProfiling profiling = new SoNodeProfiling();
+	    //profiling.preTraversal(action);
 	    ((SoNode)childarray[i]).GLRenderBelowPath(action);
-	    profiling.postTraversal(action);
+	    //profiling.postTraversal(action);
 
 	//#if COIN_DEBUG
 	    // The GL error test is default disabled for this optimized

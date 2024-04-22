@@ -67,7 +67,7 @@ public class SbClip {
 	  should return a new void pointer to be stored by the clipper.
 	*/
 	public void
-	clip(final SbPlane plane)
+	clip(final SbPlane plane, final Object[] data0, final Object[] data1)
 	{
 	  int n = this.array[this.curr].getLength();
 
@@ -81,7 +81,6 @@ public class SbClip {
 
 	  for (int i = 0; i < n; i++) {
 	    v0.constructor(); v1.constructor();
-	    final Object[] data0 = new Object[1], data1 = new Object[1];
 	    this.array(this.curr).operator_square_bracket(i).get(v0, data0);
 	    this.array(this.curr).operator_square_bracket(i+1).get(v1, data1);
 
@@ -96,7 +95,7 @@ public class SbClip {
 	      final SbVec3f newvertex = v0.operator_minus(dir.operator_mul(d0/dot));
 	      Object newdata = null;
 //	      if (this.callback) {
-//	        newdata = this.callback(v0, data0, v1, data1, newvertex, this.cbdata);
+//	        newdata = this.callback(v0, data0[0], v1, data1[0], newvertex, this.cbdata);
 //	      }
 	      outputVertex(newvertex, newdata);
 	    }
@@ -108,13 +107,13 @@ public class SbClip {
 	      final SbVec3f newvertex = v0.operator_minus(dir.operator_mul(d0/dot));
 	      Object newdata = null;
 //	      if (this.callback) {
-//	        newdata = this.callback(v0, data0, v1, data1, newvertex, this.cbdata);
+//	        newdata = this.callback(v0, data0[0], v1, data1[0], newvertex, this.cbdata);
 //	      }
 	      outputVertex(newvertex, newdata);
-	      outputVertex(v1, data1);
+	      outputVertex(v1, data1[0]);
 	    }
 	    else if (d0 >= 0.0f && d1 >= 0.0f) { // in plane
-	      outputVertex(v1, data1);
+	      outputVertex(v1, data1[0]);
 	    }
 	  }
 	  this.array[this.curr].truncate(0);

@@ -510,6 +510,9 @@ public abstract class SoTouchLOD2 extends SoLOD implements SoTouchLODMaster.SoTo
 	final SbVec3f worldcenter = new SbVec3fSingleFast();
 
 	final SbVec3f model_xyz = new SbVec3fSingleFast();
+
+	final SbMatrix dummyMatrix = new SbMatrix();
+
 	/*!
 	  Returns the child to traverse based on the ranges in
 	  SoLOD::range. Will clamp to index to the number of children.  This
@@ -542,7 +545,7 @@ public abstract class SoTouchLOD2 extends SoLOD implements SoTouchLODMaster.SoTo
 
 	  //SbVec3f world_camera_direction = camera.orientation.getValue().multVec(new SbVec3f(0,0,-1));
 	  
-	  mat.inverse().multVecMatrix(world_camera_position, model_xyz);
+	  mat.inverse(dummyMatrix).multVecMatrix(world_camera_position, model_xyz);
 	  
 	  //world_camera_direction.normalize();
 	  

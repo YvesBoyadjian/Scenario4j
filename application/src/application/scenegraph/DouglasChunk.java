@@ -460,10 +460,10 @@ public class DouglasChunk {
 				xTrunk2 = xTopTree + (zTopF - zStartBranch2)/(zTopF - getZ(tree))*(getX(tree) - xTopTree);
 				yTrunk2 = yTopTree + (zTopF - zStartBranch2)/(zTopF - getZ(tree))*(getY(tree) - yTopTree);
 
-				final SbVec3f branchBase = new SbVec3fSingle();
-				final SbVec3f branchBase2 = new SbVec3fSingle();
-				final SbVec3f branchExtremity = new SbVec3fSingle();
-				final SbVec3f branchExtremity2 = new SbVec3fSingle();
+				final SbVec3f branchBase = new SbVec3fSingleFast();
+				final SbVec3f branchBase2 = new SbVec3fSingleFast();
+				final SbVec3f branchExtremity = new SbVec3fSingleFast();
+				final SbVec3f branchExtremity2 = new SbVec3fSingleFast();
 
 				branchBase.setValue(xTrunk,yTrunk,zStartBranch);
 				branchBase2.setValue(xTrunk2,yTrunk2,zStartBranch2);

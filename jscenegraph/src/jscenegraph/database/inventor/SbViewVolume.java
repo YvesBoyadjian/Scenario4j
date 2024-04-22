@@ -1838,19 +1838,22 @@ public class SbViewVolume implements Mutable {
 	  }
 
 	  // clip view volume polygons against the bbox planes
-	  clip_face(clipper, vvpts.get(0), vvpts.get(1), vvpts.get(3), vvpts.get(2), planes, commonVolume);
-	  clip_face(clipper, vvpts.get(1), vvpts.get(5), vvpts.get(7), vvpts.get(3), planes, commonVolume);
-	  clip_face(clipper, vvpts.get(5), vvpts.get(4), vvpts.get(6), vvpts.get(7), planes, commonVolume);
-	  clip_face(clipper, vvpts.get(4), vvpts.get(0), vvpts.get(2), vvpts.get(6), planes, commonVolume);
-	  clip_face(clipper, vvpts.get(4), vvpts.get(5), vvpts.get(1), vvpts.get(0), planes, commonVolume);
-	  clip_face(clipper, vvpts.get(2), vvpts.get(3), vvpts.get(7), vvpts.get(6), planes, commonVolume);
+
+		final Object[] data0 = new Object[1], data1 = new Object[1];
+
+	  clip_face(clipper, vvpts.get(0), vvpts.get(1), vvpts.get(3), vvpts.get(2), planes, commonVolume, data0, data1);
+	  clip_face(clipper, vvpts.get(1), vvpts.get(5), vvpts.get(7), vvpts.get(3), planes, commonVolume, data0, data1);
+	  clip_face(clipper, vvpts.get(5), vvpts.get(4), vvpts.get(6), vvpts.get(7), planes, commonVolume, data0, data1);
+	  clip_face(clipper, vvpts.get(4), vvpts.get(0), vvpts.get(2), vvpts.get(6), planes, commonVolume, data0, data1);
+	  clip_face(clipper, vvpts.get(4), vvpts.get(5), vvpts.get(1), vvpts.get(0), planes, commonVolume, data0, data1);
+	  clip_face(clipper, vvpts.get(2), vvpts.get(3), vvpts.get(7), vvpts.get(6), planes, commonVolume, data0, data1);
 
 	  return commonVolume;
 	}
 
 	public void clip_face(SbClip clipper, SbVec3f v0, SbVec3f v1,
               SbVec3f v2, SbVec3f v3,
-              Array< SbPlane> planes, SbBox3f isect)
+              Array< SbPlane> planes, SbBox3f isect, final Object[] data0, final Object[] data1)
 {
  int i;
  clipper.addVertex(v0);
@@ -1858,7 +1861,7 @@ public class SbViewVolume implements Mutable {
  clipper.addVertex(v2);
  clipper.addVertex(v3);
  for (i = 0; i < 6; i++) {
-   clipper.clip(planes.get(i));
+   clipper.clip(planes.get(i), data0, data1);
  }
  int n = clipper.getNumVertices();
  if (n > 0) {
