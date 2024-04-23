@@ -83,6 +83,12 @@ public class IntArrayPtr implements Destroyable, IntBufferAble {
 		intOffset = start + values.start;		
 	}
 
+	public void initFrom(int start, IntArray values) {
+		this.array = values.values;
+		intOffset = start + values.start;
+		intBuffer = null;
+	}
+
 	public IntArrayPtr(IntArray values) {
 		this.array = values.values;
 		this.intOffset = values.start;

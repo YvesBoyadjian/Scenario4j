@@ -210,7 +210,12 @@ public class SbDPViewVolume implements Mutable {
 	public static SbVec3f 
 	dp_to_sbvec3f(final SbVec3d v)
 	{
-	  return new SbVec3f((float)(v.getX()), (float)(v.getY()), (float)(v.getZ()));
+	  return new SbVec3fSingleFast((float)(v.getX()), (float)(v.getY()), (float)(v.getZ()));
+	}
+	public static SbVec3f
+	dp_to_sbvec3f(final SbVec3d v, final SbVec3f dummy)
+	{
+		return dummy.setValue((float)(v.getX()), (float)(v.getY()), (float)(v.getZ()));
 	}
 
 	// FIXME: bitmap-illustration for function doc which shows how the
@@ -571,17 +576,19 @@ public class SbDPViewVolume implements Mutable {
 */
 	public void copyValues(final SbViewVolume vv)
 	{
+		final SbVec3f dummy = new SbVec3fSingleFast();
+
 		vv.type = /*SbViewVolume.ProjectionType)*/this.type;
-		vv.projPoint.copyFrom(dp_to_sbvec3f(this.projPoint));
-		vv.projDir.copyFrom(dp_to_sbvec3f(this.projDir));
+		vv.projPoint.copyFrom(dp_to_sbvec3f(this.projPoint, dummy));
+		vv.projDir.copyFrom(dp_to_sbvec3f(this.projDir, dummy));
 		vv.nearDist = (float)(this.nearDist);
 		vv.nearToFar = (float)(this.nearToFar);
-		vv.llf.copyFrom(dp_to_sbvec3f(this.llf.operator_add(this.projPoint)));
-		vv.lrf.copyFrom(dp_to_sbvec3f(this.lrf.operator_add(this.projPoint)));
-		vv.ulf.copyFrom(dp_to_sbvec3f(this.ulf.operator_add(this.projPoint)));
+		vv.llf.copyFrom(dp_to_sbvec3f(this.llf.operator_add(this.projPoint), dummy));
+		vv.lrf.copyFrom(dp_to_sbvec3f(this.lrf.operator_add(this.projPoint), dummy));
+		vv.ulf.copyFrom(dp_to_sbvec3f(this.ulf.operator_add(this.projPoint), dummy));
 
-		vv.llfO.copyFrom(dp_to_sbvec3f(llf)); // For compatibility
-		vv.lrfO.copyFrom(dp_to_sbvec3f(lrf));
-		vv.ulfO.copyFrom(dp_to_sbvec3f(ulf));
+		vv.llfO.copyFrom(dp_to_sbvec3f(llf, dummy)); // For compatibility
+		vv.lrfO.copyFrom(dp_to_sbvec3f(lrf, dummy));
+		vv.ulfO.copyFrom(dp_to_sbvec3f(ulf, dummy));
 	}
 }

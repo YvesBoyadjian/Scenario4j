@@ -291,6 +291,22 @@ public IntArrayPtr getValuesIntArrayPtr(int start) {
 	return new IntArrayPtr(start, values);
 }
 
+	/**
+	 * Java port
+	 * @param start
+	 * @return
+	 */
+	public IntArrayPtr getValuesIntArrayPtr(int start, final IntArrayPtr dummy) {
+		evaluate();
+
+		if( values == null ) {
+			return null;
+		}
+
+		dummy.initFrom(start, values);
+		return dummy;
+	}
+
 public int operator_square_bracketI(int i) {
 	evaluate();
 	return (int) values.get(i);

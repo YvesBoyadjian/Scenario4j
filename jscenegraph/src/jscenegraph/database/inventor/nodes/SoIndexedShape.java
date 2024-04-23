@@ -804,6 +804,11 @@ allocateSequentialWithHoles()
     return result;
 }
 
+    final IntArrayPtr dummyCIndices = new IntArrayPtr((int[])null);
+    final IntArrayPtr dummyMIndices = new IntArrayPtr((int[])null);
+    final IntArrayPtr dummyTIndices = new IntArrayPtr((int[])null);
+    final IntArrayPtr dummyNIndices = new IntArrayPtr((int[])null);
+
 /*!
   Convenience method that will fetch data needed for rendering or
   generating primitives. Takes care of normal cache.
@@ -826,19 +831,19 @@ getVertexData(final SoState state,
 {
   super.getVertexData(state, coords, normalsFloat, normalsShort, needNormals);
   
-  cindices[0] = this.coordIndex.getValuesIntArrayPtr(0);
+  cindices[0] = this.coordIndex.getValuesIntArrayPtr(0,dummyCIndices);
   numcindices[0] = this.coordIndex.getNum();
 
-  mindices[0] = this.materialIndex.getValuesIntArrayPtr(0);
+  mindices[0] = this.materialIndex.getValuesIntArrayPtr(0,dummyMIndices);
   if (this.materialIndex.getNum() <= 0 || mindices[0].get(0) < 0) mindices[0] = null;
 
-  tindices[0] = this.textureCoordIndex.getValuesIntArrayPtr(0);
+  tindices[0] = this.textureCoordIndex.getValuesIntArrayPtr(0,dummyTIndices);
   if (this.textureCoordIndex.getNum() <= 0 || tindices[0].get(0) < 0) tindices[0] = null;
 
   normalCacheUsed[0] = false;
   nindices[0] = null;
   if (needNormals) {
-    nindices[0] = this.normalIndex.getValuesIntArrayPtr(0);
+    nindices[0] = this.normalIndex.getValuesIntArrayPtr(0, dummyNIndices);
     if (this.normalIndex.getNum() <= 0 || nindices[0].get(0) < 0) nindices[0] = null;
 
     if (normalsFloat[0] == null && normalsShort[0] == null) {

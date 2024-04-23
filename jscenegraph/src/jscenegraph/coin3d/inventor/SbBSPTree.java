@@ -36,10 +36,7 @@ import jscenegraph.coin3d.inventor.lists.SbList;
 import jscenegraph.coin3d.inventor.lists.SbListIndexable;
 import jscenegraph.coin3d.inventor.lists.SbListInt;
 import jscenegraph.coin3d.inventor.lists.SbListInteger;
-import jscenegraph.database.inventor.SbBox3f;
-import jscenegraph.database.inventor.SbSphere;
-import jscenegraph.database.inventor.SbVec3f;
-import jscenegraph.database.inventor.SbVec3fSingle;
+import jscenegraph.database.inventor.*;
 import jscenegraph.port.Destroyable;
 import jscenegraph.port.SbVec3fArray;
 import jscenegraph.port.memorybuffer.FloatMemoryBuffer;
@@ -344,7 +341,7 @@ findPoints(final SbSphere sphere, final SbListInt array)
 	{
 	  int n = this.pointsArray.getLength();
 	  if (n < 32) { // points are very scattered when few are inserted
-	    final SbVec3f tmp = new SbVec3f();
+	    final SbVec3f tmp = new SbVec3fSingleFast();
 	    int smallidx = -1;
 	    float smalldist = Float.MAX_VALUE;//FLT_MAX;
 	    for (int i = 0; i < n; i++) {
@@ -391,7 +388,7 @@ findPoints(final SbSphere sphere, final SbListInt array)
 	{
 		int n = this.pointsArray.getLength();
 		if (n < 32) { // points are very scattered when few are inserted
-			final SbVec3f tmp = new SbVec3f();
+			final SbVec3f tmp = new SbVec3fSingleFast();
 			int smallidx = -1;
 			float smalldist = Float.MAX_VALUE;//FLT_MAX;
 			for (int i = 0; i < n; i++) {
@@ -443,8 +440,8 @@ findPoints(final SbSphere sphere, final SbListInt array)
 	                       final SbListInt arr)
 	{
 	  this.findPoints(sphere, arr);
-	  final SbVec3fSingle pos = new SbVec3fSingle(sphere.getCenter());
-	  final SbVec3fSingle dummy = new SbVec3fSingle();
+	  final SbVec3fSingleFast pos = new SbVec3fSingleFast(sphere.getCenter());
+	  final SbVec3fSingleFast dummy = new SbVec3fSingleFast();
 	  int n = arr.getLength();
 	  int closeidx = -1;
 	  float closedist = Float.MAX_VALUE;
@@ -463,7 +460,7 @@ findPoints(final SbSphere sphere, final SbListInt array)
 				final SbListInt arr, Filter filter)
 	{
 		this.findPoints(sphere, arr);
-		final SbVec3f pos = new SbVec3f(sphere.getCenter());
+		final SbVec3f pos = new SbVec3fSingleFast(sphere.getCenter());
 		int n = arr.getLength();
 		int closeidx = -1;
 		float closedist = Float.MAX_VALUE;

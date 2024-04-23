@@ -10,7 +10,9 @@ import application.objects.DouglasFir;
 import application.scenegraph.douglas.IndexedFaceSetParameters;
 import application.scenegraph.douglas.IndexedFaceSetParametersImpl;
 import jscenegraph.coin3d.inventor.lists.SbListInt;
+import jscenegraph.coin3d.inventor.lists.SbListOfMutableRefs;
 import jscenegraph.database.inventor.*;
+import jscenegraph.port.SbVec3fArray;
 import jscenegraph.port.memorybuffer.FloatMemoryBuffer;
 import jscenegraph.port.memorybuffer.ShortMemoryBuffer;
 
@@ -172,6 +174,12 @@ public class DouglasChunk {
 
 		//final List<SbVec3f> branchStartPoints = new ArrayList<>();
 
+		final SbVec3fSingleFast rotAxis = new SbVec3fSingleFast();
+
+		final SbRotation rot = new SbRotation();
+
+		final SbVec3f xyzTop = new SbVec3fSingleFast();
+
 		for( int tree = 0; tree< nbDouglas; tree++) {
 			
 			float height = getHeight(tree);
@@ -197,13 +205,13 @@ public class DouglasChunk {
 			float angleRadian2 = angleDegree2 * (float)Math.PI / 180.0f;
 			float angleRadian3 = angleDegree3 * (float)Math.PI / 180.0f;
 			
-			SbVec3f rotAxis = new SbVec3f((float)Math.sin(getRandomLeanDirectionAngleTree(tree)),(float)Math.cos(getRandomLeanDirectionAngleTree(tree)),0.0f);
+			rotAxis.setValue((float)Math.sin(getRandomLeanDirectionAngleTree(tree)),(float)Math.cos(getRandomLeanDirectionAngleTree(tree)),0.0f);
 			
-			SbRotation rot = new SbRotation(rotAxis,getRandomLeanAngleTree(tree));
+			rot.setValue(rotAxis,getRandomLeanAngleTree(tree));
 						
-			SbVec3f xyzTree = new SbVec3f(getX(tree), getY(tree),getZ(tree));
+			//SbVec3f xyzTree = new SbVec3f(getX(tree), getY(tree),getZ(tree));
 			
-			SbVec3f xyzTop = new SbVec3f(0,0,height);
+			xyzTop.setValue(0,0,height);
 			
 			final SbVec3f xyzTopLean = rot.multVec(xyzTop);
 			
@@ -389,18 +397,24 @@ public class DouglasChunk {
 		final float zDeltaBaseBranch = 1.5f;
 		final boolean branchExtremityOn = false;
 
+		final SbVec3f rotAxis = new SbVec3fSingleFast();
+
+		final SbRotation rot = new SbRotation();
+
+		final SbVec3f xyzTop = new SbVec3fSingleFast();
+
 		// _____________________________________________________________________ For each tree
 		for( int tree = groupIndex; tree< nbDouglas; tree += NUM_NEAR_FOLIAGE) {
 
 			float height = getHeight(tree);
 
-			SbVec3f rotAxis = new SbVec3f((float)Math.sin(getRandomLeanDirectionAngleTree(tree)),(float)Math.cos(getRandomLeanDirectionAngleTree(tree)),0.0f);
+			rotAxis.setValue((float)Math.sin(getRandomLeanDirectionAngleTree(tree)),(float)Math.cos(getRandomLeanDirectionAngleTree(tree)),0.0f);
 
-			SbRotation rot = new SbRotation(rotAxis,getRandomLeanAngleTree(tree));
+			rot.setValue(rotAxis,getRandomLeanAngleTree(tree));
 
 			//SbVec3f xyzTree = new SbVec3f(getX(tree), getY(tree),getZ(tree));
 
-			SbVec3f xyzTop = new SbVec3f(0,0,height);
+			xyzTop.setValue(0,0,height);
 
 			final SbVec3f xyzTopLean = rot.multVec(xyzTop);
 
@@ -560,7 +574,11 @@ public class DouglasChunk {
 		douglasColorsT = new int[nbVertices];
 		
 		float trunk_width_coef = DouglasFir.trunk_diameter_angle_degree*(float)Math.PI/180.0f;
-		
+
+		final SbVec3f rotAxis = new SbVec3fSingleFast();
+
+		final SbRotation rot = new SbRotation();
+
 		for( int tree = 0; tree< nbDouglas; tree++) {
 			
 			float height = getHeight(tree);
@@ -574,9 +592,9 @@ public class DouglasChunk {
 			
 			int vertexCoordIndice = vertex * 3;
 			
-			SbVec3f rotAxis = new SbVec3f((float)Math.sin(getRandomLeanDirectionAngleTree(tree)),(float)Math.cos(getRandomLeanDirectionAngleTree(tree)),0.0f);
+			rotAxis.setValue((float)Math.sin(getRandomLeanDirectionAngleTree(tree)),(float)Math.cos(getRandomLeanDirectionAngleTree(tree)),0.0f);
 			
-			SbRotation rot = new SbRotation(rotAxis,getRandomLeanAngleTree(tree));
+			rot.setValue(rotAxis,getRandomLeanAngleTree(tree));
 						
 			SbVec3f xyzTree = new SbVec3f(getX(tree), getY(tree),getZ(tree));
 			
