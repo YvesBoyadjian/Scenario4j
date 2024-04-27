@@ -1634,11 +1634,11 @@ public class MainGLFW {
 //				e.printStackTrace();
 //			}
 
-			byte[] seaSound = loadSound("AMBSea_Falaise 2 (ID 2572)_LS_16bit.wav");
+			InputStream seaSound = loadMP3Sound("AMBSea_Falaise 2 (ID 2572)_LS_16bit.mp3");
 
-			seaClip = playSound(new ByteArrayInputStream(seaSound),true, 0.001f);
+			seaClip = playSound(seaSound,true, 0.0001f);
 
-			InputStream forestSound = loadGZipSound("STORM_Orage et pluie 4 (ID 2719)_LS.wav.gz");
+			InputStream forestSound = loadMP3Sound("STORM_Orage et pluie 4 (ID 2719)_LS_audacity.mp3");
 
 			forestClip = playSound(forestSound, true, 1.0f);
 
@@ -1772,6 +1772,34 @@ public class MainGLFW {
 		return null;
 	}
 
+	public static AudioInputStream loadMP3Sound(final String url) {
+		String args = "ressource/" + url;
+		File file = new File(args);
+		if (!file.exists()) {
+			file = new File("application/" + args);
+		}
+		try {
+			AudioInputStream in= AudioSystem.getAudioInputStream(file);
+			AudioFormat baseFormat = in.getFormat();
+			AudioFormat decodedFormat = new AudioFormat(AudioFormat.Encoding.PCM_SIGNED,
+					baseFormat.getSampleRate(),
+					16,
+					baseFormat.getChannels(),
+					baseFormat.getChannels() * 2,
+					baseFormat.getSampleRate(),
+					false);
+			AudioInputStream din = AudioSystem.getAudioInputStream(decodedFormat, in);
+			return din;
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (UnsupportedAudioFileException e) {
+            throw new RuntimeException(e);
+        }
+
+        return null;
+	}
+
 	public static synchronized void playSoundDelayed(final /*String url*/byte[] sound, boolean loop, float volume) {
 		new Thread(new Runnable() {
 		// The wrapper thread is unnecessary, unless it blocks on the
@@ -1799,7 +1827,7 @@ public class MainGLFW {
 						}
 
 					});
-					AudioInputStream inputStream = AudioSystem.getAudioInputStream(
+					AudioInputStream inputStream = sound instanceof AudioInputStream ? (AudioInputStream)sound : AudioSystem.getAudioInputStream(
 							sound);
 					clip.open(inputStream);
 					setVolume(clip,volume);
