@@ -17,6 +17,7 @@ import java.nio.file.Files;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
+import java.util.zip.GZIPInputStream;
 
 import javax.sound.sampled.*;
 import javax.swing.*;
@@ -312,6 +313,8 @@ public class MainGLFW {
 	//static final DxHashSpace.Node[][] tablePtr = new DxHashSpace.Node[1][];
 
 	static Clip seaClip;
+
+	static Clip forestClip;
 
 	static final AtomicLong[] lastAliveMillis = new AtomicLong[1];
 	static {
@@ -611,7 +614,7 @@ public class MainGLFW {
 						}
 					}
 			if (sg.getHero() != null && sg.getHero().hurting) {
-				screamClip[0] = playSound(screamSound, false,1.0f);
+				screamClip[0] = playSound(new ByteArrayInputStream(screamSound), false,1.0f);
 			}
 		});
 
@@ -966,7 +969,6 @@ public class MainGLFW {
 //		     }
 //		}
 		System.gc();
-		System.runFinalization();
 
 		int[] depthBits = new int[1];
 		gl2.glGetIntegerv(GL2.GL_DEPTH_BITS, depthBits);
@@ -1444,7 +1446,9 @@ public class MainGLFW {
 			float distanceFromBeach = sg.getDistanceFromBeach();
 			if (seaClip != null) {
 				float atmosphericAbsorption = (float)Math.pow(0.01, distanceFromBeach/1000.0f);
-				setVolume(seaClip, 1.0f / (15.0f + distanceFromBeach/40.0f) * atmosphericAbsorption);
+				float seaClipVolume = 1.0f / (15.0f + distanceFromBeach/40.0f) * atmosphericAbsorption;
+				setVolume(seaClip, seaClipVolume);
+				setVolume(forestClip, 1 - 15.0f * seaClipVolume);
 			}
 		});
 
@@ -1632,7 +1636,11 @@ public class MainGLFW {
 
 			byte[] seaSound = loadSound("AMBSea_Falaise 2 (ID 2572)_LS_16bit.wav");
 
-			seaClip = playSound(seaSound,true, 0.001f);
+			seaClip = playSound(new ByteArrayInputStream(seaSound),true, 0.001f);
+
+			InputStream forestSound = loadGZipSound("STORM_Orage et pluie 4 (ID 2719)_LS.wav.gz");
+
+			forestClip = playSound(forestSound, true, 1.0f);
 
 			boolean success = viewer.setFocus();
 
@@ -1746,17 +1754,35 @@ public class MainGLFW {
 		return fileContent;
 	}
 
+	public static InputStream loadGZipSound(final String url) {
+		String args = "ressource/" + url;
+		File file = new File(args);
+		if (!file.exists()) {
+			file = new File("application/" + args);
+		}
+		InputStream fileContent = null;
+		try {
+			fileContent = new FileInputStream(file);//Files.readAllBytes(file.toPath());
+			return new BufferedInputStream(new GZIPInputStream(fileContent));
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		return null;
+	}
+
 	public static synchronized void playSoundDelayed(final /*String url*/byte[] sound, boolean loop, float volume) {
 		new Thread(new Runnable() {
 		// The wrapper thread is unnecessary, unless it blocks on the
 		// Clip finishing; see comments.
 			public void run() {
-		playSound(sound,loop,volume);
+		playSound(new ByteArrayInputStream(sound),loop,volume);
 			}
 		}).start();
 	}
 
-	public static synchronized Clip playSound(final /*String url*/byte[] sound, boolean loop, float volume) {
+	public static synchronized Clip playSound(final /*String url*/InputStream sound, boolean loop, float volume) {
 //		new Thread(new Runnable() {
 			// The wrapper thread is unnecessary, unless it blocks on the
 			// Clip finishing; see comments.
@@ -1774,7 +1800,7 @@ public class MainGLFW {
 
 					});
 					AudioInputStream inputStream = AudioSystem.getAudioInputStream(
-							new ByteArrayInputStream(sound));
+							sound);
 					clip.open(inputStream);
 					setVolume(clip,volume);
 					if (loop) {
