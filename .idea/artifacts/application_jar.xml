@@ -72,9 +72,9 @@
       <element id="extracted-dir" path="$MAVEN_REPOSITORY$/com/fasterxml/jackson/core/jackson-databind/2.13.1/jackson-databind-2.13.1.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$MAVEN_REPOSITORY$/de/javagl/obj/0.3.0/obj-0.3.0.jar" path-in-jar="/" />
       <element id="module-output" name="obj" />
-      <element id="file-copy" path="$PROJECT_DIR$/application/jl1.0.1.jar" />
-      <element id="file-copy" path="$PROJECT_DIR$/application/mp3spi1.9.5.jar" />
-      <element id="file-copy" path="$PROJECT_DIR$/application/tritonus_share.jar" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/application/jl1.0.1.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/application/mp3spi1.9.5.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/application/tritonus_share.jar" path-in-jar="/" />
     </root>
   </artifact>
 </component>
