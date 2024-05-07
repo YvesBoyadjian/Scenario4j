@@ -23,12 +23,13 @@
  *************************************************************************/
 package org.ode4j.ode.threading.task;
 
+import java.util.ArrayDeque;
 import java.util.LinkedList;
 import java.util.Queue;
 
 public class SameThreadTaskExecutor extends AbstractTaskExecutor {
 
-    private final Queue<Task> queue = new LinkedList<>();
+    private final Queue<Task> queue = new /*LinkedList*/ArrayDeque<>();
 
 	public SameThreadTaskExecutor() {}
 

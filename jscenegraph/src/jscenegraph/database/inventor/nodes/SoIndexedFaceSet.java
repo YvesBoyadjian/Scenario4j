@@ -251,15 +251,7 @@ import jscenegraph.coin3d.inventor.rendering.SoTriangleIntArrayIndexer;
 import jscenegraph.coin3d.inventor.rendering.SoTriangleShortArrayIndexer;
 import jscenegraph.coin3d.inventor.rendering.VertexArrayIndexer;
 import jscenegraph.coin3d.misc.SoGL;
-import jscenegraph.database.inventor.SbMatrix;
-import jscenegraph.database.inventor.SbVec3f;
-import jscenegraph.database.inventor.SbVec3fSingle;
-import jscenegraph.database.inventor.SbVec3s;
-import jscenegraph.database.inventor.SbVec4f;
-import jscenegraph.database.inventor.SoDebug;
-import jscenegraph.database.inventor.SoPickedPoint;
-import jscenegraph.database.inventor.SoPrimitiveVertex;
-import jscenegraph.database.inventor.SoType;
+import jscenegraph.database.inventor.*;
 import jscenegraph.database.inventor.actions.SoAction;
 import jscenegraph.database.inventor.actions.SoGLRenderAction;
 import jscenegraph.database.inventor.actions.SoGetPrimitiveCountAction;
@@ -563,6 +555,10 @@ public void destructor()
 	final IntArrayPtr[] mindices = new IntArrayPtr[1];
 	final boolean[] normalCacheUsed = new boolean[1];
 
+	final SbVec3f v1 = new SbVec3fSingleFast();
+	final SbVec3f v2 = new SbVec3fSingleFast();
+	final SbVec4fSingle v3 = new SbVec4fSingle();
+
 ////////////////////////////////////////////////////////////////////////
 //
 // Description:
@@ -606,7 +602,7 @@ public void GLRender(SoGLRenderAction action)
 
 	  final SoMaterialBundle mb = new SoMaterialBundle(action);
 
-	  final SoTextureCoordinateBundle tb = new SoTextureCoordinateBundle(action, true, false);
+	  final SoTextureCoordinateBundle tb = new SoTextureCoordinateBundle(action, true, false,v1,v2,v3);
 	boolean doTextures = tb.needCoordinates();
 	  boolean sendNormals = !mb.isColorOnly() || tb.isFunction();
 

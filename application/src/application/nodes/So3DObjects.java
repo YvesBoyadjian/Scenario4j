@@ -37,6 +37,8 @@ public class So3DObjects extends SoSeparator {
         renderCaching.setValue(SoSeparator.CacheEnabled.OFF);
         this.collectible = collectible;
         this.collectible.setGraphicObject(this);
+
+        enableNotify(false); // don't notify child add/remove
     }
 
     public void

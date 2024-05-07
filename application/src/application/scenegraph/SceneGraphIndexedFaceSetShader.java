@@ -210,11 +210,11 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 	final SbVec3f douglasTreesRefPoint = new SbVec3f();
 	final SbVec3f douglasTreesRefPoint2 = new SbVec3f();
 
-	SoGroup douglasTreesST;
-	SoGroup douglasTreesSF;
+//	SoGroup douglasTreesST;
+//	SoGroup douglasTreesSF;
 	
-	final SbVec3f douglasTreesSRefPoint = new SbVec3f();
-	final SbVec3f douglasTreesSRefPoint2 = new SbVec3f();
+//	final SbVec3f douglasTreesSRefPoint = new SbVec3f();
+//	final SbVec3f douglasTreesSRefPoint2 = new SbVec3f();
 
 	SoTouchLODMaster master;
 	//SoTouchLODMaster masterS;
@@ -1468,17 +1468,17 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 	    
 	    douglasSepS.addChild(transl);
 
-		douglas_distance_shadow_trunk[0] = DOUGLAS_DISTANCE_SHADOW/2;
+//		douglas_distance_shadow_trunk[0] = DOUGLAS_DISTANCE_SHADOW/2;
 	    
-		douglasTreesST = getDouglasTreesT(douglasTreesSRefPoint,douglasTreesSRefPoint2, douglas_distance_shadow_trunk,progressBar,douglasLoadCount);
+//		douglasTreesST = getDouglasTreesT(douglasTreesSRefPoint,douglasTreesSRefPoint2, douglas_distance_shadow_trunk,progressBar,douglasLoadCount);
 		
-		douglasSepS.addChild(douglasTreesST);
+		douglasSepS.addChild(/*douglasTreesST*/douglasTreesT);
 
-		douglas_distance_shadow_foliage[0] = DOUGLAS_DISTANCE_SHADOW;
+//		douglas_distance_shadow_foliage[0] = DOUGLAS_DISTANCE_SHADOW;
 		
-		douglasTreesSF = getDouglasTreesF(douglasTreesSRefPoint,douglasTreesSRefPoint2, douglas_distance_shadow_foliage, false,progressBar,douglasLoadCount);
+//		douglasTreesSF = getDouglasTreesF(douglasTreesSRefPoint,douglasTreesSRefPoint2, douglas_distance_shadow_foliage, false,progressBar,douglasLoadCount);
 		
-		douglasSepS.addChild(douglasTreesSF);
+		douglasSepS.addChild(/*douglasTreesSF*/douglasTreesF);
 		
 		if(WITH_DOUGLAS)
 			castingShadowScene.addChild(douglasSepS);
@@ -1963,11 +1963,11 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 
 		speechGroup.addChild(materialFont);
 
-		speechGroup.addChild(oracleSpeechRotation);
+		speechGroup.addChild(oracleSpeechRotation); oracleSpeechRotation.rotation.enableNotify(false); // don't notify
 
-		speechGroup.addChild(speechTranslation);
+		speechGroup.addChild(speechTranslation); speechTranslation.translation.enableNotify(false); // don't notify
 
-		speechGroup.addChild(oracleSpeech);
+		speechGroup.addChild(oracleSpeech); oracleSpeech.string.enableNotify(false); // don't notify
 
 		return oracleSeparator;
 	}
@@ -2416,37 +2416,37 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 			}
 		}
 				
-		float treesS_x = current_x + xTransl+douglas_distance_shadow_foliage[0]*0.3f/*1000*/*world_camera_direction.getX();
-		float treesS_y = current_y + yTransl+douglas_distance_shadow_foliage[0]*0.3f/*1000*/*world_camera_direction.getY();
+//		float treesS_x = current_x + xTransl+douglas_distance_shadow_foliage[0]*0.3f/*1000*/*world_camera_direction.getX();
+//		float treesS_y = current_y + yTransl+douglas_distance_shadow_foliage[0]*0.3f/*1000*/*world_camera_direction.getY();
 		
-		douglasTreesSRefPoint.setValue(treesS_x,treesS_y,current_z + zTransl);
-		douglasTreesSRefPoint2.setValue(current_x + xTransl,current_y + yTransl,current_z + zTransl);
-
-		for (SoNode nodeForX : douglasTreesST.getChildren()) {
-			SoLODGroup sepForX = (SoLODGroup) nodeForX;
-			sepForX.referencePoint.setValue(treesS_x,treesS_y,current_z + zTransl);
-//			for( SoNode node : sepForX.getChildren()) {
-//			SoLODIndexedFaceSet lifs = (SoLODIndexedFaceSet) node;
-//			lifs.referencePoint.setValue(
-//					/*current_x + xTransl+1000*world_camera_direction.getX()*/treesS_x, 
-//					/*current_y + yTransl+1000*world_camera_direction.getY()*/treesS_y, 
-//					current_z + zTransl);
+//		douglasTreesSRefPoint.setValue(treesS_x,treesS_y,current_z + zTransl);
+//		douglasTreesSRefPoint2.setValue(current_x + xTransl,current_y + yTransl,current_z + zTransl);
+//
+//		for (SoNode nodeForX : douglasTreesST.getChildren()) {
+//			SoLODGroup sepForX = (SoLODGroup) nodeForX;
+//			sepForX.referencePoint.setValue(treesS_x,treesS_y,current_z + zTransl);
+////			for( SoNode node : sepForX.getChildren()) {
+////			SoLODIndexedFaceSet lifs = (SoLODIndexedFaceSet) node;
+////			lifs.referencePoint.setValue(
+////					/*current_x + xTransl+1000*world_camera_direction.getX()*/treesS_x,
+////					/*current_y + yTransl+1000*world_camera_direction.getY()*/treesS_y,
+////					current_z + zTransl);
+////			}
+//		}
+//
+//		for (SoNode nodeForX : douglasTreesSF.getChildren()) {
+//			if (nodeForX instanceof SoLODGroup) {
+//				SoLODGroup sepForX = (SoLODGroup) nodeForX;
+//				sepForX.referencePoint.setValue(treesS_x, treesS_y, current_z + zTransl);
+////			for( SoNode node : sepForX.getChildren()) {
+////			SoLODIndexedFaceSet lifs = (SoLODIndexedFaceSet) node;
+////			lifs.referencePoint.setValue(
+////					/*current_x + xTransl+1000*world_camera_direction.getX()*/treesS_x,
+////					/*current_y + yTransl+1000*world_camera_direction.getY()*/treesS_y,
+////					current_z + zTransl);
+////			}
 //			}
-		}
-				
-		for (SoNode nodeForX : douglasTreesSF.getChildren()) {
-			if (nodeForX instanceof SoLODGroup) {
-				SoLODGroup sepForX = (SoLODGroup) nodeForX;
-				sepForX.referencePoint.setValue(treesS_x, treesS_y, current_z + zTransl);
-//			for( SoNode node : sepForX.getChildren()) {
-//			SoLODIndexedFaceSet lifs = (SoLODIndexedFaceSet) node;
-//			lifs.referencePoint.setValue(
-//					/*current_x + xTransl+1000*world_camera_direction.getX()*/treesS_x, 
-//					/*current_y + yTransl+1000*world_camera_direction.getY()*/treesS_y, 
-//					current_z + zTransl);
-//			}
-			}
-		}
+//		}
 		
 		float targets_x = current_x + xTransl/*+SoTarget.MAX_VIEW_DISTANCE*world_camera_direction.getX()*0.8f*/;
 		float targets_y = current_y + yTransl/*+SoTarget.MAX_VIEW_DISTANCE*world_camera_direction.getY()*0.8f*/;
@@ -3006,7 +3006,9 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 	}
 
 	public void talk(String[] whatToSay) {
-		oracleSpeech.justification.setValue(SoText3.Justification.CENTER);
+		if(oracleSpeech.justification.getValue() != SoText3.Justification.CENTER.getValue()) {
+			oracleSpeech.justification.setValue(SoText3.Justification.CENTER);
+		}
 
 		float angle = (float)Math.atan2(current_y - ORACLE_Y, current_x - ORACLE_X) + (float)Math.PI/2;
 

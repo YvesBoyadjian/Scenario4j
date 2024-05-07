@@ -54,6 +54,8 @@ public class SoTargets extends SoSeparator {
 		targetCube.height.setValue(target.getSize());
 		targetCube.width.setValue(target.getRatio() * targetCube.height.getValue());
 		targetCube.depth.setValue(0.1f);
+
+		enableNotify(false); // don't notify
 	}
 
 	public void

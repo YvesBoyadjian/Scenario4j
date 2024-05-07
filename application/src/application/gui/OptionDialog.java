@@ -38,7 +38,7 @@ public class OptionDialog extends JDialog {
     public static final double DEFAULT_SHADOW_PRECISION = 0.05;//0.075;
     public static final double DEFAULT_LOD_FACTOR = 0.5;
     public static final double DEFAULT_LOD_FACTOR_SHADOW = 0.5;
-    public static final double DEFAULT_TREE_DISTANCE = 1500;//3000;
+    public static final double DEFAULT_TREE_DISTANCE = 2500;//3000;
     public static final double DEFAULT_TREE_SHADOW_DISTANCE = 500;//1500;
     public static final int DEFAULT_ISLAND_DEPTH = 5612;
     public static final boolean DEFAULT_VOLUMETRIC_SKY = false;
@@ -150,7 +150,7 @@ public class OptionDialog extends JDialog {
         setShadowPrecision(0.05);
         setLODFactor(0.5);
         setLODFactorShadow(0.5);
-        setTreeDistance(1500);
+        setTreeDistance(2500);
         setTreeShadowDistance(500);
         setIslandDepth(5612);
         setVolumetricSky(false);
@@ -160,7 +160,7 @@ public class OptionDialog extends JDialog {
         setShadowPrecision(0.075/*DEFAULT_SHADOW_PRECISION*/);
         setLODFactor(1.0/*DEFAULT_LOD_FACTOR*/);
         setLODFactorShadow(1.0/*DEFAULT_LOD_FACTOR_SHADOW*/);
-        setTreeDistance(4500/*DEFAULT_TREE_DISTANCE*/);
+        setTreeDistance(6000/*DEFAULT_TREE_DISTANCE*/);
         setTreeShadowDistance(1500/*DEFAULT_TREE_SHADOW_DISTANCE*/);
         setIslandDepth(5612/*DEFAULT_ISLAND_DEPTH*/);
         setVolumetricSky(false/*DEFAULT_VOLUMETRIC_SKY*/);
@@ -170,17 +170,17 @@ public class OptionDialog extends JDialog {
         setShadowPrecision(0.2);
         setLODFactor(2.0);
         setLODFactorShadow(2.0);
-        setTreeDistance(7000);
+        setTreeDistance(6000);
         setTreeShadowDistance(3000);
         setIslandDepth(14000);
-        setVolumetricSky(false);
+        setVolumetricSky(true);
     }
 
     private void onUltra() {
         setShadowPrecision(0.2);
         setLODFactor(2.0);
         setLODFactorShadow(2.0);
-        setTreeDistance(7000);
+        setTreeDistance(9000);
         setTreeShadowDistance(3000);
         setIslandDepth(14000);
         setVolumetricSky(true);

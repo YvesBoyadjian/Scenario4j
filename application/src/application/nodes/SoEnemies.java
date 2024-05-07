@@ -49,6 +49,8 @@ public class SoEnemies extends SoSeparator {
         renderCaching.setValue(CacheEnabled.OFF);
         this.enemies = enemies;
         this.sg = sg;
+
+        enableNotify(false); //don't notify
     }
     public void setReferencePoint(SbVec3f referencePoint) {
         this.referencePoint = referencePoint;

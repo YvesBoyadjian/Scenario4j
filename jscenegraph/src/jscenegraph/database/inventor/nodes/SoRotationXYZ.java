@@ -189,10 +189,42 @@ public class SoRotationXYZ extends SoTransformation {
 	        }	    	
 	    }
 
+	//! Returns an SbRotation equivalent to the specified rotation.
+	public SbRotation          getRotation(final SbVec3fSingleFast ax, final SbRotation      rot) {
+		if (angle.isIgnored() || angle.isDefault())
+			return SbRotation.identity();
+
+		else {
+			ax.setValue(0.0f, 0.0f, 0.0f);
+
+			switch (Axis.values()[axis.getValue()]) {
+
+				case X:
+					ax.getValue()[0] = 1.0f;
+					break;
+
+				case Y:
+					ax.getValue()[1] = 1.0f;
+					break;
+
+				case Z:
+					ax.getValue()[2] = 1.0f;
+					break;
+			}
+
+			rot.setValue(ax, angle.getValue());
+
+			return rot;
+		}
+	}
+
+		final SbVec3fSingleFast dummy1 = new SbVec3fSingleFast();
+		final SbRotation      dummy2 = new SbRotation();
+
 	    public void        SoRotationXYZ_doAction(SoAction action) {
 	        if (! angle.isIgnored() && ! angle.isDefault())
 	            SoModelMatrixElement.rotateBy(action.getState(), this,
-	                                           getRotation());
+	                                           getRotation(dummy1, dummy2));
 	    }
 	    
 	    public void        callback(SoCallbackAction action) {

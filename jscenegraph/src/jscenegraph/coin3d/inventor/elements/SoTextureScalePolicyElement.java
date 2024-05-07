@@ -19,13 +19,15 @@ public class SoTextureScalePolicyElement extends SoInt32Element {
 		    SCALE_DOWN,
 		    SCALE_UP,
 		    FRACTURE;
-			  
+
+			private static final Policy[] values = Policy.values();
+
 			  public int getValue() {
 				  return ordinal();
 			  }
 			  
 			  public static Policy fromValue(int value) {
-				  return Policy.values()[value];
+				  return values[value];
 			  }
 		  };
 

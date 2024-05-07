@@ -578,6 +578,7 @@ public long getBufferDataId() // COIN 3D
 	return this._nodeId; // YB
 }
 
+    final Integer[] buffer = new Integer[1];
 /*!
   Binds the buffer for the context \a contextid.
 */
@@ -592,7 +593,6 @@ bindBuffer(int contextid)
 
   final cc_glglue glue = SoGL.cc_glglue_instance((int) contextid);
 
-  final Integer[] buffer = new Integer[1];
   if ( (buffer[0] = this.vbohash.get(contextid)) == null) {
     // need to create a new buffer for this context
     SoGL.cc_glglue_glGenBuffers(glue, 1, buffer);

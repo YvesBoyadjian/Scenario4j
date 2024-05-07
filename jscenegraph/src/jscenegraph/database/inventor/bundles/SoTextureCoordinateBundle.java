@@ -162,6 +162,10 @@ public class SoTextureCoordinateBundle extends SoBundle implements Destroyable {
 	private static final int FLAG_DIDINITDEFAULT     =0x20;
 	private static final int FLAG_NEEDINDICES        =0x40;
 
+	private final SbVec3f defaultorigo;
+	private final SbVec3f defaultsize;
+	private final SbVec4fSingle dummyInstance;
+
 	/*!
 	  Constructor with \a action being the action applied to the node.
 	  The \a forRendering parameter must be \e TRUE if the bundle is to
@@ -176,7 +180,17 @@ public class SoTextureCoordinateBundle extends SoBundle implements Destroyable {
 public SoTextureCoordinateBundle(SoAction action,
                             boolean forRendering,
                             boolean setUpDefault) {
+		this(action,forRendering,setUpDefault,new SbVec3fSingleFast(),new SbVec3fSingleFast(),new SbVec4fSingle());
+}
+
+public SoTextureCoordinateBundle(SoAction action,
+	boolean forRendering,
+	boolean setUpDefault, SbVec3f v1, SbVec3f v2, SbVec4fSingle v3) {
 	super(action);
+
+	defaultorigo = v1;
+	defaultsize = v2;
+	dummyInstance = v3;
 	
 	  this.flags = 0;
 	  //
@@ -393,9 +407,6 @@ Destructor.
   }
   
   private SoShape shapenode; //ptr
-  private final SbVec3f defaultorigo = new SbVec3fSingleFast();
-  private final SbVec3f defaultsize = new SbVec3fSingleFast();
-  private final SbVec4fSingle dummyInstance = new SbVec4fSingle();
   private int defaultdim0, defaultdim1;
   
   //

@@ -17,10 +17,10 @@ public class SoCat extends SoSeparator {
     public SoCat() {
         super();
         position = new SoTranslation();
-        addChild(position);
+        addChild(position); position.translation.enableNotify(false); // don't notify
 
         rotation = new SoRotation();
-        addChild(rotation);
+        addChild(rotation); rotation.rotation.enableNotify(false); // don't notify
 
         SoScale scale = new SoScale(){
             public void GLRender(SoGLRenderAction action) {

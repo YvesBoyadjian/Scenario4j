@@ -118,9 +118,9 @@ public class SoLODIndexedFaceSet extends /*SoIndexedFaceSet*/SoGroup {
 		}
 		else {
 
-			SbVec3f closestPoint = new SbVec3fSingleFast(finalBox.getClosestExternalPoint(referencePoint));
+			//SbVec3f closestPoint = new SbVec3fSingleFast(finalBox.getClosestExternalPoint(referencePoint));
 
-			SbVec3f closestPoint2 = new SbVec3fSingleFast(finalBox.getClosestExternalPoint(referencePoint2));
+			SbVec3f closestPoint2 = /*new SbVec3fSingleFast(*/finalBox.getClosestExternalPoint(referencePoint2)/*)*/;
 
 			if( closestPoint2.operator_minus(referencePoint2,dummy).length() <= 200 ) {
 				if(!load(true))
