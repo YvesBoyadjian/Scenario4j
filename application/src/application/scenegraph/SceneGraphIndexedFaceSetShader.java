@@ -1967,7 +1967,7 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 
 		speechGroup.addChild(speechTranslation); speechTranslation.translation.enableNotify(false); // don't notify
 
-		speechGroup.addChild(oracleSpeech); oracleSpeech.string.enableNotify(false); // don't notify
+		speechGroup.addChild(oracleSpeech); //oracleSpeech.string.enableNotify(false); // don't notify
 
 		return oracleSeparator;
 	}
