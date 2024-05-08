@@ -5,6 +5,7 @@ package jscenegraph.port;
 
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
+import java.util.Objects;
 
 import org.lwjgl.BufferUtils;
 
@@ -61,7 +62,20 @@ public class SbVec3fArray extends Indexable<SbVec3f> implements ByteBufferAble, 
 		SbVec3fArray copy = new SbVec3fArray(other,0);
 		return copy;
 	}
-	
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (!(o instanceof SbVec3fArray that)) return false;
+		if (!super.equals(o)) return false;
+        return delta == that.delta && valuesArray == that.valuesArray && dummy == that.dummy;
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(super.hashCode(), valuesArray, delta, dummy);
+	}
+
 	public int getSizeFloat() {
 		return valuesArray.numFloats() - delta*3;
 	}

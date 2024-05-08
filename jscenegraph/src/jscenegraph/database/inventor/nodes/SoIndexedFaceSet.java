@@ -559,6 +559,10 @@ public void destructor()
 	final SbVec3f v2 = new SbVec3fSingleFast();
 	final SbVec4fSingle v3 = new SbVec4fSingle();
 
+	final SoMaterialBundle mb = new SoMaterialBundle();
+
+	final SoTextureCoordinateBundle tb = new SoTextureCoordinateBundle();
+
 ////////////////////////////////////////////////////////////////////////
 //
 // Description:
@@ -600,9 +604,9 @@ public void GLRender(SoGLRenderAction action)
 	  mindices[0] = null;//final IntArrayPtr[] mindices = new IntArrayPtr[1];
 	  normalCacheUsed[0] = false;//final boolean[] normalCacheUsed = new boolean[1];
 
-	  final SoMaterialBundle mb = new SoMaterialBundle(action);
+	  mb.SoMaterialBundle_init(action);
 
-	  final SoTextureCoordinateBundle tb = new SoTextureCoordinateBundle(action, true, false,v1,v2,v3);
+	  tb.SoTextureCoordinateBundle_init(action, true, false);
 	boolean doTextures = tb.needCoordinates();
 	  boolean sendNormals = !mb.isColorOnly() || tb.isFunction();
 

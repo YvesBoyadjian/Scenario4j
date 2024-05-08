@@ -521,26 +521,27 @@ createVSMProgram()
 private final SbXfBox3f xbox = new SbXfBox3f(); // SINGLE_THREAD
   private final SbXfBox3f nearXbox = new SbXfBox3f(); // SINGLE_THREAD
 
-public SbBox3f toCameraSpace(final SbXfBox3f  worldbox)
+public SbBox3f toCameraSpace(final SbXfBox3f  worldbox, final SbMatrix mat)
 {
   SoCamera cam = this.camera;
-  final SbMatrix mat = new SbMatrix();
+  //final SbMatrix mat = new SbMatrix();
   xbox.copyFrom(worldbox);
   mat.setTranslate( cam.position.getValue().operator_minus());
   xbox.transform(mat);
-  mat.copyFrom( cam.orientation.getValue().getMatrix().inverse()); // java port
+  mat.copyFrom( cam.orientation.getValue().getMatrix().inverse(mat)); // java port
   xbox.transform(mat);
   return xbox.project();
 }
 
-  public SbBox3f toNearCameraSpace(final SbXfBox3f  worldbox)
+  public SbBox3f toNearCameraSpace(final SbXfBox3f  worldbox, final SbMatrix mat)
   {
     SoCamera cam = this.nearCamera;
-    final SbMatrix mat = new SbMatrix();
+    //final SbMatrix mat = new SbMatrix();
     nearXbox.copyFrom(worldbox);
     mat.setTranslate( cam.position.getValue().operator_minus());
     nearXbox.transform(mat);
-    mat.copyFrom( cam.orientation.getValue().getMatrix().inverse()); // java port
+    // mat can be used as dummy
+    mat.copyFrom( cam.orientation.getValue().getMatrix().inverse(mat)); // java port
     nearXbox.transform(mat);
     return nearXbox.project();
   }

@@ -104,6 +104,17 @@ public class SoMaterialBundle extends SoBundle implements Destroyable {
 public SoMaterialBundle(SoAction action) {
 	super(action);
 
+    SoMaterialBundle_init(action);
+}
+
+public SoMaterialBundle() {
+    super();
+}
+
+public void SoMaterialBundle_init(SoAction action) {
+    SoBundle_init(action);
+
+
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -111,17 +122,18 @@ public SoMaterialBundle(SoAction action) {
     // Remember that we haven't accessed elements yet
     firstTime = true;
     lastIndex = -1;
-    lazyElt = null;  
+    lazyElt = null;
 
     // See whether we need to deal with materials or just colors
     colorOnly = ((SoLazyElement.getLightModel(state)) ==
-                 SoLazyElement.LightModel.BASE_COLOR.getValue());
+            SoLazyElement.LightModel.BASE_COLOR.getValue());
     sendMultiple = false;
     fastColor = false;
 
     // Nodes that use material bundles haven't been optimized, and
     // should be render cached if possible:
     SoGLCacheContextElement.shouldAutoCache(state, SoGLCacheContextElement.AutoCache.DO_AUTO_CACHE.getValue());
+
 }
 
 ////////////////////////////////////////////////////////////////////////

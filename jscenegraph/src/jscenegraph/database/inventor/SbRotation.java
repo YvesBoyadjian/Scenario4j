@@ -283,7 +283,23 @@ getValue(final SbVec3f axis, final float[] radians)
 		   
 		    return this;
 		  	}
-	
+
+	public SbRotation setValue(SbVec3f axis, float radians, final SbVec3f dummy) {
+
+		dummy.copyFrom(axis);
+		dummy.normalize();
+
+		dummy.operator_mul_equal((float)Math.sin(radians / 2.0));
+
+		quat[0] = dummy.operator_square_bracket(0);
+		quat[1] = dummy.operator_square_bracket(1);
+		quat[2] = dummy.operator_square_bracket(2);
+
+		quat[3] = (float)Math.cos(radians / 2.0);
+
+		return this;
+	}
+
 	//
 	 // Description:
 	 // Sets rotation to rotate one direction vector to another.

@@ -94,7 +94,7 @@ SbVec3f, SbLine
  */
 public class SbPlane implements Mutable {
 	
-	   private final SbVec3f     normalVec = new SbVec3f();
+	   private final SbVec3f     normalVec = new SbVec3fSingleFast();
 		    
 		        private float       distance;
 		   	

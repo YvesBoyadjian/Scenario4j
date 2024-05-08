@@ -58,6 +58,7 @@ package jscenegraph.database.inventor;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 import jscenegraph.port.Destroyable;
 import jscenegraph.port.Mutable;
@@ -91,7 +92,7 @@ SbString
 public class SbName implements Mutable, Destroyable {
 	
 	// java port
-	private static final Map<String,String> entries = new HashMap<String,String>();
+	private static final Map<String,SbName> entries = new HashMap<String,SbName>();
 	
 	private String entry;
 	
@@ -106,19 +107,27 @@ public class SbName implements Mutable, Destroyable {
 	public SbName(SbName n) {
 		entry = n.entry;
 	}
-	
-	private String insert(String s) {
+
+    public static SbName from(String str) {
+		SbName entry = entries.get(str);
+		if (entry != null) {
+			return entry;
+		}
+		return new SbName(str);
+    }
+
+    private String insert(String s) {
 		
 		// java port
 		if(s == null) {
 			throw new IllegalArgumentException("SbName: String must not be null");
 		}
 		
-		String entry = entries.get(s);
+		SbName entry = entries.get(s);
 		if(entry != null) {
-			return entry;
+			return entry.entry;
 		}
-		entries.put(s, s);
+		entries.put(s, this);
 		return s;
 	}
 	
@@ -154,7 +163,7 @@ public class SbName implements Mutable, Destroyable {
 	}
 	
 	public boolean operator_not_equal(String str) {
-		return entry != entries.get(str);
+		return !Objects.equals(entry, str);
 	}
 	
 	/**

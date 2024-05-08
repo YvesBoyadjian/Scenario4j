@@ -65,6 +65,8 @@ import jscenegraph.port.FloatArray;
 import jscenegraph.port.SbVec3fArray;
 import jscenegraph.port.SbVec4fArray;
 
+import java.util.Objects;
+
 
 ///////////////////////////////////////////////////////////////////////////////
 ///
@@ -313,7 +315,9 @@ set3(SoState state, SoNode node,
 
     if (elt != null) {
         elt.numCoords   = numCoords;
-        elt.coords3     = SbVec3fArray.copyOf(coords);
+        if (!Objects.equals(elt.coords3, coords)) {
+            elt.coords3 = SbVec3fArray.copyOf(coords);
+        }
         elt.coordsAre3D = true;
     }
 }

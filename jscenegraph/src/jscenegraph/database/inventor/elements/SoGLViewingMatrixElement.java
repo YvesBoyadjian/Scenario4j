@@ -188,20 +188,20 @@ send()
     // identity, make sure that it gets multiplied into the current
     // model-view matrix in GL.
 
-    final boolean[] modelIsIdent = new boolean[1];
-    final SbMatrix modelMat = SoModelMatrixElement.get(state, modelIsIdent);
+//    final boolean[] modelIsIdent = new boolean[1];
+//    final SbMatrix modelMat = SoModelMatrixElement.get(state, modelIsIdent);
 
     updateStateParameters(); // CORE
 
-    GL2 gl2 = state.getGL2();
-
-    if (! modelIsIdent[0]) {
-        final SbMatrix modelView = viewingMatrix.operator_mul(modelMat);
-        gl2.glLoadMatrixf((float []) modelView.toGL(),0);
-    }
-
-    else
-        gl2.glLoadMatrixf((float []) viewingMatrix.toGL(),0);
+//    GL2 gl2 = state.getGL2();
+//
+//    if (! modelIsIdent[0]) {
+//        final SbMatrix modelView = viewingMatrix.operator_mul(modelMat);
+//        gl2.glLoadMatrixf((float []) modelView.toGL(),0);
+//    }
+//
+//    else
+//        gl2.glLoadMatrixf((float []) viewingMatrix.toGL(),0);
 }
 
 ////////////////////////////////////////////////////////////////////////

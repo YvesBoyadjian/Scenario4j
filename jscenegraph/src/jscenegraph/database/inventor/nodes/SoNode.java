@@ -159,6 +159,9 @@ public abstract class SoNode extends SoFieldContainer {
 
 		private int value;
 
+		private static final NodeType[] values = values();
+		private static final int numType = values().length;
+
 		NodeType(int value) {
 			this.value = value;
 		}
@@ -168,9 +171,9 @@ public abstract class SoNode extends SoFieldContainer {
 		}
 
 		public static NodeType fromValue(int value) {
-			for (NodeType nt : NodeType.values()) {
-				if (nt.getValue() == value) {
-					return nt;
+			for(int i=0; i<numType;i++) {
+				if (values[i].getValue() == value) {
+					return values[i];
 				}
 			}
 			return null;

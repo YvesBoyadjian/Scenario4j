@@ -191,88 +191,108 @@ public SoTextureCoordinateBundle(SoAction action,
 	defaultorigo = v1;
 	defaultsize = v2;
 	dummyInstance = v3;
-	
-	  this.flags = 0;
-	  //
-	  // return immediately if there is no texture
-	  //
-	  final int[] lastenabled = new int[1]; lastenabled[0] = -1;
-	  boolean[] multienabled = 
-	    SoMultiTextureEnabledElement.getEnabledUnits(this.state, lastenabled);
-	  boolean needinit = lastenabled[0] >= 0;
-	  boolean glrender = forRendering || action.isOfType(SoGLRenderAction.getClassTypeId());
-	  boolean bumpenabled = glrender && /*(SoBumpMapElement.get(this.state) != null)*/false; //TODO
 
-	  if (!needinit && multienabled == null && !bumpenabled) return;
-	  
-	  // It is safe to assume that shapenode is of type SoShape, so we
-	  // cast to SoShape before doing any operations on the node.
-	  this.shapenode = (SoShape)(action.getCurPathTail());
-	  
-	  this.coordElt = SoMultiTextureCoordinateElement.getInstance(this.state);
-	  
-	  if(this.coordElt == null) {
-		  int i=0;
-	  }
-	  for (int i = 0; i <= lastenabled[0]; i++) {
-	    if (multienabled[i]) {
-	      switch (this.coordElt.getType(i)) {
-	      case /*SoMultiTextureCoordinateElement::*/DEFAULT:
-			  if (!SoFromXYUVElement.getInstance(state).isActive()) {
-				  this.initDefault(action, i);
-			  }
-	        break;
-	      case /*SoMultiTextureCoordinateElement::*/EXPLICIT:
-	        this.flags |= FLAG_NEEDINDICES;
-	        if (this.coordElt.getNum(i) > 0) {
-	          this.flags |= FLAG_NEEDCOORDS;
-	        }
-	        else {
-	          this.initDefault(action, i);
-	        }
-	        break;
-	      case /*SoMultiTextureCoordinateElement::*/FUNCTION:
-	        this.flags |= FLAG_FUNCTION;
-	        this.flags |= FLAG_NEEDCOORDS; // not automatically generated
-	        break;
-	        
-	      case /*SoMultiTextureCoordinateElement::*/NONE_TEXGEN:
-	        // texcoord won't be needed. This will only happen during SoGLRenderAction,
-	        // when GL generates texture coorinates. Therefore, we will not set
-	        // the FLAG_NEEDCOORDS here.
-	        this.flags |= FLAG_FUNCTION;
-	        if (!forRendering) {
-	          this.flags |= FLAG_NEEDCOORDS;
-	        }
-	        break;
-	      default:
-	        throw new IllegalStateException("unknown CoordType");
-	        //break;
-	      }
-	    }
-	  }
-	  // refetch element in case we pushed
-	  if ((this.flags & FLAG_DIDPUSH)!=0) {
-	    this.coordElt = SoMultiTextureCoordinateElement.getInstance(this.state);
-	  }
-	  this.glElt = null;
-	  if (glrender) {
-	    boolean needindices = false;
-	    if (!needindices && this.isFunction()) {
-	      // check if bump mapping needs texture coordinate indices
-	      if (bumpenabled &&
-	          /*(SoBumpMapCoordinateElement.getInstance(state).getNum())*/false) { //TODO
-	        needindices = true;
-	      }
-	    }
-	    if (needindices && this.isFunction()) this.flags |= FLAG_NEEDINDICES;
-	    this.glElt = (SoGLMultiTextureCoordinateElement)(this.coordElt);
-	    this.glElt.initMulti(action.getState());
-	  }
-	  if ((this.flags & FLAG_DEFAULT)!=0 && !setUpDefault) {
-	    // FIXME: I couldn't be bothered to support this yet. It is for picking
-	    // optimization only, I think. pederb, 20000218
-	  }
+	SoTextureCoordinateBundle_init(action,forRendering,setUpDefault);
+}
+
+public SoTextureCoordinateBundle() {
+		super();
+
+	defaultorigo = new SbVec3fSingleFast();
+	defaultsize = new SbVec3fSingleFast();
+	dummyInstance = new SbVec4fSingle();
+
+		// need to call SoTextureCoordinateBundle_init before use
+}
+
+public void SoTextureCoordinateBundle_init(SoAction action,
+				 boolean forRendering,
+				 boolean setUpDefault) {
+
+		super.SoBundle_init(action);
+
+	this.flags = 0;
+	//
+	// return immediately if there is no texture
+	//
+	final int[] lastenabled = new int[1]; lastenabled[0] = -1;
+	boolean[] multienabled =
+			SoMultiTextureEnabledElement.getEnabledUnits(this.state, lastenabled);
+	boolean needinit = lastenabled[0] >= 0;
+	boolean glrender = forRendering || action.isOfType(SoGLRenderAction.getClassTypeId());
+	boolean bumpenabled = glrender && /*(SoBumpMapElement.get(this.state) != null)*/false; //TODO
+
+	if (!needinit && multienabled == null && !bumpenabled) return;
+
+	// It is safe to assume that shapenode is of type SoShape, so we
+	// cast to SoShape before doing any operations on the node.
+	this.shapenode = (SoShape)(action.getCurPathTail());
+
+	this.coordElt = SoMultiTextureCoordinateElement.getInstance(this.state);
+
+	if(this.coordElt == null) {
+		int i=0;
+	}
+	for (int i = 0; i <= lastenabled[0]; i++) {
+		if (multienabled[i]) {
+			switch (this.coordElt.getType(i)) {
+				case /*SoMultiTextureCoordinateElement::*/DEFAULT:
+					if (!SoFromXYUVElement.getInstance(state).isActive()) {
+						this.initDefault(action, i);
+					}
+					break;
+				case /*SoMultiTextureCoordinateElement::*/EXPLICIT:
+					this.flags |= FLAG_NEEDINDICES;
+					if (this.coordElt.getNum(i) > 0) {
+						this.flags |= FLAG_NEEDCOORDS;
+					}
+					else {
+						this.initDefault(action, i);
+					}
+					break;
+				case /*SoMultiTextureCoordinateElement::*/FUNCTION:
+					this.flags |= FLAG_FUNCTION;
+					this.flags |= FLAG_NEEDCOORDS; // not automatically generated
+					break;
+
+				case /*SoMultiTextureCoordinateElement::*/NONE_TEXGEN:
+					// texcoord won't be needed. This will only happen during SoGLRenderAction,
+					// when GL generates texture coorinates. Therefore, we will not set
+					// the FLAG_NEEDCOORDS here.
+					this.flags |= FLAG_FUNCTION;
+					if (!forRendering) {
+						this.flags |= FLAG_NEEDCOORDS;
+					}
+					break;
+				default:
+					throw new IllegalStateException("unknown CoordType");
+					//break;
+			}
+		}
+	}
+	// refetch element in case we pushed
+	if ((this.flags & FLAG_DIDPUSH)!=0) {
+		this.coordElt = SoMultiTextureCoordinateElement.getInstance(this.state);
+	}
+	this.glElt = null;
+	if (glrender) {
+		boolean needindices = false;
+		if (!needindices && this.isFunction()) {
+			// check if bump mapping needs texture coordinate indices
+			if (bumpenabled &&
+					/*(SoBumpMapCoordinateElement.getInstance(state).getNum())*/false) { //TODO
+				needindices = true;
+			}
+		}
+		if (needindices && this.isFunction()) this.flags |= FLAG_NEEDINDICES;
+		this.glElt = (SoGLMultiTextureCoordinateElement)(this.coordElt);
+		this.glElt.initMulti(action.getState());
+	}
+	if ((this.flags & FLAG_DEFAULT)!=0 && !setUpDefault) {
+		// FIXME: I couldn't be bothered to support this yet. It is for picking
+		// optimization only, I think. pederb, 20000218
+	}
+
 }
 
 /*!

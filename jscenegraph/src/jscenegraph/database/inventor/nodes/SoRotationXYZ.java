@@ -212,7 +212,8 @@ public class SoRotationXYZ extends SoTransformation {
 					break;
 			}
 
-			rot.setValue(ax, angle.getValue());
+			// ax can serve as dummy
+			rot.setValue(ax, angle.getValue(), ax);
 
 			return rot;
 		}

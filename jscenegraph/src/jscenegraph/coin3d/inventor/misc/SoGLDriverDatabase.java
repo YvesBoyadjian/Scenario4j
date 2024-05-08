@@ -66,7 +66,7 @@ public static SoGLDriverDatabaseP pimpl()
 
  */
 	public static boolean isSupported(cc_glglue context, String feature) {
-		  return pimpl().isSupported(context, new SbName(feature));
+		  return pimpl().isSupported(context, SbName.from(feature));
 	}
 
 	public static void init() {

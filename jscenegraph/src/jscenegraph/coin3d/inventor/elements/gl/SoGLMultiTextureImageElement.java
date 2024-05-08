@@ -255,7 +255,7 @@ set(SoState state, SoNode node,
       str = "coin_texunit" + unit + "_model";
       elem.coin_texunitX_model.put(unit,str);
     }
-    prog.updateCoinParameter(state, new SbName(str/*.getString()*/), ud.glimage != null ? model.getValue() : 0);
+    prog.updateCoinParameter(state, SbName.from(str/*.getString()*/), ud.glimage != null ? model.getValue() : 0);
   }
 }
 

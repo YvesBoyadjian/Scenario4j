@@ -31,21 +31,7 @@ import jscenegraph.coin3d.inventor.nodes.SoTextureUnit;
 import jscenegraph.coin3d.inventor.nodes.SoVertexShader;
 import jscenegraph.coin3d.misc.SoGL;
 import jscenegraph.coin3d.shaders.inventor.nodes.*;
-import jscenegraph.database.inventor.SbBox3f;
-import jscenegraph.database.inventor.SbMatrix;
-import jscenegraph.database.inventor.SbName;
-import jscenegraph.database.inventor.SbPlane;
-import jscenegraph.database.inventor.SbRotation;
-import jscenegraph.database.inventor.SbVec2s;
-import jscenegraph.database.inventor.SbVec3f;
-import jscenegraph.database.inventor.SbVec3fSingle;
-import jscenegraph.database.inventor.SbViewVolume;
-import jscenegraph.database.inventor.SbViewportRegion;
-import jscenegraph.database.inventor.SbXfBox3f;
-import jscenegraph.database.inventor.SoFullPath;
-import jscenegraph.database.inventor.SoNodeList;
-import jscenegraph.database.inventor.SoPath;
-import jscenegraph.database.inventor.SoPathList;
+import jscenegraph.database.inventor.*;
 import jscenegraph.database.inventor.actions.SoGLRenderAction;
 import jscenegraph.database.inventor.actions.SoGetBoundingBoxAction;
 import jscenegraph.database.inventor.actions.SoGetMatrixAction;
@@ -1410,6 +1396,8 @@ protected void endFragmentShader(SoShaderGenerator gen,SoEnvironmentElement.FogT
 
 	}
 
+	final SbMatrix mat = new SbMatrix();
+
 	public void
 updateSpotCamera(SoState state, SoShadowLightCache cache, final SbMatrix transform)
 {
@@ -1461,8 +1449,8 @@ updateSpotCamera(SoState state, SoShadowLightCache cache, final SbMatrix transfo
   }
   if (needbbox) {
     SbXfBox3f worldbox = this.calcBBox(cache);
-    SbBox3f box = cache.toCameraSpace(worldbox);
-	  SbBox3f nearbox = cache.toNearCameraSpace(worldbox);
+    SbBox3f box = cache.toCameraSpace(worldbox, mat);
+	  SbBox3f nearbox = cache.toNearCameraSpace(worldbox, mat);
 
     // Bounding box was calculated in camera space, so we need to "flip"
     // the box (because camera is pointing in the (0,0,-1) direction
@@ -1576,12 +1564,12 @@ updateDirectionalCamera(SoState state, SoShadowLightCache cache, final SbMatrix 
 
   float maxdist = light.maxShadowDistance.getValue();
 
-  final SbVec3f dir = new SbVec3f(light.direction.getValue());
+  final SbVec3f dir = new SbVec3fSingleFast(light.direction.getValue());
   dir.normalize();
   transform.multDirMatrix(dir, dir);
   dir.normalize();
   
-  SbRotation dir_rotation = new SbRotation(new SbVec3f(0.0f, 0.0f, -1.0f), dir);
+  SbRotation dir_rotation = new SbRotation(new SbVec3fSingleFast(0.0f, 0.0f, -1.0f), dir);
   
   //dir_rotation.operator_mul_equal(new SbRotation(dir,(float)Math.random()*10.0f));
   
@@ -1636,8 +1624,8 @@ updateDirectionalCamera(SoState state, SoShadowLightCache cache, final SbMatrix 
   cam.viewBoundingBox(isect, 1.0f, 1.0f);
 	nearCam.viewBoundingBox(nearIsect,1.0f,1.0f);
 
-  SbBox3f box = cache.toCameraSpace(worldbox);
-	SbBox3f nearBox = cache.toNearCameraSpace(nearWorldbox);
+  SbBox3f box = cache.toCameraSpace(worldbox, mat);
+	SbBox3f nearBox = cache.toNearCameraSpace(nearWorldbox, mat);
 
   // Bounding box was calculated in camera space, so we need to "flip"
   // the box (because camera is pointing in the (0,0,-1) direction
