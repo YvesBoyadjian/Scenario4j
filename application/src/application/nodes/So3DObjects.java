@@ -114,15 +114,18 @@ public class So3DObjects extends SoSeparator {
             nearChildren.add(id);
         }
 
-        final Set<Integer> actualChildrenSaved = new HashSet<>();
-        actualChildrenSaved.addAll(actualChildren);
-        for( int id : actualChildrenSaved) {
+        //final Set<Integer> actualChildrenSaved = new HashSet<>();
+        int actualChildrenSize = actualChildren.size();
+        Integer[] actualChildrenSavedArray = actualChildren.toArray(new Integer[actualChildrenSize]);
+        //actualChildrenSaved.addAll(actualChildren);
+        for( int index = 0; index < actualChildrenSize; index++) {
+            Integer id = actualChildrenSavedArray[index];
             if(actualChildren.contains(id) && !nearChildren.contains(id)) {
                 So3DObject child = idxToCollectibles.get(id);
                 removeCollectible(child,id);
             }
         }
-        for(int id : actualChildren) {
+        for(Integer id : actualChildren) {
             So3DObject child = idxToCollectibles.get(id);
             float distance = referencePoint.operator_minus(child.getCoordinates(), dummy).length();
             nearestCollectibleDistance = Math.min(nearestCollectibleDistance,distance);
