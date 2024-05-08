@@ -58,14 +58,13 @@ public class ComputeScattering {
     "}\n";
 
     public static final String DENSITY_AT_POINT_shadersource =
-            "float densityAtPoint(vec3 densitySamplePoint) {\n"+
+            "float densityAtPoint(vec3 densitySamplePoint, float densityFalloff) {\n"+
                     "  vec3 planetCentre = vec3(0,0,-6371e3);\n"+
                     "  float planetRadius = 6371e3;\n"+
-                    "  float atmosphereRadius = 1e4;\n"+
-                    "  float densityFalloff = 1;\n"+
+                    "  float atmosphereRadius = 1e4 + planetRadius;\n"+
                     "  float heightAboveSurface = length(densitySamplePoint - planetCentre) - planetRadius;\n"+
                     "  float height01 = heightAboveSurface / (atmosphereRadius - planetRadius);\n"+
-                    "  float localDensity = exp(-height01 * densityFalloff) * (1 - height01);\n"+
+                    "  float localDensity = max(0,exp(-height01 * densityFalloff) * (1 - height01));\n"+
                     "  return localDensity;\n"+
                     "}\n"
             ;
@@ -77,7 +76,7 @@ public class ComputeScattering {
                     "  float stepSize = rayLength / (numOpticalDepthPoints - 1);\n"+
                     "  float opticalDepth = 0;\n"+
                     "  for (int i = 0; i < numOpticalDepthPoints; i ++) {\n"+
-                    "    float localDensity = densityAtPoint(densitySamplePoint);\n"+
+                    "    float localDensity = densityAtPoint(densitySamplePoint, 1);\n"+
                     "    opticalDepth += localDensity * stepSize;\n"+
                     "    densitySamplePoint += rayDir * stepSize;\n"+
                     "  }\n"+
@@ -99,7 +98,7 @@ public class ComputeScattering {
                     "    float sunRayOpticalDepth = opticalDepth(inScatterPoint, dirToSun, sunRayLength);\n"+
                     "    viewRayOpticalDepth = opticalDepth(inScatterPoint, -rayDir, stepSize * i);\n"+
                     "    vec3 transmittance = exp(-(sunRayOpticalDepth + viewRayOpticalDepth) * scatteringCoefficients);\n"+
-                    "    float localDensity = densityAtPoint(inScatterPoint);\n"+
+                    "    float localDensity = densityAtPoint(inScatterPoint, 1);\n"+
                     "    inScatteredLight += localDensity * transmittance * scatteringCoefficients * stepSize;\n"+
                     "    inScatterPoint += rayDir * stepSize;\n"+
                     "  }\n"+
