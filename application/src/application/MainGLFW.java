@@ -950,6 +950,11 @@ public class MainGLFW {
 
 		viewer.setCursor(cursor);
 
+		int pixelPerInch=java.awt.Toolkit.getDefaultToolkit().getScreenResolution();
+		System.out.println("PixelPerInch: "+ pixelPerInch);
+
+		viewer.getSceneHandler().getSceneManager().getGLRenderAction().getViewportRegion().setPixelsPerInch(pixelPerInch);
+
 		viewer.start();
 		viewer.updateLocation(new SbVec3f(0.0f, 0.0f, 0.0f),ForceProvider.Direction.STILL);
 
