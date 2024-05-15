@@ -42,7 +42,7 @@ public class OptionDialog extends JDialog {
     public static final double DEFAULT_TREE_SHADOW_DISTANCE = 500;//1500;
     public static final int DEFAULT_ISLAND_DEPTH = 5612;
     public static final boolean DEFAULT_VOLUMETRIC_SKY = false;
-    public static final double DEFAULT_OVERALL_CONTRAST = 1.6;
+    public static final double DEFAULT_OVERALL_CONTRAST = 4;//1.6;
 
     public OptionDialog(SoQtWalkViewer viewer, SceneGraphIndexedFaceSetShader sg) {
         setTitle("Game options");
@@ -236,7 +236,7 @@ public class OptionDialog extends JDialog {
             spinnerTreeShadowDistance.setModel(new SpinnerNumberModel(treeShadowDistance,500 - delta,30000 + delta,500));
             // MAX_I
             spinnerMaxI.setModel(new SpinnerNumberModel(sg.getMaxI(),5612,14000,500));
-            spinnerExposure.setModel(new SpinnerNumberModel((double) Math.round(10.0*Math.log10(sg.getOverallContrast())/Math.log10(2))/10.0,-5.01,5.01,0.1));
+            spinnerExposure.setModel(new SpinnerNumberModel((double) Math.round(10.0*Math.log10(sg.getOverallContrast())/Math.log10(2))/10.0,-5.01,5.01,0.2));
             // VOLUMETRIC_SKY
             volumetricSkyCheckBox.getModel().setSelected(sg.getShadowGroup().isVolumetricActive.getValue());
             // DISPLAY_FPS
