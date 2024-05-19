@@ -266,7 +266,9 @@ public class SoQtWalkViewer extends SoQtConstrainedViewer {
 		//}
 		//System.out.println("processSoKeyboardEvent");
 		
-		  if (SoKeyboardEvent.SO_KEY_PRESS_EVENT(event, SoKeyboardEvent.Key.PRINT))
+		  if (SoKeyboardEvent.SO_KEY_PRESS_EVENT(event, SoKeyboardEvent.Key.PRINT)
+				  || SoKeyboardEvent.SO_KEY_PRESS_EVENT(event, SoKeyboardEvent.Key.F1)
+		  )
 		  {
 			  GL11.glReadBuffer(GL11.GL_FRONT);
 			  int[] width = new int[1];
@@ -294,7 +296,7 @@ public class SoQtWalkViewer extends SoQtConstrainedViewer {
 			  try {
 				  String format = "JPG";
 				  
-				  File file = new File("MountRainierIslandScreenShot.jpg");
+				  File file = new File("../MountRainierIslandScreenShot.jpg");
 				  
 			      ImageIO.write(image, format, file);
 			  } catch (IOException e) { e.printStackTrace(); }

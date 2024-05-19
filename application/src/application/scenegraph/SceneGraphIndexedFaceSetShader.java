@@ -782,6 +782,14 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 			behindFragmentPath = "application/src/shaders/behind_fragment.glsl";
 		}
 
+		behindVertexFile = new File(behindVertexPath);
+		behindFragmentFile = new File(behindFragmentPath);
+
+		if(!behindVertexFile.exists()) {
+			behindVertexPath = "src/shaders/behind_vertex.glsl";
+			behindFragmentPath = "src/shaders/behind_fragment.glsl";
+		}
+
 	    vertexShaderSun.sourceProgram.setValue(behindVertexPath);
 		fragmentShaderSun.sourceProgram.setValue(behindFragmentPath);
 

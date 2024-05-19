@@ -7,6 +7,8 @@ import jscenegraph.coin3d.inventor.lists.SbListFloat;
 import jscenegraph.database.inventor.SbBox3f;
 
 import java.util.Random;
+import java.util.SplittableRandom;
+import java.util.random.RandomGenerator;
 
 public abstract class Owls extends TargetBase implements Target {
 
@@ -72,7 +74,7 @@ public abstract class Owls extends TargetBase implements Target {
 
     private void compute() {
 
-        Random randomPlacementOwls = new Random(SEED_OWL_PLACEMENT);
+        RandomGenerator randomPlacementOwls = new SplittableRandom(SEED_OWL_PLACEMENT);
 
         int[] indices = new int[4];
 
@@ -114,14 +116,14 @@ public abstract class Owls extends TargetBase implements Target {
         }
     }
 
-    float getRandomX(Random randomPlacementOwl) {
+    float getRandomX(RandomGenerator randomPlacementOwl) {
         SbBox3f sceneBox = sg.getChunks().getSceneBoxFullIsland();
         float xMin = sceneBox.getBounds()[0];
         float xMax = sceneBox.getBounds()[3];
         return xMin + (xMax - xMin) * randomPlacementOwl.nextFloat();
     }
 
-    float getRandomY(Random randomPlacementOwl) {
+    float getRandomY(RandomGenerator randomPlacementOwl) {
         SbBox3f sceneBox = sg.getChunks().getSceneBoxFullIsland();
         float yMin = sceneBox.getBounds()[1];
         float yMax = sceneBox.getBounds()[4];

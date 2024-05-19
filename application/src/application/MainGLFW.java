@@ -238,12 +238,12 @@ public class MainGLFW {
 
 		JLabel engine = new JLabel("Scenario4j Engine",null,SwingConstants.CENTER);
 		engine.setFont(intro.getFont().deriveFont((float) height / 30f));
-		engine.setForeground(Color.yellow);
+		engine.setForeground(Color.orange);
 		engine.setBackground(Color.black);
 
 		JLabel keys = new JLabel("[WASD] or [ZQSD] to walk, [left mouse button] to shoot"+ ((SceneGraphIndexedFaceSetShader.AIM ? ", [right mouse button] to aim":"")+", [Esc] for menu"),null,SwingConstants.CENTER);
 		keys.setForeground(Color.yellow);
-		//keys.setFont(intro.getFont().deriveFont((float) height / 100f));
+		keys.setFont(intro.getFont().deriveFont((float) height / 40f));
 		keys.setBackground(Color.black);
 
 		JPanel keysPanel = new JPanel();
@@ -346,7 +346,7 @@ public class MainGLFW {
 		boolean volumetric_sky = OptionDialog.DEFAULT_VOLUMETRIC_SKY;
 		boolean display_fps = false;
 
-		File graphicsFile = new File("graphics.mri");
+		File graphicsFile = new File("../graphics.mri");
 		if (graphicsFile.exists()) {
 			try {
 				InputStream in = new FileInputStream(graphicsFile);
@@ -429,7 +429,7 @@ public class MainGLFW {
 			public void onClose(boolean resetToDefault) {
 
 				// ____________________________________________________________________________________________ savegame
-				File saveGameFile = new File("savegame.mri");
+				File saveGameFile = new File("../savegame.mri");
 
 				Properties saveGameProperties = new Properties();
 
@@ -477,7 +477,7 @@ public class MainGLFW {
 				}
 
 				// ____________________________________________________________________________________________ graphics
-				File graphicsFile = new File("graphics.mri");
+				File graphicsFile = new File("../graphics.mri");
 
 				Properties graphicsProperties = new Properties();
 
@@ -796,7 +796,7 @@ public class MainGLFW {
 		heightField.setQuaternion(q);
 		heightField.setPosition(-SCENE_POSITION.getX() + heightFieldWidth / 2, -SCENE_POSITION.getY() + sg.getExtraDY() + heightFieldDepth / 2, 0);
 
-		File saveGameFile = new File("savegame.mri");
+		File saveGameFile = new File("../savegame.mri");
 		if (saveGameFile.exists()) {
 			try {
 				InputStream in = new FileInputStream(saveGameFile);
