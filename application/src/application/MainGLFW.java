@@ -995,7 +995,12 @@ public class MainGLFW {
 
 		// ______________________________________________________________________________________________________ planks
 		File planksFile = new File("planks.mri");
-		if (planksFile.exists()) {
+
+		if (!planksFile.exists()) {
+			planksFile = new File("../planks.mri");
+		}
+
+			if (planksFile.exists()) {
 			try {
 				InputStream in = new FileInputStream(planksFile);
 
