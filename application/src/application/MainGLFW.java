@@ -883,6 +883,7 @@ public class MainGLFW {
 		glf.profile = GLData.Profile.CORE;
 		glf.debug = DEBUG_MODE;//true;
 		glf.grabCursor = !DEBUG_MODE;
+		glf.waitForRefresh = true;
 		viewer.setFormat(glf, style);
 
 		viewer.buildWidget(style);
