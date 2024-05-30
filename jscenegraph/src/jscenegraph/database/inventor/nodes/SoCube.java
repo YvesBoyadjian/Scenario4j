@@ -62,6 +62,7 @@ import jscenegraph.coin3d.inventor.elements.SoMultiTextureEnabledElement;
 import jscenegraph.coin3d.inventor.misc.SoGenerate;
 import jscenegraph.coin3d.misc.SoGL;
 import jscenegraph.coin3d.misc.SoPick;
+import jscenegraph.coin3d.shaders.SoGLSLShaderProgram;
 import jscenegraph.coin3d.shaders.inventor.elements.SoGLShaderProgramElement;
 import jscenegraph.database.inventor.*;
 import jscenegraph.database.inventor.actions.SoAction;
@@ -654,6 +655,8 @@ rayPickBoundingBox(SoRayPickAction action, final SbBox3f bbox)
 
     final SbVec3fSingleFast normal = new SbVec3fSingleFast(); // SINGLE_THREAD
 
+    private static final String s4j_PerVertexNormal = "s4j_PerVertexNormal";
+
     void GLRenderVertexArray(SoGLRenderAction action,
                                  boolean sendNormals, boolean doTextures)
 {
@@ -760,9 +763,10 @@ rayPickBoundingBox(SoRayPickAction action, final SbBox3f bbox)
 
       int pHandle = SoGLShaderProgramElement.get(state).getGLSLShaderProgramHandle(state);
       if(pHandle >0 ) {
-          int perVertexLocation = state.getGL2().glGetUniformLocation(pHandle, "s4j_PerVertexNormal");
-          if (perVertexLocation >= 0) {
-              state.getGL2().glUniform1i(perVertexLocation, 1);
+          SoGLSLShaderProgram.Handle pHamdleO = SoGLShaderProgramElement.get(state).getGLSLShaderProgramHandleClass(state);
+          SoGLSLShaderProgram.Handle.Uniform perVertexLocation = pHamdleO.glGetUniformLocation(state.getGL2(), s4j_PerVertexNormal);
+          if (SoGLSLShaderProgram.Handle.Uniform.isValid(perVertexLocation)) {
+              state.getGL2().glUniform1i(perVertexLocation.location, 1);
           }
       }
 
@@ -775,9 +779,10 @@ rayPickBoundingBox(SoRayPickAction action, final SbBox3f bbox)
 
         int pHandle = SoGLShaderProgramElement.get(state).getGLSLShaderProgramHandle(state);
         if(pHandle >0 ) {
-            int perVertexLocation = state.getGL2().glGetUniformLocation(pHandle, "s4j_PerVertexNormal");
-            if (perVertexLocation >= 0) {
-                state.getGL2().glUniform1i(perVertexLocation, 0);
+            SoGLSLShaderProgram.Handle pHamdleO = SoGLShaderProgramElement.get(state).getGLSLShaderProgramHandleClass(state);
+            SoGLSLShaderProgram.Handle.Uniform perVertexLocation = pHamdleO.glGetUniformLocation(state.getGL2(), s4j_PerVertexNormal);
+            if (SoGLSLShaderProgram.Handle.Uniform.isValid(perVertexLocation)) {
+                state.getGL2().glUniform1i(perVertexLocation.location, 0);
             }
         }
 
