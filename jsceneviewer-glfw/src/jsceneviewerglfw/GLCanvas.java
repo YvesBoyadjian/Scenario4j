@@ -223,7 +223,9 @@ public class GLCanvas extends Composite {
 		}
 	
 	public void setCurrent() {
-		glfwMakeContextCurrent(window);
+		if (glfwGetCurrentContext() != window) {
+			glfwMakeContextCurrent(window);
+		}
 	}
 
 	public boolean setFocus () {
