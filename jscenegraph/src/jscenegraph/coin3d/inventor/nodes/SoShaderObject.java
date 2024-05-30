@@ -897,6 +897,9 @@ updateStateMatrixParameters(final int cachecontext, SoState state)
 //#undef STATE_PARAM
 }
 
+    private static final String s4j_FromXYUV = "s4j_FromXYUV";
+    private static final String s4j_XYUV = "s4j_XYUV";
+
     public void updateXYUVParameters(final int cachecontext, SoState state, SoFromXYUVElement fromXYUVElement) {
 
         if (!this.owner.isActive.getValue()) return;
@@ -910,14 +913,21 @@ updateStateMatrixParameters(final int cachecontext, SoState state)
             boolean isActive = fromXYUVElement.isActive();
             final SbVec4f xyuv = fromXYUVElement.getXYUV();
 
-            int fromXYUVLocation = state.getGL2().glGetUniformLocation(pHandle, "s4j_FromXYUV");
-            if (fromXYUVLocation >= 0) {
-                state.getGL2().glUniform1i(fromXYUVLocation, isActive ? 1 : 0);
+
+            SoGLShaderProgram shaderprogram =
+                    (SoGLShaderProgram)(SoGLShaderProgramElement.get(state));
+
+            SoGLSLShaderProgram.Handle pHandleO = shaderprogram.getGLSLShaderProgramHandleClass(state);
+
+
+            SoGLSLShaderProgram.Handle.Uniform fromXYUVLocation = pHandleO.glGetUniformLocation(/*pHandle,*/state.getGL2(), s4j_FromXYUV);
+            if (SoGLSLShaderProgram.Handle.Uniform.isValid(fromXYUVLocation)) {
+                state.getGL2().glUniform1i(fromXYUVLocation.location, isActive ? 1 : 0);
             }
 
-            int xYUVLocation = state.getGL2().glGetUniformLocation(pHandle, "s4j_XYUV");
-            if (xYUVLocation >= 0) {
-                state.getGL2().glUniform4fv(xYUVLocation, 1, xyuv.toFloatGL());
+            SoGLSLShaderProgram.Handle.Uniform xYUVLocation = pHandleO.glGetUniformLocation(state.getGL2(), s4j_XYUV);
+            if (SoGLSLShaderProgram.Handle.Uniform.isValid(xYUVLocation)) {
+                xYUVLocation.glUniform4fv(/*xYUVLocation.location*/state.getGL2(), 1, xyuv.toFloatGL());
             }
         }
     }
