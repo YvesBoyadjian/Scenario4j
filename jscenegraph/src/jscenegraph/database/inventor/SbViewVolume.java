@@ -889,16 +889,19 @@ public class SbViewVolume implements Mutable {
 	//
 	// Use: public
 
+	final static SbVec3f zero = new SbVec3fSingleFast(0.0f, 0.0f, 0.0f);
+	final static SbVec3f zdir = new SbVec3fSingleFast(0.0f, 0.0f, -1.0f);
+
 	public void ortho(float left, float right, float bottom, float top, float nearVal, float farVal)
 	//
 	////////////////////////////////////////////////////////////////////////
 	{
 		type = ProjectionType.ORTHOGRAPHIC;
-		projPoint.copyFrom(new SbVec3f(0.0f, 0.0f, 0.0f));
-		projDir.copyFrom(new SbVec3f(0.0f, 0.0f, -1.0f));
-		llfO.copyFrom(new SbVec3f(left, bottom, -nearVal));
-		lrfO.copyFrom(new SbVec3f(right, bottom, -nearVal));
-		ulfO.copyFrom(new SbVec3f(left, top, -nearVal));
+		projPoint.copyFrom(/*new SbVec3f(0.0f, 0.0f, 0.0f)*/zero);
+		projDir.copyFrom(/*new SbVec3f(0.0f, 0.0f, -1.0f)*/zdir);
+		llfO.setValue(left, bottom, -nearVal);
+		lrfO.setValue(right, bottom, -nearVal);
+		ulfO.setValue(left, top, -nearVal);
 		llf.copyFrom(llfO.operator_add(projPoint)); // For compatibility
 		lrf.copyFrom(lrfO.operator_add(projPoint));
 		ulf.copyFrom(ulfO.operator_add(projPoint));
