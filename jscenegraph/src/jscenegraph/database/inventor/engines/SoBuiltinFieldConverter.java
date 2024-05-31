@@ -724,10 +724,11 @@ public class SoBuiltinFieldConverter extends SoFieldConverter {
 	private Map<String, Map<String,String>> so_concatt = new HashMap<>();
 
 	private TypeConst SO__CONCATT(String arg1, String arg2) {
-		so_concatt.putIfAbsent(arg1, new HashMap<>());
-		so_concatt.get(arg1).putIfAbsent(arg2, arg1 + arg2);
-		String str = so_concatt.get(arg1).get(arg2);
-		return TypeConst.valueOf(str);
+		return TypeConst.valueOf(so_concatt.computeIfAbsent(arg1, (k)->new HashMap<>()).computeIfAbsent(arg2, (k1) -> arg1 + arg2));
+		//so_concatt.putIfAbsent(arg1, new HashMap<>());
+		//so_concatt.get(arg1).putIfAbsent(arg2, arg1 + arg2);
+		//String str = so_concatt.get(arg1).get(arg2);
+		//return TypeConst.valueOf(str);
 	}
 
 	private boolean CONV1(String type, final int inOutType, SoField outField) {

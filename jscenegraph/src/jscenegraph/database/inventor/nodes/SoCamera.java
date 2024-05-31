@@ -1258,6 +1258,12 @@ SoCamera_computeView(final SbViewportRegion vpReg,
 //
 // Use: private
 
+    final private SbMatrix    viewMat = new SbMatrix(), projMat = new SbMatrix();
+
+    final SbMatrix skewMatM = new SbMatrix();
+    final SbMatrix skewMatInv = new SbMatrix();
+    final SbMatrix moveToEye = new SbMatrix();
+
 private void
 setElements(final SoAction action, final SbViewVolume viewVol,
                       boolean setRegion, final SbViewportRegion vpReg,
@@ -1266,10 +1272,9 @@ setElements(final SoAction action, final SbViewVolume viewVol,
 ////////////////////////////////////////////////////////////////////////
 {
     SoState     state = action.getState();
-    final SbMatrix    viewMat = new SbMatrix(), projMat = new SbMatrix();
 
     // Compute viewing and projection matrices
-    viewVol.getMatrices(viewMat, projMat);
+    viewVol.getMatrices(viewMat, projMat, skewMatM, skewMatInv, moveToEye);
 
     // Jitter if necessary
     if (doJitter) {
@@ -1293,7 +1298,7 @@ setElements(final SoAction action, final SbViewVolume viewVol,
     final boolean[] modelIsIdent = new boolean[1];
     SbMatrix modelMat = SoModelMatrixElement.get(state, modelIsIdent);
     if (! modelIsIdent[0]) {
-        viewMat.multRight(modelMat.inverse());
+        viewMat.multRight(modelMat.inverse(projMat)); // projMat is dummy
 
         // Also, transform the view volume by the model matrix
         viewVol.transform(modelMat);

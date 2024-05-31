@@ -203,6 +203,14 @@ public class SbViewVolume implements Mutable {
 	// Use: public
 	public void getMatrices(final SbMatrix affine, final SbMatrix projM) {
 		final SbMatrix skewMatM = new SbMatrix();
+		final SbMatrix skewMatInv = new SbMatrix();
+		final SbMatrix moveToEye = new SbMatrix();
+		getMatrices(affine,projM,skewMatM,skewMatInv, moveToEye);
+	}
+
+	final static SbMatrix identity = SbMatrix.identity();
+
+	public void getMatrices(final SbMatrix affine, final SbMatrix projM, final SbMatrix skewMatM, final SbMatrix skewMatInv, final SbMatrix moveToEye) {
 		final float[][] skewMat = skewMatM.getValue();
 
 		final SbVec3f rightV = lrfO.operator_minus(llfO);
@@ -241,7 +249,7 @@ public class SbViewVolume implements Mutable {
 		// Therefore, its inverse takes our probably rotated and potentially
 		// skewed view volume and makes it orthogonal (unskewed) and aligned
 		// with neg-z axis
-		final SbMatrix skewMatInv = new SbMatrix(skewMatM.inverse());
+		skewMatM.inverse(skewMatInv);
 
 		affine.setTranslate((llfO.operator_add(projPoint).operator_minus()));
 		affine.multRight(skewMatInv);
@@ -249,7 +257,6 @@ public class SbViewVolume implements Mutable {
 		final SbVec3f eye = new SbVec3fSingleFast();
 		affine.multVecMatrix(projPoint, eye);
 
-		final SbMatrix moveToEye = new SbMatrix();
 		moveToEye.setTranslate(eye.operator_minus());
 		affine.multRight(moveToEye);
 
@@ -258,7 +265,7 @@ public class SbViewVolume implements Mutable {
 		skewMatInv.multVecMatrix(lrfO, lrfEye);
 		skewMatInv.multVecMatrix(ulfO, ulfEye);
 
-		projM.copyFrom(SbMatrix.identity());
+		projM.copyFrom(identity);
 
 		// Convenient stuff for building the projection matrices
 		float rightMinusLeft = lrfEye.getX() - llfEye.getX();
