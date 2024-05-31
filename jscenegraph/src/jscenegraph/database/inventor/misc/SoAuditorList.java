@@ -193,6 +193,10 @@ findLast(Object auditor, SoNotRec.Type type)
 		return super.getLength() / 2;
 	}
 
+	final SoNotList workingList = new SoNotList();
+
+	boolean doNotReenter;
+
 	// Propagates notification to all auditors in list. 
 	public void notify(SoNotList list) {
 		
@@ -211,19 +215,26 @@ findLast(Object auditor, SoNotRec.Type type)
 	    // copy of the record list so we can propagate identical
 	    // information to each auditor.
 	    else {
-	        final SoNotList workingList = new SoNotList(list);
+			if (doNotReenter) {
+				System.err.println("Reenter in SoAuditorList");
+			}
+			doNotReenter = true;
+
+	        //final SoNotList workingList = new SoNotList(list);
 	        int i;
 
 	        for (i = 0; i < numAuditors; i++) {
 
 	            // Copy given list to working list after first time -
 	            // each notification may change stuff in the list
-	            if (i > 0)
+	          //  if (i > 0)
 	                workingList.copy(list); // java port
 
 	            notify1(workingList, i);
 	        }
 	        workingList.destructor();
+
+			doNotReenter = false;
 	    }
 	}
 	//

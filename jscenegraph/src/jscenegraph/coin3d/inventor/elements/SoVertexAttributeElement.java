@@ -123,9 +123,11 @@ public class SoVertexAttributeElement extends SoAccumulatedElement {
 	public void
 	applyToAttributes(AttributeApplyFunc func, Object closure)
 	{
-	  for(Entry<String,SoVertexAttributeData> entry:pimpl.attribdict.entrySet()){
-	    func.apply(entry.getKey(),entry.getValue(),closure);
-	  }
+		if (!pimpl.attribdict.isEmpty()) {
+			for (Entry<String, SoVertexAttributeData> entry : pimpl.attribdict.entrySet()) {
+				func.apply(entry.getKey(), entry.getValue(), closure);
+			}
+		}
 	}
 
 }
