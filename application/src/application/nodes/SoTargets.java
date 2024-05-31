@@ -155,8 +155,7 @@ public class SoTargets extends SoSeparator {
 			nearChildren.add(id);
 		}
 
-		final Set<Integer> actualChildrenSaved = new HashSet<>();
-		actualChildrenSaved.addAll(actualChildren);
+		final Collection<Integer> actualChildrenSaved = new ArrayList<>(actualChildren);
 		for( Integer id : actualChildrenSaved) {
 			if(actualChildren.contains(id) && !nearChildren.contains(id)) {
 				//SoTarget child = (SoTarget)bspTree.getUserData(id);
