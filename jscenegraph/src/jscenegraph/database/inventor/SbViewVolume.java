@@ -354,9 +354,24 @@ public class SbViewVolume implements Mutable {
 	{
 		this.dpvv.update(this);
 
-		final SbMatrixd dpmatrix = new SbMatrixd(this.dpvv.getMatrix().getValue());
+		//final SbMatrixd dpmatrix = new SbMatrixd(this.dpvv.getMatrix().getValue());
 		final SbMatrix matrix = new SbMatrix();
-		copy_matrix(dpmatrix, matrix);
+		copy_matrix(this.dpvv.getMatrix(), matrix);
+		return matrix;
+	}
+
+	/*!
+      Returns the combined affine and projection matrix.
+
+      \sa getMatrices(), getCameraSpaceMatrix()
+     */
+	public SbMatrix getMatrix(SbMatrix matrix)
+	{
+		this.dpvv.update(this);
+
+		//final SbMatrixd dpmatrix = new SbMatrixd(this.dpvv.getMatrix().getValue());
+		//final SbMatrix matrix = new SbMatrix();
+		copy_matrix(this.dpvv.getMatrix(), matrix);
 		return matrix;
 	}
 

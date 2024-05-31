@@ -657,6 +657,8 @@ rayPickBoundingBox(SoRayPickAction action, final SbBox3f bbox)
 
     private static final String s4j_PerVertexNormal = "s4j_PerVertexNormal";
 
+    private final SoMaterialBundle    mb = new SoMaterialBundle();
+
     void GLRenderVertexArray(SoGLRenderAction action,
                                  boolean sendNormals, boolean doTextures)
 {
@@ -665,7 +667,7 @@ rayPickBoundingBox(SoRayPickAction action, final SbBox3f bbox)
 
   boolean              materialPerFace;
   //final SbVec3f             pt = new SbVec3f(), norm = new SbVec3f();
-  final SoMaterialBundle    mb = new SoMaterialBundle(action);
+  mb.SoMaterialBundle_init(action);
 
   materialPerFace = isMaterialPerFace(action);
 

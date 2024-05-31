@@ -846,6 +846,8 @@ callback(SoCallbackAction action)
 
 private final SbViewVolume        viewVol = new SbViewVolume(); // SINGLE_THREAD
 
+    private final SbMatrix cullMatrix = new SbMatrix();
+
 public void
 GLRender(SoGLRenderAction action)
 //
@@ -884,11 +886,11 @@ GLRender(SoGLRenderAction action)
     if (! SoGLUpdateAreaElement.get(state, uaOrigin, uaSize)) {
         SbViewVolume cvv = viewVol.narrow(uaOrigin.getValue()[0], uaOrigin.getValue()[1],
                                           uaSize.getValue()[0],   uaSize.getValue()[1]);
-        SoModelMatrixElement.setCullMatrix(state, this, cvv.getMatrix());
+        SoModelMatrixElement.setCullMatrix(state, this, cvv.getMatrix(cullMatrix));
     }
     // Otherwise, just set culling volume to be same as view volume
     else
-        SoModelMatrixElement.setCullMatrix(state, this, viewVol.getMatrix());
+        SoModelMatrixElement.setCullMatrix(state, this, viewVol.getMatrix(cullMatrix));
 
     // Don't auto-cache above cameras:
     SoGLCacheContextElement.shouldAutoCache(state,
