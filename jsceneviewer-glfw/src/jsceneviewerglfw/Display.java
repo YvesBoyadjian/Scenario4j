@@ -109,14 +109,20 @@ public class Display {
 	}
 
 	public boolean shouldClose() {
-		return composites.stream().map(Composite::shouldClose).reduce(false, new BinaryOperator<Boolean>() {
-
-			@Override
-			public Boolean apply(Boolean first, Boolean second) {
-				return first || second;
+		for(Composite composite : composites) {
+			if (composite.shouldClose()) {
+				return true;
 			}
-
-		});
+		}
+		return false;
+//		return composites.stream().map(Composite::shouldClose).reduce(false, new BinaryOperator<Boolean>() {
+//
+//			@Override
+//			public Boolean apply(Boolean first, Boolean second) {
+//				return first || second;
+//			}
+//
+//		});
 	}
 
 	public /*boolean*/void readAndDispatch() {
