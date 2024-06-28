@@ -607,6 +607,8 @@ protected void onAim(SoMouseButtonEvent event, boolean aim) {
 
 	double startPaintTime;
 
+	long lastDeltaAfterDraw = 1;
+
 	public double getStartPaintTime() {
 		return startPaintTime;
 	}
@@ -621,7 +623,10 @@ protected void onAim(SoMouseButtonEvent event, boolean aim) {
     	
     	//idle();
     	super.paintGL(gl2);
-    	
+
+		//gl2.glFlush();
+		gl2.glFinish();
+
     	if(lastFrameTime < 0) {
     		lastFrameTime++;
     	}
@@ -631,6 +636,18 @@ protected void onAim(SoMouseButtonEvent event, boolean aim) {
     	else {
     		nbFrames++;
     	}
+/*
+		long deltaAfterDraw = System.nanoTime() - newFrameTime;
+
+		if(deltaAfterDraw < lastDeltaAfterDraw) {
+			try {
+				Thread.sleep(Math.min((lastDeltaAfterDraw-deltaAfterDraw)*10/11/1000000,1000));
+			} catch (InterruptedException e) {
+				throw new RuntimeException(e);
+			}
+		}
+		lastDeltaAfterDraw = System.nanoTime() - newFrameTime;
+*/
 		long deltaTime = newFrameTime;
 		newFrameTime = System.nanoTime();
 		deltaTime -= newFrameTime;
