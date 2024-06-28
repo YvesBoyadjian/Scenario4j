@@ -746,12 +746,15 @@ public SoChildList getChildren()
 //
 // Use: extender public
 
-public void SoFile_doAction(SoAction action)
+    final int[]         numIndices = new int[1];
+    final int[][]   indices = new int[1][];
+
+    public void SoFile_doAction(SoAction action)
 //
 ////////////////////////////////////////////////////////////////////////
 {
-    final int[]         numIndices = new int[1];
-    final int[][]   indices = new int[1][];
+    numIndices[0] = 0;
+    indices[0] = null;
 
     if (action.getPathCode(numIndices, indices) == SoAction.PathCode.IN_PATH)
         getChildren().traverse(action, 0, indices[0][numIndices[0] - 1]);

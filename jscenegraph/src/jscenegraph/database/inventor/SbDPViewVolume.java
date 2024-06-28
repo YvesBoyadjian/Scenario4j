@@ -359,6 +359,14 @@ public class SbDPViewVolume implements Mutable {
 		return affine.multRight(proj);
 	}
 
+	public SbMatrixd
+	getMatrix(final SbMatrixd affine, final SbMatrixd  proj)
+	{
+
+		this.getMatrices(affine, proj);
+		return affine.multRight(proj);
+	}
+
 	// Perspective projection matrix. From the "OpenGL Programming Guide,
 // release 1", Appendix G (but with row-major mode).
 	public static SbMatrixd

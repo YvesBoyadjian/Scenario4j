@@ -431,9 +431,19 @@ public class SoLazyElement extends SoElement {
 			    	    numdiffuse = other.numdiffuse;
 			    	    numtransp = other.numtransp;
 			    	    diffusearray = SbColorArray.copyOf(other.diffusearray);
-			    	    packedarray = IntArrayPtr.copyOf(other.packedarray);
+						if (packedarray == null || other.packedarray == null) {
+							packedarray = IntArrayPtr.copyOf(other.packedarray);
+						}
+						else {
+							packedarray.copyFrom(other.packedarray);
+						}
 			    	    transparray = FloatArray.copyOf(other.transparray);
-			    	    colorindexarray = IntArrayPtr.copyOf(other.colorindexarray);
+						if (colorindexarray == null || other.colorindexarray == null) {
+							colorindexarray = IntArrayPtr.copyOf(other.colorindexarray);
+						}
+						else {
+							colorindexarray.copyFrom(other.colorindexarray);
+						}
 			    	    transptype = other.transptype;
 			    	    istransparent = other.istransparent;
 			    	    diffusenodeid = other.diffusenodeid; // COIN 3D

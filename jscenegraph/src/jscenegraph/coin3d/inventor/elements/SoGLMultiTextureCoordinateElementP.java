@@ -33,7 +33,7 @@ public class SoGLMultiTextureCoordinateElementP {
 		  public final SoGLMultiTextureCoordinateElement.GLUnitData defaultdata = new SoGLMultiTextureCoordinateElement.GLUnitData();
 		  void ensureCapacity(int unit) {
 		    while (unit >= this.unitdata.getLength()) {
-		      this.unitdata.append(new SoGLMultiTextureCoordinateElement.GLUnitData());
+		      this.unitdata.append(defaultdata);
 		    }
 		  }
 		  

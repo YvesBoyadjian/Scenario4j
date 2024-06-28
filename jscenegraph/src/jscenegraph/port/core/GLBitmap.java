@@ -15,6 +15,7 @@ import jscenegraph.port.memorybuffer.FloatMemoryBuffer;
 
 import static com.jogamp.opengl.GL.*;
 import static com.jogamp.opengl.GL.GL_ARRAY_BUFFER;
+import static org.lwjgl.opengl.GL15C.GL_STREAM_DRAW;
 
 public class GLBitmap {
 
@@ -43,7 +44,8 @@ public class GLBitmap {
             SbVec3f a,
             SbVec3f b,
             SbVec3f c,
-            SbVec3f d
+            SbVec3f d,
+            final int[] vertex_bo, final int[] texture_coordinate_bo
     ) {
 
 //        SoGLImage image = new SoGLImage();
@@ -122,7 +124,7 @@ public class GLBitmap {
         tcArray.getFast(4).setValue(1,1);//,dt);
         tcArray.getFast(5).setValue(0,1);//,ct);
 
-        callGL(state);
+        callGL(state, vertex_bo, texture_coordinate_bo);
 
         //image.unref(state);
 
@@ -130,27 +132,25 @@ public class GLBitmap {
         charPosition.setY(charPosition.getY()+ymove);
     }
 
-    private static void callGL(SoState state) {
+    private static void callGL(SoState state, final int[] vertex_bo, final int[] texture_coordinate_bo) {
 
         // ________________________________________________ Vertex coords
-        final int[] vertex_bo = new int[1];
 
         GL2 gl2 = state.getGL2();
 
         gl2.glGenBuffers(1,vertex_bo);
         gl2.glBindBuffer(GL_ARRAY_BUFFER,vertex_bo[0]);
-        gl2.glBufferData(GL_ARRAY_BUFFER,vboArray.sizeof(),vboArray.toFloatBuffer(),GL_STATIC_DRAW);
+        gl2.glBufferData(GL_ARRAY_BUFFER,vboArray.sizeof(),vboArray.toFloatBuffer(),GL_STREAM_DRAW);
 
         gl2.glVertexAttribPointer(0,3,GL_FLOAT,false,/*3*Float.BYTES*/0,0);
 
         gl2.glEnableVertexAttribArray(0);
 
 // __________________________________________________ Texture coords
-        final int[] texture_coordinate_bo = new int[1];
 
         gl2.glGenBuffers(1, texture_coordinate_bo);
         gl2.glBindBuffer(GL_ARRAY_BUFFER,texture_coordinate_bo[0]);
-        gl2.glBufferData(GL_ARRAY_BUFFER,tcArray.sizeof(),tcArray.toFloatBuffer(),GL_STATIC_DRAW);
+        gl2.glBufferData(GL_ARRAY_BUFFER,tcArray.sizeof(),tcArray.toFloatBuffer(),GL_STREAM_DRAW);
 
         gl2.glVertexAttribPointer(2,2,GL_FLOAT,false,0,0);
 

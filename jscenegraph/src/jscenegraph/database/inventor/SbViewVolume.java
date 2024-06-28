@@ -375,6 +375,16 @@ public class SbViewVolume implements Mutable {
 		return matrix;
 	}
 
+	public SbMatrix getMatrix(SbMatrix matrix, SbMatrixd affine, SbMatrixd proj)
+	{
+		this.dpvv.update(this);
+
+		//final SbMatrixd dpmatrix = new SbMatrixd(this.dpvv.getMatrix().getValue());
+		//final SbMatrix matrix = new SbMatrix();
+		copy_matrix(this.dpvv.getMatrix(affine, proj), matrix);
+		return matrix;
+	}
+
 	private void updateDPVV() {
 
 	}

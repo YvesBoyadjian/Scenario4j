@@ -20,6 +20,16 @@ public class SbVec3s implements Mutable {
 	protected ShortMemoryBuffer vec;
 	protected int indice;
 
+	protected SbVec3s(boolean single) {
+		if (!single) {
+			vec = ShortMemoryBuffer.allocateShorts(3);
+			indice = 0;
+		}
+		else {
+			indice = -1;
+		}
+	}
+
     //! Default constructor
     public SbVec3s()                                           {
 

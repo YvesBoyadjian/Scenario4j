@@ -310,6 +310,8 @@ public SoCube()
 //  }
 //}
 // Doc in parent.
+final SoMaterialBundle mb1 = new SoMaterialBundle();
+
 public void
 GLRender(SoGLRenderAction action)
 {
@@ -335,10 +337,10 @@ GLRender(SoGLRenderAction action)
     }
   }
 
-  final SoMaterialBundle mb = new SoMaterialBundle(action);
-  mb.sendFirst();
+  mb1.SoMaterialBundle_init(action);
+  mb1.sendFirst();
 
-  boolean sendNormals = !mb.isColorOnly() ||
+  boolean sendNormals = !mb1.isColorOnly() ||
     (SoMultiTextureCoordinateElement.getType(state) == SoMultiTextureCoordinateElement.CoordType.FUNCTION);
 
   int flags = 0;
@@ -365,7 +367,7 @@ GLRender(SoGLRenderAction action)
     GLRenderVertexArray(action,
     sendNormals, doTextures);
 
-  mb.destructor(); // java port
+  mb1.destructor(); // java port
 }
 
 

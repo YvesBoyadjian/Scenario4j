@@ -58,6 +58,7 @@ import org.ode4j.math.DMatrix3C;
 import org.ode4j.ode.*;
 
 import static application.MainGLFW.*;
+import static java.util.concurrent.Executors.defaultThreadFactory;
 
 /**
  * @author Yves Boyadjian
@@ -337,7 +338,15 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 
 	private Future<Float> distanceFromSeaFuture;
 
-	private final ExecutorService es = Executors.newSingleThreadExecutor();
+	class SimpleThreadFactory implements ThreadFactory {
+		public Thread newThread(Runnable r) {
+			Thread t = new Thread(r);
+			t.setPriority(Thread.MIN_PRIORITY);
+			return t;
+		}
+	}
+
+	private final ExecutorService es = Executors.newSingleThreadExecutor(new SimpleThreadFactory());
 
 	private Future<SoSeparator> enemiesSeparatorFuture;
 

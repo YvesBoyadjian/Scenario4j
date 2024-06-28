@@ -362,16 +362,21 @@ public class DxHashSpace extends DxSpace implements DHashSpace {
 		// every AABB in the normal list must now be intersected against every
 		// AABB in the big_boxes list. so let's hope there are not too many objects
 		// in the big_boxes list.
+		int big_boxes_size;
+		int index;
+		dxAABB aabb2;
 		for (dxAABB aabb: hash_boxes) {
-			for (dxAABB aabb2: big_boxes) {
+			big_boxes_size = big_boxes.size();
+			for (index = 0; index < big_boxes_size; index++) {
+				aabb2 = big_boxes.get(index);
 				collideAABBs (aabb.geom,aabb2.geom,data,callback);
 			}
 		}
 
 		// intersected all AABBs in the big_boxes list together
 		for (dxAABB aabb: big_boxes) {
-			for (dxAABB aabb2: big_boxes) {
-				collideAABBs (aabb.geom,aabb2.geom,data,callback);
+			for (dxAABB aabb3: big_boxes) {
+				collideAABBs (aabb.geom,aabb3.geom,data,callback);
 			}
 		}
 

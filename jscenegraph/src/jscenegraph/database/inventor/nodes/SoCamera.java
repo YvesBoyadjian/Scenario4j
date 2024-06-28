@@ -63,17 +63,7 @@ import static com.jogamp.opengl.GL2GL3.GL_LINE;
 import com.jogamp.opengl.GL2;
 
 import jscenegraph.coin3d.inventor.elements.SoGLMultiTextureEnabledElement;
-import jscenegraph.database.inventor.SbBox3f;
-import jscenegraph.database.inventor.SbMatrix;
-import jscenegraph.database.inventor.SbRotation;
-import jscenegraph.database.inventor.SbVec2f;
-import jscenegraph.database.inventor.SbVec2fSingle;
-import jscenegraph.database.inventor.SbVec2s;
-import jscenegraph.database.inventor.SbVec3f;
-import jscenegraph.database.inventor.SbViewVolume;
-import jscenegraph.database.inventor.SbViewportRegion;
-import jscenegraph.database.inventor.SoPath;
-import jscenegraph.database.inventor.SoType;
+import jscenegraph.database.inventor.*;
 import jscenegraph.database.inventor.actions.SoAction;
 import jscenegraph.database.inventor.actions.SoCallbackAction;
 import jscenegraph.database.inventor.actions.SoGLRenderAction;
@@ -848,6 +838,8 @@ private final SbViewVolume        viewVol = new SbViewVolume(); // SINGLE_THREAD
 
     private final SbMatrix cullMatrix = new SbMatrix();
 
+    final SbMatrixd affine = new SbMatrixd(), proj = new SbMatrixd();
+
 public void
 GLRender(SoGLRenderAction action)
 //
@@ -889,9 +881,11 @@ GLRender(SoGLRenderAction action)
         SoModelMatrixElement.setCullMatrix(state, this, cvv.getMatrix(cullMatrix));
     }
     // Otherwise, just set culling volume to be same as view volume
-    else
-        SoModelMatrixElement.setCullMatrix(state, this, viewVol.getMatrix(cullMatrix));
-
+    else {
+        affine.constructor();
+        proj.constructor();
+        SoModelMatrixElement.setCullMatrix(state, this, viewVol.getMatrix(cullMatrix, affine, proj));
+    }
     // Don't auto-cache above cameras:
     SoGLCacheContextElement.shouldAutoCache(state,
                 SoGLCacheContextElement.AutoCache.DONT_AUTO_CACHE.getValue());

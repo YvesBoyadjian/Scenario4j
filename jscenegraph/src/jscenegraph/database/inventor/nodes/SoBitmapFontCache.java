@@ -619,7 +619,7 @@ getHeight()
 // Use: internal public
 
 public void
-drawCharacter(char c, SoState state, SoNode node, SbVec3f charPosition, GLBitmap.Transformer transformer, SbVec3f a, SbVec3f b, SbVec3f cv, SbVec3f d)
+drawCharacter(char c, SoState state, SoNode node, SbVec3f charPosition, GLBitmap.Transformer transformer, SbVec3f a, SbVec3f b, SbVec3f cv, SbVec3f d, final int[] vertex_bo, final int[] texture_coordinate_bo)
 //
 ////////////////////////////////////////////////////////////////////////
 {
@@ -633,7 +633,7 @@ drawCharacter(char c, SoState state, SoNode node, SbVec3f charPosition, GLBitmap
         if( image != null) {
 
             GLBitmap.glBitmap(state, node, charPosition, transformer, bmap.width, bmap.height, bmap.xorig, bmap.yorig,
-                    bmap.xmove, bmap.ymove, image, a, b, cv, d);
+                    bmap.xmove, bmap.ymove, image, a, b, cv, d, vertex_bo, texture_coordinate_bo);
         }
     }
 //#ifdef DEBUG
@@ -691,10 +691,12 @@ drawString(int line, SoState state, SoNode node, SbVec3f linePosition,  GLBitmap
         SbVec3fSingleFast b = new SbVec3fSingleFast();
         SbVec3fSingleFast c = new SbVec3fSingleFast();
         SbVec3fSingleFast d = new SbVec3fSingleFast();
+        final int[] vertex_bo = new int[1];
+        final int[] texture_coordinate_bo = new int[1];
 
         for (int i = 0; i < getNumUCSChars(line); i++) {
             if (!hasDisplayList((char)str.get(/* 2**/i),state, node, charPosition,transformer)) {
-                drawCharacter((char)str.get(/*2**/i),state,node,charPosition,transformer,a,b,c,d);
+                drawCharacter((char)str.get(/*2**/i),state,node,charPosition,transformer,a,b,c,d, vertex_bo, texture_coordinate_bo);
             }
             else state.getGL2().glCallList(list.getFirstIndex()+ str.get(i)/*ustr.charAt(i)*//*((ustr[2*i]<<8) | ustr[2*i+1])*/); // java port
         }
@@ -803,7 +805,7 @@ hasDisplayList(char c, SoState state, SoNode node, SbVec3f charPosition, GLBitma
 
     // Build one:
     gl2.glNewList(list.getFirstIndex()+key, GL2.GL_COMPILE);
-    drawCharacter(c,state, node, charPosition, transformer, new SbVec3fSingleFast(), new SbVec3fSingleFast(), new SbVec3fSingleFast(), new SbVec3fSingleFast());
+    drawCharacter(c,state, node, charPosition, transformer, new SbVec3fSingleFast(), new SbVec3fSingleFast(), new SbVec3fSingleFast(), new SbVec3fSingleFast(), new int[1], new int[1]);
     gl2.glEndList();
     
     displayListDict.enter(key, value[0]);

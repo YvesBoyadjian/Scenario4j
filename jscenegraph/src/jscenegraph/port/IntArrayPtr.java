@@ -219,4 +219,10 @@ public class IntArrayPtr implements Destroyable, IntBufferAble {
 		}
 		return (intOffset + delta) < other.intOffset;
 	}
+
+	public void copyFrom(IntArrayPtr intArrayPtr) {
+		this.array = intArrayPtr.array;
+		this.intOffset = intArrayPtr.intOffset;
+		this.intBuffer = intArrayPtr.intBuffer;
+	}
 }

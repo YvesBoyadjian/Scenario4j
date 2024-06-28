@@ -53,7 +53,7 @@ public class Display {
 		
 	};
 	
-	final PriorityQueue<FutureEvent> timersQueue = new PriorityQueue<>(comparator);
+	final SortedSet<FutureEvent> timersQueue = new TreeSet<>(comparator);
 	
 	public Display() {
 		current = this;
@@ -128,11 +128,14 @@ public class Display {
 		do {
 			treated = false;
 
-			FutureEvent fe = timersQueue.peek();
+			FutureEvent fe = null;
+			if (!timersQueue.isEmpty()) {
+				fe = timersQueue.getFirst();
+			}
 			if(fe != null) {
 				if( fe.startTimeMicroseconds <= currentTimeMicro) {
 					treated = true;
-					timersQueue.remove();
+					timersQueue.remove(fe);
 					fe.doit.run();
 				}
 			}

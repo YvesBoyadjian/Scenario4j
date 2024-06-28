@@ -1355,7 +1355,7 @@ GLRender(SoGLRenderAction action)
 			  , new SbVec3fSingleFast()
 			  , new SbVec3fSingleFast()
 			  , new SbVec3fSingleFast()
-			  , new SbVec3fSingleFast());
+			  , new SbVec3fSingleFast(), new int[1], new int[1]);
   }
 
   // FIXME: this looks wrong, shouldn't we rather reset the alignment

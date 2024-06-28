@@ -27,10 +27,7 @@ package jscenegraph.coin3d.inventor.elements;
 import jscenegraph.coin3d.inventor.elements.gl.SoGLMultiTextureImageElement;
 import jscenegraph.coin3d.inventor.lists.SbList;
 import jscenegraph.coin3d.inventor.lists.SbListOfMutableRefs;
-import jscenegraph.database.inventor.SbColor;
-import jscenegraph.database.inventor.SbVec2s;
-import jscenegraph.database.inventor.SbVec3fSingleFast;
-import jscenegraph.database.inventor.SbVec3s;
+import jscenegraph.database.inventor.*;
 import jscenegraph.database.inventor.elements.SoElement;
 import jscenegraph.database.inventor.misc.SoState;
 import jscenegraph.database.inventor.nodes.SoNode;
@@ -124,7 +121,7 @@ public class SoMultiTextureImageElement extends SoElement {
   public static class UnitData implements Mutable {
   
 	  public long nodeid;
-	  public final SbVec3s size = new SbVec3s();
+	  public final SbVec3sSingleFast size = new SbVec3sSingleFast();
 	  public int numComponents;
 	  public MemoryBuffer bytes;
 	  public SoMultiTextureImageElement.Wrap wrapS, wrapT, wrapR;
