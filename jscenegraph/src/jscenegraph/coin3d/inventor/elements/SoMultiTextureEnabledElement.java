@@ -218,6 +218,30 @@ getEnabledUnits(SoState state,
   lastenabled[0] = -1;
   return null;
 }
+    public static boolean[]
+    getEnabledUnits(SoState state,
+                    final int[] lastenabled, final boolean[] retVal)
+    {
+        SoMultiTextureEnabledElement elem =
+                (SoMultiTextureEnabledElement)
+                        (SoElement.getConstElement(state, classStackIndexMap.get(SoMultiTextureEnabledElement.class)));
+
+        int i = elem.enabled.length() - 1;//elem.enabled_length-1;
+//  while (i >= 0) {
+//    if (elem.enabled.get(i)) break;
+//    i--;
+//  }
+        if (i >= 0) {
+            lastenabled[0] = i;
+            //boolean[] retVal = new boolean[/*elem.enabled_length*/i+1];
+            for (int j=0; j <= i/*elem.enabled_length*/; j++) {
+                retVal[j] = elem.enabled.get(j);
+            }
+            return retVal;
+        }
+        lastenabled[0] = -1;
+        return null;
+    }
 
 /*!
   Returns true if unit is enabled (Mode == DISABLED).

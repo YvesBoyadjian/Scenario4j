@@ -422,11 +422,14 @@ public void initRender( boolean[] enabled, int maxenabled)
 
   \internal
 */
+final int[] dummy = new int[1];
+    final boolean[] retVal = new boolean[1];
 public void initMulti(SoState state)
 {
-	final int[] dummy = new int[1];
+    dummy[0] = 0;
+    retVal[0] = false;
   this.multienabled = SoMultiTextureEnabledElement.getEnabledUnits(state,
-                                                                     /*this.multimax*/dummy);
+                                                                     /*this.multimax*/dummy, retVal);
   this.multimax = dummy[0];
   this.initRender(this.multienabled, this.multimax);
 }

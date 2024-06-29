@@ -1345,7 +1345,7 @@ public class SbViewVolume implements Mutable {
 	//#endif // COIN_DEBUG
 
 	  if (this.type == ProjectionType.PERSPECTIVE) {
-	    final SbVec3f dir = new SbVec3f();
+	    final SbVec3f dir = new SbVec3fSingleFast();
 	    dir.copyFrom( this.llf.operator_minus(this.projPoint));
 	    dir.normalize(); // safe to normalize here
 	    lowerleft.copyFrom( this.llf.operator_add(dir.operator_mul( distance / dir.dot(this.projDir))));
