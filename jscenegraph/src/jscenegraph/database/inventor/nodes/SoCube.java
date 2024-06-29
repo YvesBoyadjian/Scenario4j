@@ -74,16 +74,13 @@ import jscenegraph.database.inventor.details.SoCubeDetail;
 import jscenegraph.database.inventor.details.SoDetail;
 import jscenegraph.database.inventor.elements.SoComplexityElement;
 import jscenegraph.database.inventor.elements.SoComplexityTypeElement;
-import jscenegraph.database.inventor.elements.SoDrawStyleElement;
 import jscenegraph.database.inventor.elements.SoGLCacheContextElement;
 import jscenegraph.database.inventor.elements.SoLazyElement;
-import jscenegraph.database.inventor.elements.SoLightModelElement;
 import jscenegraph.database.inventor.elements.SoMaterialBindingElement;
 import jscenegraph.database.inventor.elements.SoModelMatrixElement;
 import jscenegraph.database.inventor.fields.SoFieldData;
 import jscenegraph.database.inventor.fields.SoSFFloat;
 import jscenegraph.database.inventor.misc.SoState;
-import jscenegraph.mevis.inventor.misc.SoVBO;
 import jscenegraph.port.CharPtr;
 import jscenegraph.port.Ctx;
 import jscenegraph.port.FloatPtr;
@@ -202,15 +199,16 @@ public		    final SoSFFloat           depth = new SoSFFloat();
   
   //! The state of the last cone tesselation,
   //! so that the VBO can be reused if nothing changed.
-  private class CacheState extends SimpleVertexArrayCache {
-	  
+  private class CubeCacheState extends SimpleVertexArrayCache {
+	  boolean materialPerFace;
+      int color;
+      boolean initialized;
   }
 	
-  private CacheState _cache = new CacheState();
+  private CubeCacheState _cache1 = new CubeCacheState();
+    private CubeCacheState _cache2 = new CubeCacheState();
 
-  private boolean cacheDirty = true;
-  private int lastColor;
-  private boolean lastNormal;
+    private CubeCacheState _cacheToUse = null;
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -647,7 +645,7 @@ rayPickBoundingBox(SoRayPickAction action, final SbBox3f bbox)
     // vertex (3 floats) + normal (3 floats) + texcood (2 floats) + color (1 uint32)
     static final int numBytes = ((3+3+2) * 4 + 4) * numVertices;
 
-    CharPtr data = new CharPtr(numBytes);
+    final CharPtr data = new CharPtr(numBytes);
 
     final static int indices[] = {0,1,2, 0,2,3};
 
@@ -679,90 +677,43 @@ rayPickBoundingBox(SoRayPickAction action, final SbBox3f bbox)
   }
   mb.sendFirst();
 
-    CharPtr vertexOffset = null;
-    CharPtr normalOffset = null;
-    CharPtr texCoordOffset = null;
-    CharPtr colorOffset = null;
-
     final IntArrayPtr colors = SoLazyElement.getPackedColors(state);
     int color = colors.get(0);
 
-    if(lastColor != color || lastNormal != sendNormals) {
-        cacheDirty = true;
-    }
+    boolean canUseCache1 = !materialPerFace && _cache1.color == color && _cache1.useNormals == sendNormals && _cache1.initialized;
+    boolean canUseCache2 = !materialPerFace && _cache2.color == color && _cache2.useNormals == sendNormals && _cache2.initialized;
+
+    boolean cacheDirty = !canUseCache1 && !canUseCache2;
 
     if (cacheDirty) {
-        lastNormal = sendNormals;
+        if (_cacheToUse == _cache1) {
+            _cacheToUse = _cache2;
+        }
+        else {
+            _cacheToUse = _cache1;
+        }
+        fillCubeCache(_cacheToUse, sendNormals,doTextures,materialPerFace, colors, color, state);
 
-      _cache.useColors = true;
-      _cache.useNormals = sendNormals;
-      _cache.useTexCoords = doTextures;
-
-      _cache.numVertices = numVertices;
-
-      FloatPtr verticesPtr = new FloatPtr(data);
-      FloatPtr normalsPtr = verticesPtr.operator_add(numVertices * 3);
-      FloatPtr texCoordsPtr = normalsPtr.operator_add(numVertices * 3);
-      IntPtr colorsPtr = new IntPtr(texCoordsPtr.operator_add(numVertices * 2));
-      vertexOffset = new CharPtr(verticesPtr);
-      normalOffset = new CharPtr(normalsPtr);
-      texCoordOffset = new CharPtr(texCoordsPtr);
-      colorOffset = new CharPtr(colorsPtr);
-
-      for (int face = 0; face < 6; face++) {
-          if (materialPerFace && face > 0) {
-              color = colors.get(face);
-          }
-          if (sendNormals) {
-              normal.copyFrom(normals[face]);
-          }
-          for (int tri = 0; tri < 6; tri++) {
-              int vert = indices[tri];
-              SoMachine.DGL_HTON_INT32(swappedColor, color);
-              colorsPtr.asterisk(swappedColor[0]);
-              colorsPtr.plusPlus();
-              if (doTextures) {
-                  float[] tmp = texCoords[vert].getValueRead();
-                  texCoordsPtr.asterisk(tmp[0]);
-                  texCoordsPtr.plusPlus();
-                  texCoordsPtr.asterisk(tmp[1]);
-                  texCoordsPtr.plusPlus();
-              }
-              if (sendNormals) {
-                  final float[] tmp = normal.getValue();
-                  normalsPtr.asterisk(tmp[0]);
-                  normalsPtr.plusPlus();
-                  normalsPtr.asterisk(tmp[1]);
-                  normalsPtr.plusPlus();
-                  normalsPtr.asterisk(tmp[2]);
-                  normalsPtr.plusPlus();
-              }
-              verticesPtr.asterisk((verts[face][vert]).getX() * scale.getValue()[0]);
-              verticesPtr.plusPlus();
-              verticesPtr.asterisk((verts[face][vert]).getY() * scale.getValue()[1]);
-              verticesPtr.plusPlus();
-              verticesPtr.asterisk((verts[face][vert]).getZ() * scale.getValue()[2]);
-              verticesPtr.plusPlus();
-          }
-      }
-
-      _cache.vbo.setData(numBytes, null, 0, state);
+        _cacheToUse.initialized = true;
   }
+    else {
+        if (canUseCache1) {
+            _cacheToUse = _cache1;
+        }
+        else if (canUseCache2) {
+            _cacheToUse = _cache2;
+        }
+    }
     GL2 gl2 = Ctx.get(action.getCacheContext());
-  _cache.vbo.bind(state);
-  if (cacheDirty) {
-      _cache.vbo.updateData(gl2, data);
+    _cacheToUse.vbo.bind(state);
+    if (cacheDirty) {
+        _cacheToUse.vbo.updateData(gl2, data);
 
-      _cache.vertexOffset = (vertexOffset.minus(data));
-      _cache.colorOffset = (colorOffset.minus(data));
-      _cache.normalOffset = (normalOffset.minus(data));
-      _cache.texCoordOffset = (texCoordOffset.minus(data));
-
-      if (!materialPerFace) {
-          lastColor = color;
-          cacheDirty = false;
-      }
-  }
+        if (!materialPerFace) {
+            _cacheToUse.color = color;
+            cacheDirty = false;
+        }
+    }
   if(sendNormals) {
 
       int pHandle = SoGLShaderProgramElement.get(state).getGLSLShaderProgramHandle(state);
@@ -776,8 +727,8 @@ rayPickBoundingBox(SoRayPickAction action, final SbBox3f bbox)
 
   }
 
-  _cache.drawArrays(this, action, GL2.GL_TRIANGLES);
-  _cache.vbo.unbind(gl2);
+  _cacheToUse.drawArrays(this, action, GL2.GL_TRIANGLES);
+  _cacheToUse.vbo.unbind(gl2);
 
     if(sendNormals) {
 
@@ -795,6 +746,75 @@ rayPickBoundingBox(SoRayPickAction action, final SbBox3f bbox)
   mb.destructor(); // java port
 }
 
+private void fillCubeCache(SoCube.CubeCacheState _cache, boolean sendNormals, boolean doTextures, boolean materialPerFace, final IntArrayPtr colors, int color, SoState state) {
+
+    _cache.useColors = true;
+    _cache.useNormals = sendNormals;
+    _cache.useTexCoords = doTextures;
+
+    _cache.numVertices = numVertices;
+
+    FloatPtr verticesPtr = new FloatPtr(data);
+    FloatPtr normalsPtr = verticesPtr.operator_add(numVertices * 3);
+    FloatPtr texCoordsPtr = normalsPtr.operator_add(numVertices * 3);
+    IntPtr colorsPtr = new IntPtr(texCoordsPtr.operator_add(numVertices * 2));
+
+
+    CharPtr vertexOffset = null;
+    CharPtr normalOffset = null;
+    CharPtr texCoordOffset = null;
+    CharPtr colorOffset = null;
+
+    vertexOffset = new CharPtr(verticesPtr);
+    normalOffset = new CharPtr(normalsPtr);
+    texCoordOffset = new CharPtr(texCoordsPtr);
+    colorOffset = new CharPtr(colorsPtr);
+
+    for (int face = 0; face < 6; face++) {
+        if (materialPerFace && face > 0) {
+            color = colors.get(face);
+        }
+        if (sendNormals) {
+            normal.copyFrom(normals[face]);
+        }
+        for (int tri = 0; tri < 6; tri++) {
+            int vert = indices[tri];
+            SoMachine.DGL_HTON_INT32(swappedColor, color);
+            colorsPtr.asterisk(swappedColor[0]);
+            colorsPtr.plusPlus();
+            if (doTextures) {
+                float[] tmp = texCoords[vert].getValueRead();
+                texCoordsPtr.asterisk(tmp[0]);
+                texCoordsPtr.plusPlus();
+                texCoordsPtr.asterisk(tmp[1]);
+                texCoordsPtr.plusPlus();
+            }
+            if (sendNormals) {
+                final float[] tmp = normal.getValue();
+                normalsPtr.asterisk(tmp[0]);
+                normalsPtr.plusPlus();
+                normalsPtr.asterisk(tmp[1]);
+                normalsPtr.plusPlus();
+                normalsPtr.asterisk(tmp[2]);
+                normalsPtr.plusPlus();
+            }
+            verticesPtr.asterisk((verts[face][vert]).getX() * scale.getValue()[0]);
+            verticesPtr.plusPlus();
+            verticesPtr.asterisk((verts[face][vert]).getY() * scale.getValue()[1]);
+            verticesPtr.plusPlus();
+            verticesPtr.asterisk((verts[face][vert]).getZ() * scale.getValue()[2]);
+            verticesPtr.plusPlus();
+        }
+    }
+
+    _cache.vbo.setData(numBytes, null, 0, state);
+
+    _cache.vertexOffset = (vertexOffset.minus(data));
+    _cache.colorOffset = (colorOffset.minus(data));
+    _cache.normalOffset = (normalOffset.minus(data));
+    _cache.texCoordOffset = (texCoordOffset.minus(data));
+
+}
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -1248,8 +1268,10 @@ getPrimitiveCount(SoGetPrimitiveCountAction action)
 }
 
 public void destructor() {
-        _cache.destructor();
-        _cache = null;
+        _cache1.destructor();
+    _cache2.destructor();
+        _cache1 = null;
+    _cache2 = null;
         super.destructor();
 }
 
