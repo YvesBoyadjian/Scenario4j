@@ -1455,10 +1455,12 @@ public class MainGLFW {
 
 		viewer.addIdleListener((viewer1) -> {
 			float distanceFromBeach = sg.getDistanceFromBeach();
-			if (seaClip != null) {
 				float atmosphericAbsorption = (float)Math.pow(0.01, distanceFromBeach/1000.0f);
 				float seaClipVolume = 1.0f / (15.0f + distanceFromBeach/40.0f) * atmosphericAbsorption;
+			if (seaClip != null) {
 				setVolume(seaClip, seaClipVolume);
+			}
+			if (forestClip != null) {
 				setVolume(forestClip, 1 - 15.0f * seaClipVolume);
 			}
 		});
