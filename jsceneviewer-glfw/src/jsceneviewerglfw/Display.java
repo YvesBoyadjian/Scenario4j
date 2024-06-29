@@ -136,7 +136,7 @@ public class Display {
 
 			FutureEvent fe = null;
 			if (!timersQueue.isEmpty()) {
-				fe = timersQueue.getFirst();
+				fe = timersQueue.first();
 			}
 			if(fe != null) {
 				if( fe.startTimeMicroseconds <= currentTimeMicro) {
