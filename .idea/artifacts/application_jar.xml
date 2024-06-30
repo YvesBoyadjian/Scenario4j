@@ -7,16 +7,12 @@
       <element id="module-output" name="application" />
       <element id="module-output" name="jscenegraph" />
       <element id="module-output" name="org.lwjglx" />
-      <element id="module-output" name="vk-bootstrap" />
       <element id="module-output" name="lwjgl-opengl" />
       <element id="module-output" name="jsceneviewer-glfw" />
       <element id="module-output" name="lwjgl-utils" />
       <element id="module-output" name="gdx" />
       <element id="module-output" name="ode4j" />
       <element id="module-output" name="sl4j" />
-      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/lwjgl/lwjgl/3.3.0-SNAPSHOT/lwjgl-3.3.0-20211020.190020-13-natives-windows.jar" path-in-jar="/" />
-      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/lwjgl/lwjgl-stb/3.3.0-SNAPSHOT/lwjgl-stb-3.3.0-20210325.222416-6.jar" path-in-jar="/" />
-      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/lwjgl/lwjgl-vma/3.3.0-SNAPSHOT/lwjgl-vma-3.3.0-20210325.222416-6.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$PROJECT_DIR$/geotools/lib/commons-lang3-3.8.1.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$PROJECT_DIR$/geotools/lib/ejml-core-0.34.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$PROJECT_DIR$/geotools/lib/ejml-ddense-0.34.jar" path-in-jar="/" />
@@ -46,20 +42,8 @@
       <element id="extracted-dir" path="$PROJECT_DIR$/gdx/lib/gdx-platform-1.9.11-natives-desktop.jar" path-in-jar="/" />
       <element id="library" level="module" name="lib" module-name="geotools" />
       <element id="extracted-dir" path="$PROJECT_DIR$/gdx/lib/gdx-bullet-platform-1.9.11-natives-desktop.jar" path-in-jar="/" />
-      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/lwjgl/lwjgl-openal/3.3.0-SNAPSHOT/lwjgl-openal-3.3.0-20210325.222416-6.jar" path-in-jar="/" />
-      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/lwjgl/lwjgl-openal/3.3.0-SNAPSHOT/lwjgl-openal-3.3.0-20210325.222416-6-natives-windows.jar" path-in-jar="/" />
-      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/lwjgl/lwjgl-glfw/3.3.0-SNAPSHOT/lwjgl-glfw-3.3.0-20210325.222416-6.jar" path-in-jar="/" />
-      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/lwjgl/lwjgl-assimp/3.3.0-SNAPSHOT/lwjgl-assimp-3.3.0-20210325.222416-6.jar" path-in-jar="/" />
-      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/lwjgl/lwjgl-assimp/3.3.0-SNAPSHOT/lwjgl-assimp-3.3.0-20210325.222416-6-natives-windows.jar" path-in-jar="/" />
-      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/lwjgl/lwjgl-glfw/3.3.0-SNAPSHOT/lwjgl-glfw-3.3.0-20210325.222416-6-natives-windows.jar" path-in-jar="/" />
-      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/lwjgl/lwjgl/3.3.0-SNAPSHOT/lwjgl-3.3.0-20211020.190020-13.jar" path-in-jar="/" />
-      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/lwjgl/lwjgl-vma/3.3.0-SNAPSHOT/lwjgl-vma-3.3.0-20210325.222416-6-natives-windows.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$PROJECT_DIR$/gdx/lib/gdx-bullet-1.9.11.jar" path-in-jar="/" />
-      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/lwjgl/lwjgl-stb/3.3.0-SNAPSHOT/lwjgl-stb-3.3.0-20210325.222416-6-natives-windows.jar" path-in-jar="/" />
-      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/lwjgl/lwjgl-opengl/3.3.0-SNAPSHOT/lwjgl-opengl-3.3.0-20211020.190020-13-natives-windows.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/joml/joml/1.10.1/joml-1.10.1.jar" path-in-jar="/" />
-      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/lwjgl/lwjgl-opengl/3.3.0-SNAPSHOT/lwjgl-opengl-3.3.0-20211020.190020-13.jar" path-in-jar="/" />
-      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/lwjgl/lwjgl-vulkan/3.3.0-SNAPSHOT/lwjgl-vulkan-3.3.0-20210325.222416-6.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$PROJECT_DIR$/gdx/lib/gdx-1.9.11.jar" path-in-jar="/" />
       <element id="module-output" name="jgltf-obj" />
       <element id="module-output" name="jgltf-model" />
@@ -75,6 +59,20 @@
       <element id="extracted-dir" path="$PROJECT_DIR$/application/jl1.0.1.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$PROJECT_DIR$/application/mp3spi1.9.5.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$PROJECT_DIR$/application/tritonus_share.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/lwjgl/lwjgl-stb/3.3.3/lwjgl-stb-3.3.3.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/lwjgl/lwjgl-stb/3.3.3/lwjgl-stb-3.3.3-natives-windows.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/lwjgl/lwjgl-openal/3.3.3/lwjgl-openal-3.3.3.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/lwjgl/lwjgl-openal/3.3.3/lwjgl-openal-3.3.3-natives-windows.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/lwjgl/lwjgl-opengl/3.3.3/lwjgl-opengl-3.3.3.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/lwjgl/lwjgl-opengl/3.3.3/lwjgl-opengl-3.3.3-natives-windows.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/lwjgl/lwjgl/3.3.3/lwjgl-3.3.3.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/lwjgl/lwjgl/3.3.3/lwjgl-3.3.3-natives-windows.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/lwjgl/lwjgl-vma/3.3.3/lwjgl-vma-3.3.3.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/lwjgl/lwjgl-vma/3.3.3/lwjgl-vma-3.3.3-natives-windows.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/lwjgl/lwjgl-assimp/3.3.3/lwjgl-assimp-3.3.3.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/lwjgl/lwjgl-assimp/3.3.3/lwjgl-assimp-3.3.3-natives-windows.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/lwjgl/lwjgl-glfw/3.3.3/lwjgl-glfw-3.3.3.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/lwjgl/lwjgl-glfw/3.3.3/lwjgl-glfw-3.3.3-natives-windows.jar" path-in-jar="/" />
     </root>
   </artifact>
 </component>

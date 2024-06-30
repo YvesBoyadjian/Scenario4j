@@ -21,6 +21,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
 import java.util.zip.GZIPInputStream;
 
+import javax.imageio.ImageIO;
 import javax.sound.sampled.*;
 import javax.swing.*;
 import javax.swing.border.BevelBorder;
@@ -225,6 +226,37 @@ public class MainGLFW {
 
     public static void showSplash() {
         window = new JWindow();
+
+        final Container rootContentPane = window.getContentPane();
+
+        Image bgImage = null;
+        try {
+            bgImage = ImageIO.read(new File("ressource/BigFoot_1200DPI.jpg"));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        final Image bgImagef = bgImage;
+
+        final Container contentPane = new JPanel() {
+            @Override
+            protected void paintComponent(Graphics g) {
+
+                super.paintComponent(g);
+
+                float imageRatio = (float)bgImagef.getHeight(null)/bgImagef.getWidth(null);
+                float rootContentPaneRatio = (float)rootContentPane.getHeight()/rootContentPane.getWidth();
+                int drawWidth = rootContentPane.getWidth();
+                if (rootContentPaneRatio < imageRatio) {
+                    drawWidth *= rootContentPaneRatio / imageRatio;
+                }
+
+                g.drawImage(bgImagef, (rootContentPane.getWidth() - drawWidth)/2, 0, drawWidth, rootContentPane.getHeight(), null);
+            }
+        };
+        rootContentPane.add(contentPane);
+        contentPane.setLayout(new BorderLayout());
+
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         double width = screenSize.getWidth();
         double height = screenSize.getHeight();
@@ -232,8 +264,7 @@ public class MainGLFW {
         JLabel intro = new JLabel("Mount Rainier Island, an Adventure Game", null, SwingConstants.CENTER);
         intro.setForeground(Color.red.darker());
         intro.setFont(intro.getFont().deriveFont((float) height / 20f));
-        window.getContentPane().add(
-                intro);
+        contentPane.add(intro);
 
         final JProgressBar progressBar = new JProgressBar(0, MAX_PROGRESS);
         progressBar.setBackground(Color.black);
@@ -241,8 +272,9 @@ public class MainGLFW {
         progressBar.setBorderPainted(false);
 
         JPanel southPanel = new JPanel();
-        southPanel.setBackground(Color.BLACK);
+        //southPanel.setBackground(Color.BLACK);
         southPanel.setLayout(new BoxLayout(southPanel, BoxLayout.PAGE_AXIS));
+        southPanel.setOpaque(false);
 
         JLabel engine = new JLabel("Scenario4j Engine", null, SwingConstants.CENTER);
         engine.setFont(intro.getFont().deriveFont((float) height / 30f));
@@ -262,10 +294,10 @@ public class MainGLFW {
         southPanel.add(progressBar);
         southPanel.add(keysPanel);
 
-        window.getContentPane().add(southPanel, BorderLayout.SOUTH);
+        contentPane.add(southPanel, BorderLayout.SOUTH);
 
 
-        window.getContentPane().setBackground(Color.BLACK);
+        contentPane.setBackground(Color.GREEN.darker().darker());
         window.setCursor(new java.awt.Cursor(java.awt.Cursor.WAIT_CURSOR));
         //window.getContentPane().setForeground(Color.white);
 
@@ -1724,7 +1756,7 @@ public class MainGLFW {
 
                 seaRenderer.play();
 
-                //seaRenderer.setVolume(0.01f);
+                seaRenderer.setVolume(0.0f);
 
                 seaAudioLatch.countDown();
 
@@ -1772,7 +1804,7 @@ public class MainGLFW {
 
                 forestRenderer.play();
 
-                //forestRenderer.setVolume(0.1f);
+                forestRenderer.setVolume(0.0f);
 
                 forestAudioLatch.countDown();
 
