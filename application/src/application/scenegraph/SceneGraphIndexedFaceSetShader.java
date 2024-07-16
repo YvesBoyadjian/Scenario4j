@@ -4,6 +4,8 @@
 package application.scenegraph;
 
 import java.awt.Color;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBuffer;
 import java.awt.image.Raster;
@@ -20,6 +22,7 @@ import java.util.stream.Stream;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
+import javax.swing.Timer;
 
 import application.RasterProvider;
 import application.nodes.*;
@@ -42,6 +45,7 @@ import jscenegraph.coin3d.inventor.SbBSPTree;
 import jscenegraph.coin3d.inventor.VRMLnodes.SoVRMLBillboard;
 import jscenegraph.coin3d.inventor.lists.SbListInt;
 import jscenegraph.coin3d.inventor.nodes.*;
+import jscenegraph.coin3d.shaders.inventor.nodes.SoShaderParameter1i;
 import jscenegraph.coin3d.shaders.inventor.nodes.SoShaderProgram;
 import jscenegraph.coin3d.shaders.inventor.nodes.SoShaderStateMatrixParameter;
 import jscenegraph.database.inventor.*;
@@ -365,6 +369,8 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 	private SoBaseColor lifeBarColor;
 
 	private SoCat cat;
+
+	private final SoSeparator targetShowSeparator = new SoSeparator();
 	
 	private final SoSwitch rulerSwitch = new SoSwitch();
 	
@@ -1532,8 +1538,8 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 				"#version 400 core\n" +
 						"layout (location = 0) in vec3 s4j_Vertex;\n" +
 						"layout (location = 1) in vec3 s4j_Normal;\n" +
-						"layout (location = 2) in vec2 s4j_MultiTexCoord0;\n"+
-						"layout (location = 3) in vec4 s4j_Color;\n" +
+						"layout (location = 2) in vec4 s4j_Color;\n" +
+						"layout (location = 3) in vec2 s4j_MultiTexCoord0;\n"+
 						"\n" +
 						"uniform mat4 s4j_ModelViewMatrix;\n" +
 						"uniform mat4 s4j_ProjectionMatrix;\n" +
@@ -1582,9 +1588,17 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 				"\n" +
 				"  vec3 color;\n"+
 				"color = mydiffuse.rgb * texcolor.rgb;\n"+
+				"color = pow(color,vec3(0.46f));\n"+
 				"s4j_FragColor = vec4(color, mydiffuse.a);\n"+
 				"}\n"
 		);
+		SoShaderParameter1i texmap =
+				new SoShaderParameter1i();
+		String str = "textureMap0";
+		texmap.name.setValue(str);
+		texmap.value.setValue(0);
+
+		fragmentShaderScreen.parameter.set1Value(fragmentShaderScreen.parameter.getNum(), texmap);
 
 		final SoShaderStateMatrixParameter smvs = new SoShaderStateMatrixParameter();
 		smvs.name.setValue("s4j_ModelViewMatrix");
@@ -1945,6 +1959,17 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 		lifeBarSeparator.addChild(lifeBar);
 
 		sep.addChild(lifeBarSeparator);
+
+		//_________________________________________________ Target showing
+
+		SoSeparator mainTargetShowSeparator = new SoSeparator();
+
+		sep.addChild(mainTargetShowSeparator);
+
+		SoOrthographicCamera offscreenTargetShowCamera = new SoOrthographicCamera();
+		mainTargetShowSeparator.addChild(offscreenTargetShowCamera);
+
+		mainTargetShowSeparator.addChild(targetShowSeparator);
 
 		onContrastChange();
 	}
@@ -2944,6 +2969,104 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 	public void shootTarget(Target t, int instance) {
 		registerShot(targetFamilies.indexOf(t),instance);
 		doShootTarget(t,instance);
+	}
+
+	public void showTarget(Target t) {
+		String texturePath = t.getTexturePath();
+
+		File textureFile = new File(texturePath);
+
+		if(!textureFile.exists()) {
+			texturePath = "application/"+texturePath;
+		}
+
+		SoTexture2 targetTexture = new SoTexture2() {
+			public void GLRender(SoGLRenderAction renderAction) {
+				super.GLRender(renderAction);
+			}
+		};
+
+		targetTexture.filename.setValue(texturePath);
+
+		targetShowSeparator.removeAllChildren();
+
+		targetShowSeparator.addChild(targetTexture);
+
+//		SoIndexedFaceSet targetRectangle = new SoIndexedFaceSet() {
+//			public void GLRender(SoGLRenderAction renderAction) {
+//				super.GLRender(renderAction);
+//			}
+//		};
+//
+//		float[] xyz = new float[4*3];
+//
+//		xyz[0] = -1f;
+//		xyz[1] = -1f;
+//
+//		xyz[3] = 1f;
+//		xyz[4] = -1;
+//
+//		xyz[6] = 1f;
+//		xyz[7] = 1f;
+//
+//		xyz[9] = -1f;
+//		xyz[10] = 1f;
+//
+//		SoVertexProperty targetVertexProperty = new SoVertexProperty();
+//
+//		targetVertexProperty.vertex.setValues(0,xyz);
+//
+//		float[] xy = new float[4*2];
+//
+//		xy[0] = 0f;
+//		xy[1] = 1f;
+//
+//		xy[2] = 1f;
+//		xy[3] = 1f;
+//
+//		xy[4] = 1f;
+//		xy[5] = 0f;
+//
+//		xy[6] = 0f;
+//		xy[7] = 0f;
+//
+//		targetVertexProperty.texCoord.setValues(0, xy);
+//
+//		targetRectangle.vertexProperty.setValue(targetVertexProperty);
+//
+//		int[] targetDrawIndices = new int[5];
+//		targetDrawIndices[1] = 1;
+//		targetDrawIndices[2] = 2;
+//		targetDrawIndices[3] = 3;
+//		targetDrawIndices[4] = -1;
+//
+//		targetRectangle.coordIndex.setValues(0,targetDrawIndices);
+//
+//		targetShowSeparator.addChild(targetRectangle);
+
+		SoCube targetRectangle = new SoCube();
+
+        try {
+            BufferedImage image = ImageIO.read(new File(texturePath));
+			int width = image.getWidth();
+			int height = image.getHeight();
+			float ratio = (float)width/(float)height;
+			targetRectangle.width.setValue(ratio*2);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+
+        targetShowSeparator.addChild(targetRectangle);
+
+		Timer timer = new Timer(6000, new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				targetShowSeparator.removeAllChildren();
+			}
+		});
+		timer.setRepeats(false);
+		timer.start();
 	}
 
 	public void registerShot(int index, int instance) {

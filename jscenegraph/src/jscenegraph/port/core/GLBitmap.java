@@ -152,9 +152,9 @@ public class GLBitmap {
         gl2.glBindBuffer(GL_ARRAY_BUFFER,texture_coordinate_bo[0]);
         gl2.glBufferData(GL_ARRAY_BUFFER,tcArray.sizeof(),tcArray.toFloatBuffer(),GL_STREAM_DRAW);
 
-        gl2.glVertexAttribPointer(2,2,GL_FLOAT,false,0,0);
+        gl2.glVertexAttribPointer(3,2,GL_FLOAT,false,0,0);
 
-        gl2.glEnableVertexAttribArray(2);
+        gl2.glEnableVertexAttribArray(3);
 
         int mode = GL_TRIANGLES;
         int first = 0;
@@ -166,7 +166,7 @@ public class GLBitmap {
         gl2.glBindBuffer(GL_ARRAY_BUFFER,0);
 
         gl2.glDisableVertexAttribArray(0);
-        gl2.glDisableVertexAttribArray(2);
+        gl2.glDisableVertexAttribArray(3);
 
 //    gl2.glDeleteBuffers(1,ebo);
         gl2.glDeleteBuffers(1,vertex_bo);

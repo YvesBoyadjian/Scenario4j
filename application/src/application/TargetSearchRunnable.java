@@ -86,6 +86,7 @@ public class TargetSearchRunnable implements Runnable {
 											t.setGroup(g,targetNode.getInstance());
 
 											main.shootTarget(t, targetNode.getInstance());
+											main.showTarget(t);
 
 											main.getHero().life += 0.1f;
 											if (main.getHero().life > 1.0f) {

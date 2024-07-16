@@ -150,6 +150,16 @@ public class MemoryBuffer implements Destroyable, ByteBufferAble {
 		}
 	}
 
+	public String toString() {
+		String outVal = "";
+		int numBytes = Math.min(numBytes(), 10);
+		for (int i=0; i < numBytes; i++) {
+			outVal += getUnsignedByte(i);
+			outVal += ", ";
+		}
+		return outVal;
+	}
+
 	@Override
 	public void destructor() {
 		free();

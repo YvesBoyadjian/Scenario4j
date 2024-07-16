@@ -203,4 +203,14 @@ public class FloatMemoryBuffer extends MemoryBuffer {
 		}		
 		return dummyFloatBuffer;
 	}
+
+	public String toString() {
+		String outVal = "";
+		int numFloats = Math.min(numFloats(), 5);
+		for (int i=0; i < numFloats; i++) {
+			outVal += getFloat(i);
+			outVal += ", ";
+		}
+		return outVal;
+	}
 }

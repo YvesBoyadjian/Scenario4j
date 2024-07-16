@@ -363,8 +363,8 @@ updateGL( int unit)
         assert(false);// && "unknown model");
         break;
       }
-      gl2.glGetError(); // YB
-      gl2.glGetError();
+      int error = gl2.glGetError(); // YB
+      error = gl2.glGetError();
     }
     else {
       SoTextureCombineElement.apply(state, unit);
