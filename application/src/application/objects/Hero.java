@@ -8,7 +8,7 @@ import org.ode4j.ode.DBody;
 
 public class Hero {
 
-    static public final float STARTING_X = 250.5f;
+    static public final float STARTING_X = 255.5f;
 
     static public final float STARTING_Y = 303.5f;
 
