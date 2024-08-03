@@ -261,7 +261,7 @@ public class MainGLFW {
         double width = screenSize.getWidth();
         double height = screenSize.getHeight();
 
-        JLabel intro = new JLabel("Mount Rainier Island, an Adventure Game", null, SwingConstants.CENTER);
+        JLabel intro = new JLabel("Bigfoot Hunting, an Adventure Game", null, SwingConstants.CENTER);
         intro.setForeground(Color.red.darker());
         intro.setFont(intro.getFont().deriveFont((float) height / 20f));
         contentPane.add(intro);
