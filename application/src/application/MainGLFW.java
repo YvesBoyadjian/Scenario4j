@@ -281,7 +281,7 @@ public class MainGLFW {
         engine.setForeground(Color.orange);
         engine.setBackground(Color.black);
 
-        JLabel keys = new JLabel("[WASD] or [ZQSD] to walk, [left mouse button] to shoot" + ((SceneGraphIndexedFaceSetShader.AIM ? ", [right mouse button] to aim" : "") + ", [Esc] for menu"), null, SwingConstants.CENTER);
+        JLabel keys = new JLabel("[WASD] or [ZQSD] to walk, [left mouse button] to shoot" + ((SceneGraphIndexedFaceSetShader.AIM ? ", [right mouse button] to aim" : "") + ", [Esc] for menu, [F1] for screenshot"), null, SwingConstants.CENTER);
         keys.setForeground(Color.yellow);
         keys.setFont(intro.getFont().deriveFont((float) height / 40f));
         keys.setBackground(Color.black);
