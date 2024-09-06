@@ -226,6 +226,7 @@ processSoEvent(final SoEvent event)
     }
     protected void initializeGL(GL2 gl2) {
         super.initializeGL(gl2);
+		Ctx.removeContext(1);
         Ctx.addContext(1, gl2);
         shareID = 1;
         soQtSceneHandler.initializeScene(/*getShareID()*/shareID);
