@@ -103,9 +103,13 @@ public class OptionDialog extends JDialog {
         if(viewer.isTimeStop()) {
             viewer.toggleTimeStop();
         }
-        viewer.addOneShotIdleListener((viewer2)->{
-        viewer.setVisible(true);
-        viewer.setFocus();
+        SwingUtilities.invokeLater(()->{
+            viewer.addOneShotIdleListener((viewer2)->{
+                SwingUtilities.invokeLater(()->{
+                viewer.setVisible(true);
+                viewer.setFocus();
+                });
+            });
         });
     }
 
