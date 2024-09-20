@@ -5,29 +5,22 @@ package application;
 
 import java.awt.*;
 import java.awt.event.InputEvent;
-import java.awt.image.Raster;
 import java.io.*;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.ByteBuffer;
-import java.nio.IntBuffer;
-import java.nio.MappedByteBuffer;
-import java.nio.channels.FileChannel;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.*;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
-import java.util.function.Consumer;
 import java.util.zip.GZIPInputStream;
 
 import javax.imageio.ImageIO;
 import javax.sound.sampled.*;
 import javax.swing.*;
-import javax.swing.border.BevelBorder;
 
 import application.audio.AudioRenderer;
-import application.audio.ProgressUpdater;
 import application.audio.VorbisTrack;
 import application.gui.OptionDialog;
 import application.objects.Hero;
@@ -37,23 +30,7 @@ import application.scenario.Scenario;
 import application.scenario.TargetsKillingQuest;
 import application.viewer.glfw.ForceProvider;
 import application.viewer.glfw.PositionProvider;
-import com.badlogic.gdx.math.Matrix4;
-import com.badlogic.gdx.math.Vector3;
-import com.badlogic.gdx.physics.bullet.Bullet;
-import com.badlogic.gdx.physics.bullet.collision.*;
-import com.badlogic.gdx.physics.bullet.dynamics.btConstraintSolver;
-import com.badlogic.gdx.physics.bullet.dynamics.btDiscreteDynamicsWorld;
-import com.badlogic.gdx.physics.bullet.dynamics.btDynamicsWorld;
-import com.badlogic.gdx.physics.bullet.dynamics.btRigidBody;
-import com.badlogic.gdx.physics.bullet.dynamics.btSequentialImpulseConstraintSolver;
-import com.badlogic.gdx.physics.bullet.linearmath.btMotionState;
-import com.badlogic.gdx.physics.bullet.linearmath.btTransform;
-import com.badlogic.gdx.physics.bullet.linearmath.btVector3;
-import com.badlogic.gdx.utils.GdxNativesLoader;
-import com.badlogic.gdx.utils.SharedLibraryLoader;
 import com.jogamp.opengl.GL2;
-
-import application.physics.OpenGLMotionState;
 
 //import org.eclipse.swt.SWT;
 //import org.eclipse.swt.graphics.Color;
@@ -65,20 +42,15 @@ import application.physics.OpenGLMotionState;
 //import org.eclipse.swt.widgets.Display;
 //import org.eclipse.swt.widgets.Shell;
 
-import application.scenegraph.SceneGraph;
-import application.scenegraph.SceneGraphIndexedFaceSet;
 import application.scenegraph.SceneGraphIndexedFaceSetShader;
-import application.scenegraph.ShadowTestSceneGraph;
 import application.scenegraph.Soleil;
 import application.terrain.IslandLoader;
 import application.trails.TrailsLoader;
 import application.viewer.glfw.SoQtWalkViewer;
 import jscenegraph.database.inventor.*;
-import jscenegraph.database.inventor.actions.SoGLRenderAction;
 import jscenegraph.database.inventor.actions.SoGLRenderAction.TransparencyType;
 import jscenegraph.database.inventor.events.SoKeyboardEvent;
 import jscenegraph.database.inventor.events.SoMouseButtonEvent;
-import jscenegraph.database.inventor.actions.SoAction;
 import jscenegraph.database.inventor.actions.SoRayPickAction;
 import jscenegraph.database.inventor.nodes.*;
 import jscenegraph.interaction.inventor.SoSceneManager;
@@ -89,18 +61,12 @@ import jsceneviewerglfw.inventor.qt.viewers.SoQtFullViewer;
 import jsceneviewerglfw.Cursor;
 import jsceneviewerglfw.Display;
 import jsceneviewerglfw.GLData;
-import jsceneviewerglfw.SWT;
-import loader.TerrainLoader;
 import org.lwjgl.BufferUtils;
-import org.lwjgl.openal.AL;
 import org.lwjgl.openal.AL10;
-import org.lwjgl.openal.ALC;
-import org.lwjgl.openal.ALCCapabilities;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GLDebugMessageCallback;
 import org.ode4j.math.DQuaternion;
 import org.ode4j.math.DVector3;
-import org.ode4j.math.DVector3C;
 import org.ode4j.ode.*;
 import org.ode4j.ode.internal.DxHashSpace;
 import org.ode4j.ode.internal.ErrorHandler;
@@ -108,10 +74,8 @@ import org.ode4j.ode.internal.ErrorHdl;
 import org.ode4j.ode.internal.Rotation;
 
 import static application.objects.Hero.*;
-import static com.badlogic.gdx.physics.bullet.collision.CollisionConstants.DISABLE_DEACTIVATION;
 import static java.lang.Thread.sleep;
 import static org.lwjgl.glfw.GLFW.glfwPollEvents;
-import static org.lwjgl.openal.ALC10.*;
 import static org.lwjgl.opengl.GL11C.glEnable;
 import static org.lwjgl.opengl.GL11C.glGetError;
 import static org.lwjgl.opengl.GL43C.*;
@@ -196,7 +160,7 @@ public class MainGLFW {
             god = true;
         }
         SwingUtilities.invokeLater(() -> {
-            showSplash();
+            loadGame(showSplash("Bigfoot Hunting, an Adventure Game", 1f / 20f));
         });
     }
 
@@ -215,7 +179,7 @@ public class MainGLFW {
 //		
 //		Image splashScreen = ii.getImage();
 
-    static JWindow window;
+    public static JWindow window;
 
     static boolean hasMainGameBeenCalled;
 
@@ -224,14 +188,19 @@ public class MainGLFW {
 
     static double last_call = Double.NaN;
 
-    public static void showSplash() {
+    public static JProgressBar showSplash(String gameName, float sizeFactor) {
         window = new JWindow();
 
         final Container rootContentPane = window.getContentPane();
 
+        Path bigFootFile = Path.of("ressource/BigFoot_1200DPI.jpg");
+        if (!bigFootFile.toFile().exists()) {
+            bigFootFile = Path.of("application", bigFootFile.toString());
+        }
+
         Image bgImage = null;
         try {
-            bgImage = ImageIO.read(new File("ressource/BigFoot_1200DPI.jpg"));
+            bgImage = ImageIO.read(bigFootFile.toFile());
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -244,14 +213,14 @@ public class MainGLFW {
 
                 super.paintComponent(g);
 
-                float imageRatio = (float)bgImagef.getHeight(null)/bgImagef.getWidth(null);
-                float rootContentPaneRatio = (float)rootContentPane.getHeight()/rootContentPane.getWidth();
+                float imageRatio = (float) bgImagef.getHeight(null) / bgImagef.getWidth(null);
+                float rootContentPaneRatio = (float) rootContentPane.getHeight() / rootContentPane.getWidth();
                 int drawWidth = rootContentPane.getWidth();
                 if (rootContentPaneRatio < imageRatio) {
                     drawWidth *= rootContentPaneRatio / imageRatio;
                 }
 
-                g.drawImage(bgImagef, (rootContentPane.getWidth() - drawWidth)/2, 0, drawWidth, rootContentPane.getHeight(), null);
+                g.drawImage(bgImagef, (rootContentPane.getWidth() - drawWidth) / 2, 0, drawWidth, rootContentPane.getHeight(), null);
             }
         };
         rootContentPane.add(contentPane);
@@ -261,9 +230,9 @@ public class MainGLFW {
         double width = screenSize.getWidth();
         double height = screenSize.getHeight();
 
-        JLabel intro = new JLabel("Bigfoot Hunting, an Adventure Game", null, SwingConstants.CENTER);
+        JLabel intro = new JLabel(gameName, null, SwingConstants.CENTER);
         intro.setForeground(Color.red.darker());
-        intro.setFont(intro.getFont().deriveFont((float) height / 20f));
+        intro.setFont(intro.getFont().deriveFont((float) height * sizeFactor));
         contentPane.add(intro);
 
         final JProgressBar progressBar = new JProgressBar(0, MAX_PROGRESS);
@@ -305,17 +274,36 @@ public class MainGLFW {
 
         window.setVisible(true);
 
+        return progressBar;
+    }
+
+    public static void loadGame(final JProgressBar progressBar) {
+
         SwingWorker sw = new SwingWorker() {
             @Override
             protected Object doInBackground() throws Exception {
                 try {
-                    mainGame(progressBar);
+                    loadSceneGraph(progressBar);
+                    buildScenario();
+                    buildViewer();
+                    fillViewer();
+                    buildPhysics();
+                    loadSavedGame();
+                    SwingUtilities.invokeLater(() -> {
+                        startOpenGL();
+                        startViewer();
+                        loadPlanks();
+                        buildHeroPhysics();
+                        setEscapeCallback();
+                        addIdleListeners();
+                        runVisu();
+                    });
                 } catch (Exception e) {
-                    JOptionPane.showMessageDialog(window, e.toString(), "Exception in Mount Rainier Island", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(window, e.toString(), "Exception in Bigfoot Hunting", JOptionPane.ERROR_MESSAGE);
                     e.printStackTrace();
                     System.exit(-1); // Necessary, because of Linux
                 } catch (Error e) {
-                    JOptionPane.showMessageDialog(window, e.toString(), "Error in Mount Rainier Island", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(window, e.toString(), "Error in Bigfoot Hunting", JOptionPane.ERROR_MESSAGE);
                     e.printStackTrace();
                     System.exit(-1); // Necessary, because of Linux
                 }
@@ -380,7 +368,7 @@ public class MainGLFW {
         lastAliveMillis[0] = new AtomicLong();
     }
 
-    public static void mainGame(final JProgressBar progressBar) {
+    public static void loadSceneGraph(final JProgressBar progressBar) {
         display = new Display();
         //Shell shell = new Shell(display);
         //shell.setLayout(new FillLayout());
@@ -470,6 +458,9 @@ public class MainGLFW {
         sg.getEnvironment().fogColor.setValue(volumetric_sky ? new SbColor(sg.SKY_COLOR.darker().darker().darker().darker().darker().darker().operator_mul(sg.getOverallContrast())) : new SbColor(sg.SKY_COLOR.darker().operator_mul(sg.getOverallContrast())));
 
         sg.enableFPS(display_fps);
+    }
+
+    public static void buildScenario() {
 
         // _____________________________________________________ Story
         scenario = new Scenario(sg);
@@ -481,6 +472,9 @@ public class MainGLFW {
         // __________________________________________ Killing targets
         scenario.addQuest(new TargetsKillingQuest());
 
+    }
+
+    public static void buildViewer() {
         int style = 0;//SWT.NO_BACKGROUND;
 
         viewer = new SoQtWalkViewer(SoQtFullViewer.BuildFlag.BUILD_NONE, SoQtCameraController.Type.BROWSER,/*shell*/null, style) {
@@ -663,6 +657,10 @@ public class MainGLFW {
             }
         };
 
+    }
+
+    public static void fillViewer() {
+
         final byte[] screamSound = loadSound("VOXEfrt_Cri de douleur (ID 2361)_LS_16bit.wav");
         final Clip[] screamClip = new Clip[1];
 
@@ -709,6 +707,9 @@ public class MainGLFW {
             SoPerspectiveCamera perspCamera = (SoPerspectiveCamera) camera;
             perspCamera.heightAngle.setValue(50.0f * (float) Math.PI / 180.0f);
         }
+    }
+
+    public static void buildPhysics() {
 
         // _____________________________________________________ Physics with bullet physics
 
@@ -813,6 +814,8 @@ public class MainGLFW {
 
         // _____________________________________________________ Physics with ODE4j
 
+        SoCamera camera = viewer.getCameraController().getCamera();
+
         OdeHelper.initODE2(0);
         world = OdeHelper.createWorld();
         world.setAutoDisableFlag(false);
@@ -855,6 +858,12 @@ public class MainGLFW {
         Rotation.dQFromAxisAndAngle(q, 1, 0, 0, Math.PI / 2);
         heightField.setQuaternion(q);
         heightField.setPosition(-SCENE_POSITION.getX() + heightFieldWidth / 2, -SCENE_POSITION.getY() + sg.getExtraDY() + heightFieldDepth / 2, 0);
+
+    }
+
+    public static void loadSavedGame() {
+
+        SoCamera camera = viewer.getCameraController().getCamera();
 
         File saveGameFile = new File("../savegame.mri");
         if (saveGameFile.exists()) {
@@ -920,12 +929,9 @@ public class MainGLFW {
 
         sg.setPosition(SCENE_POSITION.getX(), SCENE_POSITION.getY()/*,SCENE_POSITION.getZ()*/);
 
-        SwingUtilities.invokeLater(() -> {
-            runVisu();
-        });
     }
 
-    public static void runVisu() {
+    public static void startOpenGL() {
         int style = 0;//SWT.NO_BACKGROUND;
 
         // ____________________________________________________________________________________ Building OpenGL widget
@@ -958,6 +964,9 @@ public class MainGLFW {
         viewer.swapBuffers();
 
         window.setVisible(false);
+    }
+
+    public static void startViewer() {
 
         final double computerStartTimeCorrected = COMPUTER_START_TIME_SEC - (double) System.nanoTime() / 1e9;//60*60*4.5 / TimeConstants./*JMEMBA_TIME_ACCELERATION*/GTA_SA_TIME_ACCELERATION;
 
@@ -1036,6 +1045,9 @@ public class MainGLFW {
 //		}
         System.gc();
 
+        GL2 gl2 = new GL2() {
+        };
+
         int[] depthBits = new int[1];
         gl2.glGetIntegerv(GL2.GL_DEPTH_BITS, depthBits);
 
@@ -1052,6 +1064,10 @@ public class MainGLFW {
         String glRenderer = (String) GL11.glGetString(GL2.GL_RENDERER);
 
         System.out.println("GL Renderer : " + glRenderer);
+
+    }
+
+    public static void loadPlanks() {
 
         // ______________________________________________________________________________________________________ planks
         File planksFile = new File("planks.mri");
@@ -1081,6 +1097,9 @@ public class MainGLFW {
             }
 
         }
+    }
+
+    public static void buildHeroPhysics() {
 
         world.setGravity(0, 0, -9.81);
 
@@ -1458,6 +1477,9 @@ public class MainGLFW {
                 }
             }
         });
+    }
+
+    public static void setEscapeCallback() {
 
         viewer.setEscapeCallback((viewer2) -> {
 
@@ -1503,6 +1525,9 @@ public class MainGLFW {
 		});
 */
         // _____________________________________________________ Physics with ODE4j (End)
+    }
+
+    public static void addIdleListeners() {
 
         viewer.addIdleListener((viewer1) -> {
                     sg.setFPS(viewer1.getFPS());
@@ -1537,8 +1562,7 @@ public class MainGLFW {
                             if (ratio > 1 + delta_volume || ratio < 1 - delta_volume) {
                                 seaRendererVolume = seaClipVolume;
                             }
-                        }
-                        else {
+                        } else {
                             seaRendererVolume = seaClipVolume;
                         }
                     }
@@ -1549,8 +1573,7 @@ public class MainGLFW {
                             if (ratio > 1 + delta_volume || ratio < 1 - delta_volume) {
                                 forestRendererVolume = forestClipVolume;
                             }
-                        }
-                        else {
+                        } else {
                             forestRendererVolume = forestClipVolume;
                         }
                     }
@@ -1660,6 +1683,9 @@ public class MainGLFW {
             });
         } // end GOD
 
+    }
+
+    public static void runVisu() {
 //		final long[] nanotime = new long[1];
 //		nanotime[0] = -1;
 
@@ -1746,7 +1772,14 @@ public class MainGLFW {
 
             AtomicInteger seaAtomicInteger = new AtomicInteger();
 
-            VorbisTrack seaTrack = new VorbisTrack("ressource/AMBSea_Falaise 2 (ID 2572)_LS_Audacity_Quality_6.ogg", seaAtomicInteger);
+            String seaPathString = "ressource/AMBSea_Falaise 2 (ID 2572)_LS_Audacity_Quality_6.ogg";
+
+            Path seaPath = Path.of(seaPathString);
+            if (!seaPath.toFile().exists()) {
+                seaPath = Path.of("application", seaPath.toString());
+            }
+
+            VorbisTrack seaTrack = new VorbisTrack(seaPath.toString(), seaAtomicInteger);
 
             final float[] currentSeaVolume = new float[1];
 
@@ -1794,7 +1827,14 @@ public class MainGLFW {
 
             //forestClip = playSound(forestSound, true, 1.0f);
 
-            VorbisTrack forestTrack = new VorbisTrack("ressource/STORM_Orage et pluie 4 (ID 2719)_LS_Audacity_Quality_6.ogg", seaAtomicInteger);
+            String stormPathString = "ressource/STORM_Orage et pluie 4 (ID 2719)_LS_Audacity_Quality_6.ogg";
+
+            Path stormPath = Path.of(stormPathString);
+            if(!stormPath.toFile().exists()) {
+                stormPath = Path.of("application", stormPath.toString());
+            }
+
+            VorbisTrack forestTrack = new VorbisTrack(stormPath.toString(), seaAtomicInteger);
 
             final float[] currentForestVolume = new float[1];
 
