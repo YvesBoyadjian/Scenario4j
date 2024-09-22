@@ -18,5 +18,19 @@
          </property>
       </product>
    </extension>
+   <extension
+         point="org.eclipse.ui.views">
+      <e4view
+            category="MRIEditor.category1"
+            class="mrieditor.parts.View3DPart"
+            id="MRIEditor.e4view1"
+            name="3D View"
+            restorable="true">
+      </e4view>
+      <category
+            id="MRIEditor.category1"
+            name="MRI Editor">
+      </category>
+   </extension>
 
 </plugin>
