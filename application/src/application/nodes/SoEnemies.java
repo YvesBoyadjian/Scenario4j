@@ -99,7 +99,7 @@ public class SoEnemies extends SoSeparator {
                 int index = enemies.indexOfInstance(instance);
                 if (index != -1 && !enemies.isKilled(index)) {
 
-                    SoPill pill = new SoPill(instance);
+                    SoPill pill = sg.getSoPills().instantiate(instance);
                     pill.ref();
 
                     //SoTranslation collectibleTranslation = new SoTranslation();

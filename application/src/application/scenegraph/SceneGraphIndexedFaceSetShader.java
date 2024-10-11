@@ -402,6 +402,8 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 	private final SoBaseColor rulerColor = new SoBaseColor();
 	
 	private final SoText2 rulerText = new SoText2();
+	
+	private final SoPills pills = new SoPills();
 
 	private final int indice(int i, int j, int width) {
 		return i + j*width;
@@ -1976,7 +1978,7 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 
 	private SoNode buildOracle(boolean shadow) {
 
-		SoPill oracleSeparator = new SoPill(-1);//SoSeparator();
+		SoPill oracleSeparator = pills.instantiate(-1);//SoSeparator();
 
 		oracleSeparator.position.translation.setValue(ORACLE_X,ORACLE_Y,ORACLE_Z-zTranslation - 0.74f);
 		oracleSeparator.material.diffuseColor.setValue(1,0,0);
@@ -4210,5 +4212,9 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+	
+	public SoPills getSoPills() {
+		return pills;
 	}
 }
