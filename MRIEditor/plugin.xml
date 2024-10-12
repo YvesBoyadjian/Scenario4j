@@ -23,7 +23,7 @@
       <e4view
             category="MRIEditor.category1"
             class="mrieditor.parts.View3DPart"
-            id="MRIEditor.e4view1"
+            id="MRIEditor.3dview"
             name="3D View"
             restorable="true">
       </e4view>
@@ -31,6 +31,13 @@
             id="MRIEditor.category1"
             name="MRI Editor">
       </category>
+      <e4view
+            category="MRIEditor.category1"
+            class="mrieditor.parts.SoundPart"
+            id="MRIEditor.audioeditor"
+            name="Audio Editor"
+            restorable="true">
+      </e4view>
    </extension>
 
 </plugin>
