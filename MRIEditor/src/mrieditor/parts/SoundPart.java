@@ -3,6 +3,7 @@ package mrieditor.parts;
 
 import jakarta.inject.Inject;
 import mrieditor.audio.AudioRecord;
+import mrieditor.audio.AudioStats;
 import jakarta.annotation.PostConstruct;
 
 import org.eclipse.swt.SWT;
@@ -18,9 +19,12 @@ import org.eclipse.swt.widgets.Shell;
 
 import jakarta.annotation.PreDestroy;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Path;
 
+import javax.sound.sampled.AudioFileFormat;
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioFormat.Encoding;
 import javax.sound.sampled.AudioInputStream;
@@ -74,8 +78,13 @@ public class SoundPart {
 	}
 	
 	private void loadAudioFile() {
+		
+		String[] extensions = new String[1];
+		extensions[0] = "*.wav";
+		
 		Shell shell = Display.getCurrent().getActiveShell();
 		FileDialog dialog = new FileDialog(shell);
+		dialog.setFilterExtensions(extensions);
 		String choosedFilePathString = dialog.open();
 		if (choosedFilePathString == null) {
 			return;
@@ -93,8 +102,34 @@ public class SoundPart {
 		if (audioRecord == null) {
 			return;
 		}
+		
+		AudioStats audioStats = audioRecord.computeStats();
+		
+		System.err.println("Min = " + audioStats.getMin());
+		System.err.println("Max = " + audioStats.getMax());
+		
+		FileDialog saveDialog = new FileDialog(shell);
+		saveDialog.setFilterExtensions(extensions);
+		saveDialog.setOverwrite(true);
+		
+		String savedChoosedFilePathString = saveDialog.open();
+		if (savedChoosedFilePathString == null) {
+			return;
+		}
+		Path saveChoosedPath = Path.of(savedChoosedFilePathString);
+		if (saveChoosedPath == null) {
+			return;
+		}
+		File saveChoosedFile = saveChoosedPath.toFile();
+		
+		// File must not exist
+		if (saveChoosedFile == null || saveChoosedFile.isDirectory() || saveChoosedFile.isFile()) {
+			return;
+		}
+		
+		doSaveAudioFile(saveChoosedFile, audioRecord);
 	}
-	
+
 	// https://stackoverflow.com/questions/3297749/java-reading-manipulating-and-writing-wav-files
 	// https://stackoverflow.com/questions/56049170/reading-24-bit-mono-pcm-in-java
 	// https://hydrogenaud.io/index.php/topic,113371.0.html
@@ -194,5 +229,46 @@ public class SoundPart {
 		  // Handle the error...
 		}
 		return null;
+	}
+	
+	// https://stackoverflow.com/questions/3297749/java-reading-manipulating-and-writing-wav-files
+	private void doSaveAudioFile(File saveChoosedFile, AudioRecord audioRecord) {
+		// constant holding the minimum value of a signed 24bit sample: -2^22.
+		final int MIN_VALUE_24BIT = -2 << 22;
+
+		// constant holding the maximum value a signed 24bit sample can have, 2^(22-1).
+		final int MAX_VALUE_24BIT = -MIN_VALUE_24BIT-1;
+		
+        final double sampleRate = audioRecord.getSampleRate();
+
+        float[] buffer = audioRecord.getSamples();
+        int channels = audioRecord.getChannels();
+
+        final int bits = 24;
+
+        final byte[] byteBuffer = new byte[buffer.length * (bits / Byte.SIZE)];
+
+        int bufferIndex = 0;
+        for (int i = 0; i < byteBuffer.length; i++) {
+            final int x = Math.round(buffer[bufferIndex++] * MAX_VALUE_24BIT);
+
+            byteBuffer[i++] = (byte)x;
+            byteBuffer[i++] = (byte)(x >>> 8);
+            byteBuffer[i] = (byte)(x >>> 16);
+        }
+
+        final boolean bigEndian = false;
+        final boolean signed = true;
+
+        AudioFormat format = new AudioFormat((float)sampleRate, bits, channels, signed, bigEndian);
+        ByteArrayInputStream bais = new ByteArrayInputStream(byteBuffer);
+        AudioInputStream audioInputStream = new AudioInputStream(bais, format, buffer.length);
+        try {
+			AudioSystem.write(audioInputStream, AudioFileFormat.Type.WAVE, saveChoosedFile);
+	        audioInputStream.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 }
