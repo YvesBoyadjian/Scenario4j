@@ -2,6 +2,7 @@
 package mrieditor.parts;
 
 import jakarta.inject.Inject;
+import mrieditor.audio.AudioProcessor;
 import mrieditor.audio.AudioRecord;
 import mrieditor.audio.AudioStats;
 import jakarta.annotation.PostConstruct;
@@ -127,7 +128,11 @@ public class SoundPart {
 			return;
 		}
 		
-		doSaveAudioFile(saveChoosedFile, audioRecord);
+		AudioRecord processedAudioRecord = new AudioProcessor(audioRecord).enhanceBass();
+		
+		AudioRecord normalizedAudioRecord = new AudioProcessor(processedAudioRecord).normalize(); 
+		
+		doSaveAudioFile(saveChoosedFile, normalizedAudioRecord);
 	}
 
 	// https://stackoverflow.com/questions/3297749/java-reading-manipulating-and-writing-wav-files

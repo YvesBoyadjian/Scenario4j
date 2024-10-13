@@ -32,7 +32,7 @@ public class AudioRecord {
 		return new AudioStats(min,max);
 	}
 
-	public double getSampleRate() {
+	public float getSampleRate() {
 		return sampleRate;
 	}
 
