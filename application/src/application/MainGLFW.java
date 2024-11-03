@@ -1772,7 +1772,7 @@ public class MainGLFW {
 
             AtomicInteger seaAtomicInteger = new AtomicInteger();
 
-            String seaPathString = "ressource/AMBSea_Falaise 2 (ID 2572)_LS_Audacity_Quality_6.ogg";
+            String seaPathString = "ressource/AMBSea_Falaise 2 (ID 2572)_LS_120_70_Audacity_Quality_6.ogg";
 
             Path seaPath = Path.of(seaPathString);
             if (!seaPath.toFile().exists()) {
@@ -1827,7 +1827,7 @@ public class MainGLFW {
 
             //forestClip = playSound(forestSound, true, 1.0f);
 
-            String stormPathString = "ressource/STORM_Orage et pluie 4 (ID 2719)_LS_Audacity_Quality_6.ogg";
+            String stormPathString = "ressource/STORM_Orage et pluie 4 (ID 2719)_LS_120_70_Audacity_Quality_6.ogg";
 
             Path stormPath = Path.of(stormPathString);
             if(!stormPath.toFile().exists()) {
