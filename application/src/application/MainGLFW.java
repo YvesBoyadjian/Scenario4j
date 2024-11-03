@@ -350,7 +350,7 @@ public class MainGLFW {
 
     static float seaRendererVolume;
 
-    static Thread seaThread;
+    static volatile Thread seaThread;
 
     static CountDownLatch seaAudioLatch = new CountDownLatch(1);
 
