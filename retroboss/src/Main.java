@@ -32,6 +32,7 @@ public class Main {
                     MainGLFW.buildPhysics();
                     MainGLFW.loadSavedGame();
                     SwingUtilities.invokeLater(() -> {
+                        try {
                         MainGLFW.startOpenGL();
                         MainGLFW.startViewer();
                         MainGLFW.loadPlanks();
@@ -39,6 +40,15 @@ public class Main {
                         MainGLFW.setEscapeCallback();
                         MainGLFW.addIdleListeners();
                         MainGLFW.runVisu();
+                        } catch (Exception e) {
+                            JOptionPane.showMessageDialog(MainGLFW.window, e.toString(), "Exception in Retro Boss", JOptionPane.ERROR_MESSAGE);
+                            e.printStackTrace();
+                            System.exit(-1); // Necessary, because of Linux
+                        } catch (Error e) {
+                            JOptionPane.showMessageDialog(MainGLFW.window, e.toString(), "Error in Retro Boss", JOptionPane.ERROR_MESSAGE);
+                            e.printStackTrace();
+                            System.exit(-1); // Necessary, because of Linux
+                        }
                     });
                 } catch (Exception e) {
                     JOptionPane.showMessageDialog(MainGLFW.window, e.toString(), "Exception in Retro Boss", JOptionPane.ERROR_MESSAGE);

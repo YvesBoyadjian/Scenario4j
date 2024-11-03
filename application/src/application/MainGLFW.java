@@ -290,6 +290,7 @@ public class MainGLFW {
                     buildPhysics();
                     loadSavedGame();
                     SwingUtilities.invokeLater(() -> {
+                        try {
                         startOpenGL();
                         startViewer();
                         loadPlanks();
@@ -297,6 +298,15 @@ public class MainGLFW {
                         setEscapeCallback();
                         addIdleListeners();
                         runVisu();
+                        } catch (Exception e) {
+                            JOptionPane.showMessageDialog(window, e.toString(), "Exception in Bigfoot Hunting", JOptionPane.ERROR_MESSAGE);
+                            e.printStackTrace();
+                            System.exit(-1); // Necessary, because of Linux
+                        } catch (Error e) {
+                            JOptionPane.showMessageDialog(window, e.toString(), "Error in Bigfoot Hunting", JOptionPane.ERROR_MESSAGE);
+                            e.printStackTrace();
+                            System.exit(-1); // Necessary, because of Linux
+                        }
                     });
                 } catch (Exception e) {
                     JOptionPane.showMessageDialog(window, e.toString(), "Exception in Bigfoot Hunting", JOptionPane.ERROR_MESSAGE);
@@ -1719,56 +1729,7 @@ public class MainGLFW {
         });
 
         SwingUtilities.invokeLater(() -> {
-            try {
-                loop();
-            } catch (Exception e) {
-                viewer.setVisible(false);
-                JOptionPane.showMessageDialog(window, e.toString(), "Exception in Mount Rainier Island", JOptionPane.ERROR_MESSAGE);
-                e.printStackTrace();
-                System.exit(-1); // Necessary, because of Linux
-            } catch (Error e) {
-                viewer.setVisible(false);
-                JOptionPane.showMessageDialog(window, e.toString(), "Error in Mount Rainier Island", JOptionPane.ERROR_MESSAGE);
-                e.printStackTrace();
-                System.exit(-1); // Necessary, because of Linux
-            }
 
-//// Can call "alc" functions at any time
-//			long device = alcOpenDevice((ByteBuffer)null);
-//			ALCCapabilities deviceCaps = ALC.createCapabilities(device);
-//
-//			long context = alcCreateContext(device, (IntBuffer)null);
-//			alcMakeContextCurrent(context);
-//			AL.createCapabilities(deviceCaps);
-//// Can now call "al" functions
-//
-//			IntBuffer buffer = BufferUtils.createIntBuffer(1);
-//			AL10.alGenBuffers(buffer);
-//
-//			String args = "ressource/" + "AMBSea_Falaise 2 (ID 2572)_LS_16bit.wav";
-//			File file = new File(args);
-//			if (!file.exists()) {
-//				file = new File("application/" + args);
-//			}
-//			URL url = null;
-//			try {
-//				url = file.toURL();
-//			} catch (MalformedURLException e) {
-//				e.printStackTrace();
-//			}
-//
-//			long time = 0;
-//			try {
-//				time = createBufferData(buffer.get(0),url);
-//			} catch (UnsupportedAudioFileException e) {
-//				e.printStackTrace();
-//			} catch (IOException e) {
-//				e.printStackTrace();
-//			}
-
-            //InputStream seaSound = loadMP3Sound("AMBSea_Falaise 2 (ID 2572)_LS_16bit.mp3");
-
-            //seaClip = playSound(seaSound,true, 0.0001f);
 
             AtomicInteger seaAtomicInteger = new AtomicInteger();
 
@@ -1789,7 +1750,7 @@ public class MainGLFW {
 
                 seaRenderer.play();
 
-                seaRenderer.setVolume(0.0f);
+                seaRenderer.setVolume(0.001f);
 
                 seaAudioLatch.countDown();
 
@@ -1844,7 +1805,7 @@ public class MainGLFW {
 
                 forestRenderer.play();
 
-                forestRenderer.setVolume(0.0f);
+                forestRenderer.setVolume(0.001f);
 
                 forestAudioLatch.countDown();
 
@@ -1908,6 +1869,22 @@ public class MainGLFW {
                 }
             });
             //aliveThread.start();
+            SwingUtilities.invokeLater(() -> {
+
+            try {
+                loop();
+            } catch (Exception e) {
+                viewer.setVisible(false);
+                JOptionPane.showMessageDialog(window, e.toString(), "Exception in Mount Rainier Island", JOptionPane.ERROR_MESSAGE);
+                e.printStackTrace();
+                System.exit(-1); // Necessary, because of Linux
+            } catch (Error e) {
+                viewer.setVisible(false);
+                JOptionPane.showMessageDialog(window, e.toString(), "Error in Mount Rainier Island", JOptionPane.ERROR_MESSAGE);
+                e.printStackTrace();
+                System.exit(-1); // Necessary, because of Linux
+            }
+            });
         });
     }
 
