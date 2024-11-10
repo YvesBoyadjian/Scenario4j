@@ -815,4 +815,8 @@ protected void onAim(SoMouseButtonEvent event, boolean aim) {
 	public void addKeyUpListener(SoKeyboardEvent.Key key,Runnable runnable) {
 		keyUpListeners.put(key,runnable);
 	}
+
+	public boolean isIdleActive() {
+		return idleActive;
+	}
 }

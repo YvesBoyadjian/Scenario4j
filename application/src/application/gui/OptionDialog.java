@@ -132,12 +132,14 @@ public class OptionDialog extends JDialog {
         setVisible(false);
         apply();
 
-        sg.newGame(viewer);
-        
+        SwingUtilities.invokeLater(()->{
+            sg.newGame(viewer);
+
 //        viewer.onClose(true);
 //        glfwSetWindowShouldClose(viewer.getGLWidget().getWindow(), true);
-        viewer.setVisible(true);
-        viewer.setFocus();
+            viewer.setVisible(true);
+            viewer.setFocus();
+        });
     }
 
     private void onLowest() {
