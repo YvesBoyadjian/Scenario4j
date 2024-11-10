@@ -431,7 +431,11 @@ public class View3DPart {
 			@Override
 			public void run(Object data, SoSensor sensor) {
 				//System.out.println("position changed");
-				positionConsumer.accept(camera.position.getValue().operator_add(new SbVec3f(0,0,MainGLFW.Z_TRANSLATION)));
+				
+				SbVec3f cameraPosition = new SbVec3f(camera.position.getValue());
+				cameraPosition.setZ(sg.getGroundZ() + MainGLFW.Z_TRANSLATION + walkViewer.EYES_HEIGHT);
+				
+				positionConsumer.accept(cameraPosition);
 			}
 			
 		}, null);
@@ -554,8 +558,11 @@ public class View3DPart {
 
 			@Override
 			public void run(Object data, SoSensor sensor) {
-				//System.out.println("position changed");
-				positionConsumer.accept(camera.position.getValue().operator_add(new SbVec3f(0,0,MainGLFW.Z_TRANSLATION)));
+				
+				SbVec3f cameraPosition = new SbVec3f(camera.position.getValue());
+				cameraPosition.setZ(sg.getGroundZ() + MainGLFW.Z_TRANSLATION + walkViewer.EYES_HEIGHT);
+				
+				positionConsumer.accept(cameraPosition);
 			}
 			
 		}, null);
