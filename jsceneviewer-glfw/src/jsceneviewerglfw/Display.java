@@ -10,6 +10,7 @@ import org.lwjgl.glfw.*;
 import org.lwjgl.opengl.*;
 import org.lwjgl.system.*;
 
+import javax.swing.*;
 import java.nio.*;
 import java.time.Instant;
 import java.util.*;
@@ -86,8 +87,10 @@ public class Display {
 		FutureEvent fe = new FutureEvent();
 		fe.startTimeMicroseconds = startTimeMicro;
 		fe.doit = object;
-		
-		timersQueue.add(fe);
+
+		SwingUtilities.invokeLater(()->{
+			timersQueue.add(fe);
+		});
 	}
 
 	public Point getCursorLocation() {

@@ -89,7 +89,9 @@ public class OptionDialog extends JDialog {
         // call onCancel() on ESCAPE
         contentPane.registerKeyboardAction(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                onOK();
+                SwingUtilities.invokeLater(()->{
+                    onOK();
+                });
             }
         }, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
     }
@@ -131,14 +133,17 @@ public class OptionDialog extends JDialog {
         //dispose();
         setVisible(false);
         apply();
-
         SwingUtilities.invokeLater(()->{
+            viewer.addOneShotIdleListener((viewer2)->{
+                SwingUtilities.invokeLater(()->{
             sg.newGame(viewer);
 
 //        viewer.onClose(true);
 //        glfwSetWindowShouldClose(viewer.getGLWidget().getWindow(), true);
             viewer.setVisible(true);
             viewer.setFocus();
+        });
+            });
         });
     }
 
