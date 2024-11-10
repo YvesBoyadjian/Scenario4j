@@ -1,4 +1,5 @@
 import application.MainGLFW;
+import application.objects.Hero;
 
 import javax.swing.*;
 import java.util.Objects;
@@ -30,6 +31,9 @@ public class Main {
                     MainGLFW.buildViewer();
                     MainGLFW.fillViewer();
                     MainGLFW.buildPhysics();
+
+                    Hero.setStartingPosition(255.5f, 303.5f, 1256f);
+
                     MainGLFW.loadSavedGame();
                     SwingUtilities.invokeLater(() -> {
                         try {

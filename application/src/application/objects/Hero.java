@@ -8,11 +8,11 @@ import org.ode4j.ode.DBody;
 
 public class Hero {
 
-    static public final float STARTING_X = 255.5f;
+    static public float STARTING_X = 255.5f;
 
-    static public final float STARTING_Y = 303.5f;
+    static public float STARTING_Y = 303.5f;
 
-    static public final float STARTING_Z = 1256f;
+    static public float STARTING_Z = 1256f;
 
     public static final String HERO_X = "hero_x";
 
@@ -39,6 +39,12 @@ public class Hero {
 
     public float life = 1; // From 0 to 1
     public boolean hurting;
+
+    public static void setStartingPosition(float x, float y, float z) {
+        STARTING_X = x;
+        STARTING_Y = y;
+        STARTING_Z = z;
+    }
 
     public SbVec3f getPosition() {
         DVector3C bodyPostion = body.getPosition();
