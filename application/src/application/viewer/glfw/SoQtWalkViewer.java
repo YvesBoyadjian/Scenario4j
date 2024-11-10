@@ -13,6 +13,7 @@ import java.util.*;
 import java.util.function.Consumer;
 
 import javax.imageio.ImageIO;
+import javax.swing.*;
 
 import org.lwjgl.*;
 import org.lwjgl.BufferUtils;
@@ -522,7 +523,9 @@ protected void onAim(SoMouseButtonEvent event, boolean aim) {
 		SoQtWalkViewer viewer = (SoQtWalkViewer)data;
 		viewer.idle();
 		//viewer.getSceneHandler().getSceneGraph().touch();
-		sensor.schedule();
+		SwingUtilities.invokeLater(()->{
+			sensor.schedule();
+		});
 	}
 	
 	public synchronized void idle() {
