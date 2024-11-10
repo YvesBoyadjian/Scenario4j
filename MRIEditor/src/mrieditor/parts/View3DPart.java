@@ -13,6 +13,7 @@ import java.io.OutputStream;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
+import java.util.function.Consumer;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
@@ -41,6 +42,7 @@ import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.FileDialog;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.MessageBox;
 
 import application.MainGLFW;
@@ -101,7 +103,11 @@ public class View3DPart {
 	private boolean polylineDraw;
 	
 	private MouseListener polylineDrawMouseListener;
+	
+	private Consumer<SbVec3f> positionConsumer;
 
+	private SoFieldSensor auditor;
+	
 	@Inject
 	private MPart part;
 
@@ -111,6 +117,18 @@ public class View3DPart {
 		
 		Composite upperToolBar = new Composite(parent,SWT.NONE);
 		upperToolBar.setLayout(new RowLayout());
+		
+		Label label = new Label(upperToolBar, SWT.NONE);
+		
+		positionConsumer = new Consumer<SbVec3f>() {
+
+			@Override
+			public void accept(SbVec3f position) {
+				label.setText("Position: "+ position.getX()+", "+position.getY()+", "+position.getZ());
+				upperToolBar.layout();
+			}
+			
+		};
 		
 		Button button = new Button(upperToolBar, SWT.PUSH);
 		button.setText("Load 3D Model");
@@ -408,16 +426,17 @@ public class View3DPart {
 
 		SoCamera camera = walkViewer.getCameraController().getCamera();
 		
-		SoFieldSensor auditor = new SoFieldSensor(new SoSensorCB() {
+		auditor = new SoFieldSensor(new SoSensorCB() {
 
 			@Override
 			public void run(Object data, SoSensor sensor) {
-				System.out.println("position changed");
+				//System.out.println("position changed");
+				positionConsumer.accept(camera.position.getValue().operator_add(new SbVec3f(0,0,MainGLFW.Z_TRANSLATION)));
 			}
 			
 		}, null);
 		
-//		auditor.attach(camera.position);
+		auditor.attach(camera.position);
 		
 		camera.nearDistance.setValue(MainGLFW.MINIMUM_VIEW_DISTANCE);
 		camera.farDistance.setValue(MainGLFW.MAXIMUM_VIEW_DISTANCE);
@@ -524,10 +543,24 @@ public class View3DPart {
 	}
 	
 	private void upperView() {
+				
+		auditor.detach();
 		
 		walkViewer.getCameraController().toggleCameraType();
 
 		SoCamera camera = walkViewer.getCameraController().getCamera();
+		
+		auditor = new SoFieldSensor(new SoSensorCB() {
+
+			@Override
+			public void run(Object data, SoSensor sensor) {
+				//System.out.println("position changed");
+				positionConsumer.accept(camera.position.getValue().operator_add(new SbVec3f(0,0,MainGLFW.Z_TRANSLATION)));
+			}
+			
+		}, null);
+		
+		auditor.attach(camera.position);
 
 		camera.nearDistance.setValue(MainGLFW.MINIMUM_VIEW_DISTANCE);
 		camera.farDistance.setValue(MainGLFW.MAXIMUM_VIEW_DISTANCE);
