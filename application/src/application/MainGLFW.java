@@ -289,7 +289,7 @@ public class MainGLFW {
                     fillViewer();
                     buildPhysics();
 
-                    Hero.setStartingPosition(255.5f, 303.5f, 1256f);
+                    Hero.setStartingPosition(260f, 294f, 1255.5f);
 
                     loadSavedGame();
                     SwingUtilities.invokeLater(() -> {

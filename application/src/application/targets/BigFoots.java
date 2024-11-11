@@ -8,6 +8,8 @@ import jscenegraph.database.inventor.SbVec3f;
 import jscenegraph.database.inventor.fields.SoMFVec3f;
 
 import java.util.Random;
+import java.util.SplittableRandom;
+import java.util.random.RandomGenerator;
 
 public class BigFoots extends TargetBase implements Target {
 
@@ -82,7 +84,7 @@ public class BigFoots extends TargetBase implements Target {
 
     private void compute() {
 
-        Random randomPlacementBigFoots = new Random(SEED_BIGFOOT_PLACEMENT);
+        RandomGenerator randomPlacementBigFoots = new SplittableRandom(SEED_BIGFOOT_PLACEMENT);
 
         int[] indices = new int[4];
 
@@ -142,14 +144,14 @@ public class BigFoots extends TargetBase implements Target {
         bigFootCoords.setNum(nbBigFoots);
     }
 
-    float getRandomX(Random randomPlacementBigFoot) {
+    float getRandomX(RandomGenerator randomPlacementBigFoot) {
         SbBox3f sceneBox = sg.getChunks().getSceneBoxFullIsland();
         float xMin = sceneBox.getBounds()[0];
         float xMax = sceneBox.getBounds()[3];
         return xMin + (xMax - xMin) * randomPlacementBigFoot.nextFloat();
     }
 
-    float getRandomY(Random randomPlacementBigFoot) {
+    float getRandomY(RandomGenerator randomPlacementBigFoot) {
         SbBox3f sceneBox = sg.getChunks().getSceneBoxFullIsland();
         float yMin = sceneBox.getBounds()[1];
         float yMax = sceneBox.getBounds()[4];

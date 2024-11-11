@@ -9,6 +9,8 @@ import jscenegraph.database.inventor.SbVec3f;
 import jscenegraph.database.inventor.fields.SoMFVec3f;
 
 import java.util.Random;
+import java.util.SplittableRandom;
+import java.util.random.RandomGenerator;
 
 public class GroundSquirrels extends TargetBase implements Target {
 
@@ -80,7 +82,7 @@ public class GroundSquirrels extends TargetBase implements Target {
 
     private void compute() {
 
-        Random randomPlacementSquirrels = new Random(SEED_SQUIRREL_PLACEMENT);
+        RandomGenerator randomPlacementSquirrels = new SplittableRandom(SEED_SQUIRREL_PLACEMENT);
 
         int[] indices = new int[4];
 
@@ -123,14 +125,14 @@ public class GroundSquirrels extends TargetBase implements Target {
         }
     }
 
-    float getRandomX(Random randomPlacementSquirrel) {
+    float getRandomX(RandomGenerator randomPlacementSquirrel) {
         SbBox3f sceneBox = sg.getChunks().getSceneBoxFullIsland();
         float xMin = sceneBox.getBounds()[0];
         float xMax = sceneBox.getBounds()[3];
         return xMin + (xMax - xMin) * randomPlacementSquirrel.nextFloat();
     }
 
-    float getRandomY(Random randomPlacementSquirrel) {
+    float getRandomY(RandomGenerator randomPlacementSquirrel) {
         SbBox3f sceneBox = sg.getChunks().getSceneBoxFullIsland();
         float yMin = sceneBox.getBounds()[1];
         float yMax = sceneBox.getBounds()[4];
