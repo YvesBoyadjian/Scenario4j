@@ -3669,6 +3669,19 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 		return nearestCollectibleDistance;
 	}
 
+	public float getNearestBootDistance() {
+		float nearestCollectibleDistance = 99;
+		for( ThreeDObjectFamily collectible : collectibleFamilies) {
+
+			if (collectible instanceof BootsFamily) {
+				nearestCollectibleDistance = Math.min(nearestCollectibleDistance, collectible.getGraphicObject().getNearestCollectibleDistance());
+			}
+		}
+		//nearestCollectibleDistance = Math.min(nearestCollectibleDistance,enemiesSeparator.getNearestEnemyDistance());
+
+		return nearestCollectibleDistance;
+	}
+
 	public float getNearestEnemyDistance() {
 		return enemiesSeparator.getNearestEnemyDistance();
 	}
@@ -3693,7 +3706,9 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 		camera.nearDistance.setValue(minViewDistance);
 		//System.out.println(minViewDistance);
 
-		if (nearestCollectible < 1.4) {
+		float nearestBootDistance = getNearestBootDistance();
+
+		if (nearestBootDistance < 1.4) {
 			if (setBoots(true)) {
 				String[] message = new String[2];
 				message[0] = "Got the boots !";
