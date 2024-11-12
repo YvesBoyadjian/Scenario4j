@@ -52,7 +52,7 @@ Credits :
 
 - vk-bootstrap : https://github.com/charles-lunarg/vk-bootstrap
 
-- Julie Boyadjian : Testing
+- Testing : Julie Boyadjian, Arthur Jgenti
 
 - Boots : https://sketchfab.com/3d-models/hi-tec-mountain-boots-high-poly-08ce39df87a6458ba52c06063edf281c
 
