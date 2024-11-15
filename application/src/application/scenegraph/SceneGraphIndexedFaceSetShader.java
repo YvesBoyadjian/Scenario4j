@@ -25,6 +25,7 @@ import javax.swing.*;
 import javax.swing.Timer;
 
 import application.RasterProvider;
+import application.actor.Actor;
 import application.nodes.*;
 import application.objects.Hero;
 import application.objects.Target;
@@ -341,6 +342,23 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 	float distanceFromSea = 1e6f;
 
 	private Future<Float> distanceFromSeaFuture;
+
+	private final Map<String, Actor> actors = new HashMap<>();
+
+	public boolean hasActor(String key) {
+		return actors.containsKey(key);
+	}
+
+	private final SoGroup actorsGroup = new SoGroup();
+
+	public void addActor(String key, Actor actor) {
+		actors.put(key, actor);
+		actorsGroup.addChild(actor.getNode());
+	}
+
+	public Actor getActor(String key) {
+		return actors.get(key);
+	}
 
 	class SimpleThreadFactory implements ThreadFactory {
 		public Thread newThread(Runnable r) {
@@ -1444,6 +1462,8 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 
 		shadowGroup.addChild(cat);
 
+		shadowGroup.addChild(actorsGroup);
+
 		sep.addChild(shadowGroup);
 
 		// _______________________________________________ shadows
@@ -1518,6 +1538,8 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 		//castingShadowScene.addChild(targetsGroup);
 
 		castingShadowScene.addChild(collectibleGroup);
+
+		castingShadowScene.addChild(actorsGroup);
 
 		sunLight[0].shadowMapScene.setValue(castingShadowScene);
 		sunLight[1].shadowMapScene.setValue(castingShadowScene);
@@ -3892,9 +3914,9 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 		}
 		viewer.setAllowToggleFly(false);
 
-		String[] message = new String[2];
-		message[0] = "Go to the oracle."; message[1] = "He is on the right on the path";
-		displayTemporaryMessage(message,30);
+//		String[] message = new String[2];
+//		message[0] = "Go to the oracle."; message[1] = "He is on the right on the path";
+//		displayTemporaryMessage(message,30);
 	}
 
 	public void setOverallContrast(float contrast) {

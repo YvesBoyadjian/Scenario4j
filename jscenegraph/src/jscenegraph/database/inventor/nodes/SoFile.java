@@ -496,13 +496,15 @@ private static Path findFileWithExtension(Path parentPath, String extension, boo
         int numBytes = numPixels*3;
         MemoryBuffer b = MemoryBuffer.allocateBytes(numBytes);
         int j=0;
+        final byte[] bytes = new byte[3];
         for(int i=0; i< numPixels;i++) {
             int x = i%w;
             int y = obj ? h - i/w -1 : i/w;
             int rgb = textureBufferedImage.getRGB(x, y);
-            b.setByte(j, (byte)((rgb & 0x00FF0000) >>> 16)) ; j++;
-            b.setByte(j, (byte)((rgb & 0x0000FF00) >>> 8)); j++;
-            b.setByte(j, (byte)((rgb & 0x000000FF) >>> 0)); j++;
+            bytes[0] = (byte)((rgb & 0x00FF0000) >>> 16);
+            bytes[1] = (byte)((rgb & 0x0000FF00) >>> 8);
+            bytes[2] = (byte)((rgb & 0x000000FF) >>> 0);
+            b.setBytes(j, bytes, 3) ; j+=3;
         }
 
         texture.image.setValue(s,nc,true,b);

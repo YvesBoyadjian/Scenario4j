@@ -1,8 +1,18 @@
 import application.MainGLFW;
+import application.actor.Actor;
 import application.objects.Hero;
+import application.scenario.FirstApproachQuest;
+import application.scenario.Scenario;
+import application.scenario.TargetsKillingQuest;
+import application.scenegraph.SceneGraphIndexedFaceSetShader;
+import application.viewer.glfw.SoQtWalkViewer;
+import actor.boss.SoBoss;
+import jscenegraph.database.inventor.SbVec3f;
 
 import javax.swing.*;
 import java.util.Objects;
+
+import static application.MainGLFW.SCENE_POSITION;
 
 public class Main {
     public static void main(String[] args) {
@@ -26,8 +36,8 @@ public class Main {
             @Override
             protected Object doInBackground() throws Exception {
                 try {
-                    MainGLFW.loadSceneGraph(progressBar);
-                    MainGLFW.buildScenario();
+                    SceneGraphIndexedFaceSetShader sg = MainGLFW.loadSceneGraph(progressBar);
+                    buildScenario(sg);
                     MainGLFW.buildViewer();
                     MainGLFW.fillViewer();
                     MainGLFW.buildPhysics();
@@ -70,5 +80,37 @@ public class Main {
         SwingUtilities.invokeLater(() -> {
             sw.execute();
         });
+    }
+
+    public static void buildScenario(SceneGraphIndexedFaceSetShader sg) {
+
+        // _____________________________________________________ Story
+        MainGLFW.scenario = new Scenario(sg) {
+            @Override
+            public void start(int questIndex, SoQtWalkViewer viewer) {
+                super.start(questIndex, viewer);
+                Actor boss;
+                if (!sg.hasActor("boss")) {
+                    sg.addActor("boss", boss = new SoBoss());
+                }
+                else {
+                    boss = sg.getActor("boss");
+                }
+                if (questIndex == 0) {
+                    SbVec3f bossPosition = new SbVec3f(2571,-69.5f,937 - SCENE_POSITION.getZ());
+                    final int[] catPositionIndices = new int[4];
+                    bossPosition.setZ(sg.getInternalZ(bossPosition.getX(), bossPosition.getY(),catPositionIndices,false));
+                    boss.setPosition(bossPosition);
+                }
+            }
+        };
+
+        // __________________________________________ Leave Klapatche point
+        //MainGLFW.scenario.addQuest(new LeaveKlapatchePointQuest());
+        // __________________________________________ Oracle encounter
+        MainGLFW.scenario.addQuest(new FirstApproachQuest());
+        // __________________________________________ Killing targets
+        MainGLFW.scenario.addQuest(new TargetsKillingQuest());
+
     }
 }

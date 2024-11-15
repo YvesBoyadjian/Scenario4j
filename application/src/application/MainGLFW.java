@@ -24,10 +24,7 @@ import application.audio.AudioRenderer;
 import application.audio.VorbisTrack;
 import application.gui.OptionDialog;
 import application.objects.Hero;
-import application.scenario.FirstApproachQuest;
-import application.scenario.LeaveKlapatchePointQuest;
-import application.scenario.Scenario;
-import application.scenario.TargetsKillingQuest;
+import application.scenario.*;
 import application.viewer.glfw.ForceProvider;
 import application.viewer.glfw.PositionProvider;
 import com.jogamp.opengl.GL2;
@@ -183,7 +180,7 @@ public class MainGLFW {
 
     static boolean hasMainGameBeenCalled;
 
-    static Scenario scenario;
+    public static Scenario scenario;
 
 
     static double last_call = Double.NaN;
@@ -381,7 +378,7 @@ public class MainGLFW {
         lastAliveMillis[0] = new AtomicLong();
     }
 
-    public static void loadSceneGraph(final JProgressBar progressBar) {
+    public static SceneGraphIndexedFaceSetShader loadSceneGraph(final JProgressBar progressBar) {
         display = new Display();
         //Shell shell = new Shell(display);
         //shell.setLayout(new FillLayout());
@@ -471,6 +468,8 @@ public class MainGLFW {
         sg.getEnvironment().fogColor.setValue(volumetric_sky ? new SbColor(sg.SKY_COLOR.darker().darker().darker().darker().darker().darker().operator_mul(sg.getOverallContrast())) : new SbColor(sg.SKY_COLOR.darker().operator_mul(sg.getOverallContrast())));
 
         sg.enableFPS(display_fps);
+
+        return sg;
     }
 
     public static void buildScenario() {
@@ -478,6 +477,8 @@ public class MainGLFW {
         // _____________________________________________________ Story
         scenario = new Scenario(sg);
 
+        // __________________________ Display "Go to the Oracle" message
+        scenario.addQuest(new GoToTheOracleMessageQuest());
         // __________________________________________ Leave Klapatche point
         scenario.addQuest(new LeaveKlapatchePointQuest());
         // __________________________________________ Oracle encounter

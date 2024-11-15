@@ -96,6 +96,12 @@ public class MemoryBuffer implements Destroyable, ByteBufferAble {
 //		}
 	}
 
+	public void setBytes(int index, byte[] srcBytes, int numBytes) {
+		updateByteBuffer();
+
+		byteBuffer.put(index, srcBytes,0,numBytes);
+	}
+
 	public byte getByte(int index) {
 		updateByteBuffer();
 		
