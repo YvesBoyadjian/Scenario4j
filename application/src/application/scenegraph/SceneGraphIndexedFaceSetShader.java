@@ -2811,6 +2811,7 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 		hideOracleIfTooFar();
 		setNearDistance();
 		updateCatPosition(delta_t);
+		updateActors(delta_t);
 
 		runIdleCB();
 
@@ -2870,6 +2871,10 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 
 
 		//updateObjectives();
+	}
+
+	private void updateActors(float deltaT) {
+		actors.values().forEach((actor)->actor.onIdle(deltaT, this));
 	}
 
 	synchronized void addIdleCB(Runnable r) {
