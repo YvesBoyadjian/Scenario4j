@@ -77,6 +77,6 @@ public class SoBoss implements Actor {
             deltaAngle = deltaAngle - 2*Math.PI;
         }
 
-        setOrientation(previousAngle+Math.min(1d/100d, Math.abs(deltaAngle))*Math.signum(deltaAngle));
+        setOrientation(previousAngle+Math.min(dt/10f, Math.abs(deltaAngle))*Math.signum(deltaAngle));
     }
 }
