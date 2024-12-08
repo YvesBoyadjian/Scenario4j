@@ -1,5 +1,6 @@
 package actor.boss;
 
+import actor.fireball.SoFireBall;
 import application.actor.Actor;
 import application.objects.Hero;
 import application.scenegraph.SceneGraphIndexedFaceSetShader;
@@ -16,6 +17,9 @@ public class SoBoss implements Actor {
     SoRotation orientation = new SoRotation();
     SoRotation rotation = new SoRotation();
     SoFile file = new SoFile();
+    double time = 0;
+    double timeFireBallThrown = 0;
+    int fireBallNumber = 0;
 
     public SoBoss() {
         root.addChild(position);
@@ -62,6 +66,9 @@ public class SoBoss implements Actor {
 
     @Override
     public void onIdle(float dt, SceneGraphIndexedFaceSetShader sceneGraph) {
+
+        time+=dt;
+
         Hero hero = sceneGraph.getHero();
         SbVec3f heroPosition = hero.getPosition();
 
@@ -78,5 +85,20 @@ public class SoBoss implements Actor {
         }
 
         setOrientation(previousAngle+Math.min(dt/10f, Math.abs(deltaAngle))*Math.signum(deltaAngle));
+
+        if(time - timeFireBallThrown > 3d && Math.abs(deltaAngle)<0.1f) {
+            timeFireBallThrown = time;
+            fireBallNumber++;
+
+            SbVec3f initialPosition = position.translation.getValue().operator_add(new SbVec3f(0,0,5.5f));
+            SbVec3f finalPosition = heroPosition.operator_minus(new SbVec3f(0,0,0.15f));
+
+            delta = finalPosition.operator_minus(initialPosition);
+
+            delta.normalize();
+            SbVec3f speed = delta.operator_mul(5f);
+            sceneGraph.addActor("FireBall" + fireBallNumber, new SoFireBall(speed, initialPosition));
+        }
+
     }
 }

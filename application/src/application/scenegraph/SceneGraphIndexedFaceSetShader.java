@@ -2874,7 +2874,7 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 	}
 
 	private void updateActors(float deltaT) {
-		actors.values().forEach((actor)->actor.onIdle(deltaT, this));
+		new ArrayList<>(actors.values()).forEach((actor)->actor.onIdle(deltaT, this));
 	}
 
 	synchronized void addIdleCB(Runnable r) {
