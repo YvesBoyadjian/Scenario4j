@@ -80,6 +80,7 @@ import jsceneviewer.inventor.qt.SoQtGLWidget;
 import jsceneviewer.inventor.qt.SoQtGLWidget.EventType;
 import jsceneviewer.inventor.qt.SoQtGLWidget.eventCBType;
 import jsceneviewer.inventor.qt.viewers.SoQtFullViewer.BuildFlag;
+import mrieditor.utils.Utils;
 
 /**
  * 
@@ -124,7 +125,7 @@ public class View3DPart {
 
 			@Override
 			public void accept(SbVec3f position) {
-				label.setText("Position: "+ position.getX()+", "+position.getY()+", "+position.getZ());
+				label.setText("Position: "+ Utils.formatCentimeter(position.getX())+", "+Utils.formatCentimeter(position.getY())+", "+Utils.formatCentimeter(position.getZ()));
 				upperToolBar.layout();
 			}
 			
