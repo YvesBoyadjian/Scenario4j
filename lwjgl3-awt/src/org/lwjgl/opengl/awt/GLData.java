@@ -2,7 +2,7 @@ package org.lwjgl.opengl.awt;
 
 /**
  * Contains all information to create an OpenGL context on an {@link AWTGLCanvas}.
- * 
+ *
  * @author Kai Burjack
  */
 public class GLData {
@@ -76,16 +76,16 @@ public class GLData {
      * New fields not in SWT's GLData
      */
 
-    public static enum Profile {
-        CORE, COMPATIBILITY;
+    public enum Profile {
+        CORE, COMPATIBILITY
     }
 
-    public static enum API {
-        GL, GLES;
+    public enum API {
+        GL, GLES
     }
 
-    public static enum ReleaseBehavior {
-        NONE, FLUSH;
+    public enum ReleaseBehavior {
+        NONE, FLUSH
     }
 
     /**
@@ -120,6 +120,10 @@ public class GLData {
      * Whether to use sRGB color space.
      */
     public boolean sRGB;
+    /**
+     * Used to determine the sRGB extension to use
+     */
+    boolean extBuffer_sRGB = true;
     /**
      * Whether to use a floating point pixel format.
      */

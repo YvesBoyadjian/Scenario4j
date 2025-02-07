@@ -70,7 +70,7 @@ public class PlatformLinuxGLCanvas implements PlatformGLCanvas {
 
 		verifyGLXCapabilities(display, screen, attribs);
 		IntBuffer gl_attrib_list = bufferGLAttribs(attribs);
-		
+
 		long share_context = NULL;
 		if(Objects.nonNull(attribs.shareContext)) {
 			if(attribs.shareContext.context == NULL){
@@ -79,7 +79,7 @@ public class PlatformLinuxGLCanvas implements PlatformGLCanvas {
 			}
 			share_context = attribs.shareContext.context;
 		}
-		
+
 		long context = glXCreateContextAttribsARB(display, fbConfigs.get(0), share_context, true, gl_attrib_list);
 		if (context == 0) {
 			throw new AWTException("Unable to create GLX context");
@@ -154,8 +154,10 @@ public class PlatformLinuxGLCanvas implements PlatformGLCanvas {
 	}
 
 	public void dispose() {
-		JAWT_FreeDrawingSurface(this.ds, awt.FreeDrawingSurface());
-		this.ds = null;
+		if (this.ds != null) {
+			JAWT_FreeDrawingSurface(this.ds, awt.FreeDrawingSurface());
+			this.ds = null;
+		}
 	}
 
 	private static void verifyGLXCapabilities(long display, int screen, GLData data) throws AWTException {
@@ -185,8 +187,8 @@ public class PlatformLinuxGLCanvas implements PlatformGLCanvas {
 
 		if (data.majorVersion > 0) {
 			gl_attrib_list
-				.put(GLX_CONTEXT_MAJOR_VERSION_ARB).put(data.majorVersion)
-				.put(GLX_CONTEXT_MINOR_VERSION_ARB).put(data.minorVersion);
+					.put(GLX_CONTEXT_MAJOR_VERSION_ARB).put(data.majorVersion)
+					.put(GLX_CONTEXT_MINOR_VERSION_ARB).put(data.minorVersion);
 		}
 
 		// Set the profile based on GLData.api and GLData.profile

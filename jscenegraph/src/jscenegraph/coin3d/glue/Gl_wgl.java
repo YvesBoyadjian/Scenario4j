@@ -159,7 +159,7 @@ wglglue_contextdata_cleanup( Wglglue_contextdata ctx)
      glue/win32api. 20031124 mortene. */
 
   if (ctx.wglcontext != 0 && ctx.noappglcontextavail) {
-    final boolean r = WGL.wglDeleteContext(ctx.wglcontext);
+    final boolean r = WGL.wglDeleteContext(null, ctx.wglcontext);
     if (!r) {
     	Win32Api.cc_win32_print_error("wglglue_contextdata_cleanup",
                            "wglDeleteContext", WinBase.GetLastError());
@@ -212,7 +212,7 @@ wglglue_contextdata_cleanup( Wglglue_contextdata ctx)
     }
   }
   if (ctx.pbufferwnd != 0) {
-    boolean r = User32.DestroyWindow(ctx.pbufferwnd);
+    boolean r = User32.DestroyWindow(null, ctx.pbufferwnd);
     if (!r) {
     	Win32Api.cc_win32_print_error("wglglue_contextdata_cleanup",
                            "DestroyWindow", WinBase.GetLastError());
