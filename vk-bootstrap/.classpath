@@ -1,9 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry exported="true" kind="lib" path="lib/lwjgl-assimp-3.3.2.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/lwjgl-assimp-3.3.2-natives-windows.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/lwjgl-stb-3.3.2.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/lwjgl-stb-3.3.2-natives-windows.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/lwjgl.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/lwjgl-assimp.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/lwjgl-assimp-natives-windows.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/lwjgl-glfw.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/lwjgl-glfw-natives-windows.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/lwjgl-natives-windows.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/lwjgl-stb.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/lwjgl-stb-natives-windows.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER">
 		<attributes>
 			<attribute name="module" value="true"/>
@@ -15,9 +19,6 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
-	<classpathentry exported="true" kind="lib" path="lib/lwjgl-glfw-3.3.2.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/lwjgl-glfw-3.3.2-natives-windows.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/lwjgl-3.3.2.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/joml-1.10.5.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>
