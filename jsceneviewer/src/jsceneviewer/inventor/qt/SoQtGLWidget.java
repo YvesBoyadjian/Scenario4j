@@ -59,6 +59,7 @@ import org.eclipse.swt.events.TypedEvent;
 import org.eclipse.swt.graphics.Cursor;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.internal.DPIUtil;
 //import org.eclipse.swt.opengl.GLCanvas;
 //import org.eclipse.swt.opengl.GLData;
 import org.eclipse.swt.widgets.Composite;
@@ -278,7 +279,7 @@ public GLData format()
         if (mainWidget != null) {
             // QGLWidget::size calls QWidget::size which returns the size in window coordinates
             // we need to scale this size by the device pixel ratio.
-            Point size = mainWidget.getSize()/*size() * mainWidget.devicePixelRatio()*/;
+            Point size = DPIUtil.autoScaleUp(mainWidget.getSize())/*size() * mainWidget.devicePixelRatio()*/;
             return new SbVec2s ((short)size.x, (short)size.y);
         } else {
             return new SbVec2s (/*minGLWidth*/(short)1, /*minGLHeight*/(short)1);
@@ -373,7 +374,7 @@ public void setEventCallback (eventCBType cb, Object data)
         mainWidget.addListener(SWT.Resize, new Listener() {
 			@Override
 			public void handleEvent(Event event) {
-				Rectangle bounds = mainWidget.getBounds();
+				Rectangle bounds = DPIUtil.autoScaleUp(mainWidget.getBounds());
 				float fAspect = (float) bounds.width / (float) bounds.height;
 				mainWidget.setCurrent();
 				int width = bounds.width;
