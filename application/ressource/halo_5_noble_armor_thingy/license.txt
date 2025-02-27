@@ -1,0 +1,11 @@
+Model Information:
+* title:	Halo 5 Noble Armor Thingy
+* source:	https://sketchfab.com/3d-models/halo-5-noble-armor-thingy-7f769c05a8db4a1ab69653ace60d114e
+* author:	Abel (https://sketchfab.com/abel76)
+
+Model License:
+* license type:	CC-BY-NC-4.0 (http://creativecommons.org/licenses/by-nc/4.0/)
+* requirements:	Author must be credited. No commercial use.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Halo 5 Noble Armor Thingy" (https://sketchfab.com/3d-models/halo-5-noble-armor-thingy-7f769c05a8db4a1ab69653ace60d114e) by Abel (https://sketchfab.com/abel76) licensed under CC-BY-NC-4.0 (http://creativecommons.org/licenses/by-nc/4.0/)

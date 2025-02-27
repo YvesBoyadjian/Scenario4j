@@ -17,7 +17,6 @@ Require-Bundle: org.eclipse.ui,
  gdx;bundle-version="1.0.0",
  vk-bootstrap;bundle-version="1.0.0",
  lwjgl-opengl;bundle-version="1.0.0"
-Bundle-RequiredExecutionEnvironment: JavaSE-17
 Automatic-Module-Name: application
 Bundle-ActivationPolicy: lazy
 Export-Package: application,
