@@ -20,6 +20,7 @@ Require-Bundle: org.eclipse.ui,
 Automatic-Module-Name: application
 Bundle-ActivationPolicy: lazy
 Export-Package: application,
+ application.actor,
  application.gui,
  application.nodes,
  application.objects,
