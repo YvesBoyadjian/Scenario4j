@@ -38,6 +38,13 @@
             name="Audio Editor"
             restorable="true">
       </e4view>
+      <e4view
+            category="MRIEditor.category1"
+            class="mrieditor.parts.SamplePart"
+            id="MRIEditor.gameview"
+            name="Games"
+            restorable="true">
+      </e4view>
    </extension>
 
 </plugin>

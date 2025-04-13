@@ -19,8 +19,11 @@ import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.swing.JProgressBar;
 
+import org.eclipse.e4.core.di.annotations.Optional;
+import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.ui.di.Focus;
 import org.eclipse.e4.ui.di.Persist;
+import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.TableViewer;
@@ -41,6 +44,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.MessageBox;
@@ -81,6 +85,7 @@ import jsceneviewer.inventor.qt.SoQtGLWidget.EventType;
 import jsceneviewer.inventor.qt.SoQtGLWidget.eventCBType;
 import jsceneviewer.inventor.qt.viewers.SoQtFullViewer.BuildFlag;
 import mrieditor.utils.Utils;
+import retroboss.game.MRIGame;
 
 /**
  * 
@@ -88,6 +93,8 @@ import mrieditor.utils.Utils;
 public class View3DPart {
 	
 	private static final String EDITED_POLYLINE_NAME = "editedPolyline";
+	
+	private static final String GAME_SELECTION ="gameSelection";
 
 	private TableViewer tableViewer;
 	
@@ -111,6 +118,23 @@ public class View3DPart {
 	
 	@Inject
 	private MPart part;
+
+	@Inject
+	private IEventBroker eventBroker;	
+	
+	private MRIGame currentGame;
+	
+	@Inject @Optional
+	public void  getEvent(@UIEventTopic(GAME_SELECTION) Object message) {
+	    currentGame = (MRIGame) message;
+	    
+	    if (walkViewer != null) {
+			SoCamera camera = walkViewer.getCameraController().getCamera();
+			
+			float[] startingPosition = currentGame.getStartingPosition();
+			camera.position.setValue(startingPosition[0],startingPosition[1],startingPosition[2] - MainGLFW.SCENE_POSITION.getZ());
+	    }
+	}	
 
 	@PostConstruct
 	public void createComposite(Composite parent) {
@@ -432,11 +456,12 @@ public class View3DPart {
 			@Override
 			public void run(Object data, SoSensor sensor) {
 				//System.out.println("position changed");
-				
-				SbVec3f cameraPosition = new SbVec3f(camera.position.getValue());
-				cameraPosition.setZ(sg.getGroundZ() + MainGLFW.Z_TRANSLATION + walkViewer.EYES_HEIGHT);
-				
-				positionConsumer.accept(cameraPosition);
+				Display.getCurrent().asyncExec(()->{
+					SbVec3f cameraPosition = new SbVec3f(camera.position.getValue());
+					cameraPosition.setZ(sg.getGroundZ() + MainGLFW.Z_TRANSLATION + walkViewer.EYES_HEIGHT);
+					
+					positionConsumer.accept(cameraPosition);
+				});
 			}
 			
 		}, null);
@@ -452,7 +477,13 @@ public class View3DPart {
 
 		MainGLFW.SCENE_POSITION = new SbVec3f(/*sg.getCenterX()/2*/0, sg.getCenterY(), MainGLFW.Z_TRANSLATION);
 
-		camera.position.setValue(Hero.STARTING_X, Hero.STARTING_Y, Hero.STARTING_Z - MainGLFW.SCENE_POSITION.getZ());
+		if (currentGame == null) {
+			camera.position.setValue(Hero.STARTING_X, Hero.STARTING_Y, Hero.STARTING_Z - MainGLFW.SCENE_POSITION.getZ());
+		}
+		else {
+			float[] startingPosition = currentGame.getStartingPosition();
+			camera.position.setValue(startingPosition[0],startingPosition[1],startingPosition[2] - MainGLFW.SCENE_POSITION.getZ());
+		}
 		
 		walkViewer.getCameraController().changeCameraValues(camera);
 		
@@ -559,11 +590,13 @@ public class View3DPart {
 
 			@Override
 			public void run(Object data, SoSensor sensor) {
-				
-				SbVec3f cameraPosition = new SbVec3f(camera.position.getValue());
-				cameraPosition.setZ(sg.getGroundZ() + MainGLFW.Z_TRANSLATION + walkViewer.EYES_HEIGHT);
-				
-				positionConsumer.accept(cameraPosition);
+				//System.out.println("position changed");
+				Display.getCurrent().asyncExec(()->{
+					SbVec3f cameraPosition = new SbVec3f(camera.position.getValue());
+					cameraPosition.setZ(sg.getGroundZ() + MainGLFW.Z_TRANSLATION + walkViewer.EYES_HEIGHT);
+					
+					positionConsumer.accept(cameraPosition);
+				});
 			}
 			
 		}, null);

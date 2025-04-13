@@ -5,3 +5,7 @@ Require-Bundle: application,
  jscenegraph
 Bundle-Name: RetroBoss
 Bundle-ActivationPolicy: lazy
+Export-Package: retroboss.game,
+ retroboss.game.bigfoothunting,
+ retroboss.game.hikingisland,
+ retroboss.game.retroboss
