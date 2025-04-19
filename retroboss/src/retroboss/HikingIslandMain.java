@@ -13,8 +13,10 @@ import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 
 import actor.boss.SoBoss;
+import actor.house.SoHouse;
 import application.MainGLFW;
 import application.actor.Actor;
+import application.actor.ThreeDObject;
 import application.objects.Hero;
 import application.scenario.FirstApproachQuest;
 import application.scenario.GoToTheOracleMessageQuest;
@@ -121,6 +123,16 @@ public class HikingIslandMain {
                     bossPosition.setZ(sg.getInternalZ(bossPosition.getX(), bossPosition.getY(),catPositionIndices,false));
                     boss.setPosition(bossPosition);
                 }
+                
+                Actor house;
+                if(!sg.hasActor("house")) {
+                	sg.addActor("house", house = new SoHouse());
+                }
+                else {
+                	house = sg.getActor("house");
+                }
+                SbVec3f housePosition = new SbVec3f(2947.3f, -5516.95f, 1056.32f - SCENE_POSITION.getZ() - 1.7f);
+                house.setPosition(housePosition);
             }
         };
 
