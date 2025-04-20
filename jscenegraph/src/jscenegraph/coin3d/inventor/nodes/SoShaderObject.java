@@ -475,9 +475,11 @@ public void updateColor(SoState state) {
         final long lightNodeAddress = light.getAddress();
         final long lightNodeId = light.getNodeId();
 
+        boolean sameLightUniforms = false;
+        
         Long lastNodeId = addressToNodeId.get(lightNodeAddress);
         if(lastNodeId != null && (long)lastNodeId == lightNodeId) {
-            continue;
+        	sameLightUniforms = true;
         }
         addressToNodeId.put(lightNodeAddress,lightNodeId);
 
@@ -517,6 +519,7 @@ public void updateColor(SoState state) {
                     positionLocation.glUniform4fv(gl2, 1, v4.getValue());
                 }
             }
+            if (!sameLightUniforms) {
             // ______________________________________________________________________________ light color and intensity
             {
                 String diffuseName;
@@ -562,8 +565,9 @@ public void updateColor(SoState state) {
                     specularLocation.glUniform4fv(gl2, 1, v4.getValue());
                 }
             }
+            }
         }
-    }
+    } // next light
 
     //System.out.println();
 

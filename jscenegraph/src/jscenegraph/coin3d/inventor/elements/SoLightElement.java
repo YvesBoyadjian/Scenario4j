@@ -53,8 +53,11 @@
 
 package jscenegraph.coin3d.inventor.elements;
 
+import java.util.function.Supplier;
+
 import jscenegraph.coin3d.inventor.lists.SbList;
 import jscenegraph.coin3d.inventor.lists.SbListInt;
+import jscenegraph.coin3d.inventor.lists.SbListOfMutableRefs;
 import jscenegraph.database.inventor.SbMatrix;
 import jscenegraph.database.inventor.SoNodeList;
 import jscenegraph.database.inventor.elements.SoAccumulatedElement;
@@ -70,7 +73,7 @@ import jscenegraph.port.Destroyable;
 public class SoLightElement extends SoAccumulatedElement {
 
 		  protected final SoNodeList lights = new SoNodeList();
-		  protected SbList<SbMatrix> matrixlist;
+		  protected /*SbList<SbMatrix>*/SbListOfMutableRefs<SbMatrix> matrixlist;
 		  protected SbListInt indexList;
 
 		private
@@ -186,7 +189,14 @@ public void
 init(SoState state)
 {
   super.init(state);
-  this.matrixlist = new SbList<SbMatrix>();
+  this.matrixlist = new /*SbList<SbMatrix>*/SbListOfMutableRefs<SbMatrix>(new Supplier<SbMatrix>() {
+
+	@Override
+	public SbMatrix get() {
+		return new SbMatrix();
+	}
+	  
+  });
   this.indexList = new SbListInt();
   this.didalloc.state = true;
 }
