@@ -704,5 +704,36 @@ public String fieldName(SoEngineOutput output) {
 	return "";
 }
 
-	
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		sb.append(getClass().getSimpleName());
+		sb.append("\n");
+		
+	    final SoFieldList fieldList = new SoFieldList();
+	    int         numFields = getFields(fieldList);
+
+		  final SoFieldData fd = this.getFieldData();
+	    
+	    for (int i=0; i<numFields; i++) {
+	    	SoField field = ((SoField)fieldList.operator_square_bracket(i));
+	    	sb.append(fd.getFieldName(i).toString());
+	    	sb.append(" ");
+	    	if (field instanceof SoSField) {
+	    		SoSField sfield = (SoSField) field;
+	    		sb.append(sfield.getValue());
+		    	sb.append(" ");
+	    	}
+	    	else if (field instanceof SoMField) {
+	    		SoMField mfield = (SoMField) field;
+	    		int num = mfield.getNum();
+	    		for (int j=0; j< Math.min(num,3); j++) {
+	    			sb.append(mfield.getValueAt(j));
+	    	    	sb.append(" ");
+	    		}
+	    	}
+			sb.append("\n");
+	    }
+		
+		return sb.toString();
+	}
 }
