@@ -524,7 +524,7 @@ private final SbXfBox3f xbox = new SbXfBox3f(); // SINGLE_THREAD
 public SbBox3f toCameraSpace(final SbXfBox3f  worldbox, final SbMatrix mat)
 {
   SoCamera cam = this.camera;
-  //final SbMatrix mat = new SbMatrix();
+  mat.constructor();//final SbMatrix mat = new SbMatrix();
   xbox.copyFrom(worldbox);
   mat.setTranslate( cam.position.getValue().operator_minus());
   xbox.transform(mat);
@@ -536,7 +536,7 @@ public SbBox3f toCameraSpace(final SbXfBox3f  worldbox, final SbMatrix mat)
   public SbBox3f toNearCameraSpace(final SbXfBox3f  worldbox, final SbMatrix mat)
   {
     SoCamera cam = this.nearCamera;
-    //final SbMatrix mat = new SbMatrix();
+    mat.constructor();//final SbMatrix mat = new SbMatrix();
     nearXbox.copyFrom(worldbox);
     mat.setTranslate( cam.position.getValue().operator_minus());
     nearXbox.transform(mat);

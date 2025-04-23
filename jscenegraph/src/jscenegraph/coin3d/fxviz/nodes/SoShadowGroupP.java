@@ -1589,7 +1589,7 @@ updateDirectionalCamera(SoState state, SoShadowLightCache cache, final SbMatrix 
       float depth = vv.getDepth();
       if (maxdist > depth) maxdist = depth;
       vv.copyFrom(vv.zNarrow(1.0f, 1.0f - maxdist/depth));
-		nearvv.copyFrom(vv.zNarrow(1.0f, 1.0f - maxdist/depth));
+		nearvv.copyFrom(nearvv.zNarrow(1.0f, 1.0f - maxdist/depth));
     }
   }
   boolean farVisible = visible;
