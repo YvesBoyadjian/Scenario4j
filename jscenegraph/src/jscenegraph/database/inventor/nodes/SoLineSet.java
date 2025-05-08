@@ -1120,7 +1120,7 @@ void GLRenderInternal( SoGLRenderAction  action, int useTexCoordsAnyway, SoShape
   } else {
 
     // Call the appropriate render loop:
-    this.renderFunc[useTexCoordsAnyway | vpCache.getRenderCase(shapeStyle)].run(this,action);
+//    this.renderFunc[useTexCoordsAnyway | vpCache.getRenderCase(shapeStyle)].run(this,action);
 
 //#ifdef DEBUG
     if (SoDebug.GetEnv("IV_DEBUG_LEGACY_RENDERING") != null) {
