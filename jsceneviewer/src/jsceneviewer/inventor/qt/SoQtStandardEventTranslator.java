@@ -45,6 +45,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.TypedEvent;
+import org.eclipse.swt.internal.DPIUtil;
 import org.eclipse.swt.widgets.Event;
 
 import jscenegraph.database.inventor.SbTime;
@@ -217,8 +218,8 @@ private SoMouseButtonEvent translateButtonEvent (MouseEvent be, EventType type, 
     default:
       whichButton = SoMouseButtonEvent.Button.ANY;
   }
-  lastMouseX = be.x;
-  lastMouseY = be.y;
+  lastMouseX = DPIUtil.autoScaleUp(be.x);
+  lastMouseY = DPIUtil.autoScaleUp(be.y);
   fillInEventState (buttonEvent, be, viewportSize);
   
   SoButtonEvent.State whichState = State.UNKNOWN;

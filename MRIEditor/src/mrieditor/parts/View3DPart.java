@@ -653,11 +653,13 @@ public class View3DPart {
 			walkViewer.getGLWidget().addMouseListener(polylineDrawMouseListener);
 			walkViewer.setViewing(false);
 			setEventCallback(false);
+			sg.showPolylines(true);
 		}
 		else {
 			walkViewer.getGLWidget().removeMouseListener(polylineDrawMouseListener);
 			walkViewer.setViewing(true);
 			setEventCallback(true);
+			sg.showPolylines(false);
 		}
 	}
 	
