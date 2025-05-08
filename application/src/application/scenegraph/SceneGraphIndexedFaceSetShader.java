@@ -210,6 +210,8 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 	
 	float current_z;
 	
+	SoPickStyle ps;
+	
 	SoGroup douglasTreesF;
 	SoGroup douglasTreesT;
 	
@@ -934,12 +936,15 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 	    shapeHints.vertexOrdering.setValue(SoShapeHints.VertexOrdering.CLOCKWISE);
 	    landSep.addChild(shapeHints);
 
+		ps = new SoPickStyle();
+		
 		if (unpickableLand) {
-			SoPickStyle ps = new SoPickStyle();
 			ps.style.setValue(SoPickStyle.Style.UNPICKABLE);
-
-			landSep.addChild(ps);
 		}
+		else {
+			ps.style.setValue(SoPickStyle.Style.SHAPE);
+		}
+		landSep.addChild(ps);
 	    
 	    SoShaderProgram program = new SoShaderProgram();
 	    
@@ -4271,5 +4276,15 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 	
 	public SoPills getSoPills() {
 		return pills;
+	}
+	
+	public void setPickableLand(boolean pickable) {
+		boolean unpickableLand = !pickable;
+		if (unpickableLand) {
+			ps.style.setValue(SoPickStyle.Style.UNPICKABLE);
+		}
+		else {
+			ps.style.setValue(SoPickStyle.Style.SHAPE);
+		}
 	}
 }

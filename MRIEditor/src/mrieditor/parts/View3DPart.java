@@ -60,6 +60,7 @@ import application.trails.TrailsLoader;
 import jscenegraph.coin3d.inventor.SbVec2i32;
 import jscenegraph.database.inventor.SbBasic;
 import jscenegraph.database.inventor.SbTime;
+import jscenegraph.database.inventor.SbVec2s;
 import jscenegraph.database.inventor.SbVec3f;
 import jscenegraph.database.inventor.SbViewportRegion;
 import jscenegraph.database.inventor.SoDB;
@@ -132,7 +133,13 @@ public class View3DPart {
 			SoCamera camera = walkViewer.getCameraController().getCamera();
 			
 			float[] startingPosition = currentGame.getStartingPosition();
-			camera.position.setValue(startingPosition[0],startingPosition[1],startingPosition[2] - MainGLFW.SCENE_POSITION.getZ());
+			if (camera instanceof SoPerspectiveCamera) {
+				camera.position.setValue(startingPosition[0],startingPosition[1],startingPosition[2] - MainGLFW.SCENE_POSITION.getZ());
+			}
+			else {
+				camera.position.setValue(startingPosition[0],startingPosition[1], 2000);
+			}
+			walkViewer.getCameraController().changeCameraValues(camera);
 	    }
 	}	
 
@@ -300,26 +307,68 @@ public class View3DPart {
 				if (polylineDraw) {
 
 					SbViewportRegion vr = this.getSceneHandler().getViewportRegion();
-					SoNode sg_ = this.getSceneHandler().getSceneGraph();
-
-					SoRayPickAction fireAction = new SoRayPickAction(vr);
 					
-					fireAction.setPoint(event.getPosition(vr));
+					SbVec2s eventPosition = event.getPosition(vr);
 
-					fireAction.apply(sg_);
+			    	SoCamera camera = getCameraController().getCamera();
+			    	
+			    	SbVec3f pickedPointPoint = null;
 					
-					SoPickedPoint pp = fireAction.getPickedPoint();
-					if( pp == null) {
+					if (camera instanceof SoPerspectiveCamera) {
+					
+						SoNode sg_ = this.getSceneHandler().getSceneGraph();
+	
+						SoRayPickAction fireAction = new SoRayPickAction(vr);
+						
+						fireAction.setPoint(eventPosition);
+	
+						fireAction.apply(sg_);
+						
+						SoPickedPoint pp = fireAction.getPickedPoint();
+											
+						if( pp == null) {
+							fireAction.destructor();
+							return;
+						}
+						else {
+							pickedPointPoint = pp.getPoint();
+						}
 						fireAction.destructor();
-						return;
 					}
 					else {
-						SbVec3f i = new SbVec3f(pp.getPoint().operator_minus(sg.getTranslation()));
-						i.setZ(i.getZ()+20f);
-						sg.addPolylinePoint(EDITED_POLYLINE_NAME,i);
-						System.out.println("x = "+i.getX()+", y = "+i.getY()+", z = "+i.getZ());
+						sg.setPickableLand(false);
+						
+						SoNode sg_ = this.getSceneHandler().getSceneGraph();
+	
+						SoRayPickAction fireAction = new SoRayPickAction(vr);
+						
+						fireAction.setPoint(eventPosition);
+	
+						fireAction.apply(sg_);
+						
+						SoPickedPoint pp = fireAction.getPickedPoint();
+											
+						if( pp == null) {
+							fireAction.destructor();
+							return;
+						}
+						else {
+							pickedPointPoint = pp.getPoint();
+						}
+						fireAction.destructor();
+
+						sg.setPickableLand(true);
+						
+						float pickedPointZ = sg.getInternalZ(pickedPointPoint.getX(), pickedPointPoint.getY(), new int[4]);
+						
+						pickedPointPoint.setZ(pickedPointZ);
 					}
-					fireAction.destructor();					
+					
+					SbVec3f i = new SbVec3f(pickedPointPoint.operator_minus(sg.getTranslation()));
+					i.setZ(i.getZ()+20f);
+					sg.addPolylinePoint(EDITED_POLYLINE_NAME,i);
+					System.out.println("x = "+i.getX()+", y = "+i.getY()+", z = "+i.getZ());
+					
 				}
 			}
 		    
