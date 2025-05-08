@@ -4196,6 +4196,19 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 		updateLineSets(polylineName, polylinePoints);
 	}
 	
+	public void removeLastPolylinePoint(String polylineName) {
+
+		polylinePointsMap.putIfAbsent(polylineName, new ArrayList<>());
+
+		List<SbVec3f> polylinePoints = polylinePointsMap.get(polylineName);
+	
+		if (!polylinePoints.isEmpty()) {
+			polylinePoints.remove(polylinePoints.size()-1);
+		}
+		
+		updateLineSets(polylineName, polylinePoints);
+	}
+	
 	public List<SbVec3f> getPolylinePoints(String polylineName) {
 		return new ArrayList<>(polylinePointsMap.get(polylineName));
 	}

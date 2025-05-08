@@ -213,6 +213,17 @@ public class View3DPart {
 			}
 		});
 		
+		Button button45 = new Button(upperToolBar, SWT.PUSH);
+		button45.setText("Erase Last Polyline Segment");
+		
+		button45.addSelectionListener(new SelectionAdapter() {
+			
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				eraseLastPolylineSegment();
+			}
+		});
+		
 		Button button5 = new Button(upperToolBar, SWT.PUSH);
 		button5.setText("Save Polyline");
 		
@@ -645,6 +656,10 @@ public class View3DPart {
 	
 	private void erasePolyline() {		
 		sg.removeAllPolylinePoints(EDITED_POLYLINE_NAME);		
+	}
+	
+	private void eraseLastPolylineSegment() {
+		sg.removeLastPolylinePoint(EDITED_POLYLINE_NAME);
 	}
 	
 	private void togglePolylineDraw() {
