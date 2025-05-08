@@ -955,6 +955,9 @@ public static void flSetHint(
 		  /* obtain Windows font path */
 		  String szPath = "";
 		  String systemRoot = System.getenv().get("SystemRoot");
+		  if (systemRoot == null) {
+			  systemRoot = System.getenv("SystemRoot");
+		  }
 		  szPath = (systemRoot != null ? systemRoot : "/usr/share")+"/fonts";//SHGetSpecialFolderPathA(NULL, szPath, CSIDL_FONTS, 0); //TODO
 		  fontPath = szPath;
 
