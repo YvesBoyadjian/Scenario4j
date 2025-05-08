@@ -141,6 +141,7 @@ public class View3DPart {
 		parent.setLayout(new GridLayout(1, false));
 		
 		Composite upperToolBar = new Composite(parent,SWT.NONE);
+		upperToolBar.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		upperToolBar.setLayout(new RowLayout());
 		
 		Label label = new Label(upperToolBar, SWT.NONE);
@@ -555,7 +556,7 @@ public class View3DPart {
 			public boolean run(Object userData, TypedEvent anyevent, EventType type) {
 				if( anyevent instanceof MouseEvent) {
 					MouseEvent me = (MouseEvent)anyevent;
-					if (me.button == 1) {
+					if (me.button == 1 || me.button == 2) {
 						
 						if( type == EventType.MOUSE_EVENT_MOUSE_DOWN) {
 							mouseDown = true;
@@ -652,13 +653,13 @@ public class View3DPart {
 		if (polylineDraw) {
 			walkViewer.getGLWidget().addMouseListener(polylineDrawMouseListener);
 			walkViewer.setViewing(false);
-			setEventCallback(false);
+			//setEventCallback(false);
 			sg.showPolylines(true);
 		}
 		else {
 			walkViewer.getGLWidget().removeMouseListener(polylineDrawMouseListener);
 			walkViewer.setViewing(true);
-			setEventCallback(true);
+			//setEventCallback(true);
 			sg.showPolylines(false);
 		}
 	}
