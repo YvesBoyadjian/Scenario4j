@@ -676,7 +676,7 @@ doPathSort()
 
 	  SoViewportRegionElement.set(state, this.viewport);
 	  SoDepthBufferElement.set(state, true, true,
-	                            SoDepthBufferElement.DepthWriteFunction.LEQUAL,
+	                            SoDepthBufferElement.DepthWriteFunction./*LEQUAL*/GEQUAL, // Reverse Z
 	                            new SbVec2f(0.0f, 1.0f), false);
 	  SoLazyElement.setTransparencyType(state,
 	                                     (int)(this.transparencytype.getValue()));

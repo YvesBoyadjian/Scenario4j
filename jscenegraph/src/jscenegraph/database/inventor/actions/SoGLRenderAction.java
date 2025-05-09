@@ -59,6 +59,7 @@ import static com.jogamp.opengl.GL2.GL_ACCUM;
 import static com.jogamp.opengl.GL2.GL_LOAD;
 import static com.jogamp.opengl.GL2.GL_RETURN;
 import static com.jogamp.opengl.GL2ES1.GL_POINT_SMOOTH;
+import static org.lwjgl.opengl.GL11C.GL_GEQUAL;
 
 import com.jogamp.opengl.GL2;
 
@@ -1078,7 +1079,8 @@ beginTraversal(SoNode node)
     // not correct (the OpenGL specification says the initial value is
     // GL_LESS, but I've seen drivers that defaults to GL_LEQUAL as
     // well).
-    gl2.glDepthFunc(GL2.GL_LEQUAL);
+    gl2.glDepthFunc(GL_GEQUAL); // Reverse Z
+    //gl2.glDepthFunc(GL2.GL_LEQUAL);
 
     if (pimpl.smoothing) {
       gl2.glEnable(GL_POINT_SMOOTH);

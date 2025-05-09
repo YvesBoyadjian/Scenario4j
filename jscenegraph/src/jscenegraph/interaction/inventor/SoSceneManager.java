@@ -9,6 +9,8 @@ import static com.jogamp.opengl.GL.GL_DEPTH_BUFFER_BIT;
 import static com.jogamp.opengl.GL.GL_LEQUAL;
 import static org.lwjgl.opengl.GL30C.*;
 
+import org.lwjgl.opengl.GL45C;
+
 import com.jogamp.opengl.GL2;
 
 import jscenegraph.database.inventor.SbColor;
@@ -188,8 +190,10 @@ public void getAntialiasing(final boolean[] smoothing, final int[] numPasses)
 				   numBits[0] = gl.glGetFramebufferAttachmentParameteriv(GL_DRAW_FRAMEBUFFER, GL_DEPTH, GL_FRAMEBUFFER_ATTACHMENT_DEPTH_SIZE);
 			   //}
 	           needZbuffer = (numBits[0] != 0); // FALSE for overlay windows !
-	           if (needZbuffer)
-	               gl.glDepthFunc(GL_LEQUAL); // needed for hidden line rendering
+	           if (needZbuffer) {
+	        	   gl.glDepthFunc(GL_GEQUAL); // Reverse Z
+	               //gl.glDepthFunc(GL_LEQUAL); // needed for hidden line rendering
+	           }
 	           graphicsInitNeeded = false;
 	       }
 	   
@@ -214,14 +218,23 @@ public void getAntialiasing(final boolean[] smoothing, final int[] numPasses)
 	           else gl.glClearIndex(bkgIndex);
 	   
 	           // clear the color+zbuffer at the same time if we can
-	           if (needZbuffer && clearZbuffer)
+	           if (needZbuffer && clearZbuffer) {
+		    	   gl.glClearDepth(0d); // Reverse Z
 	               gl.glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		    	   gl.glClearDepth(1d); // Back to normal
+	           }
 	           else
 	               gl.glClear(GL_COLOR_BUFFER_BIT);
 	       }
 	       // check to see if only the zbuffer is needed...
-	       else if (needZbuffer && clearZbuffer)
+	       else if (needZbuffer && clearZbuffer) {
+	    	   gl.glClearDepth(0d); // Reverse Z
 	           gl.glClear(GL_DEPTH_BUFFER_BIT);
+	    	   gl.glClearDepth(1d); // Back to normal
+	       }
+	       
+	       gl.glClipControl(GL_LOWER_LEFT, GL45C.GL_ZERO_TO_ONE); // Reverse Z
+	       int error = gl.glGetError();
 	   
 	       // render the scene graph!
 	       if (scene != null)

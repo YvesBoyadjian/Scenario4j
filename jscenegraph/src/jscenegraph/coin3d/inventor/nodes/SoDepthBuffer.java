@@ -123,7 +123,7 @@ public class SoDepthBuffer extends SoNode {
 
 		nodeHeader.SO_NODE_ADD_FIELD(test, "test", (true));
 		nodeHeader.SO_NODE_ADD_FIELD(write, "write", (true));
-		nodeHeader.SO_NODE_ADD_FIELD(function, "function", (SoDepthBuffer.DepthWriteFunction.LESS.getValue()));
+		nodeHeader.SO_NODE_ADD_FIELD(function, "function", (SoDepthBuffer.DepthWriteFunction./*LESS*/GEQUAL.getValue())); // Reverse Z
 		nodeHeader.SO_NODE_ADD_FIELD(range, "range", (new SbVec2f(0.0f, 1.0f)));
 		nodeHeader.SO_NODE_ADD_FIELD(clamp, "clamp", (false));
 

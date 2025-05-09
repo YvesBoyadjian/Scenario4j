@@ -278,7 +278,29 @@ public class SbViewVolume implements Mutable {
 		float far1 = nearDist + nearToFar;
 		float farPlusNear = far1 + nearDist;
 
-		final float[][] proj = projM.getValue();
+		// Reverse Z
+		
+		SbMatrix reverseZ = new SbMatrix();
+		final float[][] rz = reverseZ.getValue();
+		rz[0][0] = 1f;
+		rz[1][1] = 1f;
+		rz[2][2] = -1f;
+		rz[3][3] = 1f;
+		rz[3][2] = 1f;
+		
+		SbMatrix normalizeUnitRange = new SbMatrix();
+		final float[][] nur = normalizeUnitRange.getValue();
+		nur[0][0] = 1f;
+		nur[1][1] = 1f;
+		nur[2][2] = 0.5f;
+		nur[3][3] = 1f;
+		nur[3][2] = 0.5f;
+		
+		SbMatrix dummyProj = new SbMatrix();
+		dummyProj.copyFrom(identity);
+		final float[][] proj = dummyProj.getValue();
+		
+//		final float[][] proj = projM.getValue();
 
 		if (type == ProjectionType.ORTHOGRAPHIC) {
 			proj[0][0] = 2.0f / rightMinusLeft;
@@ -288,8 +310,8 @@ public class SbViewVolume implements Mutable {
 			proj[3][0] = -rightPlusLeft / rightMinusLeft;
 			proj[3][1] = -topPlusBottom / topMinusBottom;
 			proj[3][2] = -farPlusNear / farMinusNear;
-		} else { // type == PERSPECTIVE
-
+			
+		} else { // type == PERSPECTIVE			
 			proj[0][0] = 2.0f * nearDist / rightMinusLeft;
 
 			proj[1][1] = 2.0f * nearDist / topMinusBottom;
@@ -302,7 +324,9 @@ public class SbViewVolume implements Mutable {
 			proj[3][2] = -2.0f * nearDist * far1 / farMinusNear;
 			proj[3][3] = 0.0f;
 		}
-
+		
+		projM.copyFrom(reverseZ.multLeft(normalizeUnitRange.multLeft(dummyProj)));
+		
 	}
 
 	////////////////////////////////////////////////////////////////////////

@@ -3356,6 +3356,10 @@ ByteBuffer data ) {
 	default void glClearIndex(int arg) {
 		org.lwjgl.opengl.GL11.glClearIndex(arg);
 	}
+	
+	default void glClearDepth(double depth) {
+		org.lwjgl.opengl.GL11.glClearDepth(depth);
+	}
 
 	default void glPolygonStipple(byte[] bs, int i) {
 		org.lwjgl.opengl.GL11.glPolygonStipple(Buffers.newDirectByteBuffer(bs)/*, i*/);
@@ -3791,5 +3795,9 @@ ByteBuffer data ) {
 	default void glUniformMatrix3fvARB(int location, int num, boolean b, float[] value) {
 		assert ( 1 == num);
 		ARBShaderObjects.glUniformMatrix3fvARB(location,b,value);
+	}
+
+	default void glClipControl(int origin, int depth) {
+		org.lwjgl.opengl.GL45C.glClipControl(origin, depth);
 	}
 }

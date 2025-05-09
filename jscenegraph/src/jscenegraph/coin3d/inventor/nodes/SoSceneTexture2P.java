@@ -283,7 +283,9 @@ public class SoSceneTexture2P implements Destroyable {
 		    SoViewportRegionElement.set(state, new SbViewportRegion(fbodata.fbo_size));
 		    final SbVec4f col = new SbVec4f(this.api.backgroundColor.getValue());
 		    gl2.glClearColor(col.getValueRead()[0], col.getValueRead()[1], col.getValueRead()[2], col.getValueRead()[3]);
+		    gl2.glClearDepth(0d); // Reverse Z
 		    gl2.glClear(GL2.GL_DEPTH_BUFFER_BIT|GL2.GL_COLOR_BUFFER_BIT);
+		    gl2.glClearDepth(1d); // back to normal
 
 		    SoGLRenderAction glaction = (SoGLRenderAction) state.getAction();
 		    // traverse the new scene graph
@@ -510,7 +512,9 @@ public class SoSceneTexture2P implements Destroyable {
 		    GL2 gl2 = new GL2() {};
 		    
 		    gl2.glClearColor(col.getValueRead()[0], col.getValueRead()[1], col.getValueRead()[2], col.getValueRead()[3]);
+		    gl2.glClearDepth(0d); // Reverse Z
 		    gl2.glClear(GL2.GL_DEPTH_BUFFER_BIT|GL2.GL_COLOR_BUFFER_BIT);
+		    gl2.glClearDepth(1d); // back to normal
 		  }
 
 		  public boolean

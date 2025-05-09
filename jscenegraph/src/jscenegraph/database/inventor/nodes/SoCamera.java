@@ -1270,6 +1270,11 @@ setElements(final SoAction action, final SbViewVolume viewVol,
     SoState     state = action.getState();
 
     // Compute viewing and projection matrices
+    viewMat.constructor();
+    projMat.constructor();
+    skewMatM.constructor();
+    skewMatInv.constructor();
+    moveToEye.constructor();
     viewVol.getMatrices(viewMat, projMat, skewMatM, skewMatInv, moveToEye);
 
     // Jitter if necessary

@@ -76,7 +76,7 @@ public class SoDepthBufferElement extends SoElement {
 		super.init(state);
 		this.test = true;
 		this.write = true;
-		this.function = DepthWriteFunction.LEQUAL;
+		this.function = DepthWriteFunction./*LEQUAL*/GEQUAL; // Reverse Z
 		this.range.setValue(0.0f, 1.0f);
 		this.clamp = false;
 	}
