@@ -280,6 +280,8 @@ public class SbViewVolume implements Mutable {
 
 		// Reverse Z
 		
+		// https://tomhultonharrop.com/mathematics/graphics/2023/08/06/reverse-z.html
+		
 		SbMatrix reverseZ = new SbMatrix();
 		final float[][] rz = reverseZ.getValue();
 		rz[0][0] = 1f;
