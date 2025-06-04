@@ -80,24 +80,24 @@ public class GLBitmap {
         float yScreenEnd = yScreenStart + height;
 
         if (a == null)
-        a = new SbVec3fSingleFast(xScreenStart,yScreenStart,-1);
+        a = new SbVec3fSingleFast(xScreenStart,yScreenStart,0); // Reverse Z
         else {
-            a.setValue(xScreenStart,yScreenStart,-1);
+            a.setValue(xScreenStart,yScreenStart,0); // Reverse Z
         }
         if (b == null)
-        b = new SbVec3fSingleFast(xScreenEnd,yScreenStart,-1);
+        b = new SbVec3fSingleFast(xScreenEnd,yScreenStart,0); // Reverse Z
         else {
-            b.setValue(xScreenEnd,yScreenStart,-1);
+            b.setValue(xScreenEnd,yScreenStart,0); // Reverse Z
         }
         if (c == null)
-        c = new SbVec3fSingleFast(xScreenStart,yScreenEnd,-1);
+        c = new SbVec3fSingleFast(xScreenStart,yScreenEnd,0); // Reverse Z
         else {
-            c.setValue(xScreenStart,yScreenEnd,-1);
+            c.setValue(xScreenStart,yScreenEnd,0); // Reverse Z
         }
         if (d == null)
-        d = new SbVec3fSingleFast(xScreenEnd,yScreenEnd,-1);
+        d = new SbVec3fSingleFast(xScreenEnd,yScreenEnd,0); // Reverse Z
         else {
-            d.setValue(xScreenEnd,yScreenEnd,-1);
+            d.setValue(xScreenEnd,yScreenEnd,0); // Reverse Z
         }
 
         a = transformer.transform(a,a);
