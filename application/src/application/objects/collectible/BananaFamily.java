@@ -16,10 +16,13 @@ import jscenegraph.database.inventor.nodes.SoNode;
 import jscenegraph.database.inventor.nodes.SoRotationXYZ;
 import jscenegraph.database.inventor.nodes.SoScale;
 import jscenegraph.database.inventor.nodes.SoSeparator;
+import jscenegraph.database.inventor.nodes.SoSwitch;
 
 public class BananaFamily extends ThreeDObjectFamilyBase implements ThreeDObjectFamily {
 
     private static final float MUSHROOM_SCALE_FACTOR = 0.01f;
+    
+    private static final float CATCH_DISTANCE = 0.6f;
 
     SceneGraphIndexedFaceSetShader sg;
 
@@ -37,7 +40,7 @@ public class BananaFamily extends ThreeDObjectFamilyBase implements ThreeDObject
 
     float[] scaleFactors;
 
-    SoNode[] nodes;
+    SoSeparator[] nodes;
 
     SoElapsedTime elapsedTime = new SoElapsedTime();
 
@@ -144,7 +147,7 @@ public class BananaFamily extends ThreeDObjectFamilyBase implements ThreeDObject
         RandomGenerator randomS = new SplittableRandom(43);
 
         scaleFactors = new float[polylinePointsSize];
-        nodes = new SoNode[polylinePointsSize];
+        nodes = new SoSeparator[polylinePointsSize];
 
         SoRotationXYZ rotXYZ = new SoRotationXYZ();
 
@@ -159,15 +162,21 @@ public class BananaFamily extends ThreeDObjectFamilyBase implements ThreeDObject
             SoSeparator node = new SoSeparator();
 
             node.ref();
+            
+            SoSwitch visibilitySwitch = new SoSwitch();
+            
+            node.addChild(visibilitySwitch);
+            
+            visibilitySwitch.whichChild.setValue(SoSwitch.SO_SWITCH_ALL);
 
             SoScale scale = new SoScale();
             scale.scaleFactor.setValue(scaleFactors[i],scaleFactors[i],scaleFactors[i]);
 
-            node.addChild(scale);
+            visibilitySwitch.addChild(scale);
 
-            node.addChild(rotXYZ);
+            visibilitySwitch.addChild(rotXYZ);
 
-            node.addChild(file);
+            visibilitySwitch.addChild(file);
 
             nodes[i] = node;
         }
@@ -193,6 +202,12 @@ public class BananaFamily extends ThreeDObjectFamilyBase implements ThreeDObject
 	@Override
 	public float getViewDistance() {
         return 350;
+	}
+
+	public void distanceCallBack(float distance, int index) {
+		if (distance < CATCH_DISTANCE) {
+			((SoSwitch)nodes[index].getChild(0)).whichChild.setValue(SoSwitch.SO_SWITCH_NONE);
+		}
 	}
 
 }

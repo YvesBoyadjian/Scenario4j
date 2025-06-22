@@ -20,4 +20,6 @@ public interface ThreeDObjectFamily {
     SoNode getNode(int index);
 
     float getViewDistance();
+
+	void distanceCallBack(float distance, int index);
 }

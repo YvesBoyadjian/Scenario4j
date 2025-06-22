@@ -36,4 +36,8 @@ public class ThreeDObjectFamilyBase {
     public void setGraphicObject(So3DObjects graphicObject) {
         this.graphicObject = graphicObject;
     }
+
+	public void distanceCallBack(float distance, int index) {
+		// do nothing by default 
+	}
 }

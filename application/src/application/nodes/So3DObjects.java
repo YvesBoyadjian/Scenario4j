@@ -125,9 +125,10 @@ public class So3DObjects extends SoSeparator {
                 removeCollectible(child,id);
             }
         }
-        for(Integer id : actualChildren) {
+        for(Integer id : nearChildren) { // Only displayed items
             So3DObject child = idxToCollectibles.get(id);
             float distance = referencePoint.operator_minus(child.getCoordinates(), dummy).length();
+            collectible.distanceCallBack(distance,id);
             nearestCollectibleDistance = Math.min(nearestCollectibleDistance,distance);
         }
         //System.out.println(nearestCollectibleDistance);
