@@ -29,6 +29,7 @@ import application.actor.Actor;
 import application.nodes.*;
 import application.objects.Hero;
 import application.objects.Target;
+import application.objects.collectible.BananaFamily;
 import application.objects.collectible.BootsFamily;
 import application.objects.collectible.MushroomsFamily;
 import application.objects.collectible.ThreeDObjectFamily;
@@ -1381,6 +1382,8 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 		collectibleFamilies.add(new MushroomsFamily(this, getPolylinePoints("PathToTheSeals3.poly"), program2));
 		loadPolyline("application/ressource/PathToTheSeals4.poly");
 		collectibleFamilies.add(new MushroomsFamily(this, getPolylinePoints("PathToTheSeals4.poly"), program2));
+		loadPolyline("application/ressource/fromHouseToOracle.poly");
+		collectibleFamilies.add(new BananaFamily(this, getPolylinePoints("fromHouseToOracle.poly"), program2));
 
 		for( ThreeDObjectFamily collectibleFamily : collectibleFamilies) {
 
