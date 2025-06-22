@@ -25,7 +25,7 @@ public class Player {
             seaPath = Path.of("application", seaPath.toString());
         }
 
-        VorbisTrack seaTrack = new VorbisTrack(seaPath.toString(), seaAtomicInteger);
+        VorbisTrack seaTrack = new VorbisTrack(seaPath.toString(), seaAtomicInteger, false);
 
         final float[] currentSeaVolume = new float[1];
 

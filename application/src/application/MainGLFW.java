@@ -578,6 +578,25 @@ public class MainGLFW {
                     e.printStackTrace();
                 }
 
+                // __________________________________________________________________________________________ bananas
+                File bananasFile = new File("bananas.mri");
+
+                Properties bananasProperties = new Properties();
+
+                sg.storeBananas(bananasProperties);
+
+                try {
+                    OutputStream out = new FileOutputStream(bananasFile);
+
+                    bananasProperties.store(out, "Mount Rainier Island planks");
+
+                    out.close();
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
                 if (god) {
 
                     // __________________________________________________________________________________________ planks
@@ -1103,6 +1122,36 @@ public class MainGLFW {
                 SbViewportRegion vpRegion = viewer.getSceneHandler().getViewportRegion();
 
                 sg.loadPlanks(vpRegion, planksProperties);
+
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+        }
+    }
+    
+    public static void loadBananas() {
+    	
+    		// _______________________________________________________________ bananas
+        File planksFile = new File("bananas.mri");
+
+        if (!planksFile.exists()) {
+            planksFile = new File("../bananas.mri");
+        }
+
+        if (planksFile.exists()) {
+            try {
+                InputStream in = new FileInputStream(planksFile);
+
+                Properties planksProperties = new Properties();
+
+                planksProperties.load(in);
+
+                in.close();
+
+                sg.loadBananas(planksProperties);
 
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
@@ -1744,7 +1793,7 @@ public class MainGLFW {
                 seaPath = Path.of("application", seaPath.toString());
             }
 
-            VorbisTrack seaTrack = new VorbisTrack(seaPath.toString(), seaAtomicInteger);
+            VorbisTrack seaTrack = new VorbisTrack(seaPath.toString(), seaAtomicInteger, true);
 
             final float[] currentSeaVolume = new float[1];
 
@@ -1801,7 +1850,7 @@ public class MainGLFW {
                 stormPath = Path.of("application", stormPath.toString());
             }
 
-            VorbisTrack forestTrack = new VorbisTrack(stormPath.toString(), stormAtomicInteger);
+            VorbisTrack forestTrack = new VorbisTrack(stormPath.toString(), stormAtomicInteger, true);
 
             final float[] currentForestVolume = new float[1];
 

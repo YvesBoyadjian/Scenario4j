@@ -51,7 +51,7 @@ public class VorbisTrack implements AutoCloseable {
 
     private final AtomicInteger sampleIndex;
 
-    public VorbisTrack(String filePath, AtomicInteger sampleIndex) {
+    public VorbisTrack(String filePath, AtomicInteger sampleIndex, boolean print) {
         try {
             encodedAudio = ioResourceToByteBuffer(filePath, 256 * 1024);
         } catch (IOException e) {
@@ -66,7 +66,11 @@ public class VorbisTrack implements AutoCloseable {
             }
 
             STBVorbisInfo info = STBVorbisInfo.malloc(stack);
-            print(info);
+            stb_vorbis_get_info(handle, info);
+            
+            if (print) {
+            		print(info);
+            }
             this.channels = info.channels();
             this.sampleRate = info.sample_rate();
         }
@@ -120,8 +124,6 @@ public class VorbisTrack implements AutoCloseable {
         System.out.println("stream length, seconds: " + stb_vorbis_stream_length_in_seconds(handle));
 
         System.out.println();
-
-        stb_vorbis_get_info(handle, info);
 
         System.out.println("channels = " + info.channels());
         System.out.println("sampleRate = " + info.sample_rate());

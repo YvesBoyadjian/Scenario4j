@@ -71,6 +71,7 @@ public class HikingIslandMain {
                         	MainGLFW.startOpenGL();
                         	MainGLFW.startViewer();
                         	MainGLFW.loadPlanks();
+                        	MainGLFW.loadBananas();
                         	MainGLFW.buildHeroPhysics();
                         	MainGLFW.setEscapeCallback();
                         	MainGLFW.addIdleListeners();

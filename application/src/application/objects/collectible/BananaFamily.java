@@ -23,7 +23,7 @@ public class BananaFamily extends ThreeDObjectFamilyBase implements ThreeDObject
 
     private static final float MUSHROOM_SCALE_FACTOR = 0.01f;
     
-    private static final float CATCH_DISTANCE = 0.8f;
+    private static final float CATCH_DISTANCE = 0.9f;
 
     SceneGraphIndexedFaceSetShader sg;
 
@@ -42,6 +42,8 @@ public class BananaFamily extends ThreeDObjectFamilyBase implements ThreeDObject
     float[] scaleFactors;
 
     SoSeparator[] nodes;
+    
+    boolean[] hiddenBananas;
 
     SoElapsedTime elapsedTime = new SoElapsedTime();
 
@@ -149,6 +151,7 @@ public class BananaFamily extends ThreeDObjectFamilyBase implements ThreeDObject
 
         scaleFactors = new float[polylinePointsSize];
         nodes = new SoSeparator[polylinePointsSize];
+        hiddenBananas = new boolean[polylinePointsSize];
 
         SoRotationXYZ rotXYZ = new SoRotationXYZ();
 
@@ -207,12 +210,36 @@ public class BananaFamily extends ThreeDObjectFamilyBase implements ThreeDObject
 
 	public void distanceCallBack(float distance, int index) {
 		if (distance < CATCH_DISTANCE) {
-			SoSwitch soSwitch = ((SoSwitch)nodes[index].getChild(0));
-			if (soSwitch.whichChild.getValue() != SoSwitch.SO_SWITCH_NONE) {
-			soSwitch.whichChild.setValue(SoSwitch.SO_SWITCH_NONE);
-			new Player().play("ressource/MACHAppl_Clochette de micro onde (ID 1631)_LS.ogg", 0.15f);
+			if (hideBanana(index)) {
+				new 	Player().play("ressource/MACHAppl_Clochette de micro onde (ID 1631)_LS.ogg", 0.15f);
 			}
 		}
+	}
+
+	public boolean hideBanana(int index) {
+		if (!hiddenBananas[index]) {
+			hiddenBananas[index] = true;
+			SoSwitch soSwitch = ((SoSwitch)nodes[index].getChild(0));
+			if (soSwitch.whichChild.getValue() != SoSwitch.SO_SWITCH_NONE) {
+				soSwitch.whichChild.setValue(SoSwitch.SO_SWITCH_NONE);
+			}
+			return true;
+		}
+		return false;
+	}
+	
+	public void placeBanana(int index) {
+		if (hiddenBananas[index]) {
+			hiddenBananas[index] = false;
+			SoSwitch soSwitch = ((SoSwitch)nodes[index].getChild(0));
+			if (soSwitch.whichChild.getValue() == SoSwitch.SO_SWITCH_NONE) {
+				soSwitch.whichChild.setValue(SoSwitch.SO_SWITCH_ALL);
+			}
+		}
+	}
+
+	public boolean isBananaHiden(int index) {
+		return hiddenBananas[index];
 	}
 
 }

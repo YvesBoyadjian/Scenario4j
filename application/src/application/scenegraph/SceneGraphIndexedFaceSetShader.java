@@ -3357,6 +3357,20 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 			planksProperties.put(key,value);
 		}
 	}
+	
+	public void storeBananas(Properties bananasProperties) {
+		BananaFamily bf = (BananaFamily)collectibleFamilies.stream().filter((tdof)->tdof instanceof BananaFamily).findAny().get();
+		int numBananas = bf.getNbCollectibles();
+		
+		String key;
+		for (int i = 0; i < numBananas; i++) {
+			if (bf.isBananaHiden(i)) {
+				key = Integer.toString(i);
+				bananasProperties.put(key,"");
+			}
+		}
+		
+	}
 
 	public void loadPlanks(SbViewportRegion vpRegion, Properties plankProperties) {
 		int plankIndex = 0;
@@ -3384,6 +3398,29 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 			
 			plankIndex++;
 		}
+	}
+	
+	public void loadBananas(Properties plankProperties) {
+		BananaFamily bf = (BananaFamily)collectibleFamilies.stream().filter((tdof)->tdof instanceof BananaFamily).findAny().get();
+		int numBananas = bf.getNbCollectibles();
+		
+		String key;
+		for (int i = 0; i < numBananas; i++) {
+			key = Integer.toString(i);
+			if (plankProperties.containsKey(key)) {
+				bf.hideBanana(i);
+			}
+		}
+		
+		System.out.println("Num bananas: "+ numBananas);
+	}
+	
+	public void placeAllBananas() {
+		BananaFamily bf = (BananaFamily)collectibleFamilies.stream().filter((tdof)->tdof instanceof BananaFamily).findAny().get();
+		int numBananas = bf.getNbCollectibles();
+		for (int i = 0; i < numBananas; i++) {
+			bf.placeBanana(i);
+		}		
 	}
 
 	public void addTrail(int i, int j) {
@@ -3919,6 +3956,7 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 
 		getHero().life = 1.0f;
 		resurrectTheAnimals();
+		placeAllBananas();
 		enemiesSeparator.removeAllEnemies();
 		resetScenario(viewer);
 		SwingUtilities.invokeLater(()->setBoots(false));
