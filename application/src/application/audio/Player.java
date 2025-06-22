@@ -53,6 +53,10 @@ public class Player {
             }
             seaRenderer.close();
             seaTrack.close();
+            
+            seaThread = null;
+            seaRenderer = null;
+            seaAudioLatch = null;
         }) {
 
         };

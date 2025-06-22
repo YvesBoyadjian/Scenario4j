@@ -18,7 +18,7 @@ import static org.lwjgl.system.MemoryUtil.*;
 public class AudioRenderer implements AutoCloseable {
     private static final int BUFFER_SIZE = 1024 * 8;
 
-    private final VorbisTrack track;
+    private VorbisTrack track;
 
     private final int format;
 
@@ -26,9 +26,9 @@ public class AudioRenderer implements AutoCloseable {
     private final long context;
 
     private int       source;
-    private final IntBuffer buffers;
+    private IntBuffer buffers;
 
-    private final ShortBuffer pcm;
+    private ShortBuffer pcm;
 
     long bufferOffset; // offset of last processed buffer
     long offset; // bufferOffset + offset of current buffer
@@ -87,6 +87,10 @@ public class AudioRenderer implements AutoCloseable {
         alcSetThreadContext(NULL);
         alcDestroyContext(context);
         alcCloseDevice(device);
+        
+        track = null;
+        buffers = null;
+        pcm = null;
     }
 
     private int stream(int buffer) {

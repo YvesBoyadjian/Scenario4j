@@ -39,7 +39,7 @@ import static org.lwjgl.stb.STBVorbis.stb_vorbis_open_memory;
 import static org.lwjgl.system.MemoryStack.stackPush;
 
 public class VorbisTrack implements AutoCloseable {
-    private final ByteBuffer encodedAudio;
+    private ByteBuffer encodedAudio;
 
     private final long handle;
 
@@ -81,6 +81,7 @@ public class VorbisTrack implements AutoCloseable {
     @Override
     public void close() {
         stb_vorbis_close(handle);
+        encodedAudio = null;
     }
 
     void progressBy(int samples) {
