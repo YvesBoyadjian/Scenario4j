@@ -1792,6 +1792,8 @@ public class MainGLFW {
 
             //forestClip = playSound(forestSound, true, 1.0f);
 
+            AtomicInteger stormAtomicInteger = new AtomicInteger();
+
             String stormPathString = "ressource/STORM_Orage et pluie 4 (ID 2719)_LS_120_70_Audacity_Quality_6.ogg";
 
             Path stormPath = Path.of(stormPathString);
@@ -1799,7 +1801,7 @@ public class MainGLFW {
                 stormPath = Path.of("application", stormPath.toString());
             }
 
-            VorbisTrack forestTrack = new VorbisTrack(stormPath.toString(), seaAtomicInteger);
+            VorbisTrack forestTrack = new VorbisTrack(stormPath.toString(), stormAtomicInteger);
 
             final float[] currentForestVolume = new float[1];
 

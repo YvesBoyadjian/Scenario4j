@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.SplittableRandom;
 import java.util.random.RandomGenerator;
 
+import application.audio.Player;
 import application.scenegraph.SceneGraphIndexedFaceSetShader;
 import jscenegraph.coin3d.shaders.inventor.nodes.SoShaderProgram;
 import jscenegraph.database.inventor.SbVec3f;
@@ -22,7 +23,7 @@ public class BananaFamily extends ThreeDObjectFamilyBase implements ThreeDObject
 
     private static final float MUSHROOM_SCALE_FACTOR = 0.01f;
     
-    private static final float CATCH_DISTANCE = 0.6f;
+    private static final float CATCH_DISTANCE = 0.8f;
 
     SceneGraphIndexedFaceSetShader sg;
 
@@ -206,7 +207,11 @@ public class BananaFamily extends ThreeDObjectFamilyBase implements ThreeDObject
 
 	public void distanceCallBack(float distance, int index) {
 		if (distance < CATCH_DISTANCE) {
-			((SoSwitch)nodes[index].getChild(0)).whichChild.setValue(SoSwitch.SO_SWITCH_NONE);
+			SoSwitch soSwitch = ((SoSwitch)nodes[index].getChild(0));
+			if (soSwitch.whichChild.getValue() != SoSwitch.SO_SWITCH_NONE) {
+			soSwitch.whichChild.setValue(SoSwitch.SO_SWITCH_NONE);
+			new Player().play("ressource/MACHAppl_Clochette de micro onde (ID 1631)_LS.ogg", 0.15f);
+			}
 		}
 	}
 
