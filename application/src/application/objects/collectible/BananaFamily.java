@@ -48,6 +48,8 @@ public class BananaFamily extends ThreeDObjectFamilyBase implements ThreeDObject
     SoElapsedTime elapsedTime = new SoElapsedTime();
 
     SoMFVec3f mushroomsCoords = new SoMFVec3f();
+    
+    private int numCollectedBananas;
 
     public BananaFamily(SceneGraphIndexedFaceSetShader sg, List<SbVec3f> polylinePoints, SoShaderProgram program2) {
         this.sg = sg;
@@ -211,6 +213,7 @@ public class BananaFamily extends ThreeDObjectFamilyBase implements ThreeDObject
 	public void distanceCallBack(float distance, int index) {
 		if (distance < CATCH_DISTANCE) {
 			if (hideBanana(index)) {
+				numCollectedBananas++;
 				new 	Player().play("ressource/MACHAppl_Clochette de micro onde (ID 1631)_LS.ogg", 0.15f);
 			}
 		}
@@ -241,5 +244,12 @@ public class BananaFamily extends ThreeDObjectFamilyBase implements ThreeDObject
 	public boolean isBananaHiden(int index) {
 		return hiddenBananas[index];
 	}
+	
+	public int getNumBananasCollected() {
+		return numCollectedBananas;
+	}
 
+	public void setNumBananasCollected(int numBananas) {
+		numCollectedBananas = numBananas;
+	}
 }

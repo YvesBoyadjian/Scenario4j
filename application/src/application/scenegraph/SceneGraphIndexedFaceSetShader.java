@@ -58,6 +58,7 @@ import jscenegraph.database.inventor.misc.SoNotList;
 import jscenegraph.database.inventor.nodes.*;
 import jscenegraph.optimization.inventor.nodes.SoOptimizationFromXYUV;
 import jscenegraph.port.Ctx;
+import jscenegraph.port.StringArray;
 import jscenegraph.port.memorybuffer.MemoryBuffer;
 import org.ode4j.math.DMatrix3;
 import org.ode4j.math.DMatrix3C;
@@ -2820,6 +2821,7 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 		setNearDistance();
 		updateCatPosition(delta_t);
 		updateActors(delta_t);
+		updateTargetDisplay();
 
 		runIdleCB();
 
@@ -3137,9 +3139,21 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 		if (haveBoots) {
 			shotTargetSize++;
 		}
+		
+		BananaFamily bf = (BananaFamily)collectibleFamilies.stream().filter((tdof)->tdof instanceof BananaFamily).findAny().get();
+		int numBananas = bf.getNumBananasCollected();
+		if (numBananas > 0) {
+			shotTargetSize++;
+		}
 
 		String[] targets = new String[shotTargetSize];
 		int i=0;
+		
+		if (numBananas > 0) {
+			targets[i] = "Bananas: "+numBananas;
+			i++;
+		}
+		
 		for(String name : shotTargets) {
 			targets[i] = name;
 			i++;
@@ -3147,6 +3161,25 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 		if(haveBoots) {
 			targets[i] = "Boots";
 		}
+		
+		int previousNum = targetDisplay.string.getNum();
+		StringArray sa = targetDisplay.string.getValues(0);
+		
+		if (previousNum == shotTargetSize) {
+			if (sa.length() == targets.length) {
+				boolean diff = false;
+				for ( i=0; i < targets.length; i++) {
+					if (!Objects.equals(targets[i],sa.getO(i))) {
+						diff = true;
+						break;
+					}
+				}
+				if (!diff) {
+					return;
+				}
+			}
+		}
+		
 		targetDisplay.string.setValues(0,targets);
 		targetDisplay.string.setNum(shotTargetSize);
 	}
@@ -3369,7 +3402,7 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 				bananasProperties.put(key,"");
 			}
 		}
-		
+		bananasProperties.put("numBananasCollected", Integer.toString(bf.getNumBananasCollected()));
 	}
 
 	public void loadPlanks(SbViewportRegion vpRegion, Properties plankProperties) {
@@ -3410,6 +3443,9 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 			if (plankProperties.containsKey(key)) {
 				bf.hideBanana(i);
 			}
+		}
+		if (plankProperties.containsKey("numBananasCollected")) {
+			bf.setNumBananasCollected(Integer.valueOf(plankProperties.getProperty("numBananasCollected")));
 		}
 		
 		System.out.println("Num bananas: "+ numBananas);
