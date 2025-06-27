@@ -3166,6 +3166,11 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 		StringArray sa = targetDisplay.string.getValues(0);
 		
 		if (previousNum == shotTargetSize) {
+			
+			if (sa == null && targets.length == 0) {
+				return;
+			}			
+			
 			if (sa.length() == targets.length) {
 				boolean diff = false;
 				for ( i=0; i < targets.length; i++) {
@@ -3993,6 +3998,8 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 		getHero().life = 1.0f;
 		resurrectTheAnimals();
 		placeAllBananas();
+		BananaFamily bf = (BananaFamily)collectibleFamilies.stream().filter((tdof)->tdof instanceof BananaFamily).findAny().get();
+		bf.setNumBananasCollected(0);
 		enemiesSeparator.removeAllEnemies();
 		resetScenario(viewer);
 		SwingUtilities.invokeLater(()->setBoots(false));
