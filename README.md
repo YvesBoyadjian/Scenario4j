@@ -12,7 +12,7 @@ Scenario4j has been used to create the game "Mount Rainier Island"
 
 Credits : 
 
-- LWJGL : https://github.com/LWJGL/lwjgl3
+- Lightweight Java Game Library : https://github.com/LWJGL/lwjgl3
 
 - Terrain : https://apps.nationalmap.gov/downloader/
 
@@ -35,8 +35,6 @@ Credits :
 - ode4j : https://github.com/tzaeschke/ode4j
 
 - sl4j : https://github.com/qos-ch/slf4j
-
-- Lightweight Java Game Library : https://github.com/LWJGL/lwjgl3
 
 - GeoTools : https://www.geotools.org/
 
@@ -67,3 +65,11 @@ Credits :
 - Cat : https://free3d.com/3d-model/cat-v1--522281.html
 
 - Optimization : https://www.youtube.com/watch?v=5zlfJW2VGLM
+
+- Eclipse : https://eclipseide.org/
+
+- House : https://free3d.com/3d-model/gameready-cottage-free-163528.html
+
+- House : https://sketchfab.com/3d-models/gameready-cottage-free-9203e8f4b67b4d9e8b32c10b2d5e6a57
+
+- Banana : https://free3d.com/3d-model/banana-v01--276226.html
