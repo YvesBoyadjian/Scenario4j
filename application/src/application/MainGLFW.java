@@ -644,16 +644,18 @@ public class MainGLFW {
 
             protected void onFire(SoMouseButtonEvent event) {
                 //playSound("shortened_40_smith_wesson_single-mike-koenig.wav"/*clipf*/);
-                if (gunSound != null) {
-                    playSoundDelayed(/*"GUN_FIRE-GoodSoundForYou-820112263_10db.wav"*//*clipf*/gunSound, false, 1f);
+                if (sg.useBullet()) {
+	                if (gunSound != null) {
+	                    playSoundDelayed(/*"GUN_FIRE-GoodSoundForYou-820112263_10db.wav"*//*clipf*/gunSound, false, 1f);
+	                }
+	
+	                SbViewportRegion vr = this.getSceneHandler().getViewportRegion();
+	                SoNode sg_ = this.getSceneHandler().getSceneGraph();
+	
+	//				TargetSearchRunnable tsr = new TargetSearchRunnable(this, vr, sg);
+	//				tsr.run();
+                		SwingUtilities.invokeLater(new TargetSearchRunnable(this, vr, sg_, sg));
                 }
-
-                SbViewportRegion vr = this.getSceneHandler().getViewportRegion();
-                SoNode sg_ = this.getSceneHandler().getSceneGraph();
-
-//				TargetSearchRunnable tsr = new TargetSearchRunnable(this, vr, sg);
-//				tsr.run();
-                SwingUtilities.invokeLater(new TargetSearchRunnable(this, vr, sg_, sg));
                 //new Thread(new TargetSearchRunnable(this, vr, sg)).start();
             }
 

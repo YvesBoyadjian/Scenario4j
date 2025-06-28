@@ -20,6 +20,9 @@ import application.actor.ThreeDObject;
 import application.objects.Hero;
 import application.scenario.FirstApproachQuest;
 import application.scenario.GoToTheOracleMessageQuest;
+import application.scenario.HikingIslandFirstApproachQuest;
+import application.scenario.HikingIslandGoToTheOracleMessageQuest;
+import application.scenario.HikingIslandLeaveHouseQuest;
 import application.scenario.LeaveKlapatchePointQuest;
 import application.scenario.Scenario;
 import application.scenario.TargetsKillingQuest;
@@ -138,11 +141,11 @@ public class HikingIslandMain {
         };
 
         // __________________________ Display "Go to the Oracle" message
-    	MainGLFW.scenario.addQuest(new GoToTheOracleMessageQuest());
+    	MainGLFW.scenario.addQuest(new HikingIslandGoToTheOracleMessageQuest());
         // __________________________________________ Leave Klapatche point
-    	MainGLFW.scenario.addQuest(new LeaveKlapatchePointQuest());
+    	MainGLFW.scenario.addQuest(new HikingIslandLeaveHouseQuest());
         // __________________________________________ Oracle encounter
-    	MainGLFW.scenario.addQuest(new FirstApproachQuest());
+    	MainGLFW.scenario.addQuest(new HikingIslandFirstApproachQuest());
         // __________________________________________ Killing targets
     	MainGLFW.scenario.addQuest(new TargetsKillingQuest());
 

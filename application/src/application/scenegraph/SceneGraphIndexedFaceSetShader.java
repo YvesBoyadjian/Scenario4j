@@ -336,6 +336,8 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 	boolean wasDisplayingTrailDistance;
 
 	boolean haveBoots;
+	
+	private int numBullets;
 
     BootsFamily boots;
 
@@ -3145,12 +3147,20 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 		if (numBananas > 0) {
 			shotTargetSize++;
 		}
+		if (numBullets > 0) {
+			shotTargetSize++;
+		}
 
 		String[] targets = new String[shotTargetSize];
 		int i=0;
 		
 		if (numBananas > 0) {
 			targets[i] = "Bananas: "+numBananas;
+			i++;
+		}
+		
+		if (numBullets > 0) {
+			targets[i] = "Bullets: "+numBullets;
 			i++;
 		}
 		
@@ -3408,6 +3418,7 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 			}
 		}
 		bananasProperties.put("numBananasCollected", Integer.toString(bf.getNumBananasCollected()));
+		bananasProperties.put("numBullets", Integer.toString(numBullets));
 	}
 
 	public void loadPlanks(SbViewportRegion vpRegion, Properties plankProperties) {
@@ -3454,6 +3465,10 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 		}
 		
 		System.out.println("Num bananas: "+ numBananas);
+
+		if (plankProperties.containsKey("numBullets")) {
+			numBullets = Integer.valueOf(plankProperties.getProperty("numBullets"));
+		}
 	}
 	
 	public void placeAllBananas() {
@@ -4000,6 +4015,7 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 		placeAllBananas();
 		BananaFamily bf = (BananaFamily)collectibleFamilies.stream().filter((tdof)->tdof instanceof BananaFamily).findAny().get();
 		bf.setNumBananasCollected(0);
+		numBullets = 6;
 		enemiesSeparator.removeAllEnemies();
 		resetScenario(viewer);
 		SwingUtilities.invokeLater(()->setBoots(false));
@@ -4370,5 +4386,20 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 		else {
 			ps.style.setValue(SoPickStyle.Style.SHAPE);
 		}
+	}
+
+	public void exchangeBananasForBullets() {
+		BananaFamily bf = (BananaFamily)collectibleFamilies.stream().filter((tdof)->tdof instanceof BananaFamily).findAny().get();
+		int numBananas = bf.getNumBananasCollected();
+		numBullets += numBananas;
+		bf.setNumBananasCollected(0);
+	}
+
+	public boolean useBullet() {
+		if (numBullets == 0) {
+			return false;
+		}
+		numBullets--;
+		return true;
 	}
 }
