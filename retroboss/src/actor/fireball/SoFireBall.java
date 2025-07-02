@@ -1,6 +1,7 @@
 package actor.fireball;
 
 import application.actor.Actor;
+import application.objects.Hero;
 import application.scenegraph.SceneGraphIndexedFaceSetShader;
 import jscenegraph.database.inventor.SbVec3f;
 import jscenegraph.database.inventor.nodes.*;
@@ -48,6 +49,18 @@ public class SoFireBall implements Actor {
     			return;
     		}
         setPosition(getPosition().operator_add(speed.operator_mul(dt)));
+
+        Hero hero = sceneGraph.getHero();
+        SbVec3f heroPosition = hero.getPosition();
+        
+        SbVec3f delta = heroPosition.operator_minus(getPosition());
+        if (delta.length() < 0.5f) {
+            hero.life -= dt/10.0f;
+            hero.hurting = true;
+            if (hero.life < 0) {
+                hero.life = 0;
+            }
+        }
     }
 	@Override
 	public void kill() {
