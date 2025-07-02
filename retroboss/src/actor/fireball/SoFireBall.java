@@ -12,6 +12,8 @@ public class SoFireBall implements Actor {
     SbVec3f speed;
     SoMaterial fireBallColor = new SoMaterial();
     SoSphere fireBall = new SoSphere();
+    
+    boolean dead;
 
     public SoFireBall(SbVec3f speed, SbVec3f initialPosition) {
         root.addChild(position);
@@ -41,6 +43,15 @@ public class SoFireBall implements Actor {
 
     @Override
     public void onIdle(float dt, SceneGraphIndexedFaceSetShader sceneGraph) {
+    	
+    		if (dead) {
+    			return;
+    		}
         setPosition(getPosition().operator_add(speed.operator_mul(dt)));
     }
+	@Override
+	public void kill() {
+		dead = true;
+		
+	}
 }

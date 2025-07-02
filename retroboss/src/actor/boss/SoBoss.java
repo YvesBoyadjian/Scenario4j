@@ -9,6 +9,10 @@ import jscenegraph.database.inventor.SbVec3f;
 import jscenegraph.database.inventor.nodes.*;
 
 import java.io.File;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 public class SoBoss implements Actor {
 
@@ -20,6 +24,7 @@ public class SoBoss implements Actor {
     double time = 0;
     double timeFireBallThrown = 0;
     int fireBallNumber = 0;
+    Map<String,SoFireBall> fireballs = new HashMap<>();
 
     public SoBoss() {
         root.addChild(position);
@@ -73,6 +78,8 @@ public class SoBoss implements Actor {
         SbVec3f heroPosition = hero.getPosition();
 
         SbVec3f delta = heroPosition.operator_minus(position.translation.getValue());
+        
+        if (delta.length() < 60) {
 
         double desiredAngle = Math.atan2(delta.y(), delta.x()) + Math.PI/2;
 
@@ -91,14 +98,36 @@ public class SoBoss implements Actor {
             fireBallNumber++;
 
             SbVec3f initialPosition = position.translation.getValue().operator_add(new SbVec3f(0,0,5.5f));
-            SbVec3f finalPosition = heroPosition.operator_minus(new SbVec3f(0,0,0.15f));
+            SbVec3f finalPosition = heroPosition.operator_minus(new SbVec3f(0,0,0.05f));
 
             delta = finalPosition.operator_minus(initialPosition);
 
             delta.normalize();
             SbVec3f speed = delta.operator_mul(5f);
-            sceneGraph.addActor("FireBall" + fireBallNumber, new SoFireBall(speed, initialPosition));
+            SoFireBall fireball = new SoFireBall(speed, initialPosition);
+            String fireballKey = "FireBall" + fireBallNumber; 
+            fireballs.put(fireballKey, fireball);
+            sceneGraph.addActor("FireBall" + fireBallNumber, fireball);
         }
-
+        }
+        for (String fireballKey : new HashSet<>(fireballs.keySet())) {
+        		SoFireBall fireball = fireballs.get(fireballKey);
+        		float distance = fireball.getPosition().operator_minus(getPosition()).length();
+        		if (distance > 99) {
+        			fireballs.remove(fireballKey);
+        			sceneGraph.removeActor(fireballKey);
+        		}
+        }
     }
+
+	@Override
+	public SbVec3f getPosition() {
+		return position.translation.getValue();
+	}
+
+	@Override
+	public void kill() {
+		// TODO Auto-generated method stub
+		
+	}
 }

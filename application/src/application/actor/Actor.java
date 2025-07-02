@@ -6,4 +6,6 @@ import jscenegraph.database.inventor.nodes.SoNode;
 
 public interface Actor extends ThreeDObject {
     void onIdle(float dt, SceneGraphIndexedFaceSetShader sceneGraph);
+
+	void kill();
 }

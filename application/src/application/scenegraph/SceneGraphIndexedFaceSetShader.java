@@ -361,6 +361,15 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 		actors.put(key, actor);
 		actorsGroup.addChild(actor.getNode());
 	}
+	
+	public void removeActor(String key) {
+		Actor actor = actors.get(key);
+		if (actor != null) {
+			actor.kill();
+			actors.remove(key);
+			actorsGroup.removeChild(actor.getNode());
+		}
+	}
 
 	public Actor getActor(String key) {
 		return actors.get(key);

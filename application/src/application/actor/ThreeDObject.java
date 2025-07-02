@@ -13,4 +13,5 @@ public interface ThreeDObject {
 
     SoNode getNode();
     void setPosition(SbVec3f position);
+    SbVec3f getPosition();
 }

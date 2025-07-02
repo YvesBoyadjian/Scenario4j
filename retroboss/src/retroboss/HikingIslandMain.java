@@ -121,7 +121,7 @@ public class HikingIslandMain {
                 else {
                     boss = sg.getActor("boss");
                 }
-                if (questIndex == 0) {
+                if (questIndex == 0 || true) {
                     SbVec3f bossPosition = new SbVec3f(2571,-69.5f,937 - SCENE_POSITION.getZ());
                     final int[] catPositionIndices = new int[4];
                     bossPosition.setZ(sg.getInternalZ(bossPosition.getX(), bossPosition.getY(),catPositionIndices,false));

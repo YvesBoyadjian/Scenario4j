@@ -63,6 +63,17 @@ public class SoHouse implements Actor {
 
 	@Override
 	public void onIdle(float dt, SceneGraphIndexedFaceSetShader sceneGraph) {
+		// nothing to do on idle
+		
+	}
+
+	@Override
+	public SbVec3f getPosition() {
+		return position.translation.getValue();
+	}
+
+	@Override
+	public void kill() {
 		// TODO Auto-generated method stub
 		
 	}
