@@ -63,8 +63,13 @@ public class SoFireBall implements Actor {
         }
     }
 	@Override
-	public void kill() {
+	public void kill(SceneGraphIndexedFaceSetShader sceneGraph) {
 		dead = true;
+		
+	}
+	@Override
+	public void shoot(SceneGraphIndexedFaceSetShader sceneGraph) {
+		// TODO Auto-generated method stub
 		
 	}
 }

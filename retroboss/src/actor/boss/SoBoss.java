@@ -2,6 +2,7 @@ package actor.boss;
 
 import actor.fireball.SoFireBall;
 import application.actor.Actor;
+import application.actor.SoActorFile;
 import application.objects.Hero;
 import application.scenegraph.SceneGraphIndexedFaceSetShader;
 import jscenegraph.database.inventor.SbRotation;
@@ -20,11 +21,15 @@ public class SoBoss implements Actor {
     SoTranslation position = new SoTranslation();
     SoRotation orientation = new SoRotation();
     SoRotation rotation = new SoRotation();
-    SoFile file = new SoFile();
+    SoFile file = new SoActorFile(this);
     double time = 0;
     double timeFireBallThrown = 0;
     int fireBallNumber = 0;
     Map<String,SoFireBall> fireballs = new HashMap<>();
+    
+    private float life = 1;
+    
+    private boolean killed;
 
     public SoBoss() {
         root.addChild(position);
@@ -71,6 +76,10 @@ public class SoBoss implements Actor {
 
     @Override
     public void onIdle(float dt, SceneGraphIndexedFaceSetShader sceneGraph) {
+    	
+    		if(killed) {
+    			return;
+    		}
 
         time+=dt;
 
@@ -126,8 +135,21 @@ public class SoBoss implements Actor {
 	}
 
 	@Override
-	public void kill() {
-		// TODO Auto-generated method stub
+	public void kill(SceneGraphIndexedFaceSetShader sceneGraph) {
+		killed = true;
+        for (String fireballKey : new HashSet<>(fireballs.keySet())) {
+    		SoFireBall fireball = fireballs.get(fireballKey);
+    			fireballs.remove(fireballKey);
+    			sceneGraph.removeActor(fireballKey);
+    }
+	}
+
+	@Override
+	public void shoot(SceneGraphIndexedFaceSetShader sceneGraph) {
+		life -= 0.1f;
 		
+		if (life <= 0) {
+			sceneGraph.removeActor("boss");
+		}
 	}
 }

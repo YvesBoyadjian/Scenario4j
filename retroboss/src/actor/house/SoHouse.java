@@ -73,7 +73,13 @@ public class SoHouse implements Actor {
 	}
 
 	@Override
-	public void kill() {
+	public void kill(SceneGraphIndexedFaceSetShader sceneGraph) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void shoot(SceneGraphIndexedFaceSetShader sceneGraph) {
 		// TODO Auto-generated method stub
 		
 	}

@@ -3,6 +3,7 @@
  */
 package application;
 
+import application.actor.SoActorFile;
 import application.nodes.SoEnemies;
 import application.nodes.SoPill;
 import application.nodes.SoTarget;
@@ -106,6 +107,10 @@ public class TargetSearchRunnable implements Runnable {
 								}
 							}
 							//System.out.println(pp.getPath().getTail().getClass());
+						}
+						else if ( n instanceof SoActorFile) {
+							SoActorFile actorFile = (SoActorFile) n;
+							actorFile.getActor().shoot(main);
 						}
 						else if(len >= 4) {
 							SoNode maybePill = pat.getNode(len-3);
