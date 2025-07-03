@@ -29,6 +29,10 @@ public class SoBoss implements Actor {
     
     private float life = 1;
     
+    private boolean shot;
+    
+    double shotDz = 0;
+    
     private boolean killed;
 
     public SoBoss() {
@@ -77,8 +81,17 @@ public class SoBoss implements Actor {
     @Override
     public void onIdle(float dt, SceneGraphIndexedFaceSetShader sceneGraph) {
     	
-    		if(killed) {
-    			return;
+		if(killed) {
+			return;
+		}
+    	
+    		if(shot) {
+    			shotDz += dt;
+    			setPosition(getPosition().operator_add(new SbVec3f(0,0, - dt)));
+    			if (shotDz > 10) {
+    				sceneGraph.removeActor("boss");
+    				return;
+    			}
     		}
 
         time+=dt;
@@ -149,7 +162,7 @@ public class SoBoss implements Actor {
 		life -= 0.1f;
 		
 		if (life <= 0) {
-			sceneGraph.removeActor("boss");
+			shot = true;
 		}
 	}
 }
