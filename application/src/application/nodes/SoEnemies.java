@@ -194,7 +194,9 @@ public class SoEnemies extends SoSeparator {
             pillPosition.setZ(sg.getInternalZ(pillPosition.getX(),pillPosition.getY(),indices,true)+sg.getzTranslation() + 1.75f/2 - 0.03f);
         }
 
-        sg.getHero().hurting = hurting;
+        if (hurting) {
+        		sg.getHero().hurting = hurting;
+        }
     }
 
     public void kill(SoPill target) {

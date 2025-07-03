@@ -707,8 +707,8 @@ public class MainGLFW {
                 }
             }
             if (sg.getHero() != null && sg.getHero().hurting) {
-                screamClip[0] = playSound(new ByteArrayInputStream(screamSound), false, 1.0f);
                 sg.getHero().hurting = false;
+                screamClip[0] = playSound(new ByteArrayInputStream(screamSound), false, 1.0f);
             }
         });
 
