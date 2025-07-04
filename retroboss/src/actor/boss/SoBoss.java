@@ -53,6 +53,7 @@ public class SoBoss implements Actor {
             bossFile = new File("../../ressource/halo_5_noble_armor_thingy/scene.gltf");
         }
         if (bossFile.exists()) {
+        		System.out.println("Loading boos "+ bossFile.getAbsolutePath());
             file.name.setValue(bossFile.getAbsolutePath());
             root.addChild(file);
         }
