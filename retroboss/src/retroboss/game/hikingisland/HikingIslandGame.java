@@ -12,7 +12,7 @@ public class HikingIslandGame implements MRIGame {
 
 	@Override
 	public String getTitle() {
-		return "Hiking Island";
+		return "Bigfoot Hunting";
 	}
 
 	@Override

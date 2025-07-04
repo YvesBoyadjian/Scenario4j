@@ -39,7 +39,7 @@ public class HikingIslandMain {
      * @param args
      */
     public static void main(String[] args) {
-        System.out.println("Hiking Island!");
+        System.out.println("Bigfoot Hunting");
 
         if (args.length == 1 && Objects.equals(args[0], "opengl32")) {
             System.loadLibrary("opengl32");
@@ -49,7 +49,7 @@ public class HikingIslandMain {
         	MainGLFW.god = true;
         }
         SwingUtilities.invokeLater(() -> {
-            loadGame(MainGLFW.showSplash("Hiking Island", 1f / 5f));
+            loadGame(MainGLFW.showSplash("Bigfoot Hunting", 1f / 5f));
         });
     }
 
@@ -80,21 +80,21 @@ public class HikingIslandMain {
                         	MainGLFW.addIdleListeners();
                         	MainGLFW.runVisu();
                         } catch (Exception e) {
-                            JOptionPane.showMessageDialog(MainGLFW.window, e.toString(), "Exception in Hiking Island", JOptionPane.ERROR_MESSAGE);
+                            JOptionPane.showMessageDialog(MainGLFW.window, e.toString(), "Exception in Bigfoot Hunting", JOptionPane.ERROR_MESSAGE);
                             e.printStackTrace();
                             System.exit(-1); // Necessary, because of Linux
                         } catch (Error e) {
-                            JOptionPane.showMessageDialog(MainGLFW.window, e.toString(), "Error in Hiking Island", JOptionPane.ERROR_MESSAGE);
+                            JOptionPane.showMessageDialog(MainGLFW.window, e.toString(), "Error in Bigfoot Hunting", JOptionPane.ERROR_MESSAGE);
                             e.printStackTrace();
                             System.exit(-1); // Necessary, because of Linux
                         }
                     });
                 } catch (Exception e) {
-                    JOptionPane.showMessageDialog(MainGLFW.window, e.toString(), "Exception in Hiking Island", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(MainGLFW.window, e.toString(), "Exception in Bigfoot Hunting", JOptionPane.ERROR_MESSAGE);
                     e.printStackTrace();
                     System.exit(-1); // Necessary, because of Linux
                 } catch (Error e) {
-                    JOptionPane.showMessageDialog(MainGLFW.window, e.toString(), "Error in Hiking Island", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(MainGLFW.window, e.toString(), "Error in Bigfoot Hunting", JOptionPane.ERROR_MESSAGE);
                     e.printStackTrace();
                     System.exit(-1); // Necessary, because of Linux
                 }
