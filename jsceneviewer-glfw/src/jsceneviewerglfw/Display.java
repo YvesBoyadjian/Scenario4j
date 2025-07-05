@@ -32,7 +32,9 @@ public class Display {
 	}
 
 	private static class FutureEvent {
+		static long globalId;
 		double startTimeMicroseconds;
+		long id;
 		Runnable doit;
 	}
 	
@@ -47,7 +49,10 @@ public class Display {
 			double t1 = o1.startTimeMicroseconds;
 			double t2 = o2.startTimeMicroseconds;
 			if( t1 == t2 ) {
-				return 0;
+				if (o1.id == o2.id) {
+					return 0;
+				}
+				return o1.id < o2.id ? -1 : 1;
 			}
 			return t1 < t2 ? -1 : 1;
 		}
@@ -86,6 +91,7 @@ public class Display {
 		
 		FutureEvent fe = new FutureEvent();
 		fe.startTimeMicroseconds = startTimeMicro;
+		fe.id = fe.globalId++;
 		fe.doit = object;
 
 		SwingUtilities.invokeLater(()->{
