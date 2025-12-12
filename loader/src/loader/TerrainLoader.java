@@ -8,13 +8,11 @@ import java.awt.image.Raster;
 import java.awt.image.RenderedImage;
 import java.awt.image.SampleModel;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 
-import javax.media.jai.JAI;
-import javax.media.jai.OperationRegistry;
-
+import org.geotools.api.data.DataSourceException;
 import org.geotools.coverage.grid.GridCoverage2D;
-import org.geotools.data.DataSourceException;
 import org.geotools.gce.geotiff.GeoTiffReader;
 
 //import com.sun.media.jai.imageioimpl.ImageReadWriteSpi;
@@ -55,7 +53,7 @@ public class TerrainLoader {
             }
         }
         try {
-			GeoTiffReader reader = new GeoTiffReader(tiffFile);
+			GeoTiffReader reader = new GeoTiffReader(new FileInputStream(tiffFile));
 			GridCoverage2D grid = reader.read(null);
 			RenderedImage ri = grid.getRenderedImage();
 			Raster r = ri.getData();

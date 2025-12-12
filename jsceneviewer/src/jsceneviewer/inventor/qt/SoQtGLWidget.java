@@ -279,7 +279,9 @@ public GLData format()
         if (mainWidget != null) {
             // QGLWidget::size calls QWidget::size which returns the size in window coordinates
             // we need to scale this size by the device pixel ratio.
-            Point size = DPIUtil.autoScaleUp(mainWidget.getSize())/*size() * mainWidget.devicePixelRatio()*/;
+        		float scaleFactor = DPIUtil.getScalingFactor(DPIUtil.getDeviceZoom());
+        	
+            Point size = new Point((int)(mainWidget.getSize().x*scaleFactor),(int)(mainWidget.getSize().y*scaleFactor))/*size() * mainWidget.devicePixelRatio()*/;
             return new SbVec2s ((short)size.x, (short)size.y);
         } else {
             return new SbVec2s (/*minGLWidth*/(short)1, /*minGLHeight*/(short)1);
@@ -374,7 +376,9 @@ public void setEventCallback (eventCBType cb, Object data)
         mainWidget.addListener(SWT.Resize, new Listener() {
 			@Override
 			public void handleEvent(Event event) {
-				Rectangle bounds = DPIUtil.autoScaleUp(mainWidget.getBounds());
+				float scalingFactor = DPIUtil.getScalingFactor(DPIUtil.getDeviceZoom());
+				Rectangle mainWidgetBounds = mainWidget.getBounds();
+				Rectangle bounds = new Rectangle((int)(mainWidgetBounds.x * scalingFactor),(int)(mainWidgetBounds.y * scalingFactor),(int)(mainWidgetBounds.width * scalingFactor),(int)(mainWidgetBounds.height * scalingFactor));
 				float fAspect = (float) bounds.width / (float) bounds.height;
 				mainWidget.setCurrent();
 				int width = bounds.width;

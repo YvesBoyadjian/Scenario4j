@@ -218,8 +218,9 @@ private SoMouseButtonEvent translateButtonEvent (MouseEvent be, EventType type, 
     default:
       whichButton = SoMouseButtonEvent.Button.ANY;
   }
-  lastMouseX = DPIUtil.autoScaleUp(be.x);
-  lastMouseY = DPIUtil.autoScaleUp(be.y);
+  float scaleFactor = DPIUtil.getScalingFactor(DPIUtil.getDeviceZoom());
+  lastMouseX = (int)(be.x * scaleFactor);
+  lastMouseY = (int)(be.y * scaleFactor);
   fillInEventState (buttonEvent, be, viewportSize);
   
   SoButtonEvent.State whichState = State.UNKNOWN;
