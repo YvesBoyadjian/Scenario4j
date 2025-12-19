@@ -1,7 +1,7 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: vk-bootstrap
-Bundle-SymbolicName: vk-bootstrap
+Bundle-SymbolicName: vk-bootstrap;singleton:=true
 Bundle-Version: 1.0.0.qualifier
 Export-Package: .,
  org.joml,
@@ -9,6 +9,7 @@ Export-Package: .,
  org.lwjgl,
  org.lwjgl.assimp,
  org.lwjgl.glfw,
+ org.lwjgl.openal,
  org.lwjgl.stb,
  org.lwjgl.system,
  org.lwjgl.system.jni,
@@ -18,9 +19,9 @@ Export-Package: .,
  org.lwjgl.system.linux.liburing,
  org.lwjgl.system.macosx,
  org.lwjgl.system.windows
-Bundle-RequiredExecutionEnvironment: JavaSE-17
+Bundle-RequiredExecutionEnvironment: JavaSE-21
 Automatic-Module-Name: vk.bootstrap
-Bundle-ClassPath: lib/joml-1.10.5.jar,
+Bundle-ClassPath: .,
  lib/lwjgl.jar,
  lib/lwjgl-assimp.jar,
  lib/lwjgl-assimp-natives-windows.jar,
@@ -29,4 +30,6 @@ Bundle-ClassPath: lib/joml-1.10.5.jar,
  lib/lwjgl-natives-windows.jar,
  lib/lwjgl-stb.jar,
  lib/lwjgl-stb-natives-windows.jar,
- .
+ lib/joml-1.10.8.jar,
+ lib/lwjgl-openal-3.3.6.jar,
+ lib/lwjgl-openal-3.3.6-natives-windows.jar

@@ -1,3 +1,5 @@
 Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
 Main-Class: application.MainGLFW
+Require-Bundle: vk-bootstrap;visibility:=reexport
 
