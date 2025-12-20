@@ -66,7 +66,8 @@ public class HikingIslandMain {
                 	MainGLFW.fillViewer();
                 	MainGLFW.buildPhysics();
 
-                    Hero.setStartingPosition(2947.3f, -5516.95f, 1056.32f);
+                    //Hero.setStartingPosition(2947.3f, -5516.95f, 1056.32f); // Chalet
+                	Hero.setStartingPosition(1275.31f, -1134.23f, 1143.35f);
 
                     MainGLFW.loadSavedGame();
                     SwingUtilities.invokeLater(() -> {
