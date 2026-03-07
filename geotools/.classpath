@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry exported="true" kind="lib" path="lib/affine-0.9.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/aircompressor-0.27.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/algebra-0.9.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/antlr4-runtime-4.7.1.jar"/>
@@ -263,5 +262,6 @@
 	</classpathentry>
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
 	<classpathentry kind="src" path="src"/>
+	<classpathentry exported="true" kind="lib" path="lib/affine-0.9.1.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
