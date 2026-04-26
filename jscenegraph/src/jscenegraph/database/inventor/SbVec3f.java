@@ -698,4 +698,17 @@ public void setValue(SbVec3f other) {
     public boolean isNull() {
 		return g(0) == 0.0f && g(1) == 0 && g(2) == 0;
     }
+
+    public String toString() {
+    	StringBuilder stringBuilder = new StringBuilder();
+    	stringBuilder.append(getClass().getSimpleName());
+    	stringBuilder.append("(");
+    	stringBuilder.append(getX());
+    	stringBuilder.append(",");
+    	stringBuilder.append(getY());
+    	stringBuilder.append(",");
+    	stringBuilder.append(getZ());
+    	stringBuilder.append(")");
+    	return stringBuilder.toString();
+    }
 }
