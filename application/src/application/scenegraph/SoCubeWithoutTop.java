@@ -56,11 +56,11 @@ import jscenegraph.port.IntPtr;
 public class SoCubeWithoutTop extends SoShape {
 
 	
-	private final SoSubNode nodeHeader = SoSubNode.SO_NODE_HEADER(SoCube.class,this);
+	private final SoSubNode nodeHeader = SoSubNode.SO_NODE_HEADER(SoCubeWithoutTop.class,this);
 	   
 	   public                                                                     
 	    static SoType       getClassTypeId()        /* Returns class type id */   
-	                                    { return SoSubNode.getClassTypeId(SoCube.class);  }                   
+	                                    { return SoSubNode.getClassTypeId(SoCubeWithoutTop.class);  }                   
 	  public  SoType      getTypeId()      /* Returns type id      */
 	  {
 		  return nodeHeader.getClassTypeId();
@@ -70,7 +70,7 @@ public class SoCubeWithoutTop extends SoShape {
 		  return nodeHeader.getFieldData();
 	  }
 	  public  static SoFieldData[] getFieldDataPtr()                              
-	        { return SoSubNode.getFieldDataPtr(SoCube.class); }    	  	
+	        { return SoSubNode.getFieldDataPtr(SoCubeWithoutTop.class); }    	  	
 	
 	
 

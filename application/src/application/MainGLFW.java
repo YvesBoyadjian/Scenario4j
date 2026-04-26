@@ -40,6 +40,7 @@ import com.jogamp.opengl.GL2;
 //import org.eclipse.swt.widgets.Shell;
 
 import application.scenegraph.SceneGraphIndexedFaceSetShader;
+import application.scenegraph.SoCubeWithoutTop;
 import application.scenegraph.Soleil;
 import application.terrain.IslandLoader;
 import application.trails.TrailsLoader;
@@ -387,6 +388,7 @@ public class MainGLFW {
         RasterProvider re = IslandLoader.loadEast();
 
         SoQt.init("demo");
+        SoCubeWithoutTop.initClass();
 
         SoDB.setDelaySensorTimeout(SbTime.zero()); // Necessary to avoid bug in Display
 

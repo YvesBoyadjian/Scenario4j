@@ -706,7 +706,13 @@ public String fieldName(SoEngineOutput output) {
 
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
-		sb.append(getClass().getSimpleName());
+		sb.append(getTypeId().getName().getString());
+		SbName name = getName();
+		if (name != null && name.getString() != null && !name.getString().isBlank()) {
+			sb.append(" (");
+			sb.append(name.getString());
+			sb.append(")");
+		}
 		sb.append("\n");
 		
 	    final SoFieldList fieldList = new SoFieldList();
@@ -716,6 +722,7 @@ public String fieldName(SoEngineOutput output) {
 	    
 	    for (int i=0; i<numFields; i++) {
 	    	SoField field = ((SoField)fieldList.operator_square_bracket(i));
+	    	sb.append("  ");
 	    	sb.append(fd.getFieldName(i).toString());
 	    	sb.append(" ");
 	    	if (field instanceof SoSField) {
@@ -724,9 +731,9 @@ public String fieldName(SoEngineOutput output) {
 		    	sb.append(" ");
 		    	if (sfield instanceof SoSFEnum) {
 		    		SoSFEnum sfEnum = (SoSFEnum) sfield;
-		    		final SbName[] name = new SbName[1]; 
-		    		if (sfEnum.findEnumName(sfEnum.getValue(), name)) {
-		    			sb.append(name[0].getString());
+		    		final SbName[] enumName = new SbName[1]; 
+		    		if (sfEnum.findEnumName(sfEnum.getValue(), enumName)) {
+		    			sb.append(enumName[0].getString());
 		    		}
 		    	}
 	    	}

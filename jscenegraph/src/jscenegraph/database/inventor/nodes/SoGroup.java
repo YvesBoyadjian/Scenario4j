@@ -57,6 +57,7 @@ package jscenegraph.database.inventor.nodes;
 import jscenegraph.coin3d.glue.Gl;
 import jscenegraph.coin3d.inventor.annex.profiler.SoProfiler;
 import jscenegraph.coin3d.misc.SoGL;
+import jscenegraph.database.inventor.SbName;
 import jscenegraph.database.inventor.SbVec3f;
 import jscenegraph.database.inventor.SoInput;
 import jscenegraph.database.inventor.SoType;
@@ -830,4 +831,28 @@ SoGroup_getPrimitiveCount(SoGetPrimitiveCountAction action)
 	        }
 	    }
 	    
+
+		public String toString() {
+			StringBuilder sb = new StringBuilder();
+			sb.append(super.toString());
+			int numChild = children.getLength();
+			for (int i=0; i<numChild; i++) {
+				SoNode child = children.get(i);
+		    	sb.append("  ");
+		    	if (child != null) {
+			    	sb.append(child.getTypeId().getName().toString());
+					SbName name = child.getName();
+					if (name != null && name.getString() != null && !name.getString().isBlank()) {
+						sb.append(" (");
+						sb.append(name.getString());
+						sb.append(")");
+					}
+		    	}
+		    	else {
+		    		sb.append("(null)");
+		    	}
+		    	sb.append("\n");
+			}
+			return sb.toString();
+		}
 	   }
