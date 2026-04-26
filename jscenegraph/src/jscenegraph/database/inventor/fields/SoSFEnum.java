@@ -241,7 +241,7 @@ findEnumValue(final SbName name, final int[] val)
 //
 // Use: protected
 
-protected boolean
+public boolean
 findEnumName(int val, final SbName[] name) 
 //
 ////////////////////////////////////////////////////////////////////////

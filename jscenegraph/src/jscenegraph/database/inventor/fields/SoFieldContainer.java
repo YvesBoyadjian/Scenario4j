@@ -722,6 +722,13 @@ public String fieldName(SoEngineOutput output) {
 	    		SoSField sfield = (SoSField) field;
 	    		sb.append(sfield.getValue());
 		    	sb.append(" ");
+		    	if (sfield instanceof SoSFEnum) {
+		    		SoSFEnum sfEnum = (SoSFEnum) sfield;
+		    		final SbName[] name = new SbName[1]; 
+		    		if (sfEnum.findEnumName(sfEnum.getValue(), name)) {
+		    			sb.append(name[0].getString());
+		    		}
+		    	}
 	    	}
 	    	else if (field instanceof SoMField) {
 	    		SoMField mfield = (SoMField) field;
