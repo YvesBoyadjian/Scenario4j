@@ -664,8 +664,12 @@ public class MainGLFW {
             protected void onAim(SoMouseButtonEvent event, boolean aim) {
                 sg.aim(aim);
             }
+            
+            protected void onWheel(short rotation) {
+            	shiftStartDate((double)rotation*5);
+            }
 
-            public void initializeGL(GL2 gl2) {
+			public void initializeGL(GL2 gl2) {
                 super.initializeGL(gl2);
 
                 if (DEBUG_MODE) {

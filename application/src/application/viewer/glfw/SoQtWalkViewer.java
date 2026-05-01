@@ -784,6 +784,11 @@ protected void onAim(SoMouseButtonEvent event, boolean aim) {
 			return nanoTime / 1e9 + getStartDate();
 		}
 	}
+
+
+    protected void shiftStartDate(double shift) {
+		this.startDate += shift;
+	}
 	
 	public void toggleFly() {
 		fly = !fly;
