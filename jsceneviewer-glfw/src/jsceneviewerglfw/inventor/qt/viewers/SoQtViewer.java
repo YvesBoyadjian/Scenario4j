@@ -789,7 +789,8 @@ protected void processEvent (TypedEvent anyEvent, EventType type, final boolean[
     } else if (type == EventType.MOUSE_EVENT_MOUSE_DOWN ||
                type == EventType.MOUSE_EVENT_MOUSE_UP ||
                type == EventType.MOUSE_EVENT_DOUBLE_CLICK ||
-               type == EventType.MOUSE_EVENT_MOUSE_MOVE)
+               type == EventType.MOUSE_EVENT_MOUSE_MOVE ||
+               type == EventType.MOUSE_EVENT_MOUSE_SCROLLED)
     {
         isMouseEvent = true;
     }

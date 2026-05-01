@@ -53,6 +53,7 @@ import jscenegraph.database.inventor.events.SoMouseButtonEvent;
 import jscenegraph.database.inventor.nodes.SoCamera;
 import jscenegraph.database.inventor.sensors.SoIdleSensor;
 import jscenegraph.database.inventor.sensors.SoSensor;
+import jscenegraph.mevis.inventor.events.SoMouseWheelEvent;
 import jsceneviewerglfw.Composite;
 import jsceneviewerglfw.Display;
 import jsceneviewerglfw.MouseEvent;
@@ -429,6 +430,19 @@ protected void onAim(SoMouseButtonEvent event, boolean aim) {
 		// do nothing by default
 	}
 
+	protected boolean processSoMouseWheelEvent(SoMouseWheelEvent event) {
+		short rotation = event.getWheelRotation();
+		if (rotation != 0) {
+			onWheel(rotation);
+			return true;
+		}
+		return false;
+	}
+	
+	protected void onWheel(short rotation) {
+		// do nothing by default
+	}
+
 	public void updateLocation(SbVec3f diff_position, ForceProvider.Direction direction) {
 		
 		double currentTimeSec = System.nanoTime()/1.0e9;
@@ -499,6 +513,10 @@ protected void onAim(SoMouseButtonEvent event, boolean aim) {
 	  {
 		    result = processSoMouseButtonEvent((SoMouseButtonEvent)
 		  	      (event));		  
+	  }
+	  else if (event.isOfType(SoMouseWheelEvent.getClassTypeId())) {
+		  result = processSoMouseWheelEvent((SoMouseWheelEvent)				  
+				  (event));
 	  }
 	  
 	  if (!result)

@@ -49,6 +49,8 @@ public class Composite {
 	
 	private final List<MouseListener> mouseListeners = new ArrayList<>();
 	
+	private final List<MouseWheelListener> mouseWheelListeners = new ArrayList<>(); 
+	
 	private boolean redrawAsked;
 	
 	private int last_resize_cb_width = -1;
@@ -165,7 +167,7 @@ public class Composite {
 	}
 	
 	public void addMouseWheelListener (MouseWheelListener listener) {
-		//TODO
+		mouseWheelListeners.add(listener);
 	}
 	
 	public Rectangle getBounds (){		
@@ -243,6 +245,15 @@ public class Composite {
 		}
 		else {
 			mouseTrackListeners.forEach((mtl)->mtl.mouseExit(e));
+		}
+	}
+	
+	public void mouseScrolledCB(double xoffset, double yoffset) {
+		MouseEvent e = new MouseEvent(xoffset, yoffset);
+		
+		mouseWheelListeners.forEach((mtl)->mtl.mouseScrolled(e));
+		if (parent != null) {
+			parent.mouseScrolledCB(xoffset, yoffset);
 		}
 	}
 	

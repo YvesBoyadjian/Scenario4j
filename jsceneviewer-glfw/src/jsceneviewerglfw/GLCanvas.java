@@ -211,6 +211,15 @@ public class GLCanvas extends Composite {
 				}
 
 			});
+			
+			glfwSetScrollCallback(window, new GLFWScrollCallbackI() {
+
+				@Override
+				public void invoke(long window, double xoffset, double yoffset) {
+					mouseScrolledCB(xoffset, yoffset);					
+				}
+				
+			});
 
 			glfwSetCursorEnterCallback(window, new GLFWCursorEnterCallbackI() {
 

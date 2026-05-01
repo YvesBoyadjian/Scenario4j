@@ -50,6 +50,7 @@ import jscenegraph.database.inventor.events.SoKeyboardEvent;
 import jscenegraph.database.inventor.events.SoLocation2Event;
 import jscenegraph.database.inventor.events.SoMouseButtonEvent;
 import jscenegraph.mevis.inventor.events.SoLocation2RefreshEvent;
+import jscenegraph.mevis.inventor.events.SoMouseWheelEvent;
 import jsceneviewerglfw.Event;
 import jsceneviewerglfw.KeyEvent;
 import jsceneviewerglfw.MouseEvent;
@@ -58,6 +59,8 @@ import jsceneviewerglfw.TypedEvent;
 import jsceneviewerglfw.inventor.qt.SoQtGLWidget.EventType;
 
 import static org.lwjgl.glfw.GLFW.*;
+
+import java.awt.Point;
 
 /**
  * @author Yves Boyadjian
@@ -92,6 +95,7 @@ public class SoQtStandardEventTranslator {
 	  private final SoLocation2Event   loc2Event = new SoLocation2Event();
 	  private final SoKeyboardEvent    keyEvent = new SoKeyboardEvent();
 	  private final SoLocation2RefreshEvent loc2RefreshEvent = new SoLocation2RefreshEvent();
+	  private final SoMouseWheelEvent  mouseWheelEvent = new SoMouseWheelEvent();
 	  //@}
 	  
 	  public static class LocationRefreshMouseEvent extends MouseEvent {
@@ -156,7 +160,12 @@ public class SoQtStandardEventTranslator {
   }
   else if( anyEvent instanceof MouseEvent) {
       //case QEvent::MouseMove:
+	  if (type == EventType.MOUSE_EVENT_MOUSE_MOVE) {
         event = translateMotionEvent(mouseEvent, viewportSize);
+	  }
+	  else if (type == EventType.MOUSE_EVENT_MOUSE_SCROLLED) {
+		  event = translateWheelEvent(mouseEvent, viewportSize);
+	  }
   }
   else if ( anyEvent instanceof KeyEvent) {
 	  //SoButtonEvent.State whichState = State.UNKNOWN;
@@ -248,7 +257,47 @@ private SoLocation2Event translateMotionEvent (MouseEvent me, final SbVec2s view
   return loc2Event;
 }
 
+static boolean environmentRead = false;
+static boolean roundUpWheelDelta = false;
 
+private SoMouseWheelEvent translateWheelEvent(MouseEvent wevent, final SbVec2s viewportSize)
+{
+  if (!environmentRead) {
+    environmentRead = true;
+    roundUpWheelDelta = System.getenv("MLAB_SOQT_ROUNDUP_WHEEL_DELTA") != null;
+  }
+//  lastMouseX = wevent->position().toPoint().x();
+//  lastMouseY = wevent->position().toPoint().y();
+  // Qt 5.12.3 has a bug that returns a wrong buttons state in wheel events on Windows if the
+  // user previously clicked on the window title bar - as a workaround we ignore this and simply
+  // rely on the state provided by previous QMouseEvents:
+  // lastMouseButtons = wevent->buttons();
+
+  int delta = 0;
+  SoMouseWheelEvent.Orientation orientation = SoMouseWheelEvent.Orientation.HORIZONTAL;
+  Point angleDelta = new Point(wevent.x, wevent.y);
+  if (angleDelta.y != 0) {
+    delta = angleDelta.y;
+    orientation = SoMouseWheelEvent.Orientation.VERTICAL;
+  }
+  else {
+    delta = angleDelta.x;
+    orientation = SoMouseWheelEvent.Orientation.HORIZONTAL;
+  }
+  if (roundUpWheelDelta && Math.abs(delta) < 120) {
+    // apply fix for TouchStrip of WACOM monitor;
+    // NOTE: this would collide with the Apple Magic/Mighty Mouse handling
+    delta = (delta < 0) ? -120 : 120;
+  }
+  mouseWheelEvent.setWheelRotation((short)delta);
+  mouseWheelEvent.setWheelOrientation(orientation);
+
+  fillInEventState(mouseWheelEvent, wevent, viewportSize);
+
+//  wevent.accept();
+
+  return mouseWheelEvent;
+}
 
 private SoLocation2Event translateLocationRefreshEvent (MouseEvent me, final SbVec2s viewportSize)
 {
