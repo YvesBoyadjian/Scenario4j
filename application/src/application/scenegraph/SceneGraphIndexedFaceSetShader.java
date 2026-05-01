@@ -944,6 +944,7 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 	    //landSep.renderCulling.setValue(SoSeparator.CacheEnabled.ON);
 	    
 	    SoShapeHints shapeHints = new SoShapeHints();
+	    shapeHints.setName("landSep");
 	    		
 	    shapeHints.shapeType.setValue(SoShapeHints.ShapeType.SOLID);
 	    shapeHints.vertexOrdering.setValue(SoShapeHints.VertexOrdering.CLOCKWISE);
@@ -1043,6 +1044,8 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 	    douglasSep.renderCaching.setValue(SoSeparator.CacheEnabled.OFF);
 	    
 	    shapeHints = new SoShapeHints();
+	    shapeHints.setName("douglasSep");	    
+	    
 	    shapeHints.shapeType.setValue(SoShapeHints.ShapeType.SOLID);
 	    shapeHints.vertexOrdering.setValue(SoShapeHints.VertexOrdering.COUNTERCLOCKWISE);
 	    douglasSep.addChild(shapeHints);
@@ -1497,7 +1500,10 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 	    SoSeparator shadowLandSep = new SoSeparator();
 	    
 	    shapeHints = new SoShapeHints();
-	    shapeHints.shapeType.setValue(SoShapeHints.ShapeType.SOLID);
+	    shapeHints.setName("shadowLandSep");
+
+	    // Disable backface culling
+	    shapeHints.shapeType.setValue(SoShapeHints.ShapeType./*SOLID*/UNKNOWN_SHAPE_TYPE);
 	    shapeHints.vertexOrdering.setValue(SoShapeHints.VertexOrdering.CLOCKWISE);
 	    shadowLandSep.addChild(shapeHints);
 	    
@@ -1527,6 +1533,8 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 	    douglasSepS.renderCaching.setValue(SoSeparator.CacheEnabled.OFF);
 	    
 	    shapeHints = new SoShapeHints();
+	    shapeHints.setName("douglasSepS");
+
 	    shapeHints.shapeType.setValue(SoShapeHints.ShapeType.SOLID);
 	    shapeHints.vertexOrdering.setValue(SoShapeHints.VertexOrdering.COUNTERCLOCKWISE);
 	    douglasSepS.addChild(shapeHints);

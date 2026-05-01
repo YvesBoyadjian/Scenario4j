@@ -121,8 +121,12 @@ public static void main(String[] args) {
     SoText3 text = new SoText3();
     text.string.setValue("Drag an drop your iv/wrl/zip file here");
 
-    cache.addChild(text);
-    //cache.addChild(new SoCube());
+    //cache.addChild(text);
+    cache.addChild(new SoCube());
+    SoTranslation transl = new SoTranslation();
+    transl.translation.setValue(2,2,2);
+    cache.addChild(transl);
+    cache.addChild(new SoCube());
 
     SwingUtilities.invokeLater(() -> {
         SoQtExaminerViewer examinerViewer = new SoQtExaminerViewer(

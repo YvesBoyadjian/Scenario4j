@@ -53,7 +53,7 @@ public class TerrainLoader {
             }
         }
         try {
-			GeoTiffReader reader = new GeoTiffReader(new FileInputStream(tiffFile));
+			GeoTiffReader reader = new GeoTiffReader(new FileInputStream(tiffFile.getCanonicalFile()));
 			GridCoverage2D grid = reader.read(null);
 			RenderedImage ri = grid.getRenderedImage();
 			Raster r = ri.getData();
