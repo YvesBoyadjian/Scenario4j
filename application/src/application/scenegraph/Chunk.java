@@ -33,7 +33,7 @@ import jscenegraph.port.memorybuffer.FloatMemoryBuffer;
  */
 public class Chunk {
 	
-	public static final int CHUNK_WIDTH = 512; ///*2 * 3 **/4 * 4 * 3 * 3 * 3 * 3 + 1; //325
+	public static final int CHUNK_WIDTH = /*2 * 3 **/4 * 4 * 3 * 3 * 3 * 3 + 1; //325
 	
 	public static final int NB_LOD = 5;
 	
