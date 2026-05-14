@@ -312,7 +312,7 @@ public class RecursiveChunk {
 						ca.verticesGet(indice0, xyz);
 						
 						if ( i == -1 || j == -1 || i == decimatedChunkWidth || j == decimatedChunkHeight) {
-							xyz[2] = zMin - 20;
+							xyz[2] = zMin - 999;
 						}
 						
 						fb.put(xyz);						

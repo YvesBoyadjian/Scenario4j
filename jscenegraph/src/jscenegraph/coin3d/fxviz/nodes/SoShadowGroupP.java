@@ -1035,10 +1035,17 @@ setFragmentShader(SoState state)
 		str = "if("+nearinsidetest2+"){\n";
 		gen.addMainStatement(str);
 		str = "shadeFactor = ((nearmap < 0.9999) && (nearShadowCoord"+i+".z > -1.0 && "+nearinsidetest+")) "+
-				"? VsmLookup(nearmap, (neardist - nearvalnear"+i+") / (farvalnear"+i+" - nearvalnear"+i+"), EPSILON, THRESHOLD) : 1.0;\n}else{\n";
+				"? VsmLookup(nearmap, (neardist - nearvalnear"+i+") / (farvalnear"+i+" - nearvalnear"+i+"), EPSILON, THRESHOLD) : 1.0;\n";
+		gen.addMainStatement(str);
+		
+		str = "if("+ "(map < 0.9999) && (shadowCoord"+i+".z > -1.0 && " + insidetest+") && map + 0.05 < (dist - nearval"+i+") / (farval"+i+" - nearval"+i+") ){\n";
+		gen.addMainStatement(str);
+		
+		str ="shadeFactor = 0;\n}\n";
 		gen.addMainStatement(str);
 
-
+		str = "}else{\n";
+		gen.addMainStatement(str);
 
       str = "shadeFactor = ((map < 0.9999) && (shadowCoord"+i+".z > -1.0 && "+insidetest+")) "+
                   "? VsmLookup(map, (dist - nearval"+i+") / (farval"+i+" - nearval"+i+"), EPSILON, THRESHOLD) : 1.0;\n}\n";
