@@ -35,15 +35,15 @@ public class OptionDialog extends JDialog {
     SceneGraphIndexedFaceSetShader sg;
 
     /**
-     * low by default
+     * Medium by default
      */
-    public static final double DEFAULT_SHADOW_PRECISION = 0.05;//0.075;
-    public static final double DEFAULT_LOD_FACTOR = 0.5;
-    public static final double DEFAULT_LOD_FACTOR_SHADOW = 0.5;
-    public static final double DEFAULT_TREE_DISTANCE = 2500;//3000;
-    public static final double DEFAULT_TREE_SHADOW_DISTANCE = 500;//1500;
+    public static final double DEFAULT_SHADOW_PRECISION = 0.075;
+    public static final double DEFAULT_LOD_FACTOR = 1.0;
+    public static final double DEFAULT_LOD_FACTOR_SHADOW = 1.0;
+    public static final double DEFAULT_TREE_DISTANCE = 6000;
+    public static final double DEFAULT_TREE_SHADOW_DISTANCE = 1500;
     public static final int DEFAULT_ISLAND_DEPTH = 5612;
-    public static final boolean DEFAULT_VOLUMETRIC_SKY = false;
+    public static final boolean DEFAULT_VOLUMETRIC_SKY = true;
     public static final double DEFAULT_OVERALL_CONTRAST = 4;//1.6;
 
     public OptionDialog(SoQtWalkViewer viewer, SceneGraphIndexedFaceSetShader sg) {
@@ -176,7 +176,7 @@ public class OptionDialog extends JDialog {
         setTreeDistance(6000/*DEFAULT_TREE_DISTANCE*/);
         setTreeShadowDistance(1500/*DEFAULT_TREE_SHADOW_DISTANCE*/);
         setIslandDepth(5612/*DEFAULT_ISLAND_DEPTH*/);
-        setVolumetricSky(false/*DEFAULT_VOLUMETRIC_SKY*/);
+        setVolumetricSky(true/*DEFAULT_VOLUMETRIC_SKY*/);
     }
 
     private void onHigh() {
