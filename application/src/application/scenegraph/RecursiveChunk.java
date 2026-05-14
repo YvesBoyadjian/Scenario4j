@@ -76,7 +76,10 @@ public class RecursiveChunk {
 		this.ni = ni;
 		this.nj = nj;
 		
-		if (ni > MIN_CHUNK_SIZE && nj > MIN_CHUNK_SIZE) {
+		ca.setSmallestNi(ni);
+		ca.setSmallestNj(nj);
+		
+		if (ni > MIN_CHUNK_SIZE || nj > MIN_CHUNK_SIZE) {
 			int mi = ni/2;
 			int mj = nj/2;
 			RecursiveChunk c1 = new RecursiveChunk(ca,this,1,i0,j0,mi+1,mj+1);
@@ -114,11 +117,11 @@ public class RecursiveChunk {
 	}
 	
 	public int getDecimatedChunkWidth() {
-		return childs.isEmpty() ? ni : Math.min(ni, MIN_CHUNK_SIZE);
+		return childs.isEmpty() ? ni : Math.min(ni, ca.getSmallestNi());
 	}
 
 	public int getDecimatedChunkHeight() {
-		return childs.isEmpty() ? nj : Math.min(nj, MIN_CHUNK_SIZE);
+		return childs.isEmpty() ? nj : Math.min(nj, ca.getSmallestNj());
 	}
 	
 	public float getDeltaX() {
@@ -255,6 +258,38 @@ public class RecursiveChunk {
 	}
 	
 	int decimatedVerticesCount;
+	
+	void computeSceneBox() {
+			int decimatedChunkWidth = ni;
+			int decimatedChunkHeight = nj;
+			
+			float[] xyz = new float[3];
+			
+			x_min = Float.MAX_VALUE;
+			x_max = - Float.MAX_VALUE;
+			y_min = Float.MAX_VALUE;
+			y_max = - Float.MAX_VALUE;
+			
+			SbVec3f dummy = new SbVec3fSingleFast();
+			
+			for(int i =0 ; i< decimatedChunkWidth; i++) {
+				for(int j =0 ; j<decimatedChunkHeight ; j++) {
+					int i00 = i + i0;
+					int j00 = j + j0;
+					int indice0 = i00*ca.getH()+j00;
+					ca.verticesGet(indice0, xyz);
+					
+					x_min = Math.min(xyz[0],x_min);
+					x_max = Math.max(xyz[0],x_max);
+					y_min = Math.min(xyz[1],y_min);
+					y_max = Math.max(xyz[1],y_max);
+					
+					dummy.setValue(xyz[0],xyz[1],xyz[2]);					
+					sceneBox.extendBy(dummy);
+				}
+			}
+			sceneCenter.setValue(sceneBox.getCenter());
+	}
 
 	FloatMemoryBuffer getDecimatedVertices() {
 		if( decimatedVertices == null) {
@@ -265,38 +300,17 @@ public class RecursiveChunk {
 				decimatedVertices = FloatMemoryBuffer.allocateFloatsMalloc(nbVertices*3);
 				FloatBuffer fb = decimatedVertices.toByteBuffer().asFloatBuffer();
 				
-				float[] xyz = new float[3];
-				
-				x_min = Float.MAX_VALUE;
-				x_max = - Float.MAX_VALUE;
-				y_min = Float.MAX_VALUE;
-				y_max = - Float.MAX_VALUE;
-				
-				SbVec3f dummy = new SbVec3fSingleFast();
+				final float[] xyz = new float[3];				
 				
 				for(int i =0 ; i< decimatedChunkWidth; i++) {
 					for(int j =0 ; j<decimatedChunkHeight ; j++) {
 						int i0 = fromSonToSourceI(i);
 						int j0 = fromSonToSourceJ(j);//chunkWidth -1 - ((decimatedChunkWidth -1 -j) << l);
 						int indice0 = i0*ca.getH()+j0;
-						int indice = i*decimatedChunkHeight+j;
 						ca.verticesGet(indice0, xyz);
-						//decimatedVertices.setFloat(indice*3, xyz[0]);
-						//decimatedVertices.setFloat(indice*3+1, xyz[1]);
-						//decimatedVertices.setFloat(indice*3+2, xyz[2]);
-						fb.put(xyz);
-						
-						x_min = Math.min(xyz[0],x_min);
-						x_max = Math.max(xyz[0],x_max);
-						y_min = Math.min(xyz[1],y_min);
-						y_max = Math.max(xyz[1],y_max);
-						
-						dummy.setValue(xyz[0],xyz[1],xyz[2]);
-						
-						sceneBox.extendBy(dummy);
+						fb.put(xyz);						
 					}
 				}
-				sceneCenter.setValue(sceneBox.getCenter());
 				//saveDecimatedVertices(); // load does not accelerate loading
 				
 				//System.out.println("loadRC");
@@ -677,8 +691,8 @@ public class RecursiveChunk {
 			
 			float[] xyz = new float[3];
 			
-			for(int i=i0;i<i0+ni;i+=(ni-1)) {
-				for(int j=j0;j<j0+nj;j+=(nj-1)) {
+			for(int i=i0;i<i0+ni;i++) {
+				for(int j=j0;j<j0+nj;j++) {
 					int index = i*ca.getH()+j;
 					ca.verticesGet(index,xyz);
 					xc += xyz[0];
@@ -710,16 +724,14 @@ public class RecursiveChunk {
 //	}
 
 	public void prepare(Lock lock,final JProgressBar progressBar) {
-		getDecimatedVertices();
 		
+		computeSceneBox();
+				
 		if(KEEP_IN_MEMORY) {		
+			getDecimatedVertices();
 			getDecimatedNormalsShort();//getDecimatedNormalsBuffer();
 			getDecimatedTexCoords();//getDecimatedTexCoordsBuffer();
 			getDecimatedCoordIndices();
-		}
-		else {
-			decimatedVertices.free();
-			decimatedVertices = null;//getDecimatedVerticesBuffer();
 		}
 		getCenter();
 

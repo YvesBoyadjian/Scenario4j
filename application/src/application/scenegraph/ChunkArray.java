@@ -58,6 +58,10 @@ public class ChunkArray {
 	private int nbChunkWidth;
 	private int nbChunkHeight;
 	
+	private int smallestNi = Integer.MAX_VALUE;
+
+	private int smallestNj = Integer.MAX_VALUE;
+	
 	public ChunkArray(int w, int h, int full_island_w) {
 		
 		this.w = w;
@@ -718,5 +722,21 @@ public class ChunkArray {
 		computeBBoxFullIsland();
 
 		return sceneBoxFullIsland;
+	}
+	
+	public int getSmallestNi() {
+		return smallestNi;
+	}
+
+	public void setSmallestNi(int smallestNi) {
+		this.smallestNi = Math.min(smallestNi, this.smallestNi);
+	}
+
+	public int getSmallestNj() {
+		return smallestNj;
+	}
+
+	public void setSmallestNj(int smallestNj) {
+		this.smallestNj = Math.min(smallestNj, this.smallestNj);
 	}
 }

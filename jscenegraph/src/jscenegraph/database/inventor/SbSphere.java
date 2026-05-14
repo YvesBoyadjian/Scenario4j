@@ -96,7 +96,7 @@ SbVec3f, SbLine, SoSphere
  */
 public class SbSphere implements Mutable {
 
-	private final SbVec3f     center = new SbVec3f();
+	private final SbVec3f     center = new SbVec3fSingleFast();
 	private float       radius;
     private float       radiusSquare;
 
