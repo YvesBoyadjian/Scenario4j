@@ -296,18 +296,25 @@ public class RecursiveChunk {
 			if( true /*|| (decimatedVertices = loadDecimatedVertices()) == null*/) { // load does not accelerate loading
 				int decimatedChunkWidth = getDecimatedChunkWidth();
 				int decimatedChunkHeight = getDecimatedChunkHeight();
-				int nbVertices = decimatedChunkWidth * decimatedChunkHeight;
+				int nbVertices = (decimatedChunkWidth+2) * (decimatedChunkHeight+2);
 				decimatedVertices = FloatMemoryBuffer.allocateFloatsMalloc(nbVertices*3);
 				FloatBuffer fb = decimatedVertices.toByteBuffer().asFloatBuffer();
 				
-				final float[] xyz = new float[3];				
+				final float[] xyz = new float[3];	
 				
-				for(int i =0 ; i< decimatedChunkWidth; i++) {
-					for(int j =0 ; j<decimatedChunkHeight ; j++) {
-						int i0 = fromSonToSourceI(i);
-						int j0 = fromSonToSourceJ(j);//chunkWidth -1 - ((decimatedChunkWidth -1 -j) << l);
+				float zMin = sceneBox.getMin().getZ();
+				
+				for(int i = -1; i<= decimatedChunkWidth; i++) {
+					for(int j = -1 ; j<=decimatedChunkHeight ; j++) {
+						int i0 = fromSonToSourceI(Math.max(Math.min(i,decimatedChunkWidth-1),0));
+						int j0 = fromSonToSourceJ(Math.max(Math.min(j,decimatedChunkHeight-1),0));
 						int indice0 = i0*ca.getH()+j0;
 						ca.verticesGet(indice0, xyz);
+						
+						if ( i == -1 || j == -1 || i == decimatedChunkWidth || j == decimatedChunkHeight) {
+							xyz[2] = zMin - 20;
+						}
+						
 						fb.put(xyz);						
 					}
 				}
@@ -516,7 +523,7 @@ public class RecursiveChunk {
 				int sourceChunkHeight = nj;
 				int decimatedChunkWidth = getDecimatedChunkWidth();
 				int decimatedChunkHeight = getDecimatedChunkHeight();
-				int nbVertices = decimatedChunkWidth *decimatedChunkHeight;
+				int nbVertices = (decimatedChunkWidth+2) * (decimatedChunkHeight+2);
 
 				ShortMemoryBuffer decimatedNormals = ShortMemoryBuffer.allocateShortsMalloc(nbVertices*3);
 
@@ -529,10 +536,10 @@ public class RecursiveChunk {
 				int indice = 0;
 
 				float normalX, normalY, normalZ;
-				for(int i =0 ; i< decimatedChunkWidth; i++) {
-					for(int j =0 ; j< decimatedChunkHeight; j++) {
-						int i0 = fromSonToSourceI(i);
-						int j0 = fromSonToSourceJ(j);
+				for(int i = -1 ; i <= decimatedChunkWidth; i++) {
+					for(int j = -1 ; j <= decimatedChunkHeight; j++) {
+						int i0 = fromSonToSourceI(Math.max(Math.min(i,decimatedChunkWidth-1),0));
+						int j0 = fromSonToSourceJ(Math.max(Math.min(j,decimatedChunkHeight-1),0));
 						int nbc = 0;
 						normalX = 0; normalY = 0; normalZ = 0;
 						for(int di = -delta; di<=delta; di++) {
@@ -639,15 +646,16 @@ public class RecursiveChunk {
 		if(decimatedCoordIndices == null) {
 			int decimatedChunkWidth = getDecimatedChunkWidth();
 			int decimatedChunkHeight = getDecimatedChunkHeight();
-			int nbCoordIndices = (decimatedChunkWidth-1)*(decimatedChunkHeight-1)*5;
+			int nbCoordIndices = (decimatedChunkWidth-1 + 2)*(decimatedChunkHeight-1 + 2)*5;
 			int[] decimatedCoordIndices = new int[nbCoordIndices];
 			int indice=0;
-			for(int i=1;i<decimatedChunkWidth;i++) {
-			for(int j=1; j<decimatedChunkHeight;j++) {
-				decimatedCoordIndices[indice++] = (i-1)*decimatedChunkHeight+(j-1); //1
-				decimatedCoordIndices[indice++] = (i)*decimatedChunkHeight+(j-1); //2
-				decimatedCoordIndices[indice++] = (i)*decimatedChunkHeight+(j); //3
-				decimatedCoordIndices[indice++] = (i-1)*decimatedChunkHeight+(j); //4
+			for(int i=1 ;i<decimatedChunkWidth+2;i++) {
+			for(int j=1 ; j<decimatedChunkHeight+2;j++) {
+				
+				decimatedCoordIndices[indice++] = (i-1)*(decimatedChunkHeight+2)+(j-1); //1
+				decimatedCoordIndices[indice++] = (i)*(decimatedChunkHeight+2)+(j-1); //2
+				decimatedCoordIndices[indice++] = (i)*(decimatedChunkHeight+2)+(j); //3
+				decimatedCoordIndices[indice++] = (i-1)*(decimatedChunkHeight+2)+(j); //4
 				decimatedCoordIndices[indice++] = -1; 
 			}
 			}
