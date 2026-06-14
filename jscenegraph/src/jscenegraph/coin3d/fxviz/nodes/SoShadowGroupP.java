@@ -1616,21 +1616,26 @@ updateDirectionalCamera(SoState state, SoShadowLightCache cache, final SbMatrix 
     	}
     	return;
   	}
-	if (!nearVisible) {
-		if (cache.neardepthmap.scene.getValue() == cache.neardepthmapscene) {
-			cache.neardepthmap.scene.setValue( new SoInfo());
-		}
-		return;
-	}
+//	if (!nearVisible) {
+//		if (cache.neardepthmap.scene.getValue() == cache.neardepthmapscene) {
+//			cache.neardepthmap.scene.setValue( new SoInfo());
+//		}
+//		return; //do not return : Just don't compute near
+//	}
 	  if (farVisible && cache.depthmap.scene.getValue() != cache.depthmapscene) {
     	cache.depthmap.scene.setValue(cache.depthmapscene);
   	}
 	if (nearVisible && cache.neardepthmap.scene.getValue() != cache.neardepthmapscene) {
 		cache.neardepthmap.scene.setValue(cache.neardepthmapscene);
 	}
+	
+	float distanceToBBoxCenter = light.distanceToBBoxCenter.getValue();
+	
   cam.viewBoundingBox(isect, 1.0f, 1.0f);
-	nearCam.viewBoundingBox(nearIsect,1.0f,1.0f);
-
+  
+  if (nearVisible) {
+	nearCam.viewBoundingBox(nearIsect,1.0f,1.0f, distanceToBBoxCenter);
+  }
   SbBox3f box = cache.toCameraSpace(worldbox, mat);
 	SbBox3f nearBox = cache.toNearCameraSpace(nearWorldbox, mat);
 
@@ -1639,9 +1644,10 @@ updateDirectionalCamera(SoState state, SoShadowLightCache cache, final SbMatrix 
   // from origo. Add a little slack (multiply by 1.01)
   cam.nearDistance.setValue( -box.getMax().getValueRead()[2]*1.01f);
   cam.farDistance.setValue( -box.getMin().getValueRead()[2]*1.01f);
+  if (nearVisible) {
 	nearCam.nearDistance.setValue( -nearBox.getMax().getValueRead()[2]*1.01f);
 	nearCam.farDistance.setValue( -nearBox.getMin().getValueRead()[2]*1.01f);
-
+  }
   final SbPlane plane = new SbPlane(dir, cam.position.getValue());
   // move to eye space
   plane.transform(SoViewingMatrixElement.get(state));
@@ -1668,8 +1674,10 @@ updateDirectionalCamera(SoState state, SoShadowLightCache cache, final SbMatrix 
 //#endif
 
   cache.fragment_lightplane.value.setValue(N.getValue()[0], N.getValue()[1], N.getValue()[2], D);
+  
+  if (nearVisible) {
 	cache.fragment_lightnearplane.value.setValue(nearN.getValue()[0], nearN.getValue()[1], nearN.getValue()[2], nearD);
-
+  }
   //SoShadowGroup::VisibilityFlag visflag = (SoShadowGroup::VisibilityFlag) this.master.visibilityFlag.getValue();
 
   float visnear = cam.nearDistance.getValue();
@@ -1691,12 +1699,15 @@ updateDirectionalCamera(SoState state, SoShadowLightCache cache, final SbMatrix 
     cam.farDistance.setValue(cache.farval);
   }
 
+  if (nearVisible) {
+  
 	if (cache.nearvalnear != nearCam.nearDistance.getValue()) {
 		nearCam.nearDistance.setValue(cache.nearvalnear);
 	}
 	if (cache.farvalnear != nearCam.farDistance.getValue()) {
 		nearCam.farDistance.setValue(cache.farvalnear);
 	}
+  }
 
   float realfarval = cache.farval * 1.1f;
 	float realfarvalnear = cache.farvalnear * 1.1f;
@@ -1707,23 +1718,26 @@ updateDirectionalCamera(SoState state, SoShadowLightCache cache, final SbMatrix 
   cache.fragment_nearval.value.setValue(cache.nearval);
   cache.vsm_nearval.value.setValue(cache.nearval);
 
+  if (nearVisible) {
 	cache.fragment_farvalnear.value.setValue(realfarvalnear);
 	cache.vsm_farvalnear.value.setValue(realfarvalnear);
 
 	cache.fragment_nearvalnear.value.setValue(cache.nearvalnear);
 	cache.vsm_nearvalnear.value.setValue(cache.nearvalnear);
-
+  }
 	cache.vsm_nearflag.value.setValue(0.0f);
-
+  
   vv.copyFrom(/*new SbViewVolume(*/cam.getViewVolume(1.0f)/*)*/);
   final SbMatrix affine = new SbMatrix(), proj = new SbMatrix();
   vv.getMatrices(affine, proj);
   cache.matrix.copyFrom( affine.operator_mul(proj));
 
+  if (nearVisible) {
 	nearvv.copyFrom(/*new SbViewVolume(*/nearCam.getViewVolume(1.0f)/*)*/);
 	final SbMatrix naffine = new SbMatrix(), nproj = new SbMatrix();
 	nearvv.getMatrices(naffine, nproj);
 	cache.nearmatrix.copyFrom( naffine.operator_mul(nproj));
+  }
 }
 
 public void

@@ -203,4 +203,12 @@ public abstract class SoSField<T extends Object> extends SoField {
     //! Reads value of field
     public abstract boolean        readValue(SoInput in);
 
+
+	public String toString() {
+		String str =  getClass().getSimpleName();
+		if (value != null) {
+			str = str + " " + value.toString();
+		}
+		return str;
+	}
 }

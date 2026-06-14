@@ -872,6 +872,25 @@ public class SbViewVolume implements Mutable {
 
 	}
 
+/*!
+  Return a copy SbViewVolume with narrowed depth by supplying
+  parameters for new near and far clipping planes.
+
+  \a nearval and \a farval should be relative to the current clipping
+  planes. A value of 1.0 is at the current near plane. A value of 0.0
+  is at the current far plane.
+
+  \sa zVector().
+*/
+public SbViewVolume zNarrow(float nearval, float farval) 
+{
+  SbDPViewVolume dpnarrowed = new SbDPViewVolume(dpvv.zNarrow(nearval, farval));
+  final SbViewVolume narrowed = new SbViewVolume();
+  dpnarrowed.copyValues(narrowed);
+  narrowed.dpvv.copyFrom(dpnarrowed);
+  return narrowed;
+}
+
 	////////////////////////////////////////////////////////////////////////
 	//
 	// Description:
@@ -887,7 +906,7 @@ public class SbViewVolume implements Mutable {
 
 	private SbViewVolume narrowed; // SINGLE_THREAD
 	
-	public SbViewVolume zNarrow(float nearVal, float farVal)
+	public SbViewVolume zNarrowOld(float nearVal, float farVal)
 	//
 	////////////////////////////////////////////////////////////////////////
 	{
@@ -1095,6 +1114,8 @@ public class SbViewVolume implements Mutable {
 		llfO.copyFrom(otherViewVolume.llfO);
 		lrfO.copyFrom(otherViewVolume.lrfO);
 		ulfO.copyFrom(otherViewVolume.ulfO);
+		
+		dpvv.copyFrom(otherViewVolume.dpvv);
 	}
 
 	////////////////////////////////////////////////////////////////////////

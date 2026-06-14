@@ -2284,6 +2284,7 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 		    sunLight[is].maxShadowDistance.setValue(1e4f + (1 - sinus)*1e5f);
 		    sunLight[is].bboxSize.setValue(5000+is*3000 + (1 - sinus)*10000, 5000+is*3000 + (1 - sinus)*10000, 2000);
 		    sunLight[is].nearBboxSize.setValue(80+is*10 + (1-sinus)*100,80+is*10+(1-sinus)*100,300);
+		    sunLight[is].distanceToBBoxCenter.setValue(1000+is*200 + (1 - sinus)*1000);
 		}
 	}
 

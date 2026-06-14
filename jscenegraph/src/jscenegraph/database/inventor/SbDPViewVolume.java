@@ -63,6 +63,13 @@ public class SbDPViewVolume implements Mutable {
 		  private			  final SbVec3d ulf = new SbVec3d();
 
 
+		  public SbDPViewVolume(SbDPViewVolume other) {
+			copyFrom(other);
+		}
+
+		  public SbDPViewVolume() {
+		}
+
 		  public void constructor() {
 			  type = null;
 			  projPoint.constructor();
@@ -598,5 +605,31 @@ public class SbDPViewVolume implements Mutable {
 		vv.llfO.copyFrom(dp_to_sbvec3f(llf, dummy)); // For compatibility
 		vv.lrfO.copyFrom(dp_to_sbvec3f(lrf, dummy));
 		vv.ulfO.copyFrom(dp_to_sbvec3f(ulf, dummy));
+	}
+
+	/*!
+	  Return a copy SbDPViewVolume with narrowed depth by supplying parameters
+	  for new near and far clipping planes.
+	
+	  \a nearval and \a farval should be relative to the current clipping
+	  planes. A value of 1.0 is at the current near plane. A value of
+	  0.0 is at the current far plane.
+	
+	  \sa zVector().
+	*/
+	public SbDPViewVolume zNarrow(double nearval, double farval)
+	{
+	  SbDPViewVolume narrowed = new SbDPViewVolume(this);
+	
+	  narrowed.nearDist = this.nearDist + (1.0f - nearval) * this.nearToFar;
+	  narrowed.nearToFar = this.nearDist + this.nearToFar * (1.0f - farval);
+	
+	  final SbVec3d dummy = new SbVec3d();
+	  getPlaneRectangle(narrowed.nearDist - this.nearDist,
+	                          narrowed.llf,
+	                          narrowed.lrf,
+	                          narrowed.ulf,
+	                          dummy);
+	  return narrowed;
 	}
 }

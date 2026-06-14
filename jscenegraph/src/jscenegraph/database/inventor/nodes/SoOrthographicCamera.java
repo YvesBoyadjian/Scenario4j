@@ -261,6 +261,51 @@ public SoOrthographicCamera()
 	       }
 	   }
 
+	// Doc in superclass.
+	public void viewBoundingBox(final SbBox3f box,
+	                                      final float aspect, final float slack, final float distanceToBBoxCenter)
+	{
+//	#if COIN_DEBUG
+//	  if (box.isEmpty()) {
+//	    SoDebugError::postWarning("SoOrthographicCamera::viewBoundingBox",
+//	                              "bounding box empty");
+//	    return;
+//	  }
+//	#endif // COIN_DEBUG
+
+	  // Get the radius of the bounding sphere.
+	  final SbSphere bs = new SbSphere();
+	  bs.circumscribe(box);
+	  float radius = bs.getRadius();
+	  float distance = Math.max(radius, distanceToBBoxCenter);
+
+	  // We want to move the camera in such a way that it is pointing
+	  // straight at the center of the scene bounding box -- but without
+	  // modifying the rotation value (so we can't use SoCamera::pointAt()),
+	  // and positioned at the edge of the bounding sphere.
+	  final SbVec3f cameradirection = new SbVec3f();
+	  orientation.getValue().multVec(new SbVec3f(0, 0, -1), cameradirection);
+	  position.setValue(box.getCenter().operator_add(cameradirection.operator_mul(-/*radius*/distance)));
+
+	  // Set up the clipping planes tangent to the bounding sphere of the scene.
+	  nearDistance.setValue(/*radius*/distance * ( -slack + 1));
+	  farDistance.setValue(/*radius*/distance * ( slack + 1));
+
+	  // The focal distance is simply the distance from the camera to the
+	  // scene midpoint. This field is not used in rendering, its just
+	  // provided to make it easier for the user to do calculations based
+	  // on the distance between the camera and the scene.
+	  focalDistance.setValue(/*radius*/distance);
+
+	  // Make sure that everything will still be inside the viewing volume
+	  // even if the aspect ratio "favorizes" width over height, and take the
+	  // slack factor into account.
+	  if (aspect < 1.0f)
+	    height.setValue(2 * radius / aspect);
+	  else
+	    height.setValue(2 * radius);
+	}
+
 	 ////////////////////////////////////////////////////////////////////////
 	  //
 	  // Description:
