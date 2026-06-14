@@ -1645,8 +1645,8 @@ updateDirectionalCamera(SoState state, SoShadowLightCache cache, final SbMatrix 
   cam.nearDistance.setValue( -box.getMax().getValueRead()[2]*1.01f);
   cam.farDistance.setValue( -box.getMin().getValueRead()[2]*1.01f);
   if (nearVisible) {
-	nearCam.nearDistance.setValue( -nearBox.getMax().getValueRead()[2]*1.01f);
-	nearCam.farDistance.setValue( -nearBox.getMin().getValueRead()[2]*1.01f);
+	nearCam.nearDistance.setValue(Math.min(nearCam.nearDistance.getValue(), -nearBox.getMax().getValueRead()[2]*1.01f));
+	nearCam.farDistance.setValue(Math.max(nearCam.farDistance.getValue(), -nearBox.getMin().getValueRead()[2]*1.01f));
   }
   final SbPlane plane = new SbPlane(dir, cam.position.getValue());
   // move to eye space

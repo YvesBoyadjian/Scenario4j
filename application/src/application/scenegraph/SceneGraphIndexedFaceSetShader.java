@@ -1494,7 +1494,11 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 		SoSeparator castingShadowScene = new SoSeparator();
 		castingShadowScene.renderCaching.setValue(SoSeparator.CacheEnabled.OFF);
 		
-		addWaterShadow(castingShadowScene, 150 + zTranslation,0.0f, false,false);
+		float waterHorizon = WATER_HORIZON;
+		for (int i = 0; i < 10; i++) {
+			addWaterShadow(castingShadowScene, 150 + zTranslation,0.0f, false,waterHorizon);
+			waterHorizon /= 1.3f;
+		}
 		//addWater(castingShadowScene,150 + zTranslation,0.0f, false,true);
 		
 	    SoSeparator shadowLandSep = new SoSeparator();
@@ -2154,7 +2158,7 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 	    
 	    SoTranslation waterTranslation = new SoTranslation();
 	    
-	    waterTranslation.translation.setValue( /*14000*/- 4000 + WATER_HORIZON/2, /*-8000*/0, - /*transl.translation.getValue().getZ()*/z);	    
+	    waterTranslation.translation.setValue( 3000, 0, - z);	    
 	    
 	    waterSeparator.addChild(waterTranslation);
 	    
@@ -2164,15 +2168,15 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 	    
 	}
 	
-	public void addWaterShadow(SoGroup group, float z, float transparency, boolean shining, boolean small) {
+	public void addWaterShadow(SoGroup group, float z, float transparency, boolean shining, final float waterHorizon) {
 		
 	    SoSeparator waterSeparator = new SoSeparator();
 	    
-		SoCubeWithoutTop water = new SoCubeWithoutTop();
+		SoCube water = new SoCube();
 		
 		water.depth.setValue(CUBE_DEPTH);
-		water.height.setValue(small ? WATER_HORIZON : WATER_HORIZON*2);
-		water.width.setValue(small ? WATER_HORIZON : WATER_HORIZON*2);
+		water.height.setValue(waterHorizon*2);
+		water.width.setValue(waterHorizon*2);
 		
 	    SoMaterial waterMat = new SoMaterial();
 	    waterMat.diffuseColor.setValue(0.12f*WATER_BRIGHTNESS,0.5f*WATER_BRIGHTNESS,0.55f*WATER_BRIGHTNESS); // For 6500 K display
@@ -2187,7 +2191,7 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 	    
 	    SoTranslation waterTranslation = new SoTranslation();
 	    
-	    waterTranslation.translation.setValue( /*14000*/- 4000 + WATER_HORIZON/2, /*-8000*/0, - /*transl.translation.getValue().getZ()*/z);	    
+	    waterTranslation.translation.setValue( 3000, 0, - z);	    
 	    
 	    waterSeparator.addChild(waterTranslation);
 	    
@@ -2287,7 +2291,7 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 		    sunLight[is].maxShadowDistance.setValue(1e4f + (1 - sinus)*1e5f);
 		    sunLight[is].bboxSize.setValue(5000+is*3000 + (1 - sinus)*10000, 5000+is*3000 + (1 - sinus)*10000, 2000);
 		    sunLight[is].nearBboxSize.setValue(80+is*10 + (1-sinus)*100,80+is*10+(1-sinus)*100,300);
-		    sunLight[is].distanceToBBoxCenter.setValue(1000+is*200 + Math.min(tan, 5)*1000);
+		    sunLight[is].distanceToBBoxCenter.setValue(500+is*100 + Math.min(tan, 10)*500);
 		}
 	}
 

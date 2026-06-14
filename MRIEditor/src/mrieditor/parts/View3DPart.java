@@ -54,6 +54,7 @@ import application.RasterProvider;
 import application.gui.OptionDialog;
 import application.objects.Hero;
 import application.scenegraph.SceneGraphIndexedFaceSetShader;
+import application.scenegraph.SoCubeWithoutTop;
 import application.swt.SoQtWalkViewer;
 import application.terrain.IslandLoader;
 import application.trails.TrailsLoader;
@@ -271,6 +272,7 @@ public class View3DPart {
 //		tableViewer.getTable().setLayoutData(new GridData(GridData.FILL_BOTH));
 
         SoQt.init("MRIEditor");
+        SoCubeWithoutTop.initClass();
 
 		SoDB.setDelaySensorTimeout(SbTime.zero()); // Necessary to avoid bug in Display
 		
