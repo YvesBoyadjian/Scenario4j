@@ -153,7 +153,7 @@ class PlatformWin32GLCanvas extends AbstractPlatformGLCanvas {
         validateAttributes(attribs);
 
         // Find this exact pixel format, though for now without multisampling. This comes later!
-        PIXELFORMATDESCRIPTOR pfd = PIXELFORMATDESCRIPTOR.callocStack();
+        PIXELFORMATDESCRIPTOR pfd = PIXELFORMATDESCRIPTOR.callocStack(stack);
         pfd.nSize((short) PIXELFORMATDESCRIPTOR.SIZEOF);
         pfd.nVersion((short) 1); // this should always be 1
         pfd.dwLayerMask(GDI32.PFD_MAIN_PLANE);
