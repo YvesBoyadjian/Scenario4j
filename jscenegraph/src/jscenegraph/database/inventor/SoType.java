@@ -167,6 +167,7 @@ public class SoType implements Mutable {
 		public final SoType parent = new SoType();
 		public final SbName name = new SbName();
 		public CreateMethod createMethod;
+		public Class className;
 	}
 	
 	
@@ -195,6 +196,14 @@ public class SoType implements Mutable {
 	// Returns the name associated with a type. 
 	public SbName getName() {
 		return new SbName(typeData[storage_index].name);
+	}
+	
+	/**
+	 * Java port
+	 * @return
+	 */
+	public Class getClassName() {
+		return typeData[storage_index].className;
 	}
 	
 	// Returns the type of the parent class. 
@@ -357,6 +366,19 @@ public class SoType implements Mutable {
 	}
 	
 	public static SoType createType(SoType parent, SbName name, CreateMethod createMethod, short data) {
+		return createType(parent, name, createMethod, data, null);
+	}
+	
+	/**
+	 * Java port
+	 * @param parent
+	 * @param name
+	 * @param createMethod
+	 * @param data
+	 * @param className java port
+	 * @return
+	 */
+	public static SoType createType(SoType parent, SbName name, CreateMethod createMethod, short data, Class className) {
 		
 		  final SoType t = new SoType();
 		  SoTypeData td;
@@ -374,6 +396,7 @@ public class SoType implements Mutable {
 		    td.parent.copyFrom(parent);
 		    td.name.copyFrom(name);
 		    td.createMethod = createMethod;
+		    td.className = className;
 		   
 		    nameDict.enter( name.getString(), t.storage_index);
 		   

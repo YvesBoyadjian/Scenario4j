@@ -59,6 +59,7 @@
 package jscenegraph.database.inventor.fields;
 
 import java.lang.reflect.Field;
+import java.util.Objects;
 
 import jscenegraph.database.inventor.SbDict;
 import jscenegraph.database.inventor.SbName;
@@ -707,6 +708,11 @@ public String fieldName(SoEngineOutput output) {
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
 		sb.append(getTypeId().getName().getString());
+		Class className = getTypeId().getClassName();
+		if (className != null && !Objects.equals(className,getClass())) {
+			sb.append(" : ");
+			sb.append(getClass().getSimpleName());
+		}
 		SbName name = getName();
 		if (name != null && name.getString() != null && !name.getString().isBlank()) {
 			sb.append(" (");

@@ -378,7 +378,8 @@ public static void SO_NODE_INIT_CLASS(Class className, String classPrintName, Cl
 		        classTypeId.put(className, SoType.createType(parent/*parentClass.getClassTypeId()*/,                     
 		                       new SbName(classPrintName),                                            
 		                       createMethod/*className.createInstance*/,                                
-		                       (short)(SoNode.nextActionMethodIndex++)));      
+		                       (short)(SoNode.nextActionMethodIndex++),
+		                       className));      
 		        
 			} catch (SecurityException e1) {
 				throw new RuntimeException(e1);
