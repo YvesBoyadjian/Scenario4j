@@ -26,9 +26,11 @@ public class SoEnemies extends SoSeparator {
 
     private EnemyFamily enemies;
 
+	// Hero position with translation 
     private SbVec3f referencePoint;
     //private SbVec3f cameraDirection;
     private final SbBSPTree bspTree = new SbBSPTree();
+    // Sphere around the hero
     private final SbSphere nearSphere = new SbSphere();
     private final Set<Integer> actualChildrenInstances = new HashSet<>();
     private final Map<Integer,SoPill> instancesToCollectibles = new HashMap<>();
@@ -80,11 +82,12 @@ public class SoEnemies extends SoSeparator {
     }
 
     void update_children_list() {
-
+    	// 250 m around the hero
         nearSphere.setValue(referencePoint, 250);
 
         final SbListInt nearIDS = new SbListInt();
         nearIDS.truncate(0);
+        // Find enemies around hero
         bspTree.findPoints(nearSphere,nearIDS);
 
         final Set<Integer> nearChildrenInstances = new HashSet<>();

@@ -206,6 +206,8 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 
 	SoTexture2 gigaTexture;
 	
+	// Position of hero
+	
 	float current_x;
 	
 	float current_y;
@@ -230,6 +232,8 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 	//SoTouchLODMaster masterS;
 	
 	//final SbBSPTree sealsBSPTree = new SbBSPTree();
+	
+	// Hero position with translation 
 	
 	final SbVec3f targetsRefPoint = new SbVec3f();
 
