@@ -54,6 +54,8 @@
 
 package jscenegraph.database.inventor.fields;
 
+import java.awt.image.BufferedImage;
+
 import jscenegraph.database.inventor.SbVec2s;
 import jscenegraph.database.inventor.SoInput;
 import jscenegraph.port.Util;
@@ -207,6 +209,39 @@ setValue(final SbVec2s s, int nc, boolean srgb, MemoryBuffer b, boolean dontCopy
         bytes = null;
 
     valueChanged();
+}
+
+/**
+ * Java port 
+ * 
+ * @param textureBufferedImage
+ * @param obj
+ */
+public void setValue(BufferedImage textureBufferedImage, boolean obj) {
+    int w = textureBufferedImage.getWidth();
+    int h = textureBufferedImage.getHeight();
+    SbVec2s s = new SbVec2s((short)w,(short)h);
+    int nc = 3;
+    int numPixels = (int)s.getX()*s.getY();
+    int numBytes = numPixels*3;
+    MemoryBuffer b = MemoryBuffer.allocateBytes(numBytes);
+    int j=0;
+    final byte[] bytes = new byte[3 * numPixels];
+    int index = 0;
+    for(int i=0; i< numPixels;i++) {
+        int x = i%w;
+        int y = obj ? h - i/w -1 : i/w;
+        int rgb = textureBufferedImage.getRGB(x, y);
+        bytes[index] = (byte)((rgb & 0x00FF0000) >>> 16);
+        index++;
+        bytes[index] = (byte)((rgb & 0x0000FF00) >>> 8);
+        index++;
+        bytes[index] = (byte)((rgb & 0x000000FF) >>> 0);
+        index++;
+    }
+    b.setBytes(j, bytes, 3 * numPixels) ; j+=3;
+
+    setValue(s,nc,true,b);
 }
 
 ////////////////////////////////////////////////////////////////////////

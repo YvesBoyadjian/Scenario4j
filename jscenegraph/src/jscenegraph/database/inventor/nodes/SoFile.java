@@ -488,30 +488,7 @@ private static Path findFileWithExtension(Path parentPath, String extension, boo
         BufferedImage textureBufferedImage = ImageIO.read(imagePath.toUri().toURL());
         SoTexture2 texture = new SoTexture2();
         //texture.filename.setValue(imagePath.toString());
-        int w = textureBufferedImage.getWidth();
-        int h = textureBufferedImage.getHeight();
-        SbVec2s s = new SbVec2s((short)w,(short)h);
-        int nc = 3;
-        int numPixels = (int)s.getX()*s.getY();
-        int numBytes = numPixels*3;
-        MemoryBuffer b = MemoryBuffer.allocateBytes(numBytes);
-        int j=0;
-        final byte[] bytes = new byte[3 * numPixels];
-        int index = 0;
-        for(int i=0; i< numPixels;i++) {
-            int x = i%w;
-            int y = obj ? h - i/w -1 : i/w;
-            int rgb = textureBufferedImage.getRGB(x, y);
-            bytes[index] = (byte)((rgb & 0x00FF0000) >>> 16);
-            index++;
-            bytes[index] = (byte)((rgb & 0x0000FF00) >>> 8);
-            index++;
-            bytes[index] = (byte)((rgb & 0x000000FF) >>> 0);
-            index++;
-        }
-        b.setBytes(j, bytes, 3 * numPixels) ; j+=3;
-
-        texture.image.setValue(s,nc,true,b);
+        texture.image.setValue(textureBufferedImage, obj);
 
         return texture;
     }
