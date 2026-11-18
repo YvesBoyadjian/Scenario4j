@@ -652,7 +652,7 @@ public class MainGLFW {
 	                }
 	
 	                SbViewportRegion vr = this.getSceneHandler().getViewportRegion();
-	                SoNode sg_ = this.getSceneHandler().getSceneGraph();
+	                SoNode sg_ = sg.getRealWorldSceneGraph();//this.getSceneHandler().getSceneGraph();
 	
 	//				TargetSearchRunnable tsr = new TargetSearchRunnable(this, vr, sg);
 	//				tsr.run();

@@ -80,24 +80,24 @@ public class GLBitmap {
         float yScreenEnd = yScreenStart + height;
 
         if (a == null)
-        a = new SbVec3fSingleFast(xScreenStart,yScreenStart,0); // Reverse Z
+        a = new SbVec3fSingleFast(xScreenStart,yScreenStart,1); // Reverse Z
         else {
-            a.setValue(xScreenStart,yScreenStart,0); // Reverse Z
+            a.setValue(xScreenStart,yScreenStart,1); // Reverse Z
         }
         if (b == null)
-        b = new SbVec3fSingleFast(xScreenEnd,yScreenStart,0); // Reverse Z
+        b = new SbVec3fSingleFast(xScreenEnd,yScreenStart,1); // Reverse Z
         else {
-            b.setValue(xScreenEnd,yScreenStart,0); // Reverse Z
+            b.setValue(xScreenEnd,yScreenStart,1); // Reverse Z
         }
         if (c == null)
-        c = new SbVec3fSingleFast(xScreenStart,yScreenEnd,0); // Reverse Z
+        c = new SbVec3fSingleFast(xScreenStart,yScreenEnd,1); // Reverse Z
         else {
-            c.setValue(xScreenStart,yScreenEnd,0); // Reverse Z
+            c.setValue(xScreenStart,yScreenEnd,1); // Reverse Z
         }
         if (d == null)
-        d = new SbVec3fSingleFast(xScreenEnd,yScreenEnd,0); // Reverse Z
+        d = new SbVec3fSingleFast(xScreenEnd,yScreenEnd,1); // Reverse Z
         else {
-            d.setValue(xScreenEnd,yScreenEnd,0); // Reverse Z
+            d.setValue(xScreenEnd,yScreenEnd,1); // Reverse Z
         }
 
         a = transformer.transform(a,a);

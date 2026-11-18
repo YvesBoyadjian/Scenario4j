@@ -158,6 +158,11 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 		}
 	};
 	
+	/**
+	 * Separator for realWorld objects
+	 */
+	private SoSeparator realWorldSep = new SoSeparator();
+	
 	private final SoTranslation transl = new SoTranslation();
 	
 	private float zTranslation;
@@ -726,8 +731,12 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 		computeEnemies();
 
 		sep.renderCaching.setValue(SoSeparator.CacheEnabled.OFF);
+		
+		sep.addChild(realWorldSep);
 
-		sep.addChild(new SoPerspectiveCamera());
+		realWorldSep.addChild(new SoPerspectiveCamera());
+		
+		realWorldSep.renderCaching.setValue(SoSeparator.CacheEnabled.OFF);
 
 	    SoCallback callback = new SoCallback();
 	    
@@ -740,7 +749,7 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 	    	}
 	    });
 	    
-	    sep.addChild(callback);
+	    realWorldSep.addChild(callback);
 
 		SoCallback objectivesCallback = new SoCallback();
 		objectivesCallback.setCallback(action->{
@@ -750,7 +759,7 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 			}
 		});
 
-		sep.addChild(objectivesCallback);
+		realWorldSep.addChild(objectivesCallback);
 	    
 	    //sep.addChild(new SoAbort());
 	    
@@ -760,15 +769,15 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 	    environment.fogColor.setValue(new SbColor(SKY_COLOR.darker().operator_mul(overallContrast)));
 	    environment.fogVisibility.setValue(4.5e4f/*5e4f*/);
 	    
-	    sep.addChild(environment);
+	    realWorldSep.addChild(environment);
 
 	    SoComplexity complexity = new SoComplexity();
 	    complexity.textureQuality.setValue(0.9f);
-	    sep.addChild(complexity);
+	    realWorldSep.addChild(complexity);
 	    
 	    SoDepthBuffer depthBuffer1 = new SoDepthBuffer();
 	    depthBuffer1.clamp.setValue(true);
-	    sep.addChild(depthBuffer1);	    
+	    realWorldSep.addChild(depthBuffer1);	    
 	    
 	    sunView = new SoSphere();
 	    sunView.radius.setValue(SUN_RADIUS/SUN_REAL_DISTANCE*SUN_FAKE_DISTANCE);
@@ -889,10 +898,10 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 	    sky[3].intensity.setValue(SKY_INTENSITY*overallContrast);
 	    sky[3].direction.setValue(-1, 0, -1);
 	    
-	    sep.addChild(sky[0]);
-	    sep.addChild(sky[1]);
-	    sep.addChild(sky[2]);
-	    sep.addChild(sky[3]);
+	    realWorldSep.addChild(sky[0]);
+	    realWorldSep.addChild(sky[1]);
+	    realWorldSep.addChild(sky[2]);
+	    realWorldSep.addChild(sky[3]);
 	    
 	    //shadowGroup = new SoSeparator();
 //	    shadowGroup = new SoShadowGroup() {
@@ -1029,7 +1038,7 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 
 		SoCallback douglasLoadCountCallback = new SoCallback();
 
-		sep.addChild(douglasLoadCountCallback);
+		realWorldSep.addChild(douglasLoadCountCallback);
 
 		douglasLoadCountCallback.setCallback((action)->{
 			douglasLoadCount.reset();
@@ -1491,7 +1500,7 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 
 		shadowGroup.addChild(actorsGroup);
 
-		sep.addChild(shadowGroup);
+		realWorldSep.addChild(shadowGroup);
 
 		// _______________________________________________ shadows
 		
@@ -1694,7 +1703,7 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 		
 		rulerSwitch.addChild(rulerText);
 		
-		sep.addChild(rulerSwitch);
+		realWorldSep.addChild(rulerSwitch);
 		
 		// ____________________________________________________ Polyline
 	    
@@ -1712,7 +1721,7 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 		
 		polylineSep.addChild(polylineSwitch);
 		
-		sep.addChild(polylineSep);
+		realWorldSep.addChild(polylineSep);				
 		
 		sep.addChild(onScreenShaderProgram);
 
@@ -2207,6 +2216,10 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 	
 	public SoNode getSceneGraph() {
 		return sep;
+	}
+	
+	public SoNode getRealWorldSceneGraph() {
+		return realWorldSep;
 	}
 
 	@Override
