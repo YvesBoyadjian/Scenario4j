@@ -1115,10 +1115,47 @@ writeToFile(final String filename, final SbName filetypeextension)
                                                 bytes,
                                                 (int)(size.getValue()[0]), (int)(size.getValue()[1]), comp,
                                                 filetypeextension.getString());
-  
-  
-  
+    
   return (ret != 0) ? true : false;
+}
+
+/**
+ * Writes to bufferedImage
+ * @param bufferedImage
+ * @return
+ */
+	public boolean writeToBufferedImage(final BufferedImage[] bufferedImage) {
+	  if (SoOffscreenRendererP.offscreenContextsNotSupported()) {
+		    SoDebugError.post("writeToFile",
+		                       "Offscreen contexts not supported.");
+		    return false;
+		  }
+	  
+	  final SbVec2s size = new SbVec2s(pimpl.viewport.getViewportSizePixels());
+	  int comp = (int) this.getComponents().ordinal();
+	  byte[] bytes = this.getBuffer();
+	  bufferedImage[0] = simage_get_image(bytes, (int)(size.getValue()[0]), (int)(size.getValue()[1]), comp);
+
+	  return bufferedImage[0] != null;
+	}
+
+/**
+ * Gets the image
+ * @param bytes
+ * @param w
+ * @param h
+ * @param numcomponents
+ * @return
+ */
+public BufferedImage simage_get_image(
+        byte[] bytes,
+        int w, int h, int numcomponents
+		) {
+	BufferedImage img = new BufferedImage(w, h, BufferedImage.TYPE_3BYTE_BGR);
+	byte[] array = ((DataBufferByte) img.getRaster().getDataBuffer()).getData();
+	System.arraycopy(bytes, 0, array, 0, array.length);
+
+	return img;
 }
 
 public  int simage_save_image(String filename,
@@ -1127,9 +1164,8 @@ public  int simage_save_image(String filename,
         String filenameextension) {
 	
 	//BufferedImage img = null;
-	BufferedImage img = new BufferedImage(w, h, BufferedImage.TYPE_3BYTE_BGR);
-	byte[] array = ((DataBufferByte) img.getRaster().getDataBuffer()).getData();
-	System.arraycopy(bytes, 0, array, 0, array.length);
+	BufferedImage img = simage_get_image(bytes, w, h, numcomponents);
+	
 	File f = new File(filename+"."+filenameextension);
 			try {
 				ImageIO.write(img, filenameextension, f);

@@ -1976,7 +1976,7 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 		final float[] currentHeroLife = new float[1];
 
 		lifeBarCallback.setCallback(action->{
-			if (action.isOfType(SoGLRenderAction.getClassTypeId())) {
+			if (action.isOfType(SoGLRenderAction.getClassTypeId()) && hero != null) {
 				SoGLRenderAction glRenderAction = (SoGLRenderAction) action;
 				float viewportAspectRatio = glRenderAction.getViewportRegion().getViewportAspectRatio();
 				if(currentViewportAspectRatio[0] != viewportAspectRatio
@@ -2853,6 +2853,8 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 		updateCatPosition(delta_t);
 		updateActors(delta_t);
 		updateTargetDisplay();
+		updateEnemiesPhysics();
+		updateEnemiesVision();
 
 		runIdleCB();
 
@@ -3226,6 +3228,17 @@ public class SceneGraphIndexedFaceSetShader implements SceneGraph {
 		
 		targetDisplay.string.setValues(0,targets);
 		targetDisplay.string.setNum(shotTargetSize);
+	}
+	
+	private void updateEnemiesPhysics() {
+		enemiesSeparator.updatePhysics();
+	}
+	
+	/**
+	 * Updates the vision of enemies
+	 */
+	private void updateEnemiesVision() {
+		enemiesSeparator.updateVision();
 	}
 
 	public void loadShots(Properties saveGameProperties) {

@@ -62,10 +62,6 @@ public class SoEnemies extends SoSeparator {
 
     ////////////////////////////////////////////////////////////////////////
     {
-        update_children_list();
-
-        update_children_position();
-
         SoState state = action.getState();
 
         // never cache this node
@@ -162,7 +158,7 @@ public class SoEnemies extends SoSeparator {
         super.removeChild(target);
     }
 
-    private void update_children_position() {
+    private void update_children_position_and_orientation() {
 
         long now = System.nanoTime();
         float deltaT = (now - nanoTime)*1.0e-9f;
@@ -177,6 +173,14 @@ public class SoEnemies extends SoSeparator {
 
         for(Integer instance : actualChildrenInstances) {
             SoPill pill = instancesToCollectibles.get(instance);
+            
+            if (pill instanceof SoPillWithScreen pillWithScreen) {
+            	final float rotation_speed = 0.3f;
+            	float orientation = pillWithScreen.getOrientation();
+            	orientation += deltaT * rotation_speed;
+            	pillWithScreen.setOrientation(orientation);
+            }
+            
             SbVec3f pillPosition = pill.position.translation.getValue();
             SbVec3f direction = referencePoint.operator_minus(pillPosition.operator_minus(feetToCenter,dummy2), dummy);
             final float distance = direction.length(); 
@@ -211,4 +215,22 @@ public class SoEnemies extends SoSeparator {
     public float getNearestEnemyDistance() {
         return nearestCollectibleDistance;
     }
+    
+    public void updatePhysics() {
+        update_children_list();
+        update_children_position_and_orientation();    	
+    }
+    
+    /**
+     * Updates the vision of pills
+     */
+	public void updateVision() {
+        for(Integer instance : actualChildrenInstances) {
+            SoPill pill = instancesToCollectibles.get(instance);
+            
+            if (pill instanceof SoPillWithScreen pillWithScreen) {
+            	pillWithScreen.look(sg);
+            }
+        }
+	}
 }

@@ -23,8 +23,8 @@ public class SoPills {
 	 * @param instance
 	 * @return
 	 */
-	public SoPill instantiate(int instance) {
-		return new SoPill(instance, this);
+	public SoPillWithScreen instantiate(int instance) {
+		return new SoPillWithScreen(instance, this);
 	}
 
     void buildCommonPart() {
