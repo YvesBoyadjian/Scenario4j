@@ -20,7 +20,7 @@ public class Wglglue_contextdata {
 	  /*HBITMAP*/int bitmap, oldbitmap;
 	  /*HGLRC*/int wglcontext;
 
-	  /*HGLRC*/int storedcontext;
+	  /*HGLRC*/long storedcontext;
 	  /*HDC*/int storeddc;
 
 	  /*WGLGLUE_HPBUFFER*/long hpbuffer;

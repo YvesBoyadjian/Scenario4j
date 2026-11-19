@@ -32,7 +32,7 @@ public class SoPillWithScreen extends SoPill {
 	/**
 	 * Definition of the look
 	 */
-	private final short LOOK_DEFINITION = 99;
+	private final short LOOK_DEFINITION = 500;
 	
 	public final SoRotation rotation = new SoRotation();
 	
@@ -116,11 +116,22 @@ public class SoPillWithScreen extends SoPill {
 		SbViewportRegion viewportregion = new SbViewportRegion(LOOK_DEFINITION, LOOK_DEFINITION);
 		SoOffscreenRenderer offscreenRenderer = new SoOffscreenRenderer(viewportregion);
 		
-		SoNode scene = sg.getSceneGraph();
+		SoNode scene = sg.getRealWorldSceneGraph();
 		
 //		if (offscreenRenderer.render(scene)) {
-////			MemoryBuffer b = MemoryBuffer.allocateFromByteArray(offscreenRenderer.getBuffer());
-//////			image.image.setValue(new SbVec2s(LOOK_DEFINITION, LOOK_DEFINITION),3,true,b,true);
+//			BufferedImage[] retVal = new BufferedImage[1];
+//			offscreenRenderer.writeToBufferedImage(retVal);
+//			File outputfile = new File("image.jpg");
+//			if (!outputfile.exists()) {
+//				try {
+//					ImageIO.write(retVal[0], "jpg", outputfile);
+//				} catch (IOException e) {
+//					// TODO Auto-generated catch block
+//					e.printStackTrace();
+//				}
+//			}
+//			MemoryBuffer b = MemoryBuffer.allocateFromByteArray(offscreenRenderer.getBuffer());
+////			image.image.setValue(new SbVec2s(LOOK_DEFINITION, LOOK_DEFINITION),3,true,b,true);
 //		}
 		
 		offscreenRenderer.destructor();

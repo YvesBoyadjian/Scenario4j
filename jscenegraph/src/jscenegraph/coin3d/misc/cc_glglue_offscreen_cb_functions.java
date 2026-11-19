@@ -3,6 +3,8 @@
  */
 package jscenegraph.coin3d.misc;
 
+import jscenegraph.coin3d.glue.Wglglue_contextdata;
+
 /**
  * @author Yves Boyadjian
  *
@@ -10,7 +12,7 @@ package jscenegraph.coin3d.misc;
 public class cc_glglue_offscreen_cb_functions {
 	
 	public interface CreateOffscreen {
-		Object apply( int width, int height);
+		Wglglue_contextdata apply( int width, int height);
 	}
 
     //cc_glglue_offscreen_data (*create_offscreen)( int width, int height);

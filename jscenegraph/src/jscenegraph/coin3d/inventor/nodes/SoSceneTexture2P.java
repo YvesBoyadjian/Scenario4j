@@ -7,6 +7,7 @@ import java.util.Objects;
 
 import com.jogamp.opengl.GL2;
 
+import jscenegraph.coin3d.glue.Wglglue_contextdata;
 import jscenegraph.coin3d.glue.cc_glglue;
 import jscenegraph.coin3d.inventor.elements.SoLightElement;
 import jscenegraph.coin3d.inventor.elements.SoMultiTextureEnabledElement;
@@ -75,7 +76,7 @@ public class SoSceneTexture2P implements Destroyable {
 		  // pederb, 2007-03-07
 
 		  public SoSceneTexture2 api; //ptr
-		  public Object glcontext; //ptr
+		  public Wglglue_contextdata glcontext; //ptr
 		  public final SbVec2s glcontextsize = new SbVec2s();
 		  public /*GL2*/int contextid;
 

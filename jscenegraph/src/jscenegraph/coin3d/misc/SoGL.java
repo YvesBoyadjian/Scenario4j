@@ -655,7 +655,7 @@ public static int cc_glglue_glGenRenderbuffers(cc_glglue glue/*, int n, int rend
 	  return renderbuffers[0];
 }
 
-public static Object cc_glglue_context_create_offscreen(short width, short height) {
+public static Wglglue_contextdata cc_glglue_context_create_offscreen(short width, short height) {
 	  if (offscreen_cb != null && offscreen_cb.create_offscreen != null) {
 		    return (offscreen_cb.create_offscreen).apply(width, height);
 		  } else {
@@ -697,20 +697,11 @@ public static boolean cc_glglue_context_make_current(Object ctx) {
 //		#elif defined(HAVE_GLX)
 //		  return glxglue_context_make_current(ctx);
 //		#elif defined(HAVE_WGL)
-			  if( ctx instanceof Wglglue_contextdata) {
-				  Wglglue_contextdata wglglue_contextdata = (Wglglue_contextdata)ctx;
-				  long window = wglglue_contextdata.pbufferwnd;
-
-					// Make the OpenGL context current
-					glfwMakeContextCurrent(window);
-			        GLCapabilities swtCapabilities = GL.createCapabilities();	        
-					return true;
-			  }
-		  return false;//wglglue_context_make_current(ctx); TODO
+			  return Gl_wgl.wglglue_context_make_current(ctx);
 		  }
 }
 
-public static void cc_glglue_context_reinstate_previous(Object ctx) {
+public static void cc_glglue_context_reinstate_previous(Wglglue_contextdata ctx) {
 	  /* FIXME: I believe two cc_glglue_context_make_current() invocations
     before invoking this function would make this function behave
     erroneously, as previous contexts are not stacked (at least not
@@ -725,7 +716,7 @@ public static void cc_glglue_context_reinstate_previous(Object ctx) {
  if (offscreen_cb != null && offscreen_cb.reinstate_previous != null) {
    (offscreen_cb.reinstate_previous).apply(ctx);
  } else {
- //wglglue_context_reinstate_previous(ctx); TODO
+	 Gl_wgl.wglglue_context_reinstate_previous(ctx);
  }
 }
 

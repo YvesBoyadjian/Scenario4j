@@ -38,24 +38,26 @@ import com.jogamp.opengl.GL2;
 import jscenegraph.coin3d.TidBits;
 import jscenegraph.coin3d.glue.Gl;
 import jscenegraph.coin3d.glue.Gl_wgl;
+import jscenegraph.coin3d.glue.Wglglue_contextdata;
 import jscenegraph.coin3d.inventor.misc.SoContextHandler;
 import jscenegraph.coin3d.misc.SoGL;
 import jscenegraph.database.inventor.SbVec2s;
 import jscenegraph.database.inventor.elements.SoGLCacheContextElement;
 import jscenegraph.database.inventor.errors.SoDebugError;
+import jscenegraph.port.Destroyable;
 import jscenegraph.port.Util;
 
 /**
  * @author Yves Boyadjian
  *
  */
-public class CoinOffscreenGLCanvas {
+public class CoinOffscreenGLCanvas implements Destroyable {
 	  
 	  private static int tilesizeroof = Integer.MAX_VALUE; // java port
 	  
 	  private final SbVec2s size = new SbVec2s();
 
-	  private Object context;
+	  private Wglglue_contextdata context;
 	  private int renderid;
 	  private Object current_hdc;
 	  

@@ -42,7 +42,7 @@ public class Gl_wgl {
    Or the older version:
      http://www.oss.sgi.com/projects/ogl-sample/registry/EXT/wgl_pbuffer.txt
 */
-public static Object
+public static Wglglue_contextdata
 wglglue_context_create_offscreen(int width, int height, boolean texture)
 {
   Wglglue_contextdata swctx, pbctx = null; // ptr
@@ -212,11 +212,12 @@ wglglue_contextdata_cleanup( Wglglue_contextdata ctx)
     }
   }
   if (ctx.pbufferwnd != 0) {
-    boolean r = User32.DestroyWindow(null, ctx.pbufferwnd);
-    if (!r) {
-    	Win32Api.cc_win32_print_error("wglglue_contextdata_cleanup",
-                           "DestroyWindow", WinBase.GetLastError());
-    }
+	  glfwDestroyWindow(ctx.pbufferwnd);
+//    boolean r = User32.DestroyWindow(null, ctx.pbufferwnd);
+//    if (!r) {
+//    	Win32Api.cc_win32_print_error("wglglue_contextdata_cleanup",
+//                           "DestroyWindow", WinBase.GetLastError());
+//    }
   }
 
   // free(ctx); java port
@@ -571,6 +572,50 @@ wglglue_context_create_pbuffer( Wglglue_contextdata ctx, boolean warnonerrors)
 //  }
 
   return true;
+}
+
+public static boolean
+wglglue_context_make_current(Object ctx)
+{
+  Wglglue_contextdata context = (Wglglue_contextdata)ctx;
+
+  context.storedcontext = glfwGetCurrentContext(); //wglGetCurrentContext();
+  if (context.storedcontext != 0) { context.storeddc = 1/*wglGetCurrentDC()*/; }
+//  HDC hdc;
+//  if(context.hpbuffer != 0)
+//	  hdc = wglglue_wglGetPbufferDC(context->hpbuffer);
+//  else
+//	  hdc = context.memorydc;
+  
+  if( ctx instanceof Wglglue_contextdata) {
+	  Wglglue_contextdata wglglue_contextdata = (Wglglue_contextdata)ctx;
+	  long window = wglglue_contextdata.pbufferwnd;
+
+		// Make the OpenGL context current
+		glfwMakeContextCurrent(window);
+        GLCapabilities swtCapabilities = GL.createCapabilities();	        
+		return true;
+  }
+  return false;
+  
+//  return wglMakeCurrent(hdc, context.wglcontext) ? true : false;
+}
+
+public static void
+wglglue_context_reinstate_previous(Wglglue_contextdata ctx)
+{
+  /* The previous context is stored and reset to make it possible to
+     use an SoOffscreenRenderer from for instance an SoCallback node
+     callback during SoGLRenderAction traversal, without the need for
+     any extra book-keeping on the application side. */
+
+  Wglglue_contextdata context = (Wglglue_contextdata )ctx;
+
+  if (context.storedcontext != 0 /*&& context.storeddc != 0*/) {
+	  glfwMakeContextCurrent(context.storedcontext);//wglMakeCurrent(context.storeddc, context.storedcontext);
+    context.storedcontext = 0/*null*/;
+  }
+//  else { wglMakeCurrent(null, null); }
 }
 
 public static void

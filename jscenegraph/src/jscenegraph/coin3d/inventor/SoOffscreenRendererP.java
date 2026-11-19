@@ -77,6 +77,7 @@ public class SoOffscreenRendererP implements Destroyable {
 		  public void destructor()
 		  {
 		    if (this.didallocation) { Destroyable.delete( this.renderaction); }
+		    Destroyable.delete(glcanvas);
 		  }
 
 		  //static SbBool offscreenContextsNotSupported(void);
@@ -373,6 +374,7 @@ public class SoOffscreenRendererP implements Destroyable {
 		               this.backgroundcolor.getValueRead()[1],
 		               this.backgroundcolor.getValueRead()[2],
 		               0.0f);
+   	   		gl2.glClearDepth(0d); // Reverse Z
 
 		  // Make this large to get best possible quality on any "big-image"
 		  // textures (from using SoTextureScalePolicy).
